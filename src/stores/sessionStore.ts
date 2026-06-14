@@ -1,0 +1,122 @@
+import { create } from 'zustand';
+import * as Crypto from 'expo-crypto';
+import { ActiveSession, SessionConfig, SessionState, Position, SessionCheckpoint } from '../types';
+
+function generateId(): string {
+  return Crypto.randomUUID();
+}
+
+interface SessionStore {
+  session: ActiveSession | null;
+  /** Set by HomeScreen / Routines → SessionModal auto-starts it */
+  pendingConfig: SessionConfig | null;
+  /** Controls visibility of the DrillConfigModal */
+  drillConfigVisible: boolean;
+  /** Checkpoint found on startup — drives ResumePromptModal */
+  pendingCheckpoint: SessionCheckpoint | null;
+
+  // Drill config modal
+  openDrillConfig: () => void;
+  closeDrillConfig: () => void;
+
+  // Checkpoint
+  setPendingCheckpoint: (cp: SessionCheckpoint | null) => void;
+
+  // Lifecycle
+  initSession: (config: SessionConfig, totalPlanned: number) => void;
+  endSession: () => void;
+  setPendingConfig: (config: SessionConfig) => void;
+  clearPendingConfig: () => void;
+
+  // State transitions
+  setState: (state: SessionState) => void;
+  setCountdown: (value: number) => void;
+
+  // Position / shot
+  setCurrentPosition: (pos: Position | null, shot: string | null) => void;
+  setNextPosition: (pos: Position | null) => void;
+  incrementRep: () => void;
+  advanceMove: () => void;
+  advanceSet: () => void;
+
+  // Pace
+  setPaceStep: (step: number) => void;
+
+  // Timers
+  setWorkSecsRemaining: (secs: number) => void;
+  setRestSecsRemaining: (secs: number) => void;
+  tickElapsed: () => void;
+}
+
+export const useSessionStore = create<SessionStore>((set) => ({
+  session: null,
+  pendingConfig: null,
+  drillConfigVisible: false,
+  pendingCheckpoint: null,
+
+  openDrillConfig:  () => set({ drillConfigVisible: true }),
+  closeDrillConfig: () => set({ drillConfigVisible: false }),
+
+  setPendingCheckpoint: (cp) => set({ pendingCheckpoint: cp }),
+
+  setPendingConfig:  (config) => set({ pendingConfig: config }),
+  clearPendingConfig: ()      => set({ pendingConfig: null }),
+
+  initSession: (config, totalPlanned) => set({
+    session: {
+      sessionId: generateId(),
+      state: 'idle',
+      config,
+      currentPosition: null,
+      nextPosition: null,
+      currentShot: null,
+      repCount: 0,
+      setIndex: 0,
+      moveIndex: 0,
+      workSecsRemaining: config.duration * 60,
+      restSecsRemaining: 0,
+      countdownValue: 3,
+      totalMovementsPlanned: totalPlanned,
+      startedAt: Date.now(),
+      elapsedSeconds: 0,
+      livePaceStep: 3,
+    },
+  }),
+
+  endSession: () => set({ session: null }),
+
+  setState: (state) =>
+    set((s) => s.session ? { session: { ...s.session, state } } : s),
+
+  setCountdown: (value) =>
+    set((s) => s.session ? { session: { ...s.session, countdownValue: value } } : s),
+
+  setCurrentPosition: (pos, shot) =>
+    set((s) => s.session ? { session: { ...s.session, currentPosition: pos, currentShot: shot } } : s),
+
+  setNextPosition: (pos) =>
+    set((s) => s.session ? { session: { ...s.session, nextPosition: pos } } : s),
+
+  incrementRep: () =>
+    set((s) => s.session ? { session: { ...s.session, repCount: s.session.repCount + 1 } } : s),
+
+  advanceMove: () =>
+    set((s) => s.session ? { session: { ...s.session, moveIndex: s.session.moveIndex + 1 } } : s),
+
+  advanceSet: () =>
+    set((s) =>
+      s.session ? { session: { ...s.session, setIndex: s.session.setIndex + 1, moveIndex: 0 } } : s),
+
+  setPaceStep: (step) =>
+    set((s) => s.session ? { session: { ...s.session, livePaceStep: Math.min(6, Math.max(0, step)) } } : s),
+
+  setWorkSecsRemaining: (secs) =>
+    set((s) => s.session ? { session: { ...s.session, workSecsRemaining: secs } } : s),
+
+  setRestSecsRemaining: (secs) =>
+    set((s) => s.session ? { session: { ...s.session, restSecsRemaining: secs } } : s),
+
+  tickElapsed: () =>
+    set((s) =>
+      s.session ? { session: { ...s.session, elapsedSeconds: s.session.elapsedSeconds + 1 } } : s),
+}));

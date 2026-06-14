@@ -1,0 +1,2385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SquashGhostingX — AI-Powered Squash Ghosting Training</title>
+<meta name="description" content="Train smarter with AI voice coaching, 6-point and 10-point court ghosting systems, real-time analytics and pattern intelligence. Free on iOS and Android.">
+<meta name="keywords" content="squash ghosting, squash training app, ghosting drill, squash fitness, court movement, squash android app">
+<meta property="og:title" content="SquashGhostingX — AI Squash Ghosting Coach">
+<meta property="og:description" content="The most advanced squash ghosting app. AI voice coaching, 6 & 10 point systems, analytics. Free on iOS & Android.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#FF6B35">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23FF6B35'/%3E%3Ctext x='16' y='23' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='900' font-size='14'%3ESX%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="App_Home_Screen.jpeg">
+<meta property="og:image" content="https://squashghostingx.com/App_Home_Screen.jpeg">
+<meta property="og:url" content="https://squashghostingx.com">
+<meta property="og:site_name" content="SquashGhostingX">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SquashGhostingX — AI-Powered Squash Ghosting Training">
+<meta name="twitter:description" content="The only squash app with AI voice coaching, 6-point & 10-point ghosting systems and real-time analytics. Free on iOS and Android.">
+<meta name="twitter:image" content="https://squashghostingx.com/App_Home_Screen.jpeg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"MobileApplication",
+  "name":"SquashGhostingX",
+  "operatingSystem":"iOS, Android",
+  "applicationCategory":"SportsApplication",
+  "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},
+  "description":"AI-powered squash ghosting training with voice coaching, 6 & 10 point court systems and analytics. Free on iOS and Android.",
+  "author":{"@type":"Person","name":"Varish Gahlot"}
+}
+</script>
+<style>
+:root{
+  --bg:#080401;--bg2:#0F0700;--bg3:#170C02;--bg4:#1E1104;--bg5:#271607;
+  --accent:#FF6B35;--accent-b:#CC4A18;--accent-l:#FF9268;
+  --glow:rgba(255,107,53,.08);--glow2:rgba(255,107,53,.15);--glow3:rgba(255,107,53,.30);
+  --border:rgba(255,255,255,.07);--borderacc:rgba(255,107,53,.25);
+  --gray1:#C4A896;--gray2:#806050;--gray3:#3D2820;
+  --white:#FFFFFF;--text:#E8D5C4;
+  --r8:8px;--r12:12px;--r16:16px;--r24:24px;
+  --font-display:'Barlow Condensed',sans-serif;--font-body:'DM Sans',sans-serif;
+}
+[data-theme="light"]{
+  --bg:#F5EDE6;--bg2:#EDE0D4;--bg3:#E5D2C0;--bg4:#DBBFA8;--bg5:#D0AB90;
+  --border:rgba(0,0,0,.08);--borderacc:rgba(255,107,53,.35);
+  --gray1:#5C3D2E;--gray2:#8C6050;--gray3:#C8A898;
+  --white:#1A0A02;--text:#2A150A;
+}
+[data-theme="gold"]{
+  --bg:#090801;--bg2:#100F02;--bg3:#181603;--bg4:#201D05;--bg5:#282406;
+  --accent:#F0C040;--accent-b:#C09820;--accent-l:#F8D870;
+  --glow:rgba(240,192,64,.08);--glow2:rgba(240,192,64,.15);--glow3:rgba(240,192,64,.30);
+  --borderacc:rgba(240,192,64,.25);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px;overflow-x:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);line-height:1.6;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+button{cursor:pointer;border:none;background:none;font-family:inherit;touch-action:manipulation}
+a,button,.btn-primary,.btn-outline,.video-frame-wrap,.blog-card,.court-tab,.prog-tab,.faq-q{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+
+/* SKIP LINK */
+.skip-link{position:fixed;top:-100%;left:1rem;background:var(--accent);color:#fff;padding:.5rem 1rem;border-radius:var(--r8);font-weight:600;z-index:9999;transition:top .2s}
+.skip-link:focus{top:1rem}
+
+/* SCROLL PROGRESS */
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0%;z-index:10000;transition:width .1s linear}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:0 1.5rem;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,4,1,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);transition:all .3s}
+nav.scrolled{height:56px;background:rgba(8,4,1,.95)}
+.nav-logo{display:flex;align-items:center;gap:.75rem;font-family:var(--font-display);font-size:1.55rem;font-weight:900;letter-spacing:-.025em;color:var(--white);text-decoration:none}
+.nav-logo-squash{color:var(--white)}
+.nav-logo-ghosting{background:linear-gradient(135deg,#FF6B35 0%,#ff9f6b 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-logo-icon{width:38px;height:38px;background:linear-gradient(135deg,#FF6B35 0%,#c0392b 100%);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:900;color:#fff;font-family:var(--font-display);box-shadow:0 0 18px rgba(255,107,53,.5),0 2px 8px rgba(0,0,0,.4);flex-shrink:0}
+.nav-links{display:flex;align-items:center;gap:1.5rem}
+.nav-links a{font-size:.85rem;font-weight:500;color:var(--gray1);transition:color .2s}
+.nav-links a:hover{color:var(--accent)}
+.nav-cta{background:var(--accent);color:#fff;padding:.45rem 1.1rem;border-radius:var(--r8);font-size:.85rem;font-weight:600;transition:all .2s}
+.nav-cta:hover{background:var(--accent-b);transform:translateY(-1px)}
+.burger{display:none;flex-direction:column;gap:5px;width:28px;cursor:pointer;padding:4px}
+.burger span{display:block;height:2px;background:var(--white);border-radius:2px;transition:all .3s}
+.burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.burger.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+.burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mobile-menu{display:none;position:fixed;top:64px;left:0;right:0;background:rgba(8,4,1,.98);backdrop-filter:blur(20px);padding:1.5rem;flex-direction:column;gap:1rem;border-bottom:1px solid var(--border);z-index:999}
+.mobile-menu.open{display:flex}
+.mobile-menu a{font-size:1rem;font-weight:500;color:var(--text);padding:.6rem 0;border-bottom:1px solid var(--border)}
+
+/* HERO */
+#hero{position:relative;min-height:100vh;display:flex;align-items:center;overflow:hidden}
+#hero-canvas{position:absolute;inset:0;width:100%;height:100%}
+.hero-inner{position:relative;z-index:2;max-width:1200px;margin:0 auto;padding:6rem 1.5rem 4rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:var(--glow2);border:1px solid var(--borderacc);border-radius:100px;padding:.35rem .9rem;font-size:.78rem;font-weight:600;color:var(--accent);margin-bottom:1.5rem;letter-spacing:.05em;text-transform:uppercase}
+.hero-badge-dot{width:7px;height:7px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.hero-title{font-family:var(--font-display);font-size:clamp(2.8rem,6vw,5.2rem);font-weight:900;line-height:1;letter-spacing:-.01em;color:var(--white);margin-bottom:1.2rem}
+.hero-title em{font-style:italic;color:var(--accent)}
+.hero-sub{font-size:1.05rem;color:var(--gray1);line-height:1.7;margin-bottom:2rem;max-width:480px}
+.hero-actions{display:flex;gap:1rem;flex-wrap:wrap}
+.btn-primary{background:var(--accent);color:#fff;padding:.85rem 2rem;border-radius:var(--r12);font-size:.95rem;font-weight:700;letter-spacing:.01em;transition:all .25s;display:inline-flex;align-items:center;gap:.5rem}
+.btn-primary:hover{background:var(--accent-b);transform:translateY(-2px);box-shadow:0 8px 30px var(--glow3)}
+.btn-outline{background:transparent;color:var(--white);padding:.85rem 2rem;border-radius:var(--r12);font-size:.95rem;font-weight:600;border:1px solid var(--borderacc);transition:all .25s;display:inline-flex;align-items:center;gap:.5rem}
+.btn-outline:hover{background:var(--glow2);transform:translateY(-2px)}
+.hero-social-proof{margin-top:2.5rem;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap}
+.hero-sp-avatars{display:flex}
+.hero-sp-avatars span{width:34px;height:34px;border-radius:50%;border:2px solid var(--bg);background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:var(--accent);margin-left:-8px}
+.hero-sp-avatars span:first-child{margin-left:0}
+.hero-sp-text{font-size:.82rem;color:var(--gray1)}.hero-sp-text strong{color:var(--white)}
+.hero-mockup{position:relative;display:flex;justify-content:center}
+.hero-phone{width:260px;background:var(--bg3);border-radius:36px;border:1px solid var(--border);position:relative;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.05)}
+.hero-phone-notch{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:80px;height:22px;background:var(--bg);border-radius:12px;z-index:2}
+.hero-phone-screen{position:absolute;inset:0;background:linear-gradient(160deg,var(--bg3) 0%,var(--bg) 100%);padding:50px 16px 20px;display:flex;flex-direction:column;gap:10px}
+.phone-top-bar{display:flex;justify-content:space-between;align-items:center}
+.phone-greeting{font-size:.6rem;color:var(--gray2);font-family:var(--font-body)}
+.phone-name{font-size:.75rem;font-weight:700;color:var(--white);font-family:var(--font-display);letter-spacing:.02em}
+.phone-avatar{width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:800;color:#fff}
+.phone-start-btn{background:var(--accent);border-radius:10px;padding:10px;text-align:center;margin-top:4px}
+.phone-start-label{font-size:.55rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.7);font-family:var(--font-body)}
+.phone-start-text{font-size:.85rem;font-weight:900;color:#fff;font-family:var(--font-display);letter-spacing:.03em}
+.phone-tiles{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.phone-tile{background:var(--bg4);border-radius:8px;padding:8px;border:1px solid var(--border)}
+.phone-tile-icon{font-size:.8rem;margin-bottom:3px}
+.phone-tile-label{font-size:.5rem;color:var(--gray1);font-family:var(--font-body)}
+.phone-tile-val{font-size:.7rem;font-weight:700;color:var(--white);font-family:var(--font-display)}
+.phone-court-mini{background:var(--bg4);border-radius:8px;padding:8px;border:1px solid var(--borderacc);margin-top:4px}
+.phone-court-label{font-size:.5rem;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;font-family:var(--font-body)}
+.hero-phone-glow{position:absolute;bottom:-40px;left:50%;transform:translateX(-50%);width:180px;height:80px;background:var(--accent);filter:blur(60px);opacity:.25;pointer-events:none}
+.hero-float-card{position:absolute;background:var(--bg3);border:1px solid var(--borderacc);border-radius:var(--r12);padding:.75rem 1rem;backdrop-filter:blur(10px)}
+.hero-float-card.left{left:-20px;top:20%}
+.hero-float-card.right{right:-20px;bottom:25%}
+.float-label{font-size:.65rem;color:var(--gray2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.2rem}
+.float-val{font-size:1.1rem;font-weight:800;font-family:var(--font-display);color:var(--accent)}
+
+/* SECTIONS */
+section{padding:5rem 1.5rem}
+.container{max-width:1200px;margin:0 auto}
+.section-label{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem}
+.section-title{font-family:var(--font-display);font-size:clamp(2rem,4vw,3.2rem);font-weight:900;line-height:1.05;color:var(--white);margin-bottom:1rem}
+.section-title em{color:var(--accent);font-style:italic}
+.section-sub{font-size:1rem;color:var(--gray1);max-width:560px;line-height:1.7}
+.section-head{margin-bottom:3rem}
+.text-center{text-align:center}.text-center .section-sub{margin:0 auto}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}.d5{transition-delay:.5s}
+
+/* STATS */
+#stats{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:3.5rem 1.5rem}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2rem}
+.stat-item{text-align:center;position:relative}
+.stat-item+.stat-item::before{content:'';position:absolute;left:0;top:20%;height:60%;width:1px;background:var(--border)}
+.stat-num{font-family:var(--font-display);font-size:clamp(2.4rem,4vw,3.6rem);font-weight:900;color:var(--accent);line-height:1;letter-spacing:-.02em}
+.stat-suffix{font-size:1.5rem}
+.stat-label{font-size:.82rem;color:var(--gray1);margin-top:.3rem;font-weight:500}
+.stat-sub{font-size:.72rem;color:var(--gray2);margin-top:.1rem}
+
+/* WHY GHOSTING */
+#why{background:var(--bg)}
+.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+.why-visual{position:relative}
+.why-court-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r24);padding:2rem;position:relative;overflow:hidden}
+.why-court-card::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:var(--accent);filter:blur(80px);opacity:.12}
+.why-courts-dual{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.why-court-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:1rem .75rem .75rem;display:flex;flex-direction:column;align-items:center;gap:.5rem;overflow:hidden;transition:border-color .3s}
+.why-court-item:hover{border-color:var(--borderacc)}
+.why-court-item-label{font-family:var(--font-display);font-size:.7rem;font-weight:700;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;text-align:center}
+.why-court-item-stat{font-family:var(--font-display);font-size:1.35rem;font-weight:900;color:var(--white);text-align:center;line-height:1.1}
+.why-court-item-sub{font-size:.68rem;color:var(--gray2);text-align:center;margin-top:-.25rem}
+.court-svg-wrap{display:flex;justify-content:center;margin-bottom:1.5rem}
+.why-metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:1rem}
+.metric-box{background:var(--bg4);border-radius:var(--r12);padding:.9rem;text-align:center;border:1px solid var(--border)}
+.metric-num{font-family:var(--font-display);font-size:1.6rem;font-weight:900;color:var(--accent)}
+.metric-label{font-size:.68rem;color:var(--gray2);text-transform:uppercase;letter-spacing:.05em;margin-top:.2rem}
+.why-list{display:flex;flex-direction:column;gap:1.5rem;margin-top:2rem}
+.why-item{display:flex;gap:1rem;align-items:flex-start}
+.why-icon{width:44px;height:44px;background:var(--glow2);border:1px solid var(--borderacc);border-radius:var(--r12);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.why-item h4{font-family:var(--font-display);font-size:1.05rem;font-weight:700;color:var(--white);margin-bottom:.25rem;letter-spacing:.01em}
+.why-item p{font-size:.88rem;color:var(--gray1);line-height:1.6}
+
+/* TRAINING SYSTEM */
+#system{background:var(--bg2)}
+.system-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
+.sys-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:1.75rem;position:relative;overflow:hidden;transition:transform .3s,border-color .3s}
+.sys-card:hover{transform:translateY(-6px);border-color:var(--borderacc)}
+.sys-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent);opacity:0;transition:opacity .3s}
+.sys-card:hover::before{opacity:1}
+.sys-card-num{font-family:var(--font-display);font-size:3.5rem;font-weight:900;color:var(--border);line-height:1;position:absolute;top:.75rem;right:1rem;letter-spacing:-.02em}
+.sys-card-icon{width:48px;height:48px;background:var(--glow2);border:1px solid var(--borderacc);border-radius:var(--r12);display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:1.2rem}
+.sys-card h3{font-family:var(--font-display);font-size:1.15rem;font-weight:800;color:var(--white);margin-bottom:.6rem;letter-spacing:.01em}
+.sys-card p{font-size:.85rem;color:var(--gray1);line-height:1.6}
+.sys-card-tag{display:inline-block;margin-top:1rem;font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:var(--glow);padding:.25rem .6rem;border-radius:4px}
+
+/* CONFIGURE SESSION */
+#configure{background:var(--bg2)}
+.config-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.config-phone{background:#0d0d0f;border:1px solid var(--border);border-radius:22px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+.config-phone-bar{background:var(--accent);padding:11px 18px;display:flex;align-items:center;justify-content:space-between}
+.config-phone-title{font-size:.78rem;font-weight:700;color:#fff;letter-spacing:.02em}
+.config-phone-step{font-size:.7rem;color:rgba(255,255,255,.8)}
+.config-pips{display:flex;gap:3px;padding:10px 14px 0}
+.config-pip{height:3px;flex:1;background:rgba(255,255,255,.1);border-radius:2px}
+.config-pip.act{background:var(--accent)}
+.config-pip.done{background:rgba(255,107,53,.45)}
+.config-body{padding:14px 12px 16px}
+.config-q{font-size:.9rem;font-weight:800;color:#fff;line-height:1.3;margin-bottom:3px}
+.config-qsub{font-size:.65rem;color:rgba(255,255,255,.38);margin-bottom:11px;line-height:1.4}
+.config-opt{display:flex;align-items:center;gap:10px;background:#1a1a1c;border:1.5px solid #2a2a2e;border-radius:12px;padding:10px 11px;margin-bottom:6px}
+.config-opt.sel{border-color:var(--accent);background:rgba(255,107,53,.1)}
+.config-opt-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.config-opt-body{flex:1;min-width:0}
+.config-opt-name{font-size:.76rem;font-weight:700;color:rgba(255,255,255,.85);margin-bottom:1px}
+.config-opt.sel .config-opt-name{color:var(--accent)}
+.config-opt-desc{font-size:.62rem;color:rgba(255,255,255,.36);line-height:1.4}
+.config-dot{width:20px;height:20px;border-radius:50%;border:1.5px solid #555;flex-shrink:0}
+.config-dot.sel{background:var(--accent);border-color:var(--accent);display:flex;align-items:center;justify-content:center}
+.config-dot.sel::after{content:'✓';font-size:.54rem;color:#fff;font-weight:900}
+.config-phone-label{text-align:center;font-family:var(--font-display);font-size:.7rem;font-weight:700;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-top:.75rem}
+.config-phone-sub{text-align:center;font-size:.72rem;color:var(--gray2);margin-top:.2rem}
+
+/* SESSION SETUP & RESULTS */
+#session-setup{background:var(--bg)}
+#results{background:var(--bg2)}
+
+/* COURT SYSTEMS */
+#courts{background:var(--bg)}
+.courts-tabs{display:flex;gap:.75rem;margin-bottom:2.5rem;background:var(--bg3);border-radius:var(--r12);padding:.4rem;width:fit-content}
+.court-tab{padding:.6rem 1.4rem;border-radius:var(--r8);font-size:.88rem;font-weight:600;color:var(--gray1);cursor:pointer;transition:all .25s}
+.court-tab.active{background:var(--accent);color:#fff;box-shadow:0 2px 12px var(--glow3)}
+.court-panel{display:none}.court-panel.active{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+.court-diagram-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:2rem;display:flex;justify-content:center}
+.court-info h3{font-family:var(--font-display);font-size:1.6rem;font-weight:800;color:var(--white);margin-bottom:.75rem}
+.court-info p{font-size:.9rem;color:var(--gray1);line-height:1.7;margin-bottom:1.5rem}
+.court-points-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.5rem}
+.court-point{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r8);padding:.75rem;display:flex;align-items:center;gap:.6rem}
+.court-point-num{width:28px;height:28px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;color:#fff;flex-shrink:0;font-family:var(--font-display)}
+.court-point-label{font-size:.8rem;color:var(--text);font-weight:500}
+.court-features{display:flex;flex-direction:column;gap:.6rem}
+.court-feature{display:flex;align-items:center;gap:.6rem;font-size:.85rem;color:var(--gray1)}
+.court-feature::before{content:'✓';color:var(--accent);font-weight:700;flex-shrink:0}
+
+/* PATTERN INTELLIGENCE */
+#patterns{background:var(--bg2)}
+.patterns-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+.pattern-cards{display:flex;flex-direction:column;gap:1rem}
+.pattern-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:1.25rem;display:flex;gap:1rem;align-items:center;transition:border-color .3s,transform .3s}
+.pattern-card:hover{border-color:var(--borderacc);transform:translateX(6px)}
+.pattern-card-icon{width:44px;height:44px;background:var(--glow2);border-radius:var(--r8);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.pattern-card h4{font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--white);margin-bottom:.2rem}
+.pattern-card p{font-size:.82rem;color:var(--gray1)}
+.pattern-vis{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:2rem;position:relative;overflow:hidden}
+.pattern-vis-title{font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--white);margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem}
+.pattern-vis-title span{width:8px;height:8px;background:var(--accent);border-radius:50%;display:inline-block}
+.pattern-bar-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem}
+.pattern-bar-label{font-size:.78rem;color:var(--gray1);width:80px;flex-shrink:0;text-align:right}
+.pattern-bar-track{flex:1;height:8px;background:var(--bg4);border-radius:4px;overflow:hidden}
+.pattern-bar-fill{height:100%;background:var(--accent);border-radius:4px;transition:width 1.5s ease}
+.pattern-bar-pct{font-size:.72rem;color:var(--gray2);width:32px;text-align:right}
+
+/* SKILL LEVELS */
+#skills{background:var(--bg)}
+.skills-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
+.skill-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:1.5rem;position:relative;transition:all .3s}
+.skill-card:hover{border-color:var(--borderacc);transform:translateY(-4px)}
+.skill-level-badge{display:inline-flex;align-items:center;gap:.4rem;padding:.3rem .7rem;border-radius:100px;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:1rem}
+.skill-card.beginner .skill-level-badge{background:rgba(100,200,100,.15);color:#64c864}
+.skill-card.intermediate .skill-level-badge{background:rgba(100,150,255,.15);color:#6496ff}
+.skill-card.advanced .skill-level-badge{background:rgba(255,165,50,.15);color:#FFA532}
+.skill-card.elite .skill-level-badge{background:rgba(255,107,53,.15);color:var(--accent)}
+.skill-card h3{font-family:var(--font-display);font-size:1.2rem;font-weight:800;color:var(--white);margin-bottom:.5rem}
+.skill-card p{font-size:.82rem;color:var(--gray1);line-height:1.6;margin-bottom:1rem}
+.skill-features{list-style:none;display:flex;flex-direction:column;gap:.4rem}
+.skill-features li{font-size:.78rem;color:var(--gray2);display:flex;align-items:center;gap:.4rem}
+.skill-features li::before{content:'→';color:var(--accent);font-size:.7rem}
+
+/* APP SHOWCASE */
+#showcase{background:var(--bg2)}
+.showcase-inner{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;align-items:end}
+.showcase-phone{display:flex;flex-direction:column;align-items:center;gap:1rem}
+.showcase-phone.center{transform:scale(1.08)}
+.showcase-screen{width:200px;background:var(--bg3);border-radius:32px;border:1px solid var(--border);overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.5);position:relative}
+.showcase-screen img{width:100%;display:block;object-fit:cover;object-position:top}
+.showcase-screen-header{background:var(--bg2);padding:48px 16px 12px;border-bottom:1px solid var(--border)}
+.ss-title{font-family:var(--font-display);font-size:.9rem;font-weight:800;color:var(--white);letter-spacing:.02em}
+.ss-sub{font-size:.6rem;color:var(--gray2)}
+.showcase-screen-body{padding:12px}
+.showcase-caption{font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--white);letter-spacing:.02em}
+.showcase-caption-sub{font-size:.8rem;color:var(--gray2)}
+.ss-session-card{background:var(--accent);border-radius:10px;padding:10px;margin-bottom:8px}
+.ss-session-label{font-size:.5rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.7);font-family:var(--font-body)}
+.ss-session-time{font-family:var(--font-display);font-size:1.6rem;font-weight:900;color:#fff;line-height:1}
+.ss-row{display:flex;gap:6px;margin-bottom:6px}
+.ss-mini{flex:1;background:var(--bg4);border-radius:8px;padding:7px;border:1px solid var(--border)}
+.ss-mini-label{font-size:.45rem;color:var(--gray2);text-transform:uppercase;letter-spacing:.05em}
+.ss-mini-val{font-family:var(--font-display);font-size:.85rem;font-weight:800;color:var(--white)}
+.ss-chart-placeholder{background:var(--bg4);border-radius:8px;padding:10px;border:1px solid var(--border);height:60px;display:flex;align-items:flex-end;gap:3px;overflow:hidden}
+.ss-bar{border-radius:3px 3px 0 0;background:var(--accent);opacity:.7;flex:1;min-height:4px}
+.ss-analytics-row{display:flex;justify-content:space-between;margin-bottom:6px}
+.ss-analytics-item{text-align:center}
+.ss-analytics-val{font-family:var(--font-display);font-size:.9rem;font-weight:800;color:var(--accent)}
+.ss-analytics-label{font-size:.45rem;color:var(--gray2);text-transform:uppercase}
+.progress-ring-placeholder{width:70px;height:70px;border-radius:50%;border:4px solid var(--bg4);border-top-color:var(--accent);margin:8px auto;position:relative;display:flex;align-items:center;justify-content:center}
+.progress-ring-text{font-family:var(--font-display);font-size:.8rem;font-weight:900;color:var(--accent)}
+
+/* PERFORMANCE BENTO */
+#performance{background:var(--bg)}
+.bento-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto;gap:1.5rem}
+.bento-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:1.75rem;position:relative;overflow:hidden;transition:border-color .3s}
+.bento-card:hover{border-color:var(--borderacc)}
+.bento-card.wide{grid-column:span 2}
+.bento-card.tall{grid-row:span 2}
+.bento-card-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem}
+.bento-card h3{font-family:var(--font-display);font-size:1.3rem;font-weight:800;color:var(--white);margin-bottom:.5rem}
+.bento-card p{font-size:.85rem;color:var(--gray1);line-height:1.6}
+.bento-big-num{font-family:var(--font-display);font-size:3rem;font-weight:900;color:var(--accent);line-height:1;margin-bottom:.25rem}
+.bento-accent-bg{position:absolute;bottom:-30px;right:-30px;width:120px;height:120px;background:var(--accent);filter:blur(60px);opacity:.12;pointer-events:none}
+
+/* COACHES */
+#coaches{background:var(--bg2)}
+.coaches-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+.coaches-steps{display:flex;flex-direction:column;gap:1.5rem;margin-top:2rem}
+.step{display:flex;gap:1rem;align-items:flex-start}
+.step-num{width:36px;height:36px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.95rem;font-weight:900;color:#fff;flex-shrink:0}
+.step-content h4{font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--white);margin-bottom:.25rem}
+.step-content p{font-size:.85rem;color:var(--gray1);line-height:1.6}
+.coaches-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:2rem}
+.coach-quote{font-size:1.05rem;color:var(--text);line-height:1.7;font-style:italic;margin-bottom:1.5rem;padding-left:1rem;border-left:3px solid var(--accent)}
+.coach-meta{display:flex;align-items:center;gap:.75rem}
+.coach-avatar{width:44px;height:44px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:1rem;font-weight:900;color:#fff}
+.coach-name{font-weight:600;color:var(--white);font-size:.9rem}
+.coach-role{font-size:.78rem;color:var(--gray2)}
+
+/* PRICING */
+#pricing{background:var(--bg)}
+.pricing-toggle{display:flex;align-items:center;gap:.75rem;justify-content:center;margin-bottom:3rem}
+.pricing-toggle span{font-size:.88rem;font-weight:600;color:var(--gray1);transition:color .2s}
+.pricing-toggle span.active{color:var(--white)}
+.toggle-track{width:44px;height:24px;background:var(--bg4);border-radius:12px;cursor:pointer;position:relative;border:1px solid var(--border);transition:background .3s}
+.toggle-track.on{background:var(--accent)}
+.toggle-thumb{width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:2px;left:3px;transition:left .25s;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.toggle-track.on .toggle-thumb{left:23px}
+.pricing-save-badge{background:var(--accent);color:#fff;font-size:.7rem;font-weight:700;padding:.2rem .5rem;border-radius:4px;letter-spacing:.04em}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;align-items:start}
+.pricing-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:2rem;position:relative;transition:transform .3s,border-color .3s}
+.pricing-card:hover{transform:translateY(-4px)}
+.pricing-card.featured{border-color:var(--borderacc);background:var(--bg4)}
+.pricing-card.featured::before{content:'MOST POPULAR';position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:.65rem;font-weight:800;letter-spacing:.1em;padding:.25rem .8rem;border-radius:100px}
+.pricing-tier{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.5rem}
+.pricing-name{font-family:var(--font-display);font-size:1.6rem;font-weight:900;color:var(--white);margin-bottom:.25rem}
+.pricing-desc{font-size:.82rem;color:var(--gray1);margin-bottom:1.5rem;min-height:2.5rem}
+.pricing-price{margin-bottom:1.5rem}
+.price-amount{font-family:var(--font-display);font-size:3rem;font-weight:900;color:var(--white);line-height:1}
+.price-amount.free{color:var(--accent)}
+.price-period{font-size:.82rem;color:var(--gray2)}
+.price-annual-note{font-size:.72rem;color:var(--gray2);margin-top:.25rem}
+.pricing-cta{width:100%;padding:.85rem;border-radius:var(--r8);font-size:.9rem;font-weight:700;letter-spacing:.01em;transition:all .25s;margin-bottom:1.5rem;display:block;text-align:center}
+.pricing-cta.primary{background:var(--accent);color:#fff}
+.pricing-cta.primary:hover{background:var(--accent-b)}
+.pricing-cta.outline{border:1px solid var(--borderacc);color:var(--accent)}
+.pricing-cta.outline:hover{background:var(--glow2)}
+.pricing-cta.muted{border:1px solid var(--border);color:var(--gray1)}
+.pricing-features{display:flex;flex-direction:column;gap:.6rem}
+.pf-item{display:flex;align-items:flex-start;gap:.5rem;font-size:.82rem;color:var(--gray1)}
+.pf-check{color:var(--accent);flex-shrink:0;font-size:.85rem;margin-top:.05rem}
+.pf-item.muted{color:var(--gray3)}
+.pf-item.muted .pf-check{color:var(--gray3)}
+
+/* FOUNDERS */
+#founder{background:var(--bg2);position:relative;overflow:hidden}
+#founder::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(255,107,53,.06) 0%,transparent 70%);pointer-events:none}
+.founders-story{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:2.5rem 2.75rem;margin-bottom:3.5rem;position:relative;overflow:hidden}
+.founders-story::before{content:'"';position:absolute;top:-20px;left:16px;font-size:9rem;font-family:var(--font-display);color:var(--accent);opacity:.09;line-height:1;pointer-events:none}
+.founders-story h3{font-family:var(--font-display);font-size:1.2rem;font-weight:900;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.9rem}
+.founders-story p{color:var(--text);line-height:1.9;font-size:1.02rem;max-width:820px}
+.founders-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2.5rem}
+.founder-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);overflow:hidden;transition:transform .3s ease,box-shadow .3s ease}
+.founder-card:hover{transform:translateY(-6px);box-shadow:0 24px 64px rgba(0,0,0,.45),0 0 0 1px var(--borderacc)}
+.founder-card-photo{position:relative;height:340px;overflow:hidden;background:linear-gradient(160deg,var(--bg) 0%,var(--bg2) 100%)}
+.founder-card-photo::after{content:'';position:absolute;bottom:0;left:0;right:0;height:150px;background:linear-gradient(to top,var(--bg3),transparent);pointer-events:none;z-index:1}
+.founder-card-img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;transition:transform .4s ease}
+.founder-card:hover .founder-card-img{transform:scale(1.04)}
+.founder-card-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:5.5rem;font-weight:900;color:var(--accent)}
+.founder-card-body{padding:1.75rem 2rem 2rem}
+.founder-card-role{font-size:.7rem;font-weight:700;color:var(--accent);letter-spacing:.14em;text-transform:uppercase;margin-bottom:.35rem}
+.founder-card-name{font-family:var(--font-display);font-size:2.1rem;font-weight:900;color:var(--white);letter-spacing:.02em;margin-bottom:1rem;line-height:1.05}
+.founder-card-quote{font-size:.95rem;color:var(--text);line-height:1.8;font-style:italic;margin:0 0 1.25rem;padding:.9rem 1.1rem;background:var(--glow);border-left:3px solid var(--accent);border-radius:0 var(--r8) var(--r8) 0}
+.founder-card-bio{font-size:.88rem;color:var(--gray2);line-height:1.85}
+.founders-mission{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-top:.5rem}
+.mission-pillar{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:1.75rem;text-align:center;transition:border-color .3s,transform .3s}
+.mission-pillar:hover{border-color:var(--borderacc);transform:translateY(-3px)}
+.mission-pillar-icon{width:54px;height:54px;background:linear-gradient(135deg,var(--accent),var(--accent-b));border-radius:var(--r8);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem}
+.mission-pillar h4{font-family:var(--font-display);font-size:1rem;font-weight:900;color:var(--white);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.5rem}
+.mission-pillar p{font-size:.84rem;color:var(--gray2);line-height:1.7}
+
+/* VIDEOS */
+#videos{background:var(--bg)}
+.videos-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+.video-section h3{font-family:var(--font-display);font-size:1.3rem;font-weight:800;color:var(--white);margin-bottom:.5rem}
+.video-section p{font-size:.85rem;color:var(--gray1);margin-bottom:1rem}
+.video-tabs{display:flex;gap:.5rem;margin-bottom:1rem}
+.video-tab{padding:.4rem .9rem;border-radius:var(--r8);font-size:.8rem;font-weight:600;color:var(--gray2);cursor:pointer;background:var(--bg3);border:1px solid var(--border);transition:all .2s}
+.video-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.video-frame-wrap{border-radius:var(--r12);overflow:hidden;position:relative;width:100%;padding-bottom:56.25%;height:0;background:var(--bg3);cursor:pointer}
+.video-thumb{width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;right:0;bottom:0}
+.video-play-btn{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.4);transition:background .2s}
+.video-play-btn:hover{background:rgba(0,0,0,.2)}
+.video-play-icon{width:56px;height:56px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px var(--glow3)}
+.video-play-icon svg{margin-left:4px}
+.video-iframe-container{display:none;border-radius:var(--r12);overflow:hidden;position:relative;width:100%;padding-bottom:56.25%;height:0}
+.video-iframe-container iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;display:block}
+
+/* BLOG */
+#blog{background:var(--bg2)}
+.blog-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
+.blog-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);overflow:hidden;cursor:pointer;transition:all .3s}
+.blog-card:hover{border-color:var(--borderacc);transform:translateY(-4px)}
+.blog-card-img{height:120px;background:var(--bg4);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.blog-card-emoji{font-size:2.5rem}
+.blog-card-body{padding:1rem}
+.blog-card-tag{font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+.blog-card-title{font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--white);line-height:1.3;margin-bottom:.4rem}
+.blog-card-excerpt{font-size:.75rem;color:var(--gray1);line-height:1.5}
+
+/* BLOG MODAL */
+.blog-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+.blog-modal-overlay.open{display:flex}
+.blog-modal{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r24);max-width:700px;width:90%;max-height:85vh;overflow-y:auto;padding:2.5rem;position:relative}
+.blog-modal-close{position:absolute;top:1.25rem;right:1.25rem;width:36px;height:36px;background:var(--bg4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:var(--gray1);cursor:pointer;transition:all .2s}
+.blog-modal-close:hover{background:var(--accent);color:#fff}
+.blog-modal-tag{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem}
+.blog-modal-title{font-family:var(--font-display);font-size:2rem;font-weight:900;color:var(--white);margin-bottom:.75rem;line-height:1.1}
+.blog-modal-meta{font-size:.8rem;color:var(--gray2);margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+.blog-modal-body{font-size:.9rem;color:var(--text);line-height:1.8}
+.blog-modal-body p{margin-bottom:1rem}
+.blog-modal-body h4{font-family:var(--font-display);font-size:1.1rem;font-weight:800;color:var(--white);margin:1.5rem 0 .5rem}
+
+/* TESTIMONIALS */
+#testimonials{background:var(--bg)}
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.testi-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:1.75rem;transition:border-color .3s}
+.testi-card:hover{border-color:var(--borderacc)}
+.testi-stars{color:var(--accent);font-size:.95rem;margin-bottom:.75rem;letter-spacing:.1em}
+.testi-quote{font-size:.9rem;color:var(--text);line-height:1.7;margin-bottom:1.25rem;font-style:italic}
+.testi-author{display:flex;align-items:center;gap:.75rem}
+.testi-avatar{width:38px;height:38px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.85rem;font-weight:900;color:#fff;flex-shrink:0}
+.testi-name{font-weight:600;color:var(--white);font-size:.88rem}
+.testi-handle{font-size:.75rem;color:var(--gray2)}
+
+/* FAQ */
+#faq{background:var(--bg2)}
+.faq-list{max-width:800px;margin:0 auto;display:flex;flex-direction:column;gap:.75rem}
+.faq-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);overflow:hidden;transition:border-color .3s}
+.faq-item.open{border-color:var(--borderacc)}
+.faq-q{width:100%;display:flex;justify-content:space-between;align-items:center;padding:1.25rem 1.5rem;font-size:.95rem;font-weight:600;color:var(--white);cursor:pointer;background:none;text-align:left;gap:1rem}
+.faq-arrow{width:24px;height:24px;background:var(--bg4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--gray1);flex-shrink:0;transition:transform .3s,background .3s}
+.faq-item.open .faq-arrow{transform:rotate(180deg);background:var(--accent);color:#fff}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease,padding .35s ease}
+.faq-a-inner{padding:0 1.5rem 1.25rem;font-size:.88rem;color:var(--gray1);line-height:1.7}
+.faq-item.open .faq-a{max-height:400px}
+
+/* CTA */
+#cta{background:var(--bg);padding:6rem 1.5rem}
+.cta-inner{max-width:700px;margin:0 auto;text-align:center;background:var(--bg3);border:1px solid var(--borderacc);border-radius:var(--r24);padding:4rem 3rem;position:relative;overflow:hidden}
+.cta-inner::before{content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:300px;height:200px;background:var(--accent);filter:blur(100px);opacity:.15;pointer-events:none}
+.cta-title{font-family:var(--font-display);font-size:clamp(2rem,4vw,3rem);font-weight:900;color:var(--white);line-height:1.05;margin-bottom:1rem;position:relative}
+.cta-sub{font-size:.95rem;color:var(--gray1);margin-bottom:2rem;position:relative}
+.cta-actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;position:relative}
+.store-btn{display:inline-flex;align-items:center;gap:.6rem;background:var(--accent);color:#fff;padding:.85rem 1.75rem;border-radius:var(--r12);font-size:.9rem;font-weight:700;transition:all .25s}
+.store-btn:hover{background:var(--accent-b);transform:translateY(-2px);box-shadow:0 8px 30px var(--glow3)}
+.store-btn.outline{background:transparent;border:1px solid var(--borderacc);color:var(--white)}
+.store-btn.outline:hover{background:var(--glow2)}
+.store-btn-icon{font-size:1.3rem}
+.cta-note{font-size:.75rem;color:var(--gray2);margin-top:1rem;position:relative}
+
+/* FOOTER */
+footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5rem 2rem}
+.footer-inner{max-width:1200px;margin:0 auto}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:2.5rem}
+.footer-brand p{font-size:.85rem;color:var(--gray2);line-height:1.7;margin-top:.75rem;max-width:260px}
+.footer-col h4{font-family:var(--font-display);font-size:.85rem;font-weight:800;color:var(--white);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.9rem}
+.footer-links{display:flex;flex-direction:column;gap:.5rem}
+.footer-links a{font-size:.83rem;color:var(--gray2);transition:color .2s}
+.footer-links a:hover{color:var(--accent)}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:1.5rem;border-top:1px solid var(--border);flex-wrap:wrap;gap:1rem}
+.footer-copy{font-size:.8rem;color:var(--gray3)}
+.footer-theme-btns{display:flex;gap:.5rem}
+.theme-btn{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);cursor:pointer;transition:border-color .2s;position:relative}
+.theme-btn:hover,.theme-btn.active{border-color:var(--accent)}
+.theme-btn[data-theme="dark"]{background:#1A0A02}
+.theme-btn[data-theme="light"]{background:#F5EDE6}
+.theme-btn[data-theme="gold"]{background:#1A1800}
+
+/* FOREVER FREE */
+#free{background:var(--bg2)}
+.free-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:3rem}
+.free-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:1.75rem;position:relative;overflow:hidden;transition:border-color .3s,transform .3s}
+.free-card:hover{border-color:var(--borderacc);transform:translateY(-4px)}
+.free-card::after{content:'FREE';position:absolute;top:1rem;right:1rem;font-size:.6rem;font-weight:800;letter-spacing:.1em;color:var(--accent);background:var(--glow2);padding:.2rem .5rem;border-radius:4px}
+.free-card-icon{font-size:1.8rem;margin-bottom:1rem}
+.free-card h3{font-family:var(--font-display);font-size:1.1rem;font-weight:800;color:var(--white);margin-bottom:.5rem}
+.free-card p{font-size:.83rem;color:var(--gray1);line-height:1.6}
+.free-features-list{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem}
+.free-feat{display:flex;align-items:flex-start;gap:.5rem;font-size:.83rem;color:var(--text);padding:.6rem;background:var(--bg3);border-radius:var(--r8);border:1px solid var(--border)}
+.free-feat-icon{color:var(--accent);flex-shrink:0;margin-top:.05rem}
+
+/* PROGRAMS */
+#programs{background:var(--bg)}
+.programs-level-tabs{display:flex;gap:.6rem;margin-bottom:2rem;flex-wrap:wrap}
+.prog-tab{padding:.5rem 1.1rem;border-radius:100px;font-size:.8rem;font-weight:700;cursor:pointer;border:1px solid var(--border);color:var(--gray1);background:var(--bg3);transition:all .2s;letter-spacing:.03em}
+.prog-tab.active,.prog-tab:hover{color:#fff}
+.prog-tab[data-level="beginner"].active{background:#22c55e;border-color:#22c55e}
+.prog-tab[data-level="intermediate"].active{background:#3b82f6;border-color:#3b82f6}
+.prog-tab[data-level="advanced"].active{background:#f97316;border-color:#f97316}
+.prog-tab[data-level="elite"].active{background:var(--accent);border-color:var(--accent)}
+.prog-tab[data-level="pro"].active{background:#a855f7;border-color:#a855f7}
+.prog-tab[data-level="custom"].active{background:#06b6d4;border-color:#06b6d4}
+.programs-panel{display:none}.programs-panel.active{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.prog-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:1.25rem;transition:all .3s;cursor:pointer}
+.prog-card:hover{border-color:var(--borderacc);transform:translateY(-3px)}
+.prog-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.6rem}
+.prog-card-name{font-family:var(--font-display);font-size:1.05rem;font-weight:800;color:var(--white);line-height:1.2}
+.prog-card-time{font-size:.7rem;color:var(--gray2);background:var(--bg4);padding:.2rem .5rem;border-radius:4px;white-space:nowrap;flex-shrink:0}
+.prog-card-desc{font-size:.78rem;color:var(--gray1);line-height:1.5;margin-bottom:.75rem}
+.prog-card-tags{display:flex;gap:.4rem;flex-wrap:wrap}
+.prog-tag{font-size:.65rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:.2rem .5rem;border-radius:4px;background:var(--glow);color:var(--accent)}
+
+/* FOUNDERS RESPONSIVE OVERRIDE */
+@media(max-width:900px){.founders-grid{grid-template-columns:1fr}.founders-mission{grid-template-columns:1fr 1fr}}
+
+/* VIDEOS 4-up */
+.videos-4grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.video-item h4{font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--white);margin-bottom:.3rem}
+.video-item p{font-size:.78rem;color:var(--gray2);margin-bottom:.75rem}
+
+/* LIGHTBOX */
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:3000;align-items:center;justify-content:center}
+.lightbox.open{display:flex}
+.lightbox img{max-width:90vw;max-height:85vh;border-radius:var(--r12)}
+.lightbox-close{position:absolute;top:1rem;right:1rem;width:40px;height:40px;background:rgba(255,255,255,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#fff;cursor:pointer}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  .system-grid,.skills-grid,.blog-grid,.free-grid{grid-template-columns:repeat(2,1fr)}
+  .bento-grid{grid-template-columns:1fr 1fr}.bento-card.wide{grid-column:span 2}
+  .showcase-inner{grid-template-columns:1fr 1fr;}.showcase-phone:last-child{display:none}
+  .footer-top{grid-template-columns:1fr 1fr}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .programs-panel.active{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:768px){
+  .nav-links,.nav-cta{display:none}.burger{display:flex}
+  .hero-inner{grid-template-columns:1fr;text-align:center}.hero-mockup{margin-top:2rem;justify-content:center}
+  .hero-phone{width:min(260px,72vw)}
+  .hero-actions{justify-content:center;flex-wrap:wrap}.hero-social-proof{justify-content:center}
+  .hero-float-card.left,.hero-float-card.right{display:none}
+  .why-grid,.patterns-grid,.coaches-grid,.courts-tabs-panel{grid-template-columns:1fr}
+  .founders-grid,.founders-mission,.config-grid{grid-template-columns:1fr}
+  .config-grid>div{display:flex;flex-direction:column;align-items:center}
+  .config-phone{max-width:min(340px,88vw);width:100%}
+  .court-panel.active{grid-template-columns:1fr}
+  .system-grid,.skills-grid{grid-template-columns:1fr}
+  .blog-grid{grid-template-columns:repeat(2,1fr)}
+  .testi-grid{grid-template-columns:1fr}
+  .free-grid{grid-template-columns:1fr}
+  .free-features-list{grid-template-columns:1fr}
+  .videos-4grid{grid-template-columns:1fr}
+  .programs-panel.active{grid-template-columns:1fr}
+  .showcase-inner{grid-template-columns:1fr;justify-items:center}.showcase-phone:not(.center){display:none}
+  .bento-card.wide{grid-column:span 1}.bento-grid{grid-template-columns:1fr}
+  .footer-top{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .cta-inner{padding:2.5rem 1.5rem}
+  section{padding:3.5rem 1.25rem}
+  .section-title{font-size:clamp(2rem,8vw,3.5rem)}
+  .hero-title{font-size:clamp(2.8rem,10vw,5rem)}
+}
+@media(max-width:480px){
+  .blog-grid{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:1fr}
+  .stat-item+.stat-item::before{display:none}
+  .hero-phone{width:min(240px,78vw)}
+  .btn-primary,.btn-outline{padding:.75rem 1.25rem;font-size:.88rem}
+  .hero-actions{gap:.6rem}
+  .nav-logo{font-size:1.25rem}
+  .showcase-screen{width:min(180px,72vw)}
+  .video-play-icon{width:44px;height:44px}
+  .section-sub{font-size:.88rem}
+}
+
+/* ── CONTACT ── */
+#contact{background:var(--bg2)}
+.contact-grid{display:grid;grid-template-columns:1fr 1.6fr;gap:3rem;align-items:start;margin-top:2.5rem}
+.contact-info-title{font-family:var(--font-display);font-size:1.35rem;font-weight:800;color:var(--white);margin-bottom:.85rem}
+.contact-info-body{font-size:.92rem;color:var(--gray1);line-height:1.75;margin-bottom:1.5rem}
+.contact-detail{display:flex;align-items:flex-start;gap:.75rem;font-size:.88rem;color:var(--gray1);margin-bottom:.7rem;line-height:1.5}
+.contact-detail-icon{width:32px;height:32px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r8);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.contact-detail a{color:var(--accent)}
+.contact-form-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:2rem}
+.cf-field{margin-bottom:1.1rem}
+.cf-field label{display:block;font-size:.76rem;font-weight:600;color:var(--gray1);margin-bottom:.38rem;letter-spacing:.05em;text-transform:uppercase}
+.cf-field input,.cf-field select,.cf-field textarea{width:100%;background:var(--bg4);border:1px solid var(--border);border-radius:var(--r8);padding:.72rem 1rem;font-size:.92rem;font-family:var(--font-body);color:var(--white);outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none}
+.cf-field input::placeholder,.cf-field textarea::placeholder{color:var(--gray2)}
+.cf-field input:focus,.cf-field select:focus,.cf-field textarea:focus{border-color:var(--borderacc)}
+.cf-field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23806050' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;padding-right:2.5rem;cursor:pointer}
+.cf-field select option{background:var(--bg4);color:var(--white)}
+.cf-field textarea{resize:vertical;min-height:120px;line-height:1.6}
+.cf-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.cf-submit{width:100%;padding:.85rem;background:var(--accent);color:#fff;border:none;border-radius:var(--r8);font-size:.95rem;font-weight:700;font-family:var(--font-body);cursor:pointer;transition:background .2s,transform .1s;margin-top:.25rem;display:flex;align-items:center;justify-content:center;gap:.5rem}
+.cf-submit:hover{background:var(--accent-b)}
+.cf-submit:active{transform:scale(.98)}
+.cf-submit:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.cf-success{display:none;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:var(--r12);padding:1rem 1.25rem;color:#4ade80;font-size:.9rem;margin-bottom:1rem;text-align:center}
+.cf-success.show{display:block}
+.cf-error{display:none;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:var(--r12);padding:1rem 1.25rem;color:#f87171;font-size:.9rem;margin-bottom:1rem}
+.cf-error.show{display:block}
+@media(max-width:768px){.contact-grid{grid-template-columns:1fr}.cf-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body data-theme="dark">
+<a href="#main" class="skip-link">Skip to main content</a>
+<div id="progress"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo" aria-label="SquashGhostingX Home">
+    <div class="nav-logo-icon">SX</div>
+    <span class="nav-logo-squash">Squash</span><span class="nav-logo-ghosting">GhostingX</span>
+  </a>
+  <div class="nav-links">
+    <a href="#why">Why Ghosting</a>
+    <a href="#courts">Court Systems</a>
+    <a href="#programs">Programs</a>
+    <a href="#showcase">App</a>
+    <a href="#videos">Videos</a>
+    <a href="#blog">Blog</a>
+    <a href="#founder">Team</a>
+    <a href="#cta" class="nav-cta">Download Free</a>
+  </div>
+  <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#why" onclick="closeMobileMenu()">Why Ghosting</a>
+  <a href="#courts" onclick="closeMobileMenu()">Court Systems</a>
+  <a href="#programs" onclick="closeMobileMenu()">Programs</a>
+  <a href="#showcase" onclick="closeMobileMenu()">App</a>
+  <a href="#videos" onclick="closeMobileMenu()">Videos</a>
+  <a href="#blog" onclick="closeMobileMenu()">Blog</a>
+  <a href="#founder" onclick="closeMobileMenu()">Team</a>
+  <a href="#faq" onclick="closeMobileMenu()">FAQ</a>
+  <a href="#contact" onclick="closeMobileMenu()">Contact</a>
+  <a href="#cta" onclick="closeMobileMenu()" style="color:var(--accent);font-weight:700">⬇ Download Free</a>
+</div>
+
+<!-- HERO -->
+<main id="main">
+<section id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-badge reveal"><span class="hero-badge-dot"></span>Free on iOS &amp; Android</div>
+      <h1 class="hero-title reveal d1">Train Like a <em>Ghost.</em><br>Move Like a Pro.</h1>
+      <p class="hero-sub reveal d2">The only squash app with AI voice coaching, 6-point &amp; 10-point ghosting systems, real-time analytics and pattern intelligence — built by a squash player, for squash players.</p>
+      <div class="hero-actions reveal d3">
+        <a href="https://apps.apple.com/app/squashghostingx/id6744036820" class="btn-primary" target="_blank" rel="noopener"> iOS App Store</a>
+        <a href="https://play.google.com/store/apps/details?id=com.squashghostingx.app" class="btn-primary" style="background:var(--bg4);border:1px solid var(--borderacc)" target="_blank" rel="noopener">🤖 Google Play</a>
+        <a href="#videos" class="btn-outline">▶ Watch Demo</a>
+      </div>
+      <div class="hero-social-proof reveal d4">
+        <div class="hero-sp-avatars">
+          <span>SG</span><span>MK</span><span>AT</span><span>RB</span><span>PW</span>
+        </div>
+        <p class="hero-sp-text"><strong>2,500+ players</strong> across 40+ countries</p>
+      </div>
+    </div>
+    <div class="hero-mockup reveal d2">
+      <div class="hero-float-card left">
+        <div class="float-label">Session Streak</div>
+        <div class="float-val">14 🔥</div>
+      </div>
+      <div class="hero-phone">
+        <img src="App_Home_Screen.jpeg" alt="SquashGhostingX home screen — Good morning, START SESSION, Ghosting, Last Session, Routines, Progress"
+             style="width:100%;display:block" onerror="this.style.opacity='.12'">
+        <div class="hero-phone-glow"></div>
+      </div>
+      <div class="hero-float-card right">
+        <div class="float-label">Zone Balance</div>
+        <div class="float-val">92%</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section id="stats">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item reveal">
+        <div class="stat-num"><span data-count="2500">0</span><span class="stat-suffix">+</span></div>
+        <div class="stat-label">Active Players</div>
+        <div class="stat-sub">Across 40+ countries</div>
+      </div>
+      <div class="stat-item reveal d1">
+        <div class="stat-num"><span data-count="12000">0</span><span class="stat-suffix">+</span></div>
+        <div class="stat-label">Sessions Completed</div>
+        <div class="stat-sub">And counting</div>
+      </div>
+      <div class="stat-item reveal d2">
+        <div class="stat-num"><span data-count="10">0</span></div>
+        <div class="stat-label">Court Positions</div>
+        <div class="stat-sub">Full 10-point system</div>
+      </div>
+      <div class="stat-item reveal d3">
+        <div class="stat-num"><span data-count="100">0</span><span class="stat-suffix">%</span></div>
+        <div class="stat-label">Free to Download</div>
+        <div class="stat-sub">No credit card needed</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY GHOSTING -->
+<section id="why">
+  <div class="container">
+    <div class="why-grid">
+      <div>
+        <div class="section-label reveal">The Science</div>
+        <h2 class="section-title reveal d1">Why Ghosting Is the <em>Ultimate</em> Squash Drill</h2>
+        <p class="section-sub reveal d2">Ghosting — moving to all court positions without hitting the ball — builds the muscle memory, aerobic base, and decision speed that translate directly to match performance.</p>
+        <div class="why-list">
+          <div class="why-item reveal d2">
+            <div class="why-icon">🧠</div>
+            <div>
+              <h4>Neurological Patterning</h4>
+              <p>Repeated movement patterns wire your nervous system to respond automatically — so in a match, your feet go before your brain tells them to.</p>
+            </div>
+          </div>
+          <div class="why-item reveal d3">
+            <div class="why-icon">💪</div>
+            <div>
+              <h4>Sport-Specific Fitness</h4>
+              <p>Ghosting builds the exact energy systems squash demands: explosive bursts, rapid direction changes, and sustained aerobic capacity.</p>
+            </div>
+          </div>
+          <div class="why-item reveal d4">
+            <div class="why-icon">📍</div>
+            <div>
+              <h4>T-Position Recovery</h4>
+              <p>Every ghost forces you to recover to the T — the cornerstone habit separating recreational players from competitive athletes.</p>
+            </div>
+          </div>
+          <div class="why-item reveal d5">
+            <div class="why-icon">🎤</div>
+            <div>
+              <h4>AI Voice Coaching</h4>
+              <p>Real-time audio cues call each position — keeping your eyes forward and your focus on movement quality, not the screen.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="why-visual reveal d2">
+        <div class="why-courts-dual">
+          <!-- 6-Point Court -->
+          <div class="why-court-item">
+            <div class="why-court-item-label">6-Point System</div>
+            <svg viewBox="0 0 640 975" width="190" height="289" aria-label="6-point squash court — WSF accurate">
+              <rect x="0" y="0" width="640" height="975" fill="#020812"/>
+              <rect x="8" y="8" width="624" height="959" fill="#0C1C2E"/>
+              <rect x="8" y="8" width="624" height="418" fill="rgba(10,132,255,0.07)"/>
+              <rect x="8" y="426" width="624" height="541" fill="rgba(255,107,53,0.06)"/>
+              <circle cx="320" cy="426" r="240" fill="rgba(25,75,130,0.07)"/>
+              <circle cx="320" cy="426" r="120" fill="rgba(40,95,165,0.09)"/>
+              <rect x="8" y="8" width="624" height="959" fill="none" stroke="rgba(255,107,53,0.12)" stroke-width="18"/>
+              <rect x="8" y="8" width="624" height="959" fill="none" stroke="rgba(255,107,53,0.28)" stroke-width="7"/>
+              <rect x="8" y="8" width="624" height="959" fill="none" stroke="#FF6B35" stroke-width="3"/>
+              <rect x="8" y="8" width="624" height="13" fill="#FF6B35" opacity="0.85"/>
+              <line x1="8" y1="426" x2="632" y2="426" stroke="#FF6B35" stroke-width="4"/>
+              <line x1="320" y1="426" x2="320" y2="967" stroke="#FF6B35" stroke-width="4"/>
+              <rect x="8" y="426" width="160" height="160" fill="rgba(255,107,53,0.04)" stroke="#FF6B35" stroke-width="3"/>
+              <rect x="472" y="426" width="160" height="160" fill="rgba(255,107,53,0.04)" stroke="#FF6B35" stroke-width="3"/>
+              <text x="320" y="36" text-anchor="middle" font-size="22" fill="rgba(255,107,53,0.4)" font-family="sans-serif" font-weight="700" letter-spacing="3">FRONT WALL</text>
+              <circle cx="320" cy="426" r="22" fill="rgba(255,107,53,0.2)"/>
+              <circle cx="320" cy="426" r="10" fill="#FF6B35"/>
+              <text x="320" y="431" text-anchor="middle" font-size="13" fill="#fff" font-weight="bold" font-family="sans-serif">T</text>
+              <circle cx="100" cy="100" r="32" fill="rgba(255,107,53,0.15)" stroke="#FF9268" stroke-width="3"/>
+              <text x="100" y="107" text-anchor="middle" font-size="22" fill="#FF9268" font-weight="bold" font-family="sans-serif">FL</text>
+              <circle cx="540" cy="100" r="32" fill="rgba(255,107,53,0.15)" stroke="#FF9268" stroke-width="3"/>
+              <text x="540" y="107" text-anchor="middle" font-size="22" fill="#FF9268" font-weight="bold" font-family="sans-serif">FR</text>
+              <circle cx="120" cy="460" r="32" fill="rgba(255,107,53,0.15)" stroke="#FF9268" stroke-width="3"/>
+              <text x="120" y="467" text-anchor="middle" font-size="22" fill="#FF9268" font-weight="bold" font-family="sans-serif">ML</text>
+              <circle cx="520" cy="460" r="32" fill="rgba(255,107,53,0.15)" stroke="#FF9268" stroke-width="3"/>
+              <text x="520" y="467" text-anchor="middle" font-size="22" fill="#FF9268" font-weight="bold" font-family="sans-serif">MR</text>
+              <circle cx="100" cy="850" r="32" fill="rgba(255,107,53,0.15)" stroke="#FF9268" stroke-width="3"/>
+              <text x="100" y="857" text-anchor="middle" font-size="22" fill="#FF9268" font-weight="bold" font-family="sans-serif">BL</text>
+              <circle cx="540" cy="850" r="32" fill="rgba(255,107,53,0.15)" stroke="#FF9268" stroke-width="3"/>
+              <text x="540" y="857" text-anchor="middle" font-size="22" fill="#FF9268" font-weight="bold" font-family="sans-serif">BR</text>
+            </svg>
+            <div class="why-court-item-stat">6 Positions</div>
+            <div class="why-court-item-sub">Beginner → Advanced</div>
+          </div>
+          <!-- 10-Point Court -->
+          <div class="why-court-item">
+            <div class="why-court-item-label">10-Point System</div>
+            <svg viewBox="0 0 640 975" width="190" height="289" aria-label="10-point squash court — WSF accurate">
+              <rect x="0" y="0" width="640" height="975" fill="#020812"/>
+              <rect x="8" y="8" width="624" height="959" fill="#0C1C2E"/>
+              <rect x="8" y="8" width="624" height="418" fill="rgba(10,132,255,0.07)"/>
+              <rect x="8" y="426" width="624" height="541" fill="rgba(255,107,53,0.06)"/>
+              <circle cx="320" cy="426" r="240" fill="rgba(25,75,130,0.07)"/>
+              <circle cx="320" cy="426" r="120" fill="rgba(40,95,165,0.09)"/>
+              <rect x="8" y="8" width="624" height="959" fill="none" stroke="rgba(255,107,53,0.12)" stroke-width="18"/>
+              <rect x="8" y="8" width="624" height="959" fill="none" stroke="rgba(255,107,53,0.28)" stroke-width="7"/>
+              <rect x="8" y="8" width="624" height="959" fill="none" stroke="#FF6B35" stroke-width="3"/>
+              <rect x="8" y="8" width="624" height="13" fill="#FF6B35" opacity="0.85"/>
+              <line x1="8" y1="426" x2="632" y2="426" stroke="#FF6B35" stroke-width="4"/>
+              <line x1="320" y1="426" x2="320" y2="967" stroke="#FF6B35" stroke-width="4"/>
+              <rect x="8" y="426" width="160" height="160" fill="rgba(255,107,53,0.04)" stroke="#FF6B35" stroke-width="3"/>
+              <rect x="472" y="426" width="160" height="160" fill="rgba(255,107,53,0.04)" stroke="#FF6B35" stroke-width="3"/>
+              <text x="320" y="36" text-anchor="middle" font-size="22" fill="rgba(255,107,53,0.4)" font-family="sans-serif" font-weight="700" letter-spacing="3">FRONT WALL</text>
+              <circle cx="320" cy="426" r="22" fill="rgba(255,107,53,0.2)"/>
+              <circle cx="320" cy="426" r="10" fill="#FF6B35"/>
+              <text x="320" y="431" text-anchor="middle" font-size="13" fill="#fff" font-weight="bold" font-family="sans-serif">T</text>
+              <circle cx="100" cy="100" r="30" fill="rgba(29,78,216,0.2)" stroke="#60a5fa" stroke-width="2.5"/>
+              <text x="100" y="107" text-anchor="middle" font-size="21" fill="#93c5fd" font-weight="bold" font-family="sans-serif">FL</text>
+              <circle cx="540" cy="100" r="30" fill="rgba(29,78,216,0.2)" stroke="#60a5fa" stroke-width="2.5"/>
+              <text x="540" y="107" text-anchor="middle" font-size="21" fill="#93c5fd" font-weight="bold" font-family="sans-serif">FR</text>
+              <circle cx="120" cy="280" r="26" fill="rgba(14,165,233,0.15)" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="7,4"/>
+              <text x="120" y="287" text-anchor="middle" font-size="18" fill="#7dd3fc" font-weight="bold" font-family="sans-serif">FML</text>
+              <circle cx="520" cy="280" r="26" fill="rgba(14,165,233,0.15)" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="7,4"/>
+              <text x="520" y="287" text-anchor="middle" font-size="18" fill="#7dd3fc" font-weight="bold" font-family="sans-serif">FMR</text>
+              <circle cx="120" cy="460" r="30" fill="rgba(255,107,53,0.12)" stroke="#FF9268" stroke-width="2.5"/>
+              <text x="120" y="467" text-anchor="middle" font-size="21" fill="#FF9268" font-weight="bold" font-family="sans-serif">ML</text>
+              <circle cx="520" cy="460" r="30" fill="rgba(255,107,53,0.12)" stroke="#FF9268" stroke-width="2.5"/>
+              <text x="520" y="467" text-anchor="middle" font-size="21" fill="#FF9268" font-weight="bold" font-family="sans-serif">MR</text>
+              <circle cx="120" cy="650" r="26" fill="rgba(234,88,12,0.15)" stroke="#fb923c" stroke-width="2.5" stroke-dasharray="7,4"/>
+              <text x="120" y="657" text-anchor="middle" font-size="18" fill="#fdba74" font-weight="bold" font-family="sans-serif">BML</text>
+              <circle cx="520" cy="650" r="26" fill="rgba(234,88,12,0.15)" stroke="#fb923c" stroke-width="2.5" stroke-dasharray="7,4"/>
+              <text x="520" y="657" text-anchor="middle" font-size="18" fill="#fdba74" font-weight="bold" font-family="sans-serif">BMR</text>
+              <circle cx="100" cy="850" r="30" fill="rgba(194,65,12,0.2)" stroke="#FF6B35" stroke-width="2.5"/>
+              <text x="100" y="857" text-anchor="middle" font-size="21" fill="#FF9268" font-weight="bold" font-family="sans-serif">BL</text>
+              <circle cx="540" cy="850" r="30" fill="rgba(194,65,12,0.2)" stroke="#FF6B35" stroke-width="2.5"/>
+              <text x="540" y="857" text-anchor="middle" font-size="21" fill="#FF9268" font-weight="bold" font-family="sans-serif">BR</text>
+            </svg>
+            <div class="why-court-item-stat">10 Positions</div>
+            <div class="why-court-item-sub">Advanced → Pro</div>
+          </div>
+        </div>
+        <div class="why-metrics">
+          <div class="metric-box"><div class="metric-num">6/10</div><div class="metric-label">Positions</div></div>
+          <div class="metric-box"><div class="metric-num">T</div><div class="metric-label">Recovery</div></div>
+          <div class="metric-box"><div class="metric-num">AI</div><div class="metric-label">Voice</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRAINING SYSTEM -->
+<section id="system">
+  <div class="container">
+    <div class="section-head text-center">
+      <div class="section-label reveal">How It Works</div>
+      <h2 class="section-title reveal d1">A Complete <em>Training System</em></h2>
+      <p class="section-sub reveal d2">Four pillars working together to make every session purposeful, measurable, and progressively harder.</p>
+    </div>
+    <div class="system-grid">
+      <div class="sys-card reveal">
+        <div class="sys-card-num">01</div>
+        <div class="sys-card-icon">🎤</div>
+        <h3>AI Voice Coaching</h3>
+        <p>Real-time audio cues call each court position. Adjustable coaching intensity, speech rate, and voice gender — hands-free, eyes-forward training.</p>
+        <span class="sys-card-tag">Hands-Free</span>
+      </div>
+      <div class="sys-card reveal d1">
+        <div class="sys-card-num">02</div>
+        <div class="sys-card-icon">🗺️</div>
+        <h3>Court Systems</h3>
+        <p>Choose between the classic 6-point system for fundamentals or the advanced 10-point system for elite-level court coverage and pattern complexity.</p>
+        <span class="sys-card-tag">6 + 10 Point</span>
+      </div>
+      <div class="sys-card reveal d2">
+        <div class="sys-card-num">03</div>
+        <div class="sys-card-icon">📊</div>
+        <h3>Analytics Engine</h3>
+        <p>Every session is stored locally. Track zone balance, session load, personal bests, streak consistency, and weekly training patterns over time.</p>
+        <span class="sys-card-tag">SQLite Local</span>
+      </div>
+      <div class="sys-card reveal d3">
+        <div class="sys-card-num">04</div>
+        <div class="sys-card-icon">🧩</div>
+        <h3>Pattern Intelligence</h3>
+        <p>AI analyses your zone visit frequency and suggests patterns to address imbalances — so you train your weaknesses, not just your strengths.</p>
+        <span class="sys-card-tag">Adaptive AI</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- APP SHOWCASE -->
+<section id="showcase">
+  <div class="container">
+    <div class="section-head text-center">
+      <div class="section-label reveal">The Training Loop</div>
+      <h2 class="section-title reveal d1">Three Steps.<br><em>Infinite Progress.</em></h2>
+      <p class="section-sub reveal d2">Every great session follows the same loop. Pick a program for your level, ghost with AI voice coaching calling every position, then review your zone data to see exactly where to push harder next time.</p>
+    </div>
+    <div class="showcase-inner" style="align-items:flex-start">
+      <div class="showcase-phone reveal">
+        <div style="font-family:var(--font-display);font-size:2.8rem;font-weight:900;color:var(--gray3);line-height:1;margin-bottom:.5rem;letter-spacing:-.03em">01</div>
+        <div class="showcase-screen">
+          <img src="App_Program_Screen.jpeg" alt="SquashGhostingX routines — training programs by skill level"
+               onerror="this.style.opacity='.12'">
+        </div>
+        <div class="showcase-caption">Choose Your Program</div>
+        <div class="showcase-caption-sub">20+ programs matched to your level</div>
+      </div>
+      <div class="showcase-phone center reveal d1">
+        <div style="font-family:var(--font-display);font-size:2.8rem;font-weight:900;color:var(--accent);line-height:1;margin-bottom:.5rem;letter-spacing:-.03em">02</div>
+        <div class="showcase-screen" style="border-color:var(--borderacc);box-shadow:0 30px 60px rgba(0,0,0,.6),0 0 0 1px rgba(255,107,53,.2)">
+          <img src="App_Home_Screen.jpeg" alt="SquashGhostingX home screen — START SESSION with AI ghosting"
+               onerror="this.style.opacity='.12'">
+        </div>
+        <div class="showcase-caption" style="color:var(--accent)">Train With AI</div>
+        <div class="showcase-caption-sub">Voice coaching calls every rep</div>
+      </div>
+      <div class="showcase-phone reveal d2">
+        <div style="font-family:var(--font-display);font-size:2.8rem;font-weight:900;color:var(--gray3);line-height:1;margin-bottom:.5rem;letter-spacing:-.03em">03</div>
+        <div class="showcase-screen">
+          <img src="App_Session_Stats_Screen.jpeg" alt="SquashGhostingX session stats — reps, zones, duration and performance score"
+               onerror="this.style.opacity='.12'">
+        </div>
+        <div class="showcase-caption">Review &amp; Improve</div>
+        <div class="showcase-caption-sub">Zone data shows where to focus next</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COURT SYSTEMS -->
+<section id="courts">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-label reveal">Court Systems</div>
+      <h2 class="section-title reveal d1">Choose Your <em>System</em></h2>
+      <p class="section-sub reveal d2">Both systems include AI voice coaching, analytics, and T-position recovery. Choose based on your current skill level.</p>
+    </div>
+    <div class="courts-tabs reveal">
+      <button class="court-tab active" onclick="switchCourt('6pt')">6-Point System</button>
+      <button class="court-tab" onclick="switchCourt('10pt')">10-Point System</button>
+    </div>
+    <div id="court-6pt" class="court-panel active">
+      <div class="court-diagram-wrap reveal">
+        <!--
+          WSF court: 6.40m wide × 9.75m long
+          SVG viewBox 0 0 640 975 (1px = 0.01m)
+          toSvgX(x) = (x + 3.20) * 100   toSvgY(z) = z * 100
+          Short line y=426 (4.26m), Half-court x=320, Service boxes 160×160 at each side of short line
+          6-point positions:
+            FL(Front Left):  x=-2.20,z=1.00 → SVG(100,100)
+            FR(Front Right): x= 2.20,z=1.00 → SVG(540,100)
+            ML(Mid Left):    x=-2.00,z=4.60 → SVG(120,460)
+            MR(Mid Right):   x= 2.00,z=4.60 → SVG(520,460)
+            BL(Back Left):   x=-2.20,z=8.50 → SVG(100,850)
+            BR(Back Right):  x= 2.20,z=8.50 → SVG(540,850)
+            T:               x= 0.00,z=4.26 → SVG(320,426)
+        -->
+        <svg viewBox="0 0 640 975" width="180" height="274" aria-label="6-point squash ghosting court — WSF accurate positions">
+          <!-- Surround -->
+          <rect x="0" y="0" width="640" height="975" fill="#020812"/>
+          <!-- Court surface — navy hero style -->
+          <rect x="8" y="8" width="624" height="959" fill="#0C1C2E"/>
+          <!-- Front zone tint -->
+          <rect x="8" y="8" width="624" height="418" fill="rgba(10,132,255,0.07)"/>
+          <!-- Back zone tint -->
+          <rect x="8" y="426" width="624" height="541" fill="rgba(255,107,53,0.06)"/>
+          <!-- T spotlight -->
+          <circle cx="320" cy="426" r="280" fill="rgba(25,75,130,0.07)"/>
+          <circle cx="320" cy="426" r="160" fill="rgba(40,95,165,0.09)"/>
+          <circle cx="320" cy="426" r="80" fill="rgba(60,125,200,0.11)"/>
+          <!-- Court boundary glow -->
+          <rect x="8" y="8" width="624" height="959" fill="none" stroke="rgba(255,107,53,0.12)" stroke-width="18"/>
+          <rect x="8" y="8" width="624" height="959" fill="none" stroke="rgba(255,107,53,0.28)" stroke-width="7"/>
+          <rect x="8" y="8" width="624" height="959" fill="none" stroke="#FF6B35" stroke-width="3"/>
+          <!-- Tin strip -->
+          <rect x="8" y="8" width="624" height="13" fill="#FF6B35" opacity="0.85"/>
+          <!-- Short line (T-line at 4.26m) -->
+          <line x1="8" y1="426" x2="632" y2="426" stroke="#FF6B35" stroke-width="4"/>
+          <!-- Half-court line (short line to back wall) -->
+          <line x1="320" y1="426" x2="320" y2="967" stroke="#FF6B35" stroke-width="4"/>
+          <!-- Service boxes (1.60m × 1.60m each side) -->
+          <rect x="8" y="426" width="160" height="160" fill="rgba(255,107,53,0.04)" stroke="#FF6B35" stroke-width="3"/>
+          <rect x="472" y="426" width="160" height="160" fill="rgba(255,107,53,0.04)" stroke="#FF6B35" stroke-width="3"/>
+          <!-- FRONT WALL label -->
+          <text x="320" y="32" text-anchor="middle" font-size="22" fill="rgba(255,107,53,0.45)" font-family="sans-serif" font-weight="700" letter-spacing="3">FRONT WALL</text>
+          <!-- T-position marker -->
+          <circle cx="320" cy="426" r="20" fill="rgba(255,107,53,0.2)"/>
+          <circle cx="320" cy="426" r="9" fill="#FF6B35"/>
+          <text x="320" y="430" text-anchor="middle" font-size="10" fill="#fff" font-weight="bold" font-family="sans-serif">T</text>
+          <!-- 6 position markers with labels -->
+          <!-- FL: Front Left -->
+          <circle cx="100" cy="100" r="28" fill="rgba(255,107,53,0.12)" stroke="#FF9268" stroke-width="3"/>
+          <text x="100" y="94" text-anchor="middle" font-size="18" fill="#FF9268" font-weight="bold" font-family="sans-serif">FL</text>
+          <text x="100" y="112" text-anchor="middle" font-size="13" fill="rgba(255,146,104,0.7)" font-family="sans-serif">Front L</text>
+          <!-- FR: Front Right -->
+          <circle cx="540" cy="100" r="28" fill="rgba(255,107,53,0.12)" stroke="#FF9268" stroke-width="3"/>
+          <text x="540" y="94" text-anchor="middle" font-size="18" fill="#FF9268" font-weight="bold" font-family="sans-serif">FR</text>
+          <text x="540" y="112" text-anchor="middle" font-size="13" fill="rgba(255,146,104,0.7)" font-family="sans-serif">Front R</text>
+          <!-- ML: Mid Left -->
+          <circle cx="120" cy="460" r="28" fill="rgba(255,107,53,0.12)" stroke="#FF9268" stroke-width="3"/>
+          <text x="120" y="454" text-anchor="middle" font-size="18" fill="#FF9268" font-weight="bold" font-family="sans-serif">ML</text>
+          <text x="120" y="472" text-anchor="middle" font-size="13" fill="rgba(255,146,104,0.7)" font-family="sans-serif">Mid L</text>
+          <!-- MR: Mid Right -->
+          <circle cx="520" cy="460" r="28" fill="rgba(255,107,53,0.12)" stroke="#FF9268" stroke-width="3"/>
+          <text x="520" y="454" text-anchor="middle" font-size="18" fill="#FF9268" font-weight="bold" font-family="sans-serif">MR</text>
+          <text x="520" y="472" text-anchor="middle" font-size="13" fill="rgba(255,146,104,0.7)" font-family="sans-serif">Mid R</text>
+          <!-- BL: Back Left -->
+          <circle cx="100" cy="850" r="28" fill="rgba(255,107,53,0.12)" stroke="#FF9268" stroke-width="3"/>
+          <text x="100" y="844" text-anchor="middle" font-size="18" fill="#FF9268" font-weight="bold" font-family="sans-serif">BL</text>
+          <text x="100" y="862" text-anchor="middle" font-size="13" fill="rgba(255,146,104,0.7)" font-family="sans-serif">Back L</text>
+          <!-- BR: Back Right -->
+          <circle cx="540" cy="850" r="28" fill="rgba(255,107,53,0.12)" stroke="#FF9268" stroke-width="3"/>
+          <text x="540" y="844" text-anchor="middle" font-size="18" fill="#FF9268" font-weight="bold" font-family="sans-serif">BR</text>
+          <text x="540" y="862" text-anchor="middle" font-size="13" fill="rgba(255,146,104,0.7)" font-family="sans-serif">Back R</text>
+        </svg>
+      </div>
+      <div class="court-info reveal d1">
+        <h3>6-Point Ghosting System</h3>
+        <p>Six WSF-accurate court positions across three zones — front corners, mid-court service box sides, and deep back corners. The foundation every squash player needs.</p>
+        <div class="court-points-grid">
+          <div class="court-point"><div class="court-point-num" style="background:#1d4ed8;font-size:.6rem">FL</div><div class="court-point-label">Front Left corner</div></div>
+          <div class="court-point"><div class="court-point-num" style="background:#1d4ed8;font-size:.6rem">FR</div><div class="court-point-label">Front Right corner</div></div>
+          <div class="court-point"><div class="court-point-num" style="background:#0369a1;font-size:.6rem">ML</div><div class="court-point-label">Mid Left zone</div></div>
+          <div class="court-point"><div class="court-point-num" style="background:#0369a1;font-size:.6rem">MR</div><div class="court-point-label">Mid Right zone</div></div>
+          <div class="court-point"><div class="court-point-num" style="background:var(--accent-b);font-size:.6rem">BL</div><div class="court-point-label">Back Left corner</div></div>
+          <div class="court-point"><div class="court-point-num" style="background:var(--accent-b);font-size:.6rem">BR</div><div class="court-point-label">Back Right corner</div></div>
+        </div>
+        <div class="court-features">
+          <div class="court-feature">AI voice calls each position code in real time</div>
+          <div class="court-feature">T-position recovery after every rep</div>
+          <div class="court-feature">WSF regulation court dimensions</div>
+          <div class="court-feature">Ideal for Beginner through Advanced players</div>
+          <div class="court-feature">Fixed, Random, and Shot-based pattern modes</div>
+        </div>
+      </div>
+    </div>
+    <div id="court-10pt" class="court-panel">
+      <div class="court-diagram-wrap reveal">
+        <!--
+          10-point: all 6 positions + 4 bridging positions:
+            FMCL (Front Mid Court Left):  x=-2.00,z=2.80 → SVG(120,280)
+            FMCR (Front Mid Court Right): x= 2.00,z=2.80 → SVG(520,280)
+            BMCL (Back Mid Court Left):   x=-2.00,z=6.50 → SVG(120,650)
+            BMCR (Back Mid Court Right):  x= 2.00,z=6.50 → SVG(520,650)
+        -->
+        <svg viewBox="0 0 640 975" width="180" height="274" aria-label="10-point squash ghosting court — WSF accurate positions">
+          <!-- Surround -->
+          <rect x="0" y="0" width="640" height="975" fill="#020812"/>
+          <!-- Court surface -->
+          <rect x="8" y="8" width="624" height="959" fill="#0C1C2E"/>
+          <!-- Zone tints -->
+          <rect x="8" y="8" width="624" height="418" fill="rgba(10,132,255,0.07)"/>
+          <rect x="8" y="426" width="624" height="541" fill="rgba(255,107,53,0.06)"/>
+          <!-- Spotlight -->
+          <circle cx="320" cy="426" r="280" fill="rgba(25,75,130,0.07)"/>
+          <circle cx="320" cy="426" r="160" fill="rgba(40,95,165,0.09)"/>
+          <circle cx="320" cy="426" r="80" fill="rgba(60,125,200,0.11)"/>
+          <!-- Court boundary -->
+          <rect x="8" y="8" width="624" height="959" fill="none" stroke="rgba(255,107,53,0.12)" stroke-width="18"/>
+          <rect x="8" y="8" width="624" height="959" fill="none" stroke="rgba(255,107,53,0.28)" stroke-width="7"/>
+          <rect x="8" y="8" width="624" height="959" fill="none" stroke="#FF6B35" stroke-width="3"/>
+          <!-- Tin strip -->
+          <rect x="8" y="8" width="624" height="13" fill="#FF6B35" opacity="0.85"/>
+          <!-- Short line y=426 -->
+          <line x1="8" y1="426" x2="632" y2="426" stroke="#FF6B35" stroke-width="4"/>
+          <!-- Half-court line -->
+          <line x1="320" y1="426" x2="320" y2="967" stroke="#FF6B35" stroke-width="4"/>
+          <!-- Service boxes -->
+          <rect x="8" y="426" width="160" height="160" fill="rgba(255,107,53,0.04)" stroke="#FF6B35" stroke-width="3"/>
+          <rect x="472" y="426" width="160" height="160" fill="rgba(255,107,53,0.04)" stroke="#FF6B35" stroke-width="3"/>
+          <!-- FRONT WALL label -->
+          <text x="320" y="32" text-anchor="middle" font-size="22" fill="rgba(255,107,53,0.45)" font-family="sans-serif" font-weight="700" letter-spacing="3">FRONT WALL</text>
+          <!-- T-position -->
+          <circle cx="320" cy="426" r="20" fill="rgba(255,107,53,0.2)"/>
+          <circle cx="320" cy="426" r="9" fill="#FF6B35"/>
+          <text x="320" y="430" text-anchor="middle" font-size="10" fill="#fff" font-weight="bold" font-family="sans-serif">T</text>
+          <!-- FL: Front Left SVG(100,100) -->
+          <circle cx="100" cy="100" r="26" fill="rgba(29,78,216,0.2)" stroke="#60a5fa" stroke-width="2.5"/>
+          <text x="100" y="95" text-anchor="middle" font-size="16" fill="#93c5fd" font-weight="bold" font-family="sans-serif">FL</text>
+          <text x="100" y="111" text-anchor="middle" font-size="11" fill="rgba(147,197,253,0.65)" font-family="sans-serif">Front L</text>
+          <!-- FR: Front Right SVG(540,100) -->
+          <circle cx="540" cy="100" r="26" fill="rgba(29,78,216,0.2)" stroke="#60a5fa" stroke-width="2.5"/>
+          <text x="540" y="95" text-anchor="middle" font-size="16" fill="#93c5fd" font-weight="bold" font-family="sans-serif">FR</text>
+          <text x="540" y="111" text-anchor="middle" font-size="11" fill="rgba(147,197,253,0.65)" font-family="sans-serif">Front R</text>
+          <!-- FMCL: Front Mid Court Left SVG(120,280) — 10pt only -->
+          <circle cx="120" cy="280" r="24" fill="rgba(14,165,233,0.15)" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="6,3"/>
+          <text x="120" y="275" text-anchor="middle" font-size="14" fill="#7dd3fc" font-weight="bold" font-family="sans-serif">FML</text>
+          <text x="120" y="290" text-anchor="middle" font-size="10" fill="rgba(125,211,252,0.6)" font-family="sans-serif">F.Mid L</text>
+          <!-- FMCR: Front Mid Court Right SVG(520,280) — 10pt only -->
+          <circle cx="520" cy="280" r="24" fill="rgba(14,165,233,0.15)" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="6,3"/>
+          <text x="520" y="275" text-anchor="middle" font-size="14" fill="#7dd3fc" font-weight="bold" font-family="sans-serif">FMR</text>
+          <text x="520" y="290" text-anchor="middle" font-size="10" fill="rgba(125,211,252,0.6)" font-family="sans-serif">F.Mid R</text>
+          <!-- ML: Mid Left SVG(120,460) -->
+          <circle cx="120" cy="460" r="26" fill="rgba(255,107,53,0.12)" stroke="#FF9268" stroke-width="2.5"/>
+          <text x="120" y="455" text-anchor="middle" font-size="16" fill="#FF9268" font-weight="bold" font-family="sans-serif">ML</text>
+          <text x="120" y="471" text-anchor="middle" font-size="11" fill="rgba(255,146,104,0.65)" font-family="sans-serif">Mid L</text>
+          <!-- MR: Mid Right SVG(520,460) -->
+          <circle cx="520" cy="460" r="26" fill="rgba(255,107,53,0.12)" stroke="#FF9268" stroke-width="2.5"/>
+          <text x="520" y="455" text-anchor="middle" font-size="16" fill="#FF9268" font-weight="bold" font-family="sans-serif">MR</text>
+          <text x="520" y="471" text-anchor="middle" font-size="11" fill="rgba(255,146,104,0.65)" font-family="sans-serif">Mid R</text>
+          <!-- BMCL: Back Mid Court Left SVG(120,650) — 10pt only -->
+          <circle cx="120" cy="650" r="24" fill="rgba(234,88,12,0.15)" stroke="#fb923c" stroke-width="2.5" stroke-dasharray="6,3"/>
+          <text x="120" y="645" text-anchor="middle" font-size="14" fill="#fdba74" font-weight="bold" font-family="sans-serif">BML</text>
+          <text x="120" y="660" text-anchor="middle" font-size="10" fill="rgba(253,186,116,0.6)" font-family="sans-serif">B.Mid L</text>
+          <!-- BMCR: Back Mid Court Right SVG(520,650) — 10pt only -->
+          <circle cx="520" cy="650" r="24" fill="rgba(234,88,12,0.15)" stroke="#fb923c" stroke-width="2.5" stroke-dasharray="6,3"/>
+          <text x="520" y="645" text-anchor="middle" font-size="14" fill="#fdba74" font-weight="bold" font-family="sans-serif">BMR</text>
+          <text x="520" y="660" text-anchor="middle" font-size="10" fill="rgba(253,186,116,0.6)" font-family="sans-serif">B.Mid R</text>
+          <!-- BL: Back Left SVG(100,850) -->
+          <circle cx="100" cy="850" r="26" fill="rgba(194,65,12,0.2)" stroke="#FF6B35" stroke-width="2.5"/>
+          <text x="100" y="845" text-anchor="middle" font-size="16" fill="#FF9268" font-weight="bold" font-family="sans-serif">BL</text>
+          <text x="100" y="861" text-anchor="middle" font-size="11" fill="rgba(255,146,104,0.65)" font-family="sans-serif">Back L</text>
+          <!-- BR: Back Right SVG(540,850) -->
+          <circle cx="540" cy="850" r="26" fill="rgba(194,65,12,0.2)" stroke="#FF6B35" stroke-width="2.5"/>
+          <text x="540" y="845" text-anchor="middle" font-size="16" fill="#FF9268" font-weight="bold" font-family="sans-serif">BR</text>
+          <text x="540" y="861" text-anchor="middle" font-size="11" fill="rgba(255,146,104,0.65)" font-family="sans-serif">Back R</text>
+          <!-- Legend: dashed = 10pt extra -->
+          <line x1="30" y1="940" x2="60" y2="940" stroke="#38bdf8" stroke-width="2" stroke-dasharray="5,3"/>
+          <text x="68" y="945" font-size="16" fill="rgba(56,189,248,0.8)" font-family="sans-serif">10pt extra positions</text>
+        </svg>
+      </div>
+      <div class="court-info reveal d1">
+        <h3>10-Point Ghosting System</h3>
+        <p>Four bridging positions added between the 6-point zones — creating longer diagonal movement arcs and exponentially more complex patterns. Recommended for advanced, elite and pro training.</p>
+        <div class="court-points-grid">
+          <div class="court-point"><div class="court-point-num" style="background:#1d4ed8;font-size:.55rem">FL</div><div class="court-point-label">Front Left corner</div></div>
+          <div class="court-point"><div class="court-point-num" style="background:#1d4ed8;font-size:.55rem">FR</div><div class="court-point-label">Front Right corner</div></div>
+          <div class="court-point"><div class="court-point-num" style="background:#0284c7;font-size:.5rem">FML</div><div class="court-point-label">Front Mid Left zone</div></div>
+          <div class="court-point"><div class="court-point-num" style="background:#0284c7;font-size:.5rem">FMR</div><div class="court-point-label">Front Mid Right zone</div></div>
+          <div class="court-point"><div class="court-point-num" style="background:var(--accent-b);font-size:.55rem">ML</div><div class="court-point-label">Mid Left zone</div></div>
+          <div class="court-point"><div class="court-point-num" style="background:var(--accent-b);font-size:.55rem">MR</div><div class="court-point-label">Mid Right zone</div></div>
+          <div class="court-point"><div class="court-point-num" style="background:#c2410c;font-size:.5rem">BML</div><div class="court-point-label">Back Mid Left zone</div></div>
+          <div class="court-point"><div class="court-point-num" style="background:#c2410c;font-size:.5rem">BMR</div><div class="court-point-label">Back Mid Right zone</div></div>
+          <div class="court-point"><div class="court-point-num" style="background:#7c2d12;font-size:.55rem">BL</div><div class="court-point-label">Back Left corner</div></div>
+          <div class="court-point"><div class="court-point-num" style="background:#7c2d12;font-size:.55rem">BR</div><div class="court-point-label">Back Right corner</div></div>
+        </div>
+        <div class="court-features">
+          <div class="court-feature">All 6-point positions plus 4 bridging zones</div>
+          <div class="court-feature">Sequential order: FL→FR→FML→FMR→ML→MR→BML→BMR→BL→BR</div>
+          <div class="court-feature">Coverage filters: full, front, back, forehand, backhand</div>
+          <div class="court-feature">Recommended for Advanced, Elite and Pro levels</div>
+          <div class="court-feature">Match Simulation pattern type available</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PATTERN INTELLIGENCE -->
+<section id="patterns">
+  <div class="container">
+    <div class="patterns-grid">
+      <div>
+        <div class="section-label reveal">AI Intelligence</div>
+        <h2 class="section-title reveal d1">Train Your <em>Weaknesses</em>,<br>Not Your Comfort Zone</h2>
+        <p class="section-sub reveal d2">The pattern engine analyses every session and surfaces the court zones you visit least — then builds sessions that specifically target those gaps.</p>
+        <div class="pattern-cards">
+          <div class="pattern-card reveal d2">
+            <div class="pattern-card-icon">🗂️</div>
+            <div>
+              <h4>Zone Frequency Analysis</h4>
+              <p>Tracks how often you visit each court position across all sessions, revealing habitual patterns and neglected areas.</p>
+            </div>
+          </div>
+          <div class="pattern-card reveal d3">
+            <div class="pattern-card-icon">🎯</div>
+            <div>
+              <h4>Smart Session Suggestions</h4>
+              <p>AI recommends the next session type based on your recent zone distribution to correct imbalances before they become habits.</p>
+            </div>
+          </div>
+          <div class="pattern-card reveal d4">
+            <div class="pattern-card-icon">📈</div>
+            <div>
+              <h4>Progressive Overload</h4>
+              <p>Session difficulty adapts as you improve — automatically increasing pace and pattern complexity to keep you in the optimal training zone.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal d2" style="display:flex;justify-content:center;align-items:flex-start">
+        <div style="width:min(280px,88%);background:var(--bg3);border-radius:32px;border:1px solid var(--borderacc);overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.5),0 0 0 1px rgba(255,107,53,.15)">
+          <img src="App_Progress_Screen.jpeg" alt="SquashGhostingX progress screen — zone balance, session history, streaks and personal bests" style="width:100%;display:block" onerror="this.style.opacity='.12'">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILL LEVELS -->
+<section id="skills">
+  <div class="container">
+    <div class="section-head text-center">
+      <div class="section-label reveal">Skill Levels</div>
+      <h2 class="section-title reveal d1">Built for <em>Every</em> Level</h2>
+      <p class="section-sub reveal d2">Whether you're picking up a racket for the first time or training for county championships, SquashGhostingX adapts to your level.</p>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-card beginner reveal">
+        <div class="skill-level-badge">⬤ Beginner</div>
+        <h3>Just Starting Out</h3>
+        <p>Learn basic court movement, build aerobic base, and develop the T-position habit from day one.</p>
+        <ul class="skill-features">
+          <li>6-point system only</li>
+          <li>Slow pace with long rests</li>
+          <li>Clear verbal position calls</li>
+          <li>Short 10-15 min sessions</li>
+        </ul>
+      </div>
+      <div class="skill-card intermediate reveal d1">
+        <div class="skill-level-badge">⬤ Intermediate</div>
+        <h3>Building Consistency</h3>
+        <p>Increase pace, explore both court systems, and start using analytics to identify pattern weaknesses.</p>
+        <ul class="skill-features">
+          <li>6 and 10-point systems</li>
+          <li>Medium pace, shorter rests</li>
+          <li>Zone balance tracking</li>
+          <li>20-30 min session targets</li>
+        </ul>
+      </div>
+      <div class="skill-card advanced reveal d2">
+        <div class="skill-level-badge">⬤ Advanced</div>
+        <h3>Competing Regularly</h3>
+        <p>High-intensity 10-point sessions, pattern intelligence, and data-driven training to sharpen competitive edge.</p>
+        <ul class="skill-features">
+          <li>10-point primary system</li>
+          <li>High pace, minimal rest</li>
+          <li>AI session suggestions</li>
+          <li>Progressive overload</li>
+        </ul>
+      </div>
+      <div class="skill-card elite reveal d3">
+        <div class="skill-level-badge">⬤ Elite</div>
+        <h3>County &amp; Above</h3>
+        <p>Maximum pace, custom routines, and full analytics suite to maintain peak performance and track periodisation.</p>
+        <ul class="skill-features">
+          <li>Custom pattern sequences</li>
+          <li>Elite pace settings</li>
+          <li>Full analytics dashboard</li>
+          <li>Weekly load monitoring</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROGRAMS -->
+<section id="programs">
+  <div class="container">
+    <div class="section-head text-center">
+      <div class="section-label reveal">Built-In Programs</div>
+      <h2 class="section-title reveal d1">20 Programs. <em>Every Level.</em></h2>
+      <p class="section-sub reveal d2">Expertly designed sessions from beginner warm-ups to professional match simulations. All included. All free.</p>
+    </div>
+    <div class="programs-level-tabs reveal">
+      <button class="prog-tab active" data-level="beginner" onclick="switchPrograms('beginner',this)">Beginner</button>
+      <button class="prog-tab" data-level="intermediate" onclick="switchPrograms('intermediate',this)">Intermediate</button>
+      <button class="prog-tab" data-level="advanced" onclick="switchPrograms('advanced',this)">Advanced</button>
+      <button class="prog-tab" data-level="elite" onclick="switchPrograms('elite',this)">Elite</button>
+      <button class="prog-tab" data-level="pro" onclick="switchPrograms('pro',this)">Pro</button>
+      <button class="prog-tab" data-level="custom" onclick="switchPrograms('custom',this)">Custom</button>
+    </div>
+    <div id="prog-beginner" class="programs-panel active">
+      <div class="prog-card reveal"><div class="prog-card-top"><div class="prog-card-name">Warm Up</div><div class="prog-card-time">5 min</div></div><div class="prog-card-desc">Easy 5-min movement to prepare your body and mind.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Slow</span><span class="prog-tag">Movement</span></div></div>
+      <div class="prog-card reveal d1"><div class="prog-card-top"><div class="prog-card-name">First Steps</div><div class="prog-card-time">8 min</div></div><div class="prog-card-desc">4-corner drill at a forgiving pace. Learn the court.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Slow</span><span class="prog-tag">Front Focus</span></div></div>
+      <div class="prog-card reveal d2"><div class="prog-card-top"><div class="prog-card-name">Finding the T</div><div class="prog-card-time">10 min</div></div><div class="prog-card-desc">All 6 positions. Focus on T recovery every rep.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Random</span><span class="prog-tag">T Recovery</span></div></div>
+      <div class="prog-card reveal d3"><div class="prog-card-top"><div class="prog-card-name">Steady Pace</div><div class="prog-card-time">12 min</div></div><div class="prog-card-desc">6-point random ghosting at a comfortable natural tempo.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Natural</span><span class="prog-tag">Full Court</span></div></div>
+      <div class="prog-card reveal d4"><div class="prog-card-top"><div class="prog-card-name">Cool Down</div><div class="prog-card-time">5 min</div></div><div class="prog-card-desc">Slow-paced movement to recover after hard training.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Slow</span><span class="prog-tag">Recovery</span></div></div>
+    </div>
+    <div id="prog-intermediate" class="programs-panel">
+      <div class="prog-card reveal"><div class="prog-card-top"><div class="prog-card-name">Court Coverage</div><div class="prog-card-time">15 min</div></div><div class="prog-card-desc">Continuous 6-point ghosting at match pace.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Natural</span><span class="prog-tag">Full Court</span></div></div>
+      <div class="prog-card reveal d1"><div class="prog-card-top"><div class="prog-card-name">Drop &amp; Drive</div><div class="prog-card-time">12 min</div></div><div class="prog-card-desc">Shot-based: drops from front, drives from back.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Shot-Based</span><span class="prog-tag">Tactics</span></div></div>
+      <div class="prog-card reveal d2"><div class="prog-card-top"><div class="prog-card-name">Cross Court Pattern</div><div class="prog-card-time">12 min</div></div><div class="prog-card-desc">FL→BR→FR→BL diagonal pattern to build width.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Fixed</span><span class="prog-tag">Diagonal</span></div></div>
+      <div class="prog-card reveal d3"><div class="prog-card-top"><div class="prog-card-name">Front Court Focus</div><div class="prog-card-time">10 min</div></div><div class="prog-card-desc">Front and mid positions only. Fast feet, low body.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Front Zone</span><span class="prog-tag">Random</span></div></div>
+      <div class="prog-card reveal d4"><div class="prog-card-top"><div class="prog-card-name">Back Court Power</div><div class="prog-card-time">10 min</div></div><div class="prog-card-desc">Back and mid positions. Build leg strength and drive length.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Back Zone</span><span class="prog-tag">Strength</span></div></div>
+    </div>
+    <div id="prog-advanced" class="programs-panel">
+      <div class="prog-card reveal"><div class="prog-card-top"><div class="prog-card-name">Ghost Master</div><div class="prog-card-time">20 min</div></div><div class="prog-card-desc">10-point court, explosive tempo. Maximum court coverage.</div><div class="prog-card-tags"><span class="prog-tag">10pt</span><span class="prog-tag">Explosive</span><span class="prog-tag">Full Court</span></div></div>
+      <div class="prog-card reveal d1"><div class="prog-card-top"><div class="prog-card-name">Full Court Shot Drill</div><div class="prog-card-time">15 min</div></div><div class="prog-card-desc">All positions, full shot library. Think and move.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Shot-Based</span><span class="prog-tag">Natural</span></div></div>
+      <div class="prog-card reveal d2"><div class="prog-card-top"><div class="prog-card-name">PSA Speed</div><div class="prog-card-time">15 min</div></div><div class="prog-card-desc">6-point at pro tempo. Race the clock.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Explosive</span><span class="prog-tag">Elite Pace</span></div></div>
+    </div>
+    <div id="prog-elite" class="programs-panel">
+      <div class="prog-card reveal"><div class="prog-card-top"><div class="prog-card-name">Match Simulation</div><div class="prog-card-time">20 min</div></div><div class="prog-card-desc">Rally-like 10-point sequences. Pressure and unpredictability.</div><div class="prog-card-tags"><span class="prog-tag">10pt</span><span class="prog-tag">Match Sim</span><span class="prog-tag">Natural</span></div></div>
+      <div class="prog-card reveal d1"><div class="prog-card-top"><div class="prog-card-name">No Rest</div><div class="prog-card-time">5 min</div></div><div class="prog-card-desc">5 minutes continuous. No rest. Pure endurance.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">No Rest</span><span class="prog-tag">Endurance</span></div></div>
+    </div>
+    <div id="prog-pro" class="programs-panel">
+      <div class="prog-card reveal"><div class="prog-card-top"><div class="prog-card-name">Full Court Blitz</div><div class="prog-card-time">25 min</div></div><div class="prog-card-desc">10-point court at maximum explosive pace. Every corner, zero rest.</div><div class="prog-card-tags"><span class="prog-tag">10pt</span><span class="prog-tag">Explosive</span><span class="prog-tag">Endurance</span></div></div>
+      <div class="prog-card reveal d1"><div class="prog-card-top"><div class="prog-card-name">PSA Match Sim</div><div class="prog-card-time">25 min</div></div><div class="prog-card-desc">Rally-length sequences simulating pro match conditions.</div><div class="prog-card-tags"><span class="prog-tag">10pt</span><span class="prog-tag">Match Sim</span><span class="prog-tag">Tactical</span></div></div>
+      <div class="prog-card reveal d2"><div class="prog-card-top"><div class="prog-card-name">Precision &amp; Power</div><div class="prog-card-time">20 min</div></div><div class="prog-card-desc">Explosive shot-based drill across all 10 positions.</div><div class="prog-card-tags"><span class="prog-tag">10pt</span><span class="prog-tag">Shot-Based</span><span class="prog-tag">Explosive</span></div></div>
+      <div class="prog-card reveal d3"><div class="prog-card-top"><div class="prog-card-name">Maximum Intensity</div><div class="prog-card-time">30 min</div></div><div class="prog-card-desc">30 minutes continuous at explosive pace. No mercy.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Explosive</span><span class="prog-tag">No Rest</span></div></div>
+      <div class="prog-card reveal d4"><div class="prog-card-top"><div class="prog-card-name">Total Court Mastery</div><div class="prog-card-time">30 min</div></div><div class="prog-card-desc">Full 10-point court with complete shot library. The ultimate test.</div><div class="prog-card-tags"><span class="prog-tag">10pt</span><span class="prog-tag">Shot-Based</span><span class="prog-tag">Explosive</span></div></div>
+    </div>
+    <div id="prog-custom" class="programs-panel">
+      <div class="prog-card reveal" style="grid-column:1/-1;text-align:center;padding:2.5rem">
+        <div style="font-size:3rem;margin-bottom:1rem">🔧</div>
+        <div class="prog-card-name" style="font-size:1.4rem;margin-bottom:.75rem">Custom Session Builder</div>
+        <p style="color:var(--gray1);font-size:.9rem;line-height:1.7;max-width:500px;margin:0 auto 1.5rem">Build your own session from scratch. Choose court system, drill type, coverage mode, pattern type, tempo, duration, rest intervals, shot groups, and voice settings — everything configurable.</p>
+        <a href="#cta" class="btn-primary" style="display:inline-flex">⬇ Download to Build</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONFIGURE SESSION -->
+<section id="configure">
+  <div class="container">
+    <div class="section-head text-center">
+      <div class="section-label reveal">Setup Training</div>
+      <h2 class="section-title reveal d1">Configure Every <em>Detail</em></h2>
+      <p class="section-sub reveal d2">A 6-step setup wizard gives you complete control. Three key choices shape every session — training mode, court coverage zone, and position sequencing.</p>
+    </div>
+    <div class="config-grid">
+
+      <!-- Step 2: Training Mode -->
+      <div class="reveal">
+        <div class="config-phone">
+          <img src="App_Drill_Type_Screen.jpeg" alt="Training mode selection — Shot-Based, Match Simulation, Movement Only, Custom Drill"
+               style="width:100%;display:block" onerror="this.style.opacity='.12'">
+        </div>
+        <div class="config-phone-label">Training Mode</div>
+        <div class="config-phone-sub">4 modes — movement to match simulation</div>
+      </div>
+
+      <!-- Step 4: Coverage Zone -->
+      <div class="reveal d1">
+        <div class="config-phone">
+          <img src="App_Court_Zone_Screen.jpeg" alt="Coverage zone selection — Full Court, Front Court, Back Court, Forehand, Backhand"
+               style="width:100%;display:block" onerror="this.style.opacity='.12'">
+        </div>
+        <div class="config-phone-label">Court Coverage</div>
+        <div class="config-phone-sub">5 zone modes — full court to targeted side</div>
+      </div>
+
+      <!-- Step 5: Position Sequence -->
+      <div class="reveal d2">
+        <div class="config-phone">
+          <img src="App_Squence_Screen.jpeg" alt="Position sequence — Random or Fixed"
+               style="width:100%;display:block" onerror="this.style.opacity='.12'">
+        </div>
+        <div class="config-phone-label">Position Sequence</div>
+        <div class="config-phone-sub">Random unpredictability or Fixed pattern grooves</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- SESSION SETUP -->
+<section id="session-setup">
+  <div class="container">
+    <div class="section-head text-center">
+      <div class="section-label reveal">Last Step</div>
+      <h2 class="section-title reveal d1">Every Parameter,<br><em>Under Your Control</em></h2>
+      <p class="section-sub reveal d2">Step 6 locks in duration, tempo, rest intervals, and voice mode. Your audio preferences and default session settings are always one tap away — no reconfiguring before every session.</p>
+    </div>
+    <div class="config-grid">
+      <div class="reveal">
+        <div class="config-phone">
+          <img src="App_Setup_Session_Screen.jpeg" alt="Session setup step 6 — duration, tempo, rest interval, voice mode, START SESSION"
+               style="width:100%;display:block" onerror="this.style.opacity='.12'">
+        </div>
+        <div class="config-phone-label">Session Setup</div>
+        <div class="config-phone-sub">Duration · Tempo · Rest · Voice mode</div>
+      </div>
+      <div class="reveal d1">
+        <div class="config-phone">
+          <img src="App_Audio_Screen.jpeg" alt="Audio settings — voice instructions, speech rate, coaching cues, haptic feedback, test voice"
+               style="width:100%;display:block" onerror="this.style.opacity='.12'">
+        </div>
+        <div class="config-phone-label">Audio Control</div>
+        <div class="config-phone-sub">Voice · Speech rate · Coaching cues · Haptics</div>
+      </div>
+      <div class="reveal d2">
+        <div class="config-phone">
+          <img src="App_Session_Settings_Screen.jpeg" alt="Default session settings — court system, court style, difficulty, tempo, movement pace"
+               style="width:100%;display:block" onerror="this.style.opacity='.12'">
+        </div>
+        <div class="config-phone-label">Default Settings</div>
+        <div class="config-phone-sub">Court system · Difficulty · Tempo · Pace</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SESSION RESULTS -->
+<section id="results">
+  <div class="container">
+    <div class="section-head text-center">
+      <div class="section-label reveal">Session Results</div>
+      <h2 class="section-title reveal d1">Every Session<br><em>Earns Its Score</em></h2>
+      <p class="section-sub reveal d2">From first sign-in to personal best — every metric logged automatically. Completion rate, reaction time, consistency, calories, court balance, and streak all tracked so you always know where you stand.</p>
+    </div>
+    <div class="config-grid">
+      <div class="reveal">
+        <div class="config-phone">
+          <img src="App_Welcome_Screen.jpeg" alt="Welcome screen — Train Hard. Play Fearless. Create Account or Sign In"
+               style="width:100%;display:block" onerror="this.style.opacity='.12'">
+        </div>
+        <div class="config-phone-label">Get Started Free</div>
+        <div class="config-phone-sub">Free account · Instant access · No payment</div>
+      </div>
+      <div class="reveal d1">
+        <div class="config-phone">
+          <img src="App_Session_Stats_Screen.jpeg" alt="Session ended — duration, movements, reaction time, consistency, calories, streak"
+               style="width:100%;display:block" onerror="this.style.opacity='.12'">
+        </div>
+        <div class="config-phone-label">Session Complete</div>
+        <div class="config-phone-sub">Duration · Movements · Consistency · Calories</div>
+      </div>
+      <div class="reveal d2">
+        <div class="config-phone">
+          <img src="App_Session_Stats_Screen%20%282%29.jpeg" alt="Personal bests and recent sessions — completion, intensity, reps by court system"
+               style="width:100%;display:block" onerror="this.style.opacity='.12'">
+        </div>
+        <div class="config-phone-label">Personal Bests</div>
+        <div class="config-phone-sub">Completion · Intensity · Most reps · By system</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PERFORMANCE BENTO -->
+<section id="performance">
+  <div class="container">
+    <div class="section-head text-center">
+      <div class="section-label reveal">Performance Features</div>
+      <h2 class="section-title reveal d1">The Details That <em>Matter</em></h2>
+    </div>
+    <div class="bento-grid">
+      <div class="bento-card wide reveal">
+        <div class="bento-card-label">Voice Engine</div>
+        <h3>AI Coaching That Keeps You Eyes-Up</h3>
+        <p>Natural-sounding voice cues call each position at exactly the right moment — adjustable speech rate, coaching intensity, and male/female voice options. Your phone stays in your pocket.</p>
+        <div class="bento-accent-bg"></div>
+      </div>
+      <div class="bento-card reveal d1">
+        <div class="bento-card-label">Local Storage</div>
+        <div class="bento-big-num">∞</div>
+        <h3>Sessions Stored</h3>
+        <p>All data stays on your device via SQLite. No cloud, no subscription, no data concerns.</p>
+      </div>
+      <div class="bento-card reveal d2">
+        <div class="bento-card-label">Recovery</div>
+        <h3>Smart Rest Intervals</h3>
+        <p>Recovery cues fire 400ms before interval end — so you're always ready at the T before the next call comes.</p>
+      </div>
+      <div class="bento-card reveal d3">
+        <div class="bento-card-label">Streak System</div>
+        <div class="bento-big-num">🔥</div>
+        <h3>Consistency Rewards</h3>
+        <p>Daily streak tracking and personal bests to keep you accountable between sessions.</p>
+      </div>
+      <div class="bento-card wide reveal d1">
+        <div class="bento-card-label">Session Engine</div>
+        <h3>Full Countdown → Active → Rest → Complete Flow</h3>
+        <p>3-second countdown, live pace control during the session (7 levels), auto-save to history, and a resume prompt if you leave mid-session. Everything you need, nothing you don't.</p>
+        <div class="bento-accent-bg"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VIDEOS -->
+<section id="videos">
+  <div class="container">
+    <div class="section-head text-center">
+      <div class="section-label reveal">See It In Action</div>
+      <h2 class="section-title reveal d1">Watch the App <em>Work</em></h2>
+      <p class="section-sub reveal d2">Real ghosting sessions using SquashGhostingX. See the AI coaching, court system, and session flow in action.</p>
+    </div>
+    <div class="videos-4grid">
+      <div class="video-item reveal">
+        <h4>10-Point Ghosting — Session 1</h4>
+        <p>10-point system at elite pace with AI voice coaching.</p>
+        <div class="video-frame-wrap" id="v1-wrap" onclick="loadVideoSimple('v1','7gtkwDIxO6A')">
+          <img src="https://img.youtube.com/vi/7gtkwDIxO6A/hqdefault.jpg" alt="10-Point Ghosting Session 1" class="video-thumb" loading="lazy">
+          <div class="video-play-btn"><div class="video-play-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg></div></div>
+        </div>
+        <div class="video-iframe-container" id="v1-iframe"></div>
+      </div>
+      <div class="video-item reveal d1">
+        <h4>10-Point Ghosting — Session 2</h4>
+        <p>Advanced 10-point patterns — longer arcs, explosive tempo.</p>
+        <div class="video-frame-wrap" id="v2-wrap" onclick="loadVideoSimple('v2','WXNJNci6hfo')">
+          <img src="https://img.youtube.com/vi/WXNJNci6hfo/hqdefault.jpg" alt="10-Point Ghosting Session 2" class="video-thumb" loading="lazy">
+          <div class="video-play-btn"><div class="video-play-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg></div></div>
+        </div>
+        <div class="video-iframe-container" id="v2-iframe"></div>
+      </div>
+      <div class="video-item reveal d2">
+        <h4>6-Point Ghosting — Session 1</h4>
+        <p>Classic 6-point system — great for all levels.</p>
+        <div class="video-frame-wrap" id="v3-wrap" onclick="loadVideoSimple('v3','U52zeGOXJvw')">
+          <img src="https://img.youtube.com/vi/U52zeGOXJvw/hqdefault.jpg" alt="6-Point Ghosting Session 1" class="video-thumb" loading="lazy">
+          <div class="video-play-btn"><div class="video-play-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg></div></div>
+        </div>
+        <div class="video-iframe-container" id="v3-iframe"></div>
+      </div>
+      <div class="video-item reveal d3">
+        <h4>6-Point Ghosting — Session 2</h4>
+        <p>6-point ghosting with shot-based coaching cues.</p>
+        <div class="video-frame-wrap" id="v4-wrap" onclick="loadVideoSimple('v4','j5CypiAZpoc')">
+          <img src="https://img.youtube.com/vi/j5CypiAZpoc/hqdefault.jpg" alt="6-Point Ghosting Session 2" class="video-thumb" loading="lazy">
+          <div class="video-play-btn"><div class="video-play-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg></div></div>
+        </div>
+        <div class="video-iframe-container" id="v4-iframe"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COACHES -->
+<section id="coaches">
+  <div class="container">
+    <div class="coaches-grid">
+      <div>
+        <div class="section-label reveal">For Coaches</div>
+        <h2 class="section-title reveal d1">Assign It as <em>Homework</em></h2>
+        <p class="section-sub reveal d2">Coaches across the world are using SquashGhostingX to set structured ghosting homework between sessions — with progress data their players can show at their next lesson.</p>
+        <div class="coaches-steps">
+          <div class="step reveal d2">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h4>Tell your player to download the app</h4>
+              <p>Free on iOS, takes 60 seconds to set up. No account required — they can start as a guest.</p>
+            </div>
+          </div>
+          <div class="step reveal d3">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h4>Prescribe the system and duration</h4>
+              <p>Specify 6-point or 10-point, session length, and pace level based on their current skill tier.</p>
+            </div>
+          </div>
+          <div class="step reveal d4">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <h4>Review their zone data at the next lesson</h4>
+              <p>Players show their Progress screen — streak, zone balance, and session history tell you exactly what they've been working on.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="coaches-card reveal d2">
+        <p class="coach-quote">"I recommend SquashGhostingX to all my juniors. The fact that the AI calls the positions means they're actually moving — not watching the screen. Their footwork has noticeably improved in just six weeks."</p>
+        <div class="coach-meta">
+          <div class="coach-avatar">RC</div>
+          <div>
+            <div class="coach-name">Richard C.</div>
+            <div class="coach-role">Head Coach · County Squash Academy</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="container">
+    <div class="section-head text-center">
+      <div class="section-label reveal">Players Love It</div>
+      <h2 class="section-title reveal d1">Real Results from <em>Real Players</em></h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card reveal">
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-quote">"The AI voice coaching is a game-changer. I can do a full ghosting session without looking at my phone once. My court coverage has improved dramatically in just two months."</div>
+        <div class="testi-author">
+          <div class="testi-avatar">MK</div>
+          <div>
+            <div class="testi-name">Marcus K.</div>
+            <div class="testi-handle">County player · UK</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal d1">
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-quote">"I use this with all my junior squad. They actually do the ghosting homework I set because the app makes it structured and trackable. The progress data at our next lesson is always revealing."</div>
+        <div class="testi-author">
+          <div class="testi-avatar">AT</div>
+          <div>
+            <div class="testi-name">Ahmed T.</div>
+            <div class="testi-handle">Head Coach · Dubai Squash Club</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal d2">
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-quote">"The 10-point system is brutal in the best possible way. My back corner movement was terrible — the zone balance data showed it immediately and now I focus every other session on it."</div>
+        <div class="testi-author">
+          <div class="testi-avatar">PW</div>
+          <div>
+            <div class="testi-name">Priya W.</div>
+            <div class="testi-handle">Club champion · Singapore</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOREVER FREE -->
+<section id="free">
+  <div class="container">
+    <div class="section-head text-center">
+      <div class="section-label reveal">Pricing</div>
+      <h2 class="section-title reveal d1">100% Free. <em>Forever.</em></h2>
+      <p class="section-sub reveal d2">No subscription. No trial. No credit card. Every feature in SquashGhostingX is completely free to use on iOS and Android.</p>
+    </div>
+    <div class="free-grid">
+      <div class="free-card reveal">
+        <div class="free-card-icon">🗺️</div>
+        <h3>Both Court Systems</h3>
+        <p>Full 6-point and 10-point WSF-accurate ghosting systems included. Switch between them any time.</p>
+      </div>
+      <div class="free-card reveal d1">
+        <div class="free-card-icon">🎤</div>
+        <h3>AI Voice Coaching</h3>
+        <p>Male or female voice, adjustable speech rate, 4 coaching styles (calm, friendly, energetic, professional), 4 voice modes.</p>
+      </div>
+      <div class="free-card reveal d2">
+        <div class="free-card-icon">📋</div>
+        <h3>20 Built-In Programs</h3>
+        <p>Pre-built sessions across 5 skill levels — Beginner, Intermediate, Advanced, Elite, Pro — plus custom session builder.</p>
+      </div>
+      <div class="free-card reveal d3">
+        <div class="free-card-icon">📊</div>
+        <h3>Full Analytics</h3>
+        <p>Zone balance, session history, streak tracking, personal bests, weekly load chart, intensity scoring — all local, all free.</p>
+      </div>
+      <div class="free-card reveal d4">
+        <div class="free-card-icon">🌍</div>
+        <h3>17 Languages</h3>
+        <p>AI voice coaching available in English (US/GB), Spanish, French, German, Hindi, Arabic, Chinese, Japanese, Korean and more.</p>
+      </div>
+      <div class="free-card reveal d5">
+        <div class="free-card-icon">🔒</div>
+        <h3>Private &amp; Offline</h3>
+        <p>Everything stored locally via SQLite. No cloud, no tracking, no account required. Works 100% offline on court.</p>
+      </div>
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--borderacc);border-radius:var(--r16);padding:2rem;margin-bottom:2.5rem" class="reveal">
+      <div class="section-label" style="margin-bottom:1rem">All Included Features</div>
+      <div class="free-features-list">
+        <div class="free-feat"><span class="free-feat-icon">✓</span>6-point and 10-point court systems</div>
+        <div class="free-feat"><span class="free-feat-icon">✓</span>Movement, Shot-based &amp; Match Sim drills</div>
+        <div class="free-feat"><span class="free-feat-icon">✓</span>Fixed, Random &amp; Shot-based patterns</div>
+        <div class="free-feat"><span class="free-feat-icon">✓</span>Full, Front, Back, Forehand, Backhand coverage</div>
+        <div class="free-feat"><span class="free-feat-icon">✓</span>Slow, Natural &amp; Explosive tempo settings</div>
+        <div class="free-feat"><span class="free-feat-icon">✓</span>5 difficulty levels + Pro difficulty</div>
+        <div class="free-feat"><span class="free-feat-icon">✓</span>Drives, drops, boasts, volleys, lobs, kills, cross shots</div>
+        <div class="free-feat"><span class="free-feat-icon">✓</span>Voice+Visual, Voice-only, Visual-only, Beep modes</div>
+        <div class="free-feat"><span class="free-feat-icon">✓</span>Male &amp; female voice, 4 voice styles</div>
+        <div class="free-feat"><span class="free-feat-icon">✓</span>17 languages for voice coaching</div>
+        <div class="free-feat"><span class="free-feat-icon">✓</span>Left &amp; right hand dominant support</div>
+        <div class="free-feat"><span class="free-feat-icon">✓</span>Auto &amp; manual rest modes</div>
+        <div class="free-feat"><span class="free-feat-icon">✓</span>Live pace control during sessions (7 steps)</div>
+        <div class="free-feat"><span class="free-feat-icon">✓</span>Session resume within 24 hours</div>
+        <div class="free-feat"><span class="free-feat-icon">✓</span>Zone balance &amp; front/mid/back analytics</div>
+        <div class="free-feat"><span class="free-feat-icon">✓</span>Streak tracking &amp; personal bests</div>
+        <div class="free-feat"><span class="free-feat-icon">✓</span>Weekly training load chart</div>
+        <div class="free-feat"><span class="free-feat-icon">✓</span>AI session suggestions based on zone gaps</div>
+        <div class="free-feat"><span class="free-feat-icon">✓</span>Haptic feedback support</div>
+        <div class="free-feat"><span class="free-feat-icon">✓</span>Silent mode bypass (court etiquette)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BLOG -->
+<section id="blog">
+  <div class="container">
+    <div class="section-head text-center">
+      <div class="section-label reveal">Training Intelligence</div>
+      <h2 class="section-title reveal d1">The <em>Squash Lab</em></h2>
+      <p class="section-sub reveal d2">Evidence-backed guides, training science, and tactical breakdowns for serious squash players.</p>
+    </div>
+    <div class="blog-grid">
+      <div class="blog-card reveal" onclick="openBlog(0)">
+        <div class="blog-card-img"><div class="blog-card-emoji">🧠</div></div>
+        <div class="blog-card-body">
+          <div class="blog-card-tag">Training Science</div>
+          <div class="blog-card-title">The Neuroscience of Court Movement</div>
+          <div class="blog-card-excerpt">How ghosting rewires your motor cortex for automatic court coverage.</div>
+        </div>
+      </div>
+      <div class="blog-card reveal d1" onclick="openBlog(1)">
+        <div class="blog-card-img"><div class="blog-card-emoji">📈</div></div>
+        <div class="blog-card-body">
+          <div class="blog-card-tag">Analytics</div>
+          <div class="blog-card-title">Reading Your Zone Balance Data</div>
+          <div class="blog-card-excerpt">What your heatmap tells you about your match game weaknesses.</div>
+        </div>
+      </div>
+      <div class="blog-card reveal d2" onclick="openBlog(2)">
+        <div class="blog-card-img"><div class="blog-card-emoji">⚡</div></div>
+        <div class="blog-card-body">
+          <div class="blog-card-tag">Fitness</div>
+          <div class="blog-card-title">6-Point vs 10-Point: Which Is Right for You?</div>
+          <div class="blog-card-excerpt">A complete breakdown of both systems and how to choose.</div>
+        </div>
+      </div>
+      <div class="blog-card reveal d3" onclick="openBlog(3)">
+        <div class="blog-card-img"><div class="blog-card-emoji">🎯</div></div>
+        <div class="blog-card-body">
+          <div class="blog-card-tag">Tactics</div>
+          <div class="blog-card-title">T-Position: The Most Important Habit in Squash</div>
+          <div class="blog-card-excerpt">Why recovering to the T after every shot is non-negotiable.</div>
+        </div>
+      </div>
+      <div class="blog-card reveal" onclick="openBlog(4)">
+        <div class="blog-card-img"><div class="blog-card-emoji">💪</div></div>
+        <div class="blog-card-body">
+          <div class="blog-card-tag">Conditioning</div>
+          <div class="blog-card-title">Progressive Overload for Squash Athletes</div>
+          <div class="blog-card-excerpt">How to structure training load to keep improving without burning out.</div>
+        </div>
+      </div>
+      <div class="blog-card reveal d1" onclick="openBlog(5)">
+        <div class="blog-card-img"><div class="blog-card-emoji">🏃</div></div>
+        <div class="blog-card-body">
+          <div class="blog-card-tag">Movement</div>
+          <div class="blog-card-title">The Perfect Ghosting Lunge Technique</div>
+          <div class="blog-card-excerpt">Biomechanics of efficient court movement that protects your knees.</div>
+        </div>
+      </div>
+      <div class="blog-card reveal d2" onclick="openBlog(6)">
+        <div class="blog-card-img"><div class="blog-card-emoji">🔄</div></div>
+        <div class="blog-card-body">
+          <div class="blog-card-tag">Routines</div>
+          <div class="blog-card-title">Building a 4-Week Ghosting Programme</div>
+          <div class="blog-card-excerpt">A structured four-week plan for competitive players pre-tournament.</div>
+        </div>
+      </div>
+      <div class="blog-card reveal d3" onclick="openBlog(7)">
+        <div class="blog-card-img"><div class="blog-card-emoji">🎤</div></div>
+        <div class="blog-card-body">
+          <div class="blog-card-tag">Technology</div>
+          <div class="blog-card-title">Why AI Voice Coaching Changes Everything</div>
+          <div class="blog-card-excerpt">How audio-first coaching keeps your eyes up and your focus on movement.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BLOG MODAL -->
+<div class="blog-modal-overlay" id="blog-modal" onclick="closeBlogOnOverlay(event)">
+  <div class="blog-modal">
+    <button class="blog-modal-close" onclick="closeBlog()">✕</button>
+    <div class="blog-modal-tag" id="bm-tag"></div>
+    <h2 class="blog-modal-title" id="bm-title"></h2>
+    <div class="blog-modal-meta" id="bm-meta"></div>
+    <div class="blog-modal-body" id="bm-body"></div>
+  </div>
+</div>
+
+<!-- FOUNDERS -->
+<section id="founder">
+  <div class="container">
+    <div class="section-head text-center">
+      <div class="section-label reveal">The Team Behind the App</div>
+      <h2 class="section-title reveal d1">Built by <em>Players,</em><br>For Every Player</h2>
+      <p class="section-sub reveal d2">SquashGhostingX was born on a real court — out of a conviction that elite-level coaching tools should reach every player, not just the privileged few.</p>
+    </div>
+
+    <div class="founders-story reveal d1">
+      <h3>Our Story</h3>
+      <p>Ghosting is the backbone of squash fitness — but training it well has always meant hiring a coach to call positions, counting in your own head, or guessing through patterns. None of it was intelligent. None of it was personalised. Varish and Darshika built the app they wished had existed: a full AI coaching engine that calls your positions out loud, tracks your court coverage across every session, adapts to your skill level, and speaks to you in 17 languages. No subscriptions. No tiers. No paywalls. Just the most precise ghosting training tool ever built — free, forever, for everyone.</p>
+    </div>
+
+    <div class="founders-grid">
+      <!-- Co-Founder & CEO -->
+      <div class="founder-card reveal">
+        <div class="founder-card-photo">
+          <img src="Co-Founder%20%26%20CEO-Varish.jpg"
+               alt="Varish Gahlot — Co-Founder &amp; CEO, SquashGhostingX"
+               class="founder-card-img"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="founder-card-fallback" style="display:none">VG</div>
+        </div>
+        <div class="founder-card-body">
+          <div class="founder-card-role">Co-Founder &amp; CEO</div>
+          <h3 class="founder-card-name">Varish Gahlot</h3>
+          <blockquote class="founder-card-quote">"I built SquashGhostingX because I couldn't find a ghosting app that trained me the way I actually play. Every position, every cue, every drill had to be engineered — not improvised. So I built it from scratch. And made it free for every player on every court."</blockquote>
+          <p class="founder-card-bio">Varish is a competitive squash player who turned a real training gap into a globally-available coaching platform. As Co-Founder &amp; CEO, he leads product vision and engineering — from the AI coaching engine and WSF-accurate court systems to the session engine powering every drill. He competes at junior elite level and has represented the U.S. at national open tournaments including the U.S. Junior Open.</p>
+        </div>
+      </div>
+
+      <!-- Co-Founder & President -->
+      <div class="founder-card reveal d1">
+        <div class="founder-card-photo">
+          <img src="Co-Founder%20%26%20President-Darshika.JPG"
+               alt="Darshika Gahlot — Co-Founder &amp; President, SquashGhostingX"
+               class="founder-card-img"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="founder-card-fallback" style="display:none">DG</div>
+        </div>
+        <div class="founder-card-body">
+          <div class="founder-card-role">Co-Founder &amp; President</div>
+          <h3 class="founder-card-name">Darshika Gahlot</h3>
+          <blockquote class="founder-card-quote">"Great squash coaching has always been the privilege of the few — players with access to elite clubs, expensive coaches, and the right connections. We're changing that. Every player, every court, every level — free, forever. That's the only way we know how to build this."</blockquote>
+          <p class="founder-card-bio">Darshika drives the vision, community, and operational strategy behind SquashGhostingX. As Co-Founder &amp; President, she ensures the platform reaches every player who needs it — from beginners finding their footing to elite competitors optimising court coverage. Her belief: access to world-class training tools should never be determined by budget or geography.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mission Pillars -->
+    <div class="founders-mission">
+      <div class="mission-pillar reveal">
+        <div class="mission-pillar-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M12 12c-2-2.5-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.5 6-4zm0 0c2 2.5 4 4 6 4a4 4 0 1 0 0-8c-2 0-4 1.5-6 4z"/></svg>
+        </div>
+        <h4>Free, Always</h4>
+        <p>Every feature, every program, every coaching cue — free forever. No subscriptions, no tiers, no paywalls. World-class training for every player.</p>
+      </div>
+      <div class="mission-pillar reveal d1">
+        <div class="mission-pillar-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="white" stroke="none"/></svg>
+        </div>
+        <h4>Precision Built</h4>
+        <p>Engineered on WSF-standard court systems. Every position, pattern, and coaching cue reflects how squash is actually played at the highest level.</p>
+      </div>
+      <div class="mission-pillar reveal d2">
+        <div class="mission-pillar-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </div>
+        <h4>Every Player</h4>
+        <p>5 skill levels, 20 built-in programs, 17 languages. Whether you're a beginner or a pro, SquashGhostingX trains you the way you need — on your court, in your language.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="container">
+    <div class="section-head text-center">
+      <div class="section-label reveal">FAQ</div>
+      <h2 class="section-title reveal d1">Common <em>Questions</em></h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item reveal">
+        <button class="faq-q" onclick="toggleFaq(this)">Is SquashGhostingX really free?<span class="faq-arrow">▼</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Yes — the full app including both 6-point and 10-point ghosting systems, AI voice coaching, all analytics, all 20 built-in programs, and unlimited session history is completely free to download and use. No trial period, no credit card, no hidden fees. Free forever.</div></div>
+      </div>
+      <div class="faq-item reveal d1">
+        <button class="faq-q" onclick="toggleFaq(this)">What is squash ghosting?<span class="faq-arrow">▼</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Ghosting is a solo squash training drill where you move to each position on the court and play a shadow stroke — as if the ball were there — then recover to the T. It builds court movement, aerobic fitness, and the muscle memory for automatic footwork without needing a partner or a coach present.</div></div>
+      </div>
+      <div class="faq-item reveal d2">
+        <button class="faq-q" onclick="toggleFaq(this)">What devices does it run on?<span class="faq-arrow">▼</span></button>
+        <div class="faq-a"><div class="faq-a-inner">SquashGhostingX is currently available on iOS (iPhone and iPad). Android support is on the roadmap. You can download it free from the App Store — no TestFlight required, it's in the public App Store.</div></div>
+      </div>
+      <div class="faq-item reveal d3">
+        <button class="faq-q" onclick="toggleFaq(this)">Does it work offline?<span class="faq-arrow">▼</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Yes, completely. SquashGhostingX works 100% offline. All session data is stored locally on your device using SQLite. You don't even need a Wi-Fi connection on court — just your phone and a squash court.</div></div>
+      </div>
+      <div class="faq-item reveal d4">
+        <button class="faq-q" onclick="toggleFaq(this)">What's the difference between 6-point and 10-point?<span class="faq-arrow">▼</span></button>
+        <div class="faq-a"><div class="faq-a-inner">The 6-point system covers front corners, mid-court, and back corners — six positions total. It's ideal for beginners through intermediate players building movement fundamentals. The 10-point system adds deep front corners, an additional centre-mid position, and deep back centre, creating more complex patterns and longer movement arcs for advanced and elite players.</div></div>
+      </div>
+      <div class="faq-item reveal d5">
+        <button class="faq-q" onclick="toggleFaq(this)">Does the AI voice work with earphones?<span class="faq-arrow">▼</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Yes — earphones are actually the recommended setup. The AI voice calls each court position clearly through any Bluetooth or wired headphones. The app is also designed to bypass iOS silent mode, so it works even when your phone is on silent — important for court etiquette.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="container">
+    <div class="cta-inner reveal">
+      <h2 class="cta-title">Your Feet Should Move<br>Before Your Brain Does.</h2>
+      <p class="cta-sub">Join 2,500+ players across 40+ countries who are training smarter with SquashGhostingX. Free to download. No account required.</p>
+      <div class="cta-actions">
+        <a href="https://apps.apple.com/app/squashghostingx/id6744036820" class="store-btn" target="_blank" rel="noopener">
+          <span class="store-btn-icon"></span>
+          <div><div style="font-size:.65rem;opacity:.8">Download on the</div><div style="font-size:.95rem;font-weight:800">App Store</div></div>
+        </a>
+        <a href="https://play.google.com/store/apps/details?id=com.squashghostingx.app" class="store-btn" target="_blank" rel="noopener">
+          <span class="store-btn-icon">🤖</span>
+          <div><div style="font-size:.65rem;opacity:.8">Get it on</div><div style="font-size:.95rem;font-weight:800">Google Play</div></div>
+        </a>
+      </div>
+      <p class="cta-note">iOS 16+ · Android 10+ · 100% Free · No subscription · No account required</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <div class="section-head text-center">
+      <div class="section-label reveal">Get In Touch</div>
+      <h2 class="section-title reveal d1">Questions or <em>Feedback?</em></h2>
+      <p class="section-sub reveal d2">We read every message and reply within 24 hours.</p>
+    </div>
+    <div class="contact-grid">
+
+      <!-- LEFT — info -->
+      <div class="reveal">
+        <div class="contact-info-title">We'd love to hear from you</div>
+        <p class="contact-info-body">Found a bug? Have a feature idea? Training question? Drop us a message and we'll get back to you personally.</p>
+        <div class="contact-detail">
+          <div class="contact-detail-icon">✉️</div>
+          <div><a href="mailto:squash.ghostingx@gmail.com">squash.ghostingx@gmail.com</a></div>
+        </div>
+        <div class="contact-detail">
+          <div class="contact-detail-icon">⏱️</div>
+          <div>Typical response within 24 hours</div>
+        </div>
+        <div class="contact-detail">
+          <div class="contact-detail-icon">📱</div>
+          <div>For bug reports, include your device model and iOS/Android version</div>
+        </div>
+        <div class="contact-detail">
+          <div class="contact-detail-icon">🔒</div>
+          <div>Messages are sent directly to our inbox — no third-party CRM</div>
+        </div>
+      </div>
+
+      <!-- RIGHT — form -->
+      <div class="reveal d1">
+        <div class="cf-success" id="cf-success">✅ Message sent! We'll reply within 24 hours.</div>
+        <div class="cf-error" id="cf-error">Something went wrong — please try emailing us directly at squash.ghostingx@gmail.com</div>
+        <form class="contact-form-card" id="contact-form">
+          <!-- Formspree: replace YOUR_FORM_ID after signing up at formspree.io -->
+          <input type="hidden" name="_subject" value="SquashGhostingX Website Contact">
+          <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+          <div class="cf-row">
+            <div class="cf-field">
+              <label for="cf-name">Your Name</label>
+              <input type="text" id="cf-name" name="name" placeholder="Alex Smith" required autocomplete="name">
+            </div>
+            <div class="cf-field">
+              <label for="cf-email">Email Address</label>
+              <input type="email" id="cf-email" name="email" placeholder="you@example.com" required autocomplete="email">
+            </div>
+          </div>
+          <div class="cf-field">
+            <label for="cf-topic">Topic</label>
+            <select id="cf-topic" name="topic" required>
+              <option value="" disabled selected>Select a topic…</option>
+              <option value="Bug Report">Bug Report</option>
+              <option value="Feature Request">Feature Request</option>
+              <option value="Voice Coaching">Voice Coaching</option>
+              <option value="Progress & Stats">Progress &amp; Stats</option>
+              <option value="Account & Login">Account &amp; Login</option>
+              <option value="Training Question">Training Question</option>
+              <option value="General Feedback">General Feedback</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="cf-field">
+            <label for="cf-msg">Message</label>
+            <textarea id="cf-msg" name="message" placeholder="Tell us what's on your mind…" required></textarea>
+          </div>
+          <button type="submit" class="cf-submit" id="cf-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Send Message
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#" class="nav-logo" style="display:inline-flex">
+          <div class="nav-logo-icon">SX</div>
+          <span class="nav-logo-squash">Squash</span><span class="nav-logo-ghosting">GhostingX</span>
+        </a>
+        <p>AI-powered squash ghosting training. Built for players who want to move like they've been there a thousand times.</p>
+      </div>
+      <div class="footer-col">
+        <h4>App</h4>
+        <div class="footer-links">
+          <a href="#why">Why Ghosting</a>
+          <a href="#courts">Court Systems</a>
+          <a href="#programs">Programs</a>
+          <a href="#showcase">Features</a>
+          <a href="https://apps.apple.com/app/squashghostingx/id6744036820" target="_blank" rel="noopener"> iOS App Store</a>
+          <a href="https://play.google.com/store/apps/details?id=com.squashghostingx.app" target="_blank" rel="noopener">🤖 Google Play</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Learn</h4>
+        <div class="footer-links">
+          <a href="#blog">Training Blog</a>
+          <a href="#videos">Demo Videos</a>
+          <a href="#coaches">For Coaches</a>
+          <a href="#faq">FAQ</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <div class="footer-links">
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Use</a>
+          <a href="#contact">Contact Us</a>
+          <a href="support.html">Support Page</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 SquashGhostingX · Varish &amp; Darshika Gahlot</div>
+      <div class="footer-theme-btns">
+        <button class="theme-btn active" data-theme="dark" onclick="setTheme('dark')" aria-label="Dark theme" title="Dark"></button>
+        <button class="theme-btn" data-theme="light" onclick="setTheme('light')" aria-label="Light theme" title="Light"></button>
+        <button class="theme-btn" data-theme="gold" onclick="setTheme('gold')" aria-label="Gold theme" title="Gold"></button>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" aria-label="Close">✕</button>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<script>
+// ── SCROLL PROGRESS ──
+const progressBar = document.getElementById('progress');
+window.addEventListener('scroll', () => {
+  const pct = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+  progressBar.style.width = pct + '%';
+}, { passive: true });
+
+// ── NAV SCROLL ──
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+}, { passive: true });
+
+// ── BURGER ──
+const burger = document.getElementById('burger');
+const mobileMenu = document.getElementById('mobile-menu');
+burger.addEventListener('click', () => {
+  const open = mobileMenu.classList.toggle('open');
+  burger.classList.toggle('open', open);
+  burger.setAttribute('aria-expanded', open);
+});
+function closeMobileMenu() {
+  mobileMenu.classList.remove('open');
+  burger.classList.remove('open');
+  burger.setAttribute('aria-expanded', false);
+}
+
+// ── REVEAL on scroll ──
+const revealEls = document.querySelectorAll('.reveal');
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+revealEls.forEach(el => revealObs.observe(el));
+
+// ── STAT COUNTER ──
+function animateCount(el, target, duration = 1800) {
+  let start = 0, step = Math.ceil(target / (duration / 16));
+  const timer = setInterval(() => {
+    start = Math.min(start + step, target);
+    el.textContent = start.toLocaleString();
+    if (start >= target) clearInterval(timer);
+  }, 16);
+}
+const statObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('[data-count]').forEach(el => {
+        animateCount(el, parseInt(el.dataset.count));
+      });
+      statObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.5 });
+const statsSection = document.getElementById('stats');
+if (statsSection) statObs.observe(statsSection);
+
+// ── PATTERN BARS ──
+const barObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.pattern-bar-fill').forEach(bar => {
+        bar.style.width = bar.dataset.width + '%';
+      });
+      barObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.3 });
+const patSection = document.getElementById('patterns');
+if (patSection) barObs.observe(patSection);
+
+// ── COURT TABS ──
+function switchCourt(id) {
+  document.querySelectorAll('.court-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.court-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('court-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ── VIDEO SYSTEM (simple 4-up) ──
+function loadVideoSimple(id, videoId) {
+  var wrap = document.getElementById(id + '-wrap');
+  var container = document.getElementById(id + '-iframe');
+  wrap.style.display = 'none';
+  container.style.display = 'block';
+  var src = 'https://www.youtube-nocookie.com/embed/' + videoId + '?autoplay=1&rel=0&playsinline=1&modestbranding=1';
+  container.innerHTML = '<iframe src="' + src + '" title="SquashGhostingX video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen playsinline style="position:absolute;top:0;left:0;width:100%;height:100%;border:none"></iframe>';
+}
+
+// ── PROGRAMS TABS ──
+function switchPrograms(level, btn) {
+  document.querySelectorAll('.programs-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.prog-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('prog-' + level).classList.add('active');
+  btn.classList.add('active');
+  // Re-trigger reveal animations for new panel
+  document.querySelectorAll('#prog-' + level + ' .reveal').forEach(el => {
+    el.classList.remove('visible');
+    setTimeout(() => el.classList.add('visible'), 50);
+  });
+}
+
+// ── BLOG DATA ──
+const blogs = [
+  {
+    tag: 'Training Science', title: 'The Neuroscience of Court Movement',
+    meta: '8 min read · Training Science', body: `
+      <p>Ghosting is not just a fitness drill — it is a neurological programming exercise. Every repetition you complete on court is embedding a movement pattern deeper into your motor cortex, the brain region responsible for automatic physical responses.</p>
+      <h4>How Motor Memory Works</h4>
+      <p>When you first learn a movement, your prefrontal cortex (conscious thinking) is heavily engaged. You are deciding, then moving. With practice, the movement programme transfers to the basal ganglia and cerebellum — subcortical structures that operate below conscious awareness. The result: you move before you think.</p>
+      <h4>Why Ghosting Is Optimal for This Transfer</h4>
+      <p>Because there is no ball to distract you, ghosting allows maximum repetitions of the pure movement pattern. Elite squash players complete more than 500 ghost repetitions per session. That volume accelerates the shift from conscious to automatic movement at a rate that match play simply cannot match.</p>
+      <h4>The Role of AI Voice Coaching</h4>
+      <p>Audio cues are processed faster than visual cues. When the AI calls a position, your motor system begins preparing the movement before your visual system has even registered the information. This is why SquashGhostingX uses voice coaching — and why you should keep your eyes forward, not on the screen.</p>
+    `
+  },
+  {
+    tag: 'Analytics', title: 'Reading Your Zone Balance Data',
+    meta: '6 min read · Analytics', body: `
+      <p>Your zone balance chart is the most honest feedback you will ever get about your movement patterns. Most players are shocked when they first see it — because what they think they do and what they actually do are very different things.</p>
+      <h4>What Zone Balance Measures</h4>
+      <p>Zone balance tracks the frequency with which you visit each court position across your sessions. A score of 100% across all zones means you are visiting every position with equal frequency — the ideal for an all-court player.</p>
+      <h4>Common Patterns and What They Mean</h4>
+      <p>Most players show strength in the mid-court and weakness in the deep back corners. This usually reflects their match game: they are comfortable at mid-court but struggle when pushed into the back. The analytics simply confirm what their coach already suspects.</p>
+      <h4>Using the Data to Improve</h4>
+      <p>Once you identify your weakest zones, you can configure sessions that heavily weight those positions. SquashGhostingX's pattern intelligence will also automatically flag these zones and suggest targeted sessions — removing the guesswork from your training planning.</p>
+    `
+  },
+  {
+    tag: 'Fitness', title: '6-Point vs 10-Point: Which Is Right for You?',
+    meta: '7 min read · Fitness', body: `
+      <p>Both systems are effective. The question is which one is right for your current level and training goals. Here is a complete breakdown.</p>
+      <h4>The 6-Point System</h4>
+      <p>Six positions: front left, front right, mid left, mid right, back left, back right. This covers the fundamental movement patterns every squash player needs. The distances between positions are shorter, making it more accessible for beginners and ideal for conditioning work at higher intensities.</p>
+      <h4>The 10-Point System</h4>
+      <p>Ten positions: all six from the standard system plus deep front corners, additional centre-mid, and deep back centre. The additional positions create longer movement arcs, more complex directional changes, and a significantly higher metabolic demand. It more accurately replicates the movement demands of elite match play.</p>
+      <h4>Our Recommendation</h4>
+      <p>Start with 6-point until you can complete a 20-minute session at medium pace with consistent T-position recovery. Then progress to 10-point. Many advanced players use both — 6-point for high-intensity conditioning and 10-point for pattern and movement quality work.</p>
+    `
+  },
+  {
+    tag: 'Tactics', title: 'T-Position: The Most Important Habit in Squash',
+    meta: '5 min read · Tactics', body: `
+      <p>Ask any squash coach what single habit separates recreational players from competitive players and the answer is almost universally the same: T-position recovery.</p>
+      <h4>What Is the T?</h4>
+      <p>The T is the junction of the half-court line and the short line — roughly the centre of the court. From the T, you are equidistant from all four corners. You have maximum time to read your opponent and minimal distance to cover regardless of where the ball goes.</p>
+      <h4>Why Most Players Do Not Return to the T</h4>
+      <p>After playing a shot, the natural tendency is to watch the ball or admire your shot. The discipline of immediately recovering to the T — before the ball even reaches the front wall — is a trained habit, not a natural one. Ghosting automates this because every drill ends with a return to the T before the next position is called.</p>
+      <h4>How Long It Takes to Automate</h4>
+      <p>Research on motor learning suggests 300-500 high-quality repetitions are needed to begin automating a movement pattern. At a moderate ghosting pace of 8 positions per minute over 20 minutes, you complete 160 T-position returns per session. After 3-4 sessions per week for 4 weeks, you will have made the T a habit.</p>
+    `
+  },
+  {
+    tag: 'Conditioning', title: 'Progressive Overload for Squash Athletes',
+    meta: '9 min read · Conditioning', body: `
+      <p>The principle of progressive overload — systematically increasing the training stimulus over time — is the cornerstone of all athletic development. Applied to ghosting, it transforms a drill into a structured training programme.</p>
+      <h4>The Four Variables You Can Manipulate</h4>
+      <p>In SquashGhostingX, you have four levers: pace (1-7), session duration, rest interval, and court system (6 or 10 point). Progressive overload means increasing at least one of these variables each week while allowing adaptation.</p>
+      <h4>A Simple 4-Week Cycle</h4>
+      <p>Week 1: Pace 4, 15 minutes, 5-second rests. Week 2: Pace 5, 18 minutes, 4-second rests. Week 3: Pace 6, 20 minutes, 3-second rests. Week 4: Deload — Pace 3, 12 minutes, longer rests. Then repeat the cycle at a higher baseline.</p>
+      <h4>How the App Supports This</h4>
+      <p>Your session history shows exactly what you did last time. The AI suggestion engine tracks your recent load and flags when it detects plateau patterns — ensuring you are always progressing, not just maintaining.</p>
+    `
+  },
+  {
+    tag: 'Movement', title: 'The Perfect Ghosting Lunge Technique',
+    meta: '6 min read · Movement', body: `
+      <p>The ghosting lunge is the most repeated movement in squash training. Done correctly, it is powerful and efficient. Done incorrectly, it is the fastest path to knee and ankle injuries. Here is how to do it right.</p>
+      <h4>The Front Corner Lunge</h4>
+      <p>Step 1: Cross-step with the dominant foot. Step 2: Plant the lead foot with toes turned out 30-45 degrees. Step 3: Drop your knee over (not beyond) your toe. Step 4: Push off explosively. The key error most players make: leading with the upper body instead of the hips, which loads the patella tendon incorrectly.</p>
+      <h4>The Back Corner Ghost</h4>
+      <p>For back corners, a split-step into an open stance is biomechanically safer than a closed stance lunge. Push off the outside foot, step through, and use the racket as a counterbalance. Your knee should track over your second toe throughout.</p>
+      <h4>Building the Habit at Slow Pace</h4>
+      <p>Use SquashGhostingX at Pace 1-2 specifically to drill technique. Slow ghosting at correct technique is vastly superior to fast ghosting with poor form. Film yourself from the side to check knee alignment — you will likely be surprised by what you see.</p>
+    `
+  },
+  {
+    tag: 'Routines', title: 'Building a 4-Week Ghosting Programme',
+    meta: '10 min read · Routines', body: `
+      <p>For competitive players preparing for a tournament, a structured 4-week ghosting programme produces measurable fitness gains and movement confidence. Here is a template you can use directly in SquashGhostingX.</p>
+      <h4>Week 1 — Foundation</h4>
+      <p>3 sessions: 2x 6-point (20 min, Pace 4), 1x 10-point (15 min, Pace 3). Focus on T-position recovery quality over speed. Use the zone balance data to identify your weakest positions from day one.</p>
+      <h4>Week 2 — Load</h4>
+      <p>4 sessions: 2x 6-point (25 min, Pace 5), 2x 10-point (20 min, Pace 4). Increase both volume and intensity. Check your zone balance — target sessions for any positions below 70%.</p>
+      <h4>Week 3 — Peak</h4>
+      <p>4 sessions: 1x 6-point (20 min, Pace 6), 3x 10-point (25 min, Pace 5-6). Highest load week. Prioritise recovery between sessions. Avoid back-to-back high-intensity days.</p>
+      <h4>Week 4 — Taper</h4>
+      <p>2 sessions only: 1x 6-point (15 min, Pace 3), 1x 10-point (15 min, Pace 4). Reduce volume by 50%, keep intensity moderate. Arrive at your tournament with fresh legs and automatic movement patterns.</p>
+    `
+  },
+  {
+    tag: 'Technology', title: 'Why AI Voice Coaching Changes Everything',
+    meta: '7 min read · Technology', body: `
+      <p>Before SquashGhostingX, ghosting required either a coach calling positions or a printed card. Both require your eyes to leave the court. The AI voice coaching engine changes this completely.</p>
+      <h4>Eyes Forward, Always</h4>
+      <p>In a real match, your eyes are always forward — reading your opponent and the ball. Training with a screen you need to glance at breaks this fundamental habit. Audio cues eliminate the problem entirely. Your phone stays in your pocket.</p>
+      <h4>Timing Precision</h4>
+      <p>The SquashGhostingX timing engine fires each voice cue at the precise moment you should be starting your movement — not when you arrive, but when you should leave. The recovery cue fires 400ms before the next position is called, giving your body time to set up at the T. No human coach can achieve this consistency.</p>
+      <h4>Personalisation at Scale</h4>
+      <p>The voice engine adapts to your settings — speech rate, coaching intensity, voice gender, language. This level of personalisation would require a dedicated personal coach in a traditional training setting. The AI delivers it to every player, every session, for free.</p>
+    `
+  }
+];
+
+function openBlog(i) {
+  const b = blogs[i];
+  document.getElementById('bm-tag').textContent = b.tag;
+  document.getElementById('bm-title').textContent = b.title;
+  document.getElementById('bm-meta').textContent = b.meta;
+  document.getElementById('bm-body').innerHTML = b.body;
+  document.getElementById('blog-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeBlog() {
+  document.getElementById('blog-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeBlogOnOverlay(e) {
+  if (e.target === document.getElementById('blog-modal')) closeBlog();
+}
+
+// ── FAQ ──
+function toggleFaq(btn) {
+  const item = btn.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+// ── THEME ──
+function setTheme(theme) {
+  document.body.dataset.theme = theme;
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.theme === theme);
+  });
+  localStorage.setItem('sgx-theme', theme);
+}
+(function() {
+  const saved = localStorage.getItem('sgx-theme');
+  if (saved) setTheme(saved);
+})();
+
+// ── LIGHTBOX ──
+function openLightbox(src, alt) {
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox-img').alt = alt || '';
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+
+// ── CONTACT FORM (Formspree) ──
+(function() {
+  var form = document.getElementById('contact-form');
+  if (!form) return;
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var btn     = document.getElementById('cf-btn');
+    var success = document.getElementById('cf-success');
+    var errBox  = document.getElementById('cf-error');
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+    success.classList.remove('show');
+    errBox.classList.remove('show');
+    var data = new FormData(form);
+    fetch('https://formspree.io/f/YOUR_FORM_ID', {
+      method: 'POST',
+      body: data,
+      headers: { 'Accept': 'application/json' }
+    }).then(function(res) {
+      if (res.ok) {
+        success.classList.add('show');
+        form.reset();
+        success.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else {
+        return res.json().then(function(d) { throw new Error(d.error || 'Error'); });
+      }
+    }).catch(function() {
+      errBox.classList.add('show');
+    }).finally(function() {
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send Message';
+    });
+  });
+})();
+
+// ── HERO CANVAS PARTICLES ──
+(function() {
+  const canvas = document.getElementById('hero-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+  function resize() {
+    W = canvas.width = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  for (let i = 0; i < 70; i++) {
+    particles.push({
+      x: Math.random() * (W || 1200),
+      y: Math.random() * (H || 800),
+      vx: (Math.random() - .5) * .4,
+      vy: (Math.random() - .5) * .4,
+      r: Math.random() * 1.8 + .4,
+      a: Math.random() * .5 + .1
+    });
+  }
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,107,53,' + p.a + ')';
+      ctx.fill();
+    });
+    particles.forEach((p, i) => {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = p.x - particles[j].x, dy = p.y - particles[j].y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 120) {
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = 'rgba(255,107,53,' + (.06 * (1 - dist/120)) + ')';
+          ctx.lineWidth = .5;
+          ctx.stroke();
+        }
+      }
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+</body>
+</html>

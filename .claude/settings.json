@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ' *)",
+      "Bash(node -e \"const d=JSON.parse\\(require\\('fs'\\).readFileSync\\('/dev/stdin','utf8'\\)\\); console.log\\('version:', d.version\\); console.log\\('exports keys:', Object.keys\\(d.exports||{}\\).slice\\(0,10\\)\\);\")",
+      "Bash(dir \"C:\\\\Users\\\\sunil\\\\OneDrive\\\\Documents\\\\Squash GhostingX\\\\Sample_or_refrence_UI_or_Screen_designs\" /b)",
+      "Bash(unzip -o \"Sample_or_refrence_UI_or_Screen_designs.zip\" -d \"/tmp/ui_refs\")",
+      "Read(//tmp/**)",
+      "Bash(mkdir -p \"c:/Users/sunil/OneDrive/Documents/SquashGhostingX/ui_refs\" && cp /tmp/ref*.jpeg \"c:/Users/sunil/OneDrive/Documents/SquashGhostingX/ui_refs/\" && echo done)",
+      "WebFetch(domain:www.youtube.com)",
+      "Bash(Get-ChildItem \"c:\\\\Users\\\\sunil\\\\OneDrive\\\\Documents\\\\SquashGhostingX\\\\assets\")",
+      "Bash(Select-Object Name, Length, LastWriteTime)",
+      "PowerShell(npx ngrok --version 2>&1)",
+      "PowerShell(npx @expo/ngrok --version 2>&1)",
+      "Read(//c/Users/sunil/AppData/Local/npm-cache/_logs/**)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\sunil\\\\OneDrive\\\\Documents\\\\SquashGhostingX\" -Recurse -File | Where-Object { $_.FullName -notmatch \"node_modules\" } | Select-Object -ExpandProperty FullName | Sort-Object)"
+    ],
+    "additionalDirectories": [
+      "\\tmp"
+    ]
+  },
+  "enabledPlugins": {
+    "expo@claude-plugins-official": true
+  }
+}
