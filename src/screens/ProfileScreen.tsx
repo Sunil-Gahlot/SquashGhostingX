@@ -295,7 +295,10 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
               <PillSelector
                 options={[{ label: 'Male', value: 'male' }, { label: 'Female', value: 'female' }]}
                 selected={profile.gender ?? 'male'}
-                onSelect={(v) => setProfile({ gender: v })}
+                onSelect={(v) => {
+                  setProfile({ gender: v });
+                  if (v === 'male' || v === 'female') setProfile({ voiceGender: v as VoiceGender });
+                }}
                 size="sm"
               />
             </View>

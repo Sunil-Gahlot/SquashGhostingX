@@ -237,6 +237,12 @@ section{padding:5rem 1.5rem}
 .court-tab.active{background:var(--accent);color:#fff;box-shadow:0 2px 12px var(--glow3)}
 .court-panel{display:none}.court-panel.active{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
 .court-diagram-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:2rem;display:flex;justify-content:center}
+.court-real-wrap{position:relative;display:inline-block;border-radius:var(--r8);overflow:hidden;box-shadow:0 0 0 3px rgba(210,45,15,0.92),0 8px 32px rgba(0,0,0,.5);font-size:0;line-height:0;vertical-align:top}
+.court-real-img{width:180px;height:274px;display:block}
+.c-dot{position:absolute;transform:translate(-50%,-50%);border-radius:50%;border:2px solid rgba(255,255,255,0.9);pointer-events:none}
+.c-dot.or{width:14px;height:14px;background:rgba(255,107,53,0.92);box-shadow:0 0 0 5px rgba(255,107,53,0.22)}
+.c-dot.bl{width:12px;height:12px;background:rgba(56,189,248,0.9);box-shadow:0 0 0 4px rgba(56,189,248,0.2)}
+.c-dot::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:5px;height:5px;border-radius:50%;background:white}
 .court-info h3{font-family:var(--font-display);font-size:1.6rem;font-weight:800;color:var(--white);margin-bottom:.75rem}
 .court-info p{font-size:.9rem;color:var(--gray1);line-height:1.7;margin-bottom:1.5rem}
 .court-points-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.5rem}
@@ -772,84 +778,38 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
           <!-- 6-Point Court -->
           <div class="why-court-item">
             <div class="why-court-item-label">6-Point System</div>
-            <svg viewBox="0 0 640 975" width="190" height="289" aria-label="6-point squash court — WSF accurate">
-              <rect x="0" y="0" width="640" height="975" fill="#020812"/>
-              <rect x="8" y="8" width="624" height="959" fill="#0C1C2E"/>
-              <rect x="8" y="8" width="624" height="418" fill="rgba(10,132,255,0.07)"/>
-              <rect x="8" y="426" width="624" height="541" fill="rgba(255,107,53,0.06)"/>
-              <circle cx="320" cy="426" r="240" fill="rgba(25,75,130,0.07)"/>
-              <circle cx="320" cy="426" r="120" fill="rgba(40,95,165,0.09)"/>
-              <rect x="8" y="8" width="624" height="959" fill="none" stroke="rgba(255,107,53,0.12)" stroke-width="18"/>
-              <rect x="8" y="8" width="624" height="959" fill="none" stroke="rgba(255,107,53,0.28)" stroke-width="7"/>
-              <rect x="8" y="8" width="624" height="959" fill="none" stroke="#FF6B35" stroke-width="3"/>
-              <rect x="8" y="8" width="624" height="13" fill="#FF6B35" opacity="0.85"/>
-              <line x1="8" y1="426" x2="632" y2="426" stroke="#FF6B35" stroke-width="4"/>
-              <line x1="320" y1="426" x2="320" y2="967" stroke="#FF6B35" stroke-width="4"/>
-              <rect x="8" y="426" width="160" height="160" fill="rgba(255,107,53,0.04)" stroke="#FF6B35" stroke-width="3"/>
-              <rect x="472" y="426" width="160" height="160" fill="rgba(255,107,53,0.04)" stroke="#FF6B35" stroke-width="3"/>
-              <text x="320" y="36" text-anchor="middle" font-size="22" fill="rgba(255,107,53,0.4)" font-family="sans-serif" font-weight="700" letter-spacing="3">FRONT WALL</text>
-              <circle cx="320" cy="426" r="22" fill="rgba(255,107,53,0.2)"/>
-              <circle cx="320" cy="426" r="10" fill="#FF6B35"/>
-              <text x="320" y="431" text-anchor="middle" font-size="13" fill="#fff" font-weight="bold" font-family="sans-serif">T</text>
-              <circle cx="100" cy="100" r="32" fill="rgba(255,107,53,0.15)" stroke="#FF9268" stroke-width="3"/>
-              <text x="100" y="107" text-anchor="middle" font-size="22" fill="#FF9268" font-weight="bold" font-family="sans-serif">FL</text>
-              <circle cx="540" cy="100" r="32" fill="rgba(255,107,53,0.15)" stroke="#FF9268" stroke-width="3"/>
-              <text x="540" y="107" text-anchor="middle" font-size="22" fill="#FF9268" font-weight="bold" font-family="sans-serif">FR</text>
-              <circle cx="120" cy="460" r="32" fill="rgba(255,107,53,0.15)" stroke="#FF9268" stroke-width="3"/>
-              <text x="120" y="467" text-anchor="middle" font-size="22" fill="#FF9268" font-weight="bold" font-family="sans-serif">ML</text>
-              <circle cx="520" cy="460" r="32" fill="rgba(255,107,53,0.15)" stroke="#FF9268" stroke-width="3"/>
-              <text x="520" y="467" text-anchor="middle" font-size="22" fill="#FF9268" font-weight="bold" font-family="sans-serif">MR</text>
-              <circle cx="100" cy="850" r="32" fill="rgba(255,107,53,0.15)" stroke="#FF9268" stroke-width="3"/>
-              <text x="100" y="857" text-anchor="middle" font-size="22" fill="#FF9268" font-weight="bold" font-family="sans-serif">BL</text>
-              <circle cx="540" cy="850" r="32" fill="rgba(255,107,53,0.15)" stroke="#FF9268" stroke-width="3"/>
-              <text x="540" y="857" text-anchor="middle" font-size="22" fill="#FF9268" font-weight="bold" font-family="sans-serif">BR</text>
-            </svg>
+            <div class="court-real-wrap" style="width:190px;height:289px">
+              <img src="court.svg" class="court-real-img" style="width:190px;height:289px" alt="Real squash court — 6 point system" onerror="this.style.opacity='.3'">
+
+              <div class="c-dot or" style="left:15.6%;top:10.3%"></div>
+              <div class="c-dot or" style="left:84.4%;top:10.3%"></div>
+              <div class="c-dot or" style="left:50%;top:43.7%"></div>
+              <div class="c-dot or" style="left:18.75%;top:47.2%"></div>
+              <div class="c-dot or" style="left:81.25%;top:47.2%"></div>
+              <div class="c-dot or" style="left:15.6%;top:87.2%"></div>
+              <div class="c-dot or" style="left:84.4%;top:87.2%"></div>
+            </div>
             <div class="why-court-item-stat">6 Positions</div>
             <div class="why-court-item-sub">Beginner → Advanced</div>
           </div>
           <!-- 10-Point Court -->
           <div class="why-court-item">
             <div class="why-court-item-label">10-Point System</div>
-            <svg viewBox="0 0 640 975" width="190" height="289" aria-label="10-point squash court — WSF accurate">
-              <rect x="0" y="0" width="640" height="975" fill="#020812"/>
-              <rect x="8" y="8" width="624" height="959" fill="#0C1C2E"/>
-              <rect x="8" y="8" width="624" height="418" fill="rgba(10,132,255,0.07)"/>
-              <rect x="8" y="426" width="624" height="541" fill="rgba(255,107,53,0.06)"/>
-              <circle cx="320" cy="426" r="240" fill="rgba(25,75,130,0.07)"/>
-              <circle cx="320" cy="426" r="120" fill="rgba(40,95,165,0.09)"/>
-              <rect x="8" y="8" width="624" height="959" fill="none" stroke="rgba(255,107,53,0.12)" stroke-width="18"/>
-              <rect x="8" y="8" width="624" height="959" fill="none" stroke="rgba(255,107,53,0.28)" stroke-width="7"/>
-              <rect x="8" y="8" width="624" height="959" fill="none" stroke="#FF6B35" stroke-width="3"/>
-              <rect x="8" y="8" width="624" height="13" fill="#FF6B35" opacity="0.85"/>
-              <line x1="8" y1="426" x2="632" y2="426" stroke="#FF6B35" stroke-width="4"/>
-              <line x1="320" y1="426" x2="320" y2="967" stroke="#FF6B35" stroke-width="4"/>
-              <rect x="8" y="426" width="160" height="160" fill="rgba(255,107,53,0.04)" stroke="#FF6B35" stroke-width="3"/>
-              <rect x="472" y="426" width="160" height="160" fill="rgba(255,107,53,0.04)" stroke="#FF6B35" stroke-width="3"/>
-              <text x="320" y="36" text-anchor="middle" font-size="22" fill="rgba(255,107,53,0.4)" font-family="sans-serif" font-weight="700" letter-spacing="3">FRONT WALL</text>
-              <circle cx="320" cy="426" r="22" fill="rgba(255,107,53,0.2)"/>
-              <circle cx="320" cy="426" r="10" fill="#FF6B35"/>
-              <text x="320" y="431" text-anchor="middle" font-size="13" fill="#fff" font-weight="bold" font-family="sans-serif">T</text>
-              <circle cx="100" cy="100" r="30" fill="rgba(29,78,216,0.2)" stroke="#60a5fa" stroke-width="2.5"/>
-              <text x="100" y="107" text-anchor="middle" font-size="21" fill="#93c5fd" font-weight="bold" font-family="sans-serif">FL</text>
-              <circle cx="540" cy="100" r="30" fill="rgba(29,78,216,0.2)" stroke="#60a5fa" stroke-width="2.5"/>
-              <text x="540" y="107" text-anchor="middle" font-size="21" fill="#93c5fd" font-weight="bold" font-family="sans-serif">FR</text>
-              <circle cx="120" cy="280" r="26" fill="rgba(14,165,233,0.15)" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="7,4"/>
-              <text x="120" y="287" text-anchor="middle" font-size="18" fill="#7dd3fc" font-weight="bold" font-family="sans-serif">FML</text>
-              <circle cx="520" cy="280" r="26" fill="rgba(14,165,233,0.15)" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="7,4"/>
-              <text x="520" y="287" text-anchor="middle" font-size="18" fill="#7dd3fc" font-weight="bold" font-family="sans-serif">FMR</text>
-              <circle cx="120" cy="460" r="30" fill="rgba(255,107,53,0.12)" stroke="#FF9268" stroke-width="2.5"/>
-              <text x="120" y="467" text-anchor="middle" font-size="21" fill="#FF9268" font-weight="bold" font-family="sans-serif">ML</text>
-              <circle cx="520" cy="460" r="30" fill="rgba(255,107,53,0.12)" stroke="#FF9268" stroke-width="2.5"/>
-              <text x="520" y="467" text-anchor="middle" font-size="21" fill="#FF9268" font-weight="bold" font-family="sans-serif">MR</text>
-              <circle cx="120" cy="650" r="26" fill="rgba(234,88,12,0.15)" stroke="#fb923c" stroke-width="2.5" stroke-dasharray="7,4"/>
-              <text x="120" y="657" text-anchor="middle" font-size="18" fill="#fdba74" font-weight="bold" font-family="sans-serif">BML</text>
-              <circle cx="520" cy="650" r="26" fill="rgba(234,88,12,0.15)" stroke="#fb923c" stroke-width="2.5" stroke-dasharray="7,4"/>
-              <text x="520" y="657" text-anchor="middle" font-size="18" fill="#fdba74" font-weight="bold" font-family="sans-serif">BMR</text>
-              <circle cx="100" cy="850" r="30" fill="rgba(194,65,12,0.2)" stroke="#FF6B35" stroke-width="2.5"/>
-              <text x="100" y="857" text-anchor="middle" font-size="21" fill="#FF9268" font-weight="bold" font-family="sans-serif">BL</text>
-              <circle cx="540" cy="850" r="30" fill="rgba(194,65,12,0.2)" stroke="#FF6B35" stroke-width="2.5"/>
-              <text x="540" y="857" text-anchor="middle" font-size="21" fill="#FF9268" font-weight="bold" font-family="sans-serif">BR</text>
-            </svg>
+            <div class="court-real-wrap" style="width:190px;height:289px">
+              <img src="court.svg" class="court-real-img" style="width:190px;height:289px" alt="Real squash court — 10 point system" onerror="this.style.opacity='.3'">
+
+              <div class="c-dot or" style="left:15.6%;top:10.3%"></div>
+              <div class="c-dot or" style="left:84.4%;top:10.3%"></div>
+              <div class="c-dot or" style="left:50%;top:43.7%"></div>
+              <div class="c-dot or" style="left:18.75%;top:47.2%"></div>
+              <div class="c-dot or" style="left:81.25%;top:47.2%"></div>
+              <div class="c-dot or" style="left:15.6%;top:87.2%"></div>
+              <div class="c-dot or" style="left:84.4%;top:87.2%"></div>
+              <div class="c-dot bl" style="left:18.75%;top:28.7%"></div>
+              <div class="c-dot bl" style="left:81.25%;top:28.7%"></div>
+              <div class="c-dot bl" style="left:18.75%;top:66.7%"></div>
+              <div class="c-dot bl" style="left:81.25%;top:66.7%"></div>
+            </div>
             <div class="why-court-item-stat">10 Positions</div>
             <div class="why-court-item-sub">Advanced → Pro</div>
           </div>
@@ -959,78 +919,17 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
     </div>
     <div id="court-6pt" class="court-panel active">
       <div class="court-diagram-wrap reveal">
-        <!--
-          WSF court: 6.40m wide × 9.75m long
-          SVG viewBox 0 0 640 975 (1px = 0.01m)
-          toSvgX(x) = (x + 3.20) * 100   toSvgY(z) = z * 100
-          Short line y=426 (4.26m), Half-court x=320, Service boxes 160×160 at each side of short line
-          6-point positions:
-            FL(Front Left):  x=-2.20,z=1.00 → SVG(100,100)
-            FR(Front Right): x= 2.20,z=1.00 → SVG(540,100)
-            ML(Mid Left):    x=-2.00,z=4.60 → SVG(120,460)
-            MR(Mid Right):   x= 2.00,z=4.60 → SVG(520,460)
-            BL(Back Left):   x=-2.20,z=8.50 → SVG(100,850)
-            BR(Back Right):  x= 2.20,z=8.50 → SVG(540,850)
-            T:               x= 0.00,z=4.26 → SVG(320,426)
-        -->
-        <svg viewBox="0 0 640 975" width="180" height="274" aria-label="6-point squash ghosting court — WSF accurate positions">
-          <!-- Surround -->
-          <rect x="0" y="0" width="640" height="975" fill="#020812"/>
-          <!-- Court surface — navy hero style -->
-          <rect x="8" y="8" width="624" height="959" fill="#0C1C2E"/>
-          <!-- Front zone tint -->
-          <rect x="8" y="8" width="624" height="418" fill="rgba(10,132,255,0.07)"/>
-          <!-- Back zone tint -->
-          <rect x="8" y="426" width="624" height="541" fill="rgba(255,107,53,0.06)"/>
-          <!-- T spotlight -->
-          <circle cx="320" cy="426" r="280" fill="rgba(25,75,130,0.07)"/>
-          <circle cx="320" cy="426" r="160" fill="rgba(40,95,165,0.09)"/>
-          <circle cx="320" cy="426" r="80" fill="rgba(60,125,200,0.11)"/>
-          <!-- Court boundary glow -->
-          <rect x="8" y="8" width="624" height="959" fill="none" stroke="rgba(255,107,53,0.12)" stroke-width="18"/>
-          <rect x="8" y="8" width="624" height="959" fill="none" stroke="rgba(255,107,53,0.28)" stroke-width="7"/>
-          <rect x="8" y="8" width="624" height="959" fill="none" stroke="#FF6B35" stroke-width="3"/>
-          <!-- Tin strip -->
-          <rect x="8" y="8" width="624" height="13" fill="#FF6B35" opacity="0.85"/>
-          <!-- Short line (T-line at 4.26m) -->
-          <line x1="8" y1="426" x2="632" y2="426" stroke="#FF6B35" stroke-width="4"/>
-          <!-- Half-court line (short line to back wall) -->
-          <line x1="320" y1="426" x2="320" y2="967" stroke="#FF6B35" stroke-width="4"/>
-          <!-- Service boxes (1.60m × 1.60m each side) -->
-          <rect x="8" y="426" width="160" height="160" fill="rgba(255,107,53,0.04)" stroke="#FF6B35" stroke-width="3"/>
-          <rect x="472" y="426" width="160" height="160" fill="rgba(255,107,53,0.04)" stroke="#FF6B35" stroke-width="3"/>
-          <!-- FRONT WALL label -->
-          <text x="320" y="32" text-anchor="middle" font-size="22" fill="rgba(255,107,53,0.45)" font-family="sans-serif" font-weight="700" letter-spacing="3">FRONT WALL</text>
-          <!-- T-position marker -->
-          <circle cx="320" cy="426" r="20" fill="rgba(255,107,53,0.2)"/>
-          <circle cx="320" cy="426" r="9" fill="#FF6B35"/>
-          <text x="320" y="430" text-anchor="middle" font-size="10" fill="#fff" font-weight="bold" font-family="sans-serif">T</text>
-          <!-- 6 position markers with labels -->
-          <!-- FL: Front Left -->
-          <circle cx="100" cy="100" r="28" fill="rgba(255,107,53,0.12)" stroke="#FF9268" stroke-width="3"/>
-          <text x="100" y="94" text-anchor="middle" font-size="18" fill="#FF9268" font-weight="bold" font-family="sans-serif">FL</text>
-          <text x="100" y="112" text-anchor="middle" font-size="13" fill="rgba(255,146,104,0.7)" font-family="sans-serif">Front L</text>
-          <!-- FR: Front Right -->
-          <circle cx="540" cy="100" r="28" fill="rgba(255,107,53,0.12)" stroke="#FF9268" stroke-width="3"/>
-          <text x="540" y="94" text-anchor="middle" font-size="18" fill="#FF9268" font-weight="bold" font-family="sans-serif">FR</text>
-          <text x="540" y="112" text-anchor="middle" font-size="13" fill="rgba(255,146,104,0.7)" font-family="sans-serif">Front R</text>
-          <!-- ML: Mid Left -->
-          <circle cx="120" cy="460" r="28" fill="rgba(255,107,53,0.12)" stroke="#FF9268" stroke-width="3"/>
-          <text x="120" y="454" text-anchor="middle" font-size="18" fill="#FF9268" font-weight="bold" font-family="sans-serif">ML</text>
-          <text x="120" y="472" text-anchor="middle" font-size="13" fill="rgba(255,146,104,0.7)" font-family="sans-serif">Mid L</text>
-          <!-- MR: Mid Right -->
-          <circle cx="520" cy="460" r="28" fill="rgba(255,107,53,0.12)" stroke="#FF9268" stroke-width="3"/>
-          <text x="520" y="454" text-anchor="middle" font-size="18" fill="#FF9268" font-weight="bold" font-family="sans-serif">MR</text>
-          <text x="520" y="472" text-anchor="middle" font-size="13" fill="rgba(255,146,104,0.7)" font-family="sans-serif">Mid R</text>
-          <!-- BL: Back Left -->
-          <circle cx="100" cy="850" r="28" fill="rgba(255,107,53,0.12)" stroke="#FF9268" stroke-width="3"/>
-          <text x="100" y="844" text-anchor="middle" font-size="18" fill="#FF9268" font-weight="bold" font-family="sans-serif">BL</text>
-          <text x="100" y="862" text-anchor="middle" font-size="13" fill="rgba(255,146,104,0.7)" font-family="sans-serif">Back L</text>
-          <!-- BR: Back Right -->
-          <circle cx="540" cy="850" r="28" fill="rgba(255,107,53,0.12)" stroke="#FF9268" stroke-width="3"/>
-          <text x="540" y="844" text-anchor="middle" font-size="18" fill="#FF9268" font-weight="bold" font-family="sans-serif">BR</text>
-          <text x="540" y="862" text-anchor="middle" font-size="13" fill="rgba(255,146,104,0.7)" font-family="sans-serif">Back R</text>
-        </svg>
+        <div class="court-real-wrap">
+          <img src="court.svg" class="court-real-img" alt="Real squash court — top view" onerror="this.style.opacity='.3'">
+
+          <div class="c-dot or" style="left:15.6%;top:10.3%"></div>
+          <div class="c-dot or" style="left:84.4%;top:10.3%"></div>
+          <div class="c-dot or" style="left:50%;top:43.7%"></div>
+          <div class="c-dot or" style="left:18.75%;top:47.2%"></div>
+          <div class="c-dot or" style="left:81.25%;top:47.2%"></div>
+          <div class="c-dot or" style="left:15.6%;top:87.2%"></div>
+          <div class="c-dot or" style="left:84.4%;top:87.2%"></div>
+        </div>
       </div>
       <div class="court-info reveal d1">
         <h3>6-Point Ghosting System</h3>
@@ -1054,88 +953,21 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
     </div>
     <div id="court-10pt" class="court-panel">
       <div class="court-diagram-wrap reveal">
-        <!--
-          10-point: all 6 positions + 4 bridging positions:
-            FMCL (Front Mid Court Left):  x=-2.00,z=2.80 → SVG(120,280)
-            FMCR (Front Mid Court Right): x= 2.00,z=2.80 → SVG(520,280)
-            BMCL (Back Mid Court Left):   x=-2.00,z=6.50 → SVG(120,650)
-            BMCR (Back Mid Court Right):  x= 2.00,z=6.50 → SVG(520,650)
-        -->
-        <svg viewBox="0 0 640 975" width="180" height="274" aria-label="10-point squash ghosting court — WSF accurate positions">
-          <!-- Surround -->
-          <rect x="0" y="0" width="640" height="975" fill="#020812"/>
-          <!-- Court surface -->
-          <rect x="8" y="8" width="624" height="959" fill="#0C1C2E"/>
-          <!-- Zone tints -->
-          <rect x="8" y="8" width="624" height="418" fill="rgba(10,132,255,0.07)"/>
-          <rect x="8" y="426" width="624" height="541" fill="rgba(255,107,53,0.06)"/>
-          <!-- Spotlight -->
-          <circle cx="320" cy="426" r="280" fill="rgba(25,75,130,0.07)"/>
-          <circle cx="320" cy="426" r="160" fill="rgba(40,95,165,0.09)"/>
-          <circle cx="320" cy="426" r="80" fill="rgba(60,125,200,0.11)"/>
-          <!-- Court boundary -->
-          <rect x="8" y="8" width="624" height="959" fill="none" stroke="rgba(255,107,53,0.12)" stroke-width="18"/>
-          <rect x="8" y="8" width="624" height="959" fill="none" stroke="rgba(255,107,53,0.28)" stroke-width="7"/>
-          <rect x="8" y="8" width="624" height="959" fill="none" stroke="#FF6B35" stroke-width="3"/>
-          <!-- Tin strip -->
-          <rect x="8" y="8" width="624" height="13" fill="#FF6B35" opacity="0.85"/>
-          <!-- Short line y=426 -->
-          <line x1="8" y1="426" x2="632" y2="426" stroke="#FF6B35" stroke-width="4"/>
-          <!-- Half-court line -->
-          <line x1="320" y1="426" x2="320" y2="967" stroke="#FF6B35" stroke-width="4"/>
-          <!-- Service boxes -->
-          <rect x="8" y="426" width="160" height="160" fill="rgba(255,107,53,0.04)" stroke="#FF6B35" stroke-width="3"/>
-          <rect x="472" y="426" width="160" height="160" fill="rgba(255,107,53,0.04)" stroke="#FF6B35" stroke-width="3"/>
-          <!-- FRONT WALL label -->
-          <text x="320" y="32" text-anchor="middle" font-size="22" fill="rgba(255,107,53,0.45)" font-family="sans-serif" font-weight="700" letter-spacing="3">FRONT WALL</text>
-          <!-- T-position -->
-          <circle cx="320" cy="426" r="20" fill="rgba(255,107,53,0.2)"/>
-          <circle cx="320" cy="426" r="9" fill="#FF6B35"/>
-          <text x="320" y="430" text-anchor="middle" font-size="10" fill="#fff" font-weight="bold" font-family="sans-serif">T</text>
-          <!-- FL: Front Left SVG(100,100) -->
-          <circle cx="100" cy="100" r="26" fill="rgba(29,78,216,0.2)" stroke="#60a5fa" stroke-width="2.5"/>
-          <text x="100" y="95" text-anchor="middle" font-size="16" fill="#93c5fd" font-weight="bold" font-family="sans-serif">FL</text>
-          <text x="100" y="111" text-anchor="middle" font-size="11" fill="rgba(147,197,253,0.65)" font-family="sans-serif">Front L</text>
-          <!-- FR: Front Right SVG(540,100) -->
-          <circle cx="540" cy="100" r="26" fill="rgba(29,78,216,0.2)" stroke="#60a5fa" stroke-width="2.5"/>
-          <text x="540" y="95" text-anchor="middle" font-size="16" fill="#93c5fd" font-weight="bold" font-family="sans-serif">FR</text>
-          <text x="540" y="111" text-anchor="middle" font-size="11" fill="rgba(147,197,253,0.65)" font-family="sans-serif">Front R</text>
-          <!-- FMCL: Front Mid Court Left SVG(120,280) — 10pt only -->
-          <circle cx="120" cy="280" r="24" fill="rgba(14,165,233,0.15)" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="6,3"/>
-          <text x="120" y="275" text-anchor="middle" font-size="14" fill="#7dd3fc" font-weight="bold" font-family="sans-serif">FML</text>
-          <text x="120" y="290" text-anchor="middle" font-size="10" fill="rgba(125,211,252,0.6)" font-family="sans-serif">F.Mid L</text>
-          <!-- FMCR: Front Mid Court Right SVG(520,280) — 10pt only -->
-          <circle cx="520" cy="280" r="24" fill="rgba(14,165,233,0.15)" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="6,3"/>
-          <text x="520" y="275" text-anchor="middle" font-size="14" fill="#7dd3fc" font-weight="bold" font-family="sans-serif">FMR</text>
-          <text x="520" y="290" text-anchor="middle" font-size="10" fill="rgba(125,211,252,0.6)" font-family="sans-serif">F.Mid R</text>
-          <!-- ML: Mid Left SVG(120,460) -->
-          <circle cx="120" cy="460" r="26" fill="rgba(255,107,53,0.12)" stroke="#FF9268" stroke-width="2.5"/>
-          <text x="120" y="455" text-anchor="middle" font-size="16" fill="#FF9268" font-weight="bold" font-family="sans-serif">ML</text>
-          <text x="120" y="471" text-anchor="middle" font-size="11" fill="rgba(255,146,104,0.65)" font-family="sans-serif">Mid L</text>
-          <!-- MR: Mid Right SVG(520,460) -->
-          <circle cx="520" cy="460" r="26" fill="rgba(255,107,53,0.12)" stroke="#FF9268" stroke-width="2.5"/>
-          <text x="520" y="455" text-anchor="middle" font-size="16" fill="#FF9268" font-weight="bold" font-family="sans-serif">MR</text>
-          <text x="520" y="471" text-anchor="middle" font-size="11" fill="rgba(255,146,104,0.65)" font-family="sans-serif">Mid R</text>
-          <!-- BMCL: Back Mid Court Left SVG(120,650) — 10pt only -->
-          <circle cx="120" cy="650" r="24" fill="rgba(234,88,12,0.15)" stroke="#fb923c" stroke-width="2.5" stroke-dasharray="6,3"/>
-          <text x="120" y="645" text-anchor="middle" font-size="14" fill="#fdba74" font-weight="bold" font-family="sans-serif">BML</text>
-          <text x="120" y="660" text-anchor="middle" font-size="10" fill="rgba(253,186,116,0.6)" font-family="sans-serif">B.Mid L</text>
-          <!-- BMCR: Back Mid Court Right SVG(520,650) — 10pt only -->
-          <circle cx="520" cy="650" r="24" fill="rgba(234,88,12,0.15)" stroke="#fb923c" stroke-width="2.5" stroke-dasharray="6,3"/>
-          <text x="520" y="645" text-anchor="middle" font-size="14" fill="#fdba74" font-weight="bold" font-family="sans-serif">BMR</text>
-          <text x="520" y="660" text-anchor="middle" font-size="10" fill="rgba(253,186,116,0.6)" font-family="sans-serif">B.Mid R</text>
-          <!-- BL: Back Left SVG(100,850) -->
-          <circle cx="100" cy="850" r="26" fill="rgba(194,65,12,0.2)" stroke="#FF6B35" stroke-width="2.5"/>
-          <text x="100" y="845" text-anchor="middle" font-size="16" fill="#FF9268" font-weight="bold" font-family="sans-serif">BL</text>
-          <text x="100" y="861" text-anchor="middle" font-size="11" fill="rgba(255,146,104,0.65)" font-family="sans-serif">Back L</text>
-          <!-- BR: Back Right SVG(540,850) -->
-          <circle cx="540" cy="850" r="26" fill="rgba(194,65,12,0.2)" stroke="#FF6B35" stroke-width="2.5"/>
-          <text x="540" y="845" text-anchor="middle" font-size="16" fill="#FF9268" font-weight="bold" font-family="sans-serif">BR</text>
-          <text x="540" y="861" text-anchor="middle" font-size="11" fill="rgba(255,146,104,0.65)" font-family="sans-serif">Back R</text>
-          <!-- Legend: dashed = 10pt extra -->
-          <line x1="30" y1="940" x2="60" y2="940" stroke="#38bdf8" stroke-width="2" stroke-dasharray="5,3"/>
-          <text x="68" y="945" font-size="16" fill="rgba(56,189,248,0.8)" font-family="sans-serif">10pt extra positions</text>
-        </svg>
+        <div class="court-real-wrap">
+          <img src="court.svg" class="court-real-img" alt="Real squash court — top view" onerror="this.style.opacity='.3'">
+
+          <div class="c-dot or" style="left:15.6%;top:10.3%"></div>
+          <div class="c-dot or" style="left:84.4%;top:10.3%"></div>
+          <div class="c-dot or" style="left:50%;top:43.7%"></div>
+          <div class="c-dot or" style="left:18.75%;top:47.2%"></div>
+          <div class="c-dot or" style="left:81.25%;top:47.2%"></div>
+          <div class="c-dot or" style="left:15.6%;top:87.2%"></div>
+          <div class="c-dot or" style="left:84.4%;top:87.2%"></div>
+          <div class="c-dot bl" style="left:18.75%;top:28.7%"></div>
+          <div class="c-dot bl" style="left:81.25%;top:28.7%"></div>
+          <div class="c-dot bl" style="left:18.75%;top:66.7%"></div>
+          <div class="c-dot bl" style="left:81.25%;top:66.7%"></div>
+        </div>
       </div>
       <div class="court-info reveal d1">
         <h3>10-Point Ghosting System</h3>

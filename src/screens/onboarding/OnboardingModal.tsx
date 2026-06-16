@@ -207,6 +207,11 @@ export default function OnboardingModal() {
   const [age,    setAge]    = useState(profile.age ? String(profile.age) : '');
   const [gender, setGender] = useState(profile.gender ?? '');
 
+  function handleGender(v: string) {
+    setGender(v);
+    if (v === 'male' || v === 'female') setVoice(v as VoiceGender);
+  }
+
   function handleNext() {
     if (step < 1) { setStep(step + 1); }
     else { finish(); }
@@ -244,7 +249,7 @@ export default function OnboardingModal() {
               <Step2
                 hand={hand} voice={voice} name={name} age={age} gender={gender}
                 onHand={setHand} onVoice={setVoice} onName={setName}
-                onAge={setAge} onGender={setGender}
+                onAge={setAge} onGender={handleGender}
               />
             )}
           </ScrollView>
