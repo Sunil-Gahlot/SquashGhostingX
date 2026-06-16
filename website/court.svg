@@ -1,115 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 975">
-  <defs>
-    <!-- Horizontal gradient: side walls cast shadow, centre is brightest -->
-    <linearGradient id="flr" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"    stop-color="#8a521c"/>
-      <stop offset="0.14" stop-color="#b87038"/>
-      <stop offset="0.5"  stop-color="#dc9650"/>
-      <stop offset="0.86" stop-color="#b87038"/>
-      <stop offset="1"    stop-color="#8a521c"/>
-    </linearGradient>
-    <!-- Vertical vignette: front wall (top) and back wall (bottom) slightly darker -->
-    <linearGradient id="vig" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0"    stop-color="#000" stop-opacity="0.30"/>
-      <stop offset="0.07" stop-color="#000" stop-opacity="0.04"/>
-      <stop offset="0.93" stop-color="#000" stop-opacity="0.04"/>
-      <stop offset="1"    stop-color="#000" stop-opacity="0.30"/>
-    </linearGradient>
-    <!-- Plank sheen: very faint specular highlight on each alternate plank -->
-    <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0"   stop-color="#fff" stop-opacity="0"/>
-      <stop offset="0.5" stop-color="#fff" stop-opacity="0.07"/>
-      <stop offset="1"   stop-color="#fff" stop-opacity="0"/>
-    </linearGradient>
-  </defs>
 
-  <!-- ── FLOOR BASE ── -->
-  <rect width="640" height="975" fill="url(#flr)"/>
+  <!-- Wood floor base — light blonde maple -->
+  <rect x="0" y="0" width="640" height="975" fill="#F5D268"/>
 
-  <!-- Alternate plank bands (every other 40-unit band is slightly darker) -->
-  <rect x="0"   y="0" width="40" height="975" fill="rgba(0,0,0,0.07)"/>
-  <rect x="80"  y="0" width="40" height="975" fill="rgba(0,0,0,0.07)"/>
-  <rect x="160" y="0" width="40" height="975" fill="rgba(0,0,0,0.07)"/>
-  <rect x="240" y="0" width="40" height="975" fill="rgba(0,0,0,0.07)"/>
-  <rect x="320" y="0" width="40" height="975" fill="rgba(0,0,0,0.07)"/>
-  <rect x="400" y="0" width="40" height="975" fill="rgba(0,0,0,0.07)"/>
-  <rect x="480" y="0" width="40" height="975" fill="rgba(0,0,0,0.07)"/>
-  <rect x="560" y="0" width="40" height="975" fill="rgba(0,0,0,0.07)"/>
+  <!-- Alternating slightly deeper planks (20px wide vertical strips) -->
+  <rect x="20"  y="0" width="20" height="975" fill="#EBC04A"/>
+  <rect x="60"  y="0" width="20" height="975" fill="#EBC04A"/>
+  <rect x="100" y="0" width="20" height="975" fill="#EBC04A"/>
+  <rect x="140" y="0" width="20" height="975" fill="#EBC04A"/>
+  <rect x="180" y="0" width="20" height="975" fill="#EBC04A"/>
+  <rect x="220" y="0" width="20" height="975" fill="#EBC04A"/>
+  <rect x="260" y="0" width="20" height="975" fill="#EBC04A"/>
+  <rect x="300" y="0" width="20" height="975" fill="#EBC04A"/>
+  <rect x="340" y="0" width="20" height="975" fill="#EBC04A"/>
+  <rect x="380" y="0" width="20" height="975" fill="#EBC04A"/>
+  <rect x="420" y="0" width="20" height="975" fill="#EBC04A"/>
+  <rect x="460" y="0" width="20" height="975" fill="#EBC04A"/>
+  <rect x="500" y="0" width="20" height="975" fill="#EBC04A"/>
+  <rect x="540" y="0" width="20" height="975" fill="#EBC04A"/>
+  <rect x="580" y="0" width="20" height="975" fill="#EBC04A"/>
+  <rect x="620" y="0" width="20" height="975" fill="#EBC04A"/>
 
-  <!-- Plank groove lines (at every 40 units) -->
-  <g stroke="rgba(0,0,0,0.22)" stroke-width="1" fill="none">
+  <!-- Plank groove lines -->
+  <g stroke="#C89820" stroke-width="1" opacity="0.5">
+    <line x1="20"  y1="0" x2="20"  y2="975"/>
     <line x1="40"  y1="0" x2="40"  y2="975"/>
+    <line x1="60"  y1="0" x2="60"  y2="975"/>
     <line x1="80"  y1="0" x2="80"  y2="975"/>
+    <line x1="100" y1="0" x2="100" y2="975"/>
     <line x1="120" y1="0" x2="120" y2="975"/>
+    <line x1="140" y1="0" x2="140" y2="975"/>
     <line x1="160" y1="0" x2="160" y2="975"/>
+    <line x1="180" y1="0" x2="180" y2="975"/>
     <line x1="200" y1="0" x2="200" y2="975"/>
+    <line x1="220" y1="0" x2="220" y2="975"/>
     <line x1="240" y1="0" x2="240" y2="975"/>
+    <line x1="260" y1="0" x2="260" y2="975"/>
     <line x1="280" y1="0" x2="280" y2="975"/>
+    <line x1="300" y1="0" x2="300" y2="975"/>
     <line x1="320" y1="0" x2="320" y2="975"/>
+    <line x1="340" y1="0" x2="340" y2="975"/>
     <line x1="360" y1="0" x2="360" y2="975"/>
+    <line x1="380" y1="0" x2="380" y2="975"/>
     <line x1="400" y1="0" x2="400" y2="975"/>
+    <line x1="420" y1="0" x2="420" y2="975"/>
     <line x1="440" y1="0" x2="440" y2="975"/>
+    <line x1="460" y1="0" x2="460" y2="975"/>
     <line x1="480" y1="0" x2="480" y2="975"/>
+    <line x1="500" y1="0" x2="500" y2="975"/>
     <line x1="520" y1="0" x2="520" y2="975"/>
+    <line x1="540" y1="0" x2="540" y2="975"/>
     <line x1="560" y1="0" x2="560" y2="975"/>
+    <line x1="580" y1="0" x2="580" y2="975"/>
     <line x1="600" y1="0" x2="600" y2="975"/>
+    <line x1="620" y1="0" x2="620" y2="975"/>
   </g>
 
-  <!-- Horizontal plank end-joints (staggered across columns for realism) -->
-  <g stroke="rgba(0,0,0,0.14)" stroke-width="1" fill="none">
-    <line x1="0"   y1="195" x2="200" y2="195"/>
-    <line x1="0"   y1="390" x2="120" y2="390"/>
-    <line x1="0"   y1="585" x2="160" y2="585"/>
-    <line x1="0"   y1="780" x2="200" y2="780"/>
-    <line x1="120" y1="293" x2="280" y2="293"/>
-    <line x1="200" y1="488" x2="360" y2="488"/>
-    <line x1="160" y1="683" x2="320" y2="683"/>
-    <line x1="280" y1="146" x2="400" y2="146"/>
-    <line x1="320" y1="341" x2="480" y2="341"/>
-    <line x1="360" y1="536" x2="520" y2="536"/>
-    <line x1="400" y1="731" x2="560" y2="731"/>
-    <line x1="440" y1="195" x2="640" y2="195"/>
-    <line x1="480" y1="390" x2="640" y2="390"/>
-    <line x1="520" y1="585" x2="640" y2="585"/>
-    <line x1="440" y1="780" x2="640" y2="780"/>
+  <!-- Staggered plank-end joints -->
+  <g stroke="#C09018" stroke-width="1.2" opacity="0.4">
+    <line x1="0"   y1="195" x2="300" y2="195"/>
+    <line x1="0"   y1="390" x2="200" y2="390"/>
+    <line x1="0"   y1="585" x2="260" y2="585"/>
+    <line x1="0"   y1="780" x2="300" y2="780"/>
+    <line x1="200" y1="293" x2="420" y2="293"/>
+    <line x1="260" y1="488" x2="480" y2="488"/>
+    <line x1="300" y1="683" x2="500" y2="683"/>
+    <line x1="380" y1="146" x2="580" y2="146"/>
+    <line x1="420" y1="341" x2="640" y2="341"/>
+    <line x1="480" y1="536" x2="640" y2="536"/>
+    <line x1="500" y1="731" x2="640" y2="731"/>
   </g>
 
-  <!-- Vignette overlay (darkens front/back wall edges) -->
-  <rect width="640" height="975" fill="url(#vig)"/>
+  <!-- Court boundary — WSF red -->
+  <rect x="3" y="3" width="634" height="969" fill="none" stroke="#CC1500" stroke-width="5"/>
 
-  <!-- ── WSF COURT LINES (red — standard for squash courts) ── -->
+  <!-- Tin strip — front wall base -->
+  <rect x="3" y="3" width="634" height="12" fill="#AA1800" opacity="0.8"/>
 
-  <!-- Outer court boundary (full perimeter) -->
-  <rect x="2" y="2" width="636" height="971"
-        fill="none" stroke="rgba(210,35,12,0.97)" stroke-width="5"/>
+  <!-- Short line -->
+  <line x1="3" y1="426" x2="637" y2="426" stroke="#DD2000" stroke-width="4.5"/>
 
-  <!-- Short line — 4.26 m from front wall (y = 426) — full court width -->
-  <line x1="2" y1="426" x2="638" y2="426"
-        stroke="rgba(210,35,12,0.97)" stroke-width="4.5"/>
+  <!-- Half-court line -->
+  <line x1="320" y1="426" x2="320" y2="972" stroke="#DD2000" stroke-width="4.5"/>
 
-  <!-- Half-court line — centre (x = 320) — from short line to back wall -->
-  <line x1="320" y1="426" x2="320" y2="973"
-        stroke="rgba(210,35,12,0.97)" stroke-width="4.5"/>
+  <!-- Left service box -->
+  <rect x="3" y="426" width="160" height="160" fill="none" stroke="#DD2000" stroke-width="4"/>
 
-  <!--
-    Service boxes — WSF standard: 1.6 m × 1.6 m each, AGAINST SIDE WALLS
-    Left box:  x = 0–160  (side wall to 1.6 m in),  y = 426–586 (short line, 1.6 m deep)
-    Right box: x = 480–640 (1.6 m in from right wall), y = 426–586
-    Top edge  = short line (already drawn).
-    Side wall = one side of each box (outer boundary already drawn).
-    Only inner vertical + bottom needed for each box.
-  -->
+  <!-- Right service box -->
+  <rect x="477" y="426" width="160" height="160" fill="none" stroke="#DD2000" stroke-width="4"/>
 
-  <!-- Left service box: inner vertical at x=160 + bottom at y=586 -->
-  <line x1="160" y1="426" x2="160" y2="586"
-        stroke="rgba(210,35,12,0.93)" stroke-width="4"/>
-  <line x1="2"   y1="586" x2="160" y2="586"
-        stroke="rgba(210,35,12,0.93)" stroke-width="4"/>
-
-  <!-- Right service box: inner vertical at x=480 + bottom at y=586 -->
-  <line x1="480" y1="426" x2="480" y2="586"
-        stroke="rgba(210,35,12,0.93)" stroke-width="4"/>
-  <line x1="480" y1="586" x2="638" y2="586"
-        stroke="rgba(210,35,12,0.93)" stroke-width="4"/>
 </svg>
