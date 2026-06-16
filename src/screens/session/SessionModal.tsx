@@ -86,7 +86,7 @@ function ActiveTrainingView({
   session: ActiveSession;
   onPause: () => void;
   onEnd:   () => void;
-  courtMode: 'hero' | 'real';
+  courtMode: 'glass' | 'wooden';
   gender: string | null;
 }) {
   const setPaceStep = useSessionStore((s) => s.setPaceStep);
@@ -339,7 +339,7 @@ function PausedView({
   session: ActiveSession;
   onResume: () => void;
   onEnd:    () => void;
-  courtMode: 'hero' | 'real';
+  courtMode: 'glass' | 'wooden';
   gender: string | null;
 }) {
   return (
@@ -381,7 +381,7 @@ const pvStyles = StyleSheet.create({
 
 // ─── RestView ─────────────────────────────────────────────────────────────────
 
-function RestView({ session, onSkip, courtMode, gender }: { session: ActiveSession; onSkip: () => void; courtMode: 'hero' | 'real'; gender: string | null }) {
+function RestView({ session, onSkip, courtMode, gender }: { session: ActiveSession; onSkip: () => void; courtMode: 'glass' | 'wooden'; gender: string | null }) {
   return (
     <View style={rvStyles.container}>
       <Text style={rvStyles.label}>REST</Text>
@@ -702,7 +702,7 @@ export default function SessionModal() {
               courtSystem={session.config.courtSystem}
               dominantHand={session.config.dominantHand}
               gender={gender}
-              courtMode={settings.courtMode ?? 'hero'}
+              courtMode={settings.courtMode ?? 'wooden'}
               showLabels={false}
               style={idleStyles.court}
             />
@@ -716,7 +716,7 @@ export default function SessionModal() {
             session={session}
             onPause={engine.pauseSession}
             onEnd={engine.endSession}
-            courtMode={settings.courtMode ?? 'hero'}
+            courtMode={settings.courtMode ?? 'wooden'}
             gender={gender}
           />
         )}
@@ -725,12 +725,12 @@ export default function SessionModal() {
             session={session}
             onResume={engine.resumeSession}
             onEnd={engine.endSession}
-            courtMode={settings.courtMode ?? 'hero'}
+            courtMode={settings.courtMode ?? 'wooden'}
             gender={gender}
           />
         )}
         {session?.state === 'rest' && (
-          <RestView session={session} onSkip={engine.skipRest} courtMode={settings.courtMode ?? 'hero'} gender={gender} />
+          <RestView session={session} onSkip={engine.skipRest} courtMode={settings.courtMode ?? 'wooden'} gender={gender} />
         )}
         {(session?.state === 'complete' || session?.state === 'abandoned') && (
           <SessionSummaryView

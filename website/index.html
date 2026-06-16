@@ -188,7 +188,7 @@ section{padding:5rem 1.5rem}
 
 /* TRAINING SYSTEM */
 #system{background:var(--bg2)}
-.system-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
+.system-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
 .sys-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:1.75rem;position:relative;overflow:hidden;transition:transform .3s,border-color .3s}
 .sys-card:hover{transform:translateY(-6px);border-color:var(--borderacc)}
 .sys-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent);opacity:0;transition:opacity .3s}
@@ -555,6 +555,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
 /* RESPONSIVE */
 @media(max-width:1024px){
   .system-grid,.skills-grid,.blog-grid,.free-grid{grid-template-columns:repeat(2,1fr)}
+  #movement .container>div[style*="grid-template-columns"]{grid-template-columns:repeat(2,1fr)}
   .bento-grid{grid-template-columns:1fr 1fr}.bento-card.wide{grid-column:span 2}
   .showcase-inner{grid-template-columns:1fr 1fr;}.showcase-phone:last-child{display:none}
   .footer-top{grid-template-columns:1fr 1fr}
@@ -568,11 +569,14 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
   .hero-actions{justify-content:center;flex-wrap:wrap}.hero-social-proof{justify-content:center}
   .hero-float-card.left,.hero-float-card.right{display:none}
   .why-grid,.patterns-grid,.coaches-grid,.courts-tabs-panel{grid-template-columns:1fr}
+  #shots .container>div{grid-template-columns:1fr}
+  #dominate-t .container>div[style*="grid-template-columns"]{grid-template-columns:1fr}
   .founders-grid,.founders-mission,.config-grid{grid-template-columns:1fr}
   .config-grid>div{display:flex;flex-direction:column;align-items:center}
   .config-phone{max-width:min(340px,88vw);width:100%}
   .court-panel.active{grid-template-columns:1fr}
   .system-grid,.skills-grid{grid-template-columns:1fr}
+  #movement .container>div[style*="grid-template-columns"]{grid-template-columns:1fr}
   .blog-grid{grid-template-columns:repeat(2,1fr)}
   .testi-grid{grid-template-columns:1fr}
   .free-grid{grid-template-columns:1fr}
@@ -642,11 +646,11 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
   </a>
   <div class="nav-links">
     <a href="#why">Why Ghosting</a>
+    <a href="#movement">Movement</a>
+    <a href="#shots">Shot Sim</a>
     <a href="#courts">Court Systems</a>
     <a href="#programs">Programs</a>
-    <a href="#showcase">App</a>
     <a href="#videos">Videos</a>
-    <a href="#blog">Blog</a>
     <a href="#founder">Team</a>
     <a href="#cta" class="nav-cta">Download Free</a>
   </div>
@@ -656,6 +660,8 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
 </nav>
 <div class="mobile-menu" id="mobile-menu">
   <a href="#why" onclick="closeMobileMenu()">Why Ghosting</a>
+  <a href="#movement" onclick="closeMobileMenu()">Movement &amp; Agility</a>
+  <a href="#shots" onclick="closeMobileMenu()">Shot Simulation</a>
   <a href="#courts" onclick="closeMobileMenu()">Court Systems</a>
   <a href="#programs" onclick="closeMobileMenu()">Programs</a>
   <a href="#showcase" onclick="closeMobileMenu()">App</a>
@@ -674,8 +680,8 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
   <div class="hero-inner">
     <div>
       <div class="hero-badge reveal"><span class="hero-badge-dot"></span>Free on iOS &amp; Android</div>
-      <h1 class="hero-title reveal d1">Train Like a <em>Ghost.</em><br>Move Like a Pro.</h1>
-      <p class="hero-sub reveal d2">The only squash app with AI voice coaching, 6-point &amp; 10-point ghosting systems, real-time analytics and pattern intelligence — built by a squash player, for squash players.</p>
+      <h1 class="hero-title reveal d1">Dominate Every Corner.<br><em>Own the T.</em></h1>
+      <p class="hero-sub reveal d2">The most advanced squash ghosting app on the planet. AI voice coaching calls every position, shot simulation sharpens your tactical mind, and real-time analytics reveal exactly where you need to push harder. Built for players who refuse to lose a rally at the back corners.</p>
       <div class="hero-actions reveal d3">
         <a href="https://apps.apple.com/app/squashghostingx/id6744036820" class="btn-primary" target="_blank" rel="noopener"> iOS App Store</a>
         <a href="https://play.google.com/store/apps/details?id=com.squashghostingx.app" class="btn-primary" style="background:var(--bg4);border:1px solid var(--borderacc)" target="_blank" rel="noopener">🤖 Google Play</a>
@@ -717,18 +723,18 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       </div>
       <div class="stat-item reveal d1">
         <div class="stat-num"><span data-count="12000">0</span><span class="stat-suffix">+</span></div>
-        <div class="stat-label">Sessions Completed</div>
-        <div class="stat-sub">And counting</div>
+        <div class="stat-label">Training Sessions</div>
+        <div class="stat-sub">Ghost reps logged globally</div>
       </div>
       <div class="stat-item reveal d2">
-        <div class="stat-num"><span data-count="10">0</span></div>
-        <div class="stat-label">Court Positions</div>
-        <div class="stat-sub">Full 10-point system</div>
+        <div class="stat-num"><span data-count="20">0</span><span class="stat-suffix">+</span></div>
+        <div class="stat-label">Built-In Programs</div>
+        <div class="stat-sub">Beginner to Pro — all free</div>
       </div>
       <div class="stat-item reveal d3">
         <div class="stat-num"><span data-count="100">0</span><span class="stat-suffix">%</span></div>
-        <div class="stat-label">Free to Download</div>
-        <div class="stat-sub">No credit card needed</div>
+        <div class="stat-label">Free Forever</div>
+        <div class="stat-sub">No subscription. No catch.</div>
       </div>
     </div>
   </div>
@@ -740,35 +746,35 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
     <div class="why-grid">
       <div>
         <div class="section-label reveal">The Science</div>
-        <h2 class="section-title reveal d1">Why Ghosting Is the <em>Ultimate</em> Squash Drill</h2>
-        <p class="section-sub reveal d2">Ghosting — moving to all court positions without hitting the ball — builds the muscle memory, aerobic base, and decision speed that translate directly to match performance.</p>
+        <h2 class="section-title reveal d1">Why Ghosting <em>Builds</em> Champions</h2>
+        <p class="section-sub reveal d2">Ghosting — moving to every court corner without the ball — forges explosive footwork, match-level aerobic fitness, and the tactical instincts that separate good players from great ones. The world's top squash coaches prescribe it every training day.</p>
         <div class="why-list">
           <div class="why-item reveal d2">
             <div class="why-icon">🧠</div>
             <div>
-              <h4>Neurological Patterning</h4>
-              <p>Repeated movement patterns wire your nervous system to respond automatically — so in a match, your feet go before your brain tells them to.</p>
+              <h4>Motor Pattern Automaticity</h4>
+              <p>Court movement becomes instinctive through deliberate repetition. Your split-step fires before your brain decides, your lunge depth extends beyond what feels possible, and your recovery line becomes a reflex — not a decision.</p>
             </div>
           </div>
           <div class="why-item reveal d3">
-            <div class="why-icon">💪</div>
+            <div class="why-icon">⚡</div>
             <div>
-              <h4>Sport-Specific Fitness</h4>
-              <p>Ghosting builds the exact energy systems squash demands: explosive bursts, rapid direction changes, and sustained aerobic capacity.</p>
+              <h4>Explosive Agility &amp; Directional Change</h4>
+              <p>Ghosting trains the exact energy systems squash demands: explosive first steps, lateral deceleration, multi-directional speed, and the aerobic capacity to sustain all of it across a five-game match.</p>
             </div>
           </div>
           <div class="why-item reveal d4">
             <div class="why-icon">📍</div>
             <div>
-              <h4>T-Position Recovery</h4>
-              <p>Every ghost forces you to recover to the T — the cornerstone habit separating recreational players from competitive athletes.</p>
+              <h4>Dominate the T — Every Rep</h4>
+              <p>Every ghost ends at the T. Not sometimes — every single time. The app enforces this until owning the T is as automatic as breathing. On match day, the player who controls the T controls the rally.</p>
             </div>
           </div>
           <div class="why-item reveal d5">
             <div class="why-icon">🎤</div>
             <div>
-              <h4>AI Voice Coaching</h4>
-              <p>Real-time audio cues call each position — keeping your eyes forward and your focus on movement quality, not the screen.</p>
+              <h4>Shot Simulation Intelligence</h4>
+              <p>AI calls positions alongside shot types — "Front Left, Drop Shot" — training your mind to prepare the stroke during movement, not after arrival. Tactical IQ built at speed, hands-free, every rep.</p>
             </div>
           </div>
         </div>
@@ -779,7 +785,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
           <div class="why-court-item">
             <div class="why-court-item-label">6-Point System</div>
             <div class="court-real-wrap" style="width:190px;height:289px">
-              <img src="court.svg" class="court-real-img" style="width:190px;height:289px" alt="Real squash court — 6 point system" onerror="this.style.opacity='.3'">
+              <img src="court.svg" class="court-real-img" style="width:190px;height:289px" alt="Wooden squash court — 6 point system" onerror="this.style.opacity='.3'">
 
               <div class="c-dot or" style="left:15.6%;top:10.3%"></div>
               <div class="c-dot or" style="left:84.4%;top:10.3%"></div>
@@ -796,7 +802,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
           <div class="why-court-item">
             <div class="why-court-item-label">10-Point System</div>
             <div class="court-real-wrap" style="width:190px;height:289px">
-              <img src="court.svg" class="court-real-img" style="width:190px;height:289px" alt="Real squash court — 10 point system" onerror="this.style.opacity='.3'">
+              <img src="court.svg" class="court-real-img" style="width:190px;height:289px" alt="Wooden squash court — 10 point system" onerror="this.style.opacity='.3'">
 
               <div class="c-dot or" style="left:15.6%;top:10.3%"></div>
               <div class="c-dot or" style="left:84.4%;top:10.3%"></div>
@@ -824,42 +830,140 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
   </div>
 </section>
 
+<!-- MOVEMENT & AGILITY -->
+<section id="movement" style="background:var(--bg2)">
+  <div class="container">
+    <div class="section-head text-center">
+      <div class="section-label reveal">Movement Science</div>
+      <h2 class="section-title reveal d1">Footwork That <em>Dominates</em><br>Every Corner</h2>
+      <p class="section-sub reveal d2">Ghosting isn't cardio with a racket — it's precision footwork at speed. SquashGhostingX breaks movement into trainable components: split-step timing, lunge mechanics, directional changes, and explosive recovery. Each rep wires a specific motor pattern, not just burns calories.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem">
+      <div class="sys-card reveal">
+        <div class="sys-card-num">A</div>
+        <div class="sys-card-icon">⚡</div>
+        <h3>Split-Step &amp; Launch</h3>
+        <p>Timed vocal calls train your split-step to fire at the exact moment the coach speaks — building the reactive first step that gets you to the ball early, every time.</p>
+        <span class="sys-card-tag">Reactive Speed</span>
+      </div>
+      <div class="sys-card reveal d1">
+        <div class="sys-card-num">B</div>
+        <div class="sys-card-icon">↗</div>
+        <h3>Diagonal Power Lunges</h3>
+        <p>Front corners demand deep diagonal lunges. Repeated ghosting builds the quad strength and ankle stability to reach a tight drop and explode back to the T without losing balance.</p>
+        <span class="sys-card-tag">Front Court</span>
+      </div>
+      <div class="sys-card reveal d2">
+        <div class="sys-card-num">C</div>
+        <div class="sys-card-icon">🔄</div>
+        <h3>Multi-Directional Agility</h3>
+        <p>Random and Match-Sim patterns force reactive direction changes — decelerating, planting, and exploding toward the opposite corner exactly as real match play demands.</p>
+        <span class="sys-card-tag">Reactive Agility</span>
+      </div>
+      <div class="sys-card reveal d1">
+        <div class="sys-card-num">D</div>
+        <div class="sys-card-icon">💥</div>
+        <h3>Back-Corner Explosiveness</h3>
+        <p>Back corners are where matches are decided. Ghosting builds the explosive push from deep back corners back to the T — turning a defensive recovery into an attacking launch.</p>
+        <span class="sys-card-tag">Back Court</span>
+      </div>
+      <div class="sys-card reveal d2">
+        <div class="sys-card-num">E</div>
+        <div class="sys-card-icon">📈</div>
+        <h3>Tempo Progression</h3>
+        <p>Start at Slow to dial in correct mechanics. Progress to Natural, then Explosive — each level shortens the call window, demanding faster transitions and higher movement intensity.</p>
+        <span class="sys-card-tag">3 Tempos</span>
+      </div>
+      <div class="sys-card reveal d3">
+        <div class="sys-card-num">F</div>
+        <div class="sys-card-icon">🏃</div>
+        <h3>Sustained Match Fitness</h3>
+        <p>Sessions run 5–30 minutes of continuous ghosting — building the aerobic capacity and mental fortitude that makes the fifth game feel like the first.</p>
+        <span class="sys-card-tag">Up to 30 min</span>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- TRAINING SYSTEM -->
 <section id="system">
   <div class="container">
     <div class="section-head text-center">
       <div class="section-label reveal">How It Works</div>
-      <h2 class="section-title reveal d1">A Complete <em>Training System</em></h2>
-      <p class="section-sub reveal d2">Four pillars working together to make every session purposeful, measurable, and progressively harder.</p>
+      <h2 class="section-title reveal d1">Six Pillars. One <em>Unstoppable</em> Player.</h2>
+      <p class="section-sub reveal d2">Every pillar works together — voice coaching, shot simulation, court systems, analytics, pattern intelligence, and court environments — to make every session purposeful, measurable, and progressively harder.</p>
     </div>
     <div class="system-grid">
       <div class="sys-card reveal">
         <div class="sys-card-num">01</div>
         <div class="sys-card-icon">🎤</div>
         <h3>AI Voice Coaching</h3>
-        <p>Real-time audio cues call each court position. Adjustable coaching intensity, speech rate, and voice gender — hands-free, eyes-forward training.</p>
+        <p>Natural-language audio cues call each position at exactly the right moment. Adjustable speech rate, coaching intensity, and male/female voice — hands-free, eyes-forward, every rep.</p>
         <span class="sys-card-tag">Hands-Free</span>
       </div>
       <div class="sys-card reveal d1">
         <div class="sys-card-num">02</div>
-        <div class="sys-card-icon">🗺️</div>
-        <h3>Court Systems</h3>
-        <p>Choose between the classic 6-point system for fundamentals or the advanced 10-point system for elite-level court coverage and pattern complexity.</p>
-        <span class="sys-card-tag">6 + 10 Point</span>
+        <div class="sys-card-icon">🎯</div>
+        <h3>Shot Simulation</h3>
+        <p>Shot-based mode overlays a shot type on every position call — "Back Left, Boast" — training your mind to prepare the stroke during movement, building tactical IQ at full speed.</p>
+        <span class="sys-card-tag">Tactical Training</span>
       </div>
       <div class="sys-card reveal d2">
         <div class="sys-card-num">03</div>
+        <div class="sys-card-icon">🗺️</div>
+        <h3>Court Systems</h3>
+        <p>6-point for fundamentals and intermediate. 10-point for elite coverage — adding four bridging zones to create longer diagonal arcs and exponentially more complex match-like patterns.</p>
+        <span class="sys-card-tag">6 + 10 Point</span>
+      </div>
+      <div class="sys-card reveal d1">
+        <div class="sys-card-num">04</div>
         <div class="sys-card-icon">📊</div>
         <h3>Analytics Engine</h3>
-        <p>Every session is stored locally. Track zone balance, session load, personal bests, streak consistency, and weekly training patterns over time.</p>
+        <p>Every session stored locally. Zone balance, session load, personal bests, streak consistency, reaction time, and weekly training patterns — all tracked, all yours.</p>
         <span class="sys-card-tag">SQLite Local</span>
       </div>
-      <div class="sys-card reveal d3">
-        <div class="sys-card-num">04</div>
+      <div class="sys-card reveal d2">
+        <div class="sys-card-num">05</div>
         <div class="sys-card-icon">🧩</div>
         <h3>Pattern Intelligence</h3>
-        <p>AI analyses your zone visit frequency and suggests patterns to address imbalances — so you train your weaknesses, not just your strengths.</p>
+        <p>AI analyses zone visit frequency across sessions and surfaces where you're undertraining. Fixed, Random, and Match-Simulation modes ensure no corner gets ignored.</p>
         <span class="sys-card-tag">Adaptive AI</span>
+      </div>
+      <div class="sys-card reveal d3">
+        <div class="sys-card-num">06</div>
+        <div class="sys-card-icon">🏟️</div>
+        <h3>Two Court Environments</h3>
+        <p>Train on the warm Wooden Court with WSF-accurate red lines, or switch to Glass Court — the dark neon stadium mode — for the most immersive ghosting experience on any device.</p>
+        <span class="sys-card-tag">Wooden + Glass</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DOMINATE THE T -->
+<section id="dominate-t" style="background:var(--bg);padding:5rem 1.5rem;overflow:hidden;position:relative">
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(255,107,53,.055) 0%,transparent 65%);pointer-events:none"></div>
+  <div class="container" style="position:relative;z-index:1">
+    <div class="section-head text-center">
+      <div class="section-label reveal">Court Control</div>
+      <h2 class="section-title reveal d1" style="max-width:800px;margin:0 auto 1rem">The T is Where Matches Are<br><em>Won and Lost</em></h2>
+      <p class="section-sub reveal d2" style="max-width:640px;margin:0 auto 3.5rem">Every SquashGhostingX session enforces one non-negotiable rule — every rep ends at the T. Not sometimes. Every time. The AI coaches you to build this habit until returning to the T is as automatic as breathing. Because on match day, the player who owns the T owns the rally.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;max-width:960px;margin:0 auto" class="reveal d2">
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:2rem;text-align:center;transition:all .3s" onmouseover="this.style.borderColor='var(--borderacc)';this.style.transform='translateY(-4px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='translateY(0)'">
+        <div style="font-size:2.5rem;margin-bottom:.85rem">⚡</div>
+        <div style="font-family:var(--font-display);font-size:1.15rem;font-weight:800;color:var(--white);margin-bottom:.6rem">Recovery Timing</div>
+        <div style="font-size:.87rem;color:var(--gray1);line-height:1.65">Recovery cues fire 400ms before each call — giving you precisely the time needed to re-centre at the T before the next position is called.</div>
+      </div>
+      <div style="background:var(--bg3);border:2px solid var(--borderacc);border-radius:var(--r16);padding:2rem;text-align:center;box-shadow:0 0 40px rgba(255,107,53,.08)">
+        <div style="font-size:2.5rem;margin-bottom:.85rem">📍</div>
+        <div style="font-family:var(--font-display);font-size:1.15rem;font-weight:800;color:var(--accent);margin-bottom:.6rem">T-Position Every Rep</div>
+        <div style="font-size:.87rem;color:var(--gray1);line-height:1.65">Every single ghost movement ends at the T. The AI enforces the habit relentlessly until returning to the T is involuntary — not a choice you make.</div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:2rem;text-align:center;transition:all .3s" onmouseover="this.style.borderColor='var(--borderacc)';this.style.transform='translateY(-4px)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='translateY(0)'">
+        <div style="font-size:2.5rem;margin-bottom:.85rem">🏆</div>
+        <div style="font-family:var(--font-display);font-size:1.15rem;font-weight:800;color:var(--white);margin-bottom:.6rem">Match Transfer</div>
+        <div style="font-size:.87rem;color:var(--gray1);line-height:1.65">When T-recovery is automatic, your match play transforms — you anticipate, you pressure, you dictate. The drill becomes the winning habit.</div>
       </div>
     </div>
   </div>
@@ -871,7 +975,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
     <div class="section-head text-center">
       <div class="section-label reveal">The Training Loop</div>
       <h2 class="section-title reveal d1">Three Steps.<br><em>Infinite Progress.</em></h2>
-      <p class="section-sub reveal d2">Every great session follows the same loop. Pick a program for your level, ghost with AI voice coaching calling every position, then review your zone data to see exactly where to push harder next time.</p>
+      <p class="section-sub reveal d2">Pick a program built for your level, ghost every corner with AI calling your positions and shots, then review your zone data to know exactly where your movement is letting you down — and fix it in the next session.</p>
     </div>
     <div class="showcase-inner" style="align-items:flex-start">
       <div class="showcase-phone reveal">
@@ -920,7 +1024,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
     <div id="court-6pt" class="court-panel active">
       <div class="court-diagram-wrap reveal">
         <div class="court-real-wrap">
-          <img src="court.svg" class="court-real-img" alt="Real squash court — top view" onerror="this.style.opacity='.3'">
+          <img src="court.svg" class="court-real-img" alt="Wooden squash court — top view" onerror="this.style.opacity='.3'">
 
           <div class="c-dot or" style="left:15.6%;top:10.3%"></div>
           <div class="c-dot or" style="left:84.4%;top:10.3%"></div>
@@ -954,7 +1058,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
     <div id="court-10pt" class="court-panel">
       <div class="court-diagram-wrap reveal">
         <div class="court-real-wrap">
-          <img src="court.svg" class="court-real-img" alt="Real squash court — top view" onerror="this.style.opacity='.3'">
+          <img src="court.svg" class="court-real-img" alt="Wooden squash court — top view" onerror="this.style.opacity='.3'">
 
           <div class="c-dot or" style="left:15.6%;top:10.3%"></div>
           <div class="c-dot or" style="left:84.4%;top:10.3%"></div>
@@ -996,34 +1100,112 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
   </div>
 </section>
 
+<!-- SHOT SIMULATION -->
+<section id="shots" style="background:var(--bg2)">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center">
+      <div>
+        <div class="section-label reveal">Shot Training</div>
+        <h2 class="section-title reveal d1">Move With Purpose.<br><em>Think Under Pressure.</em></h2>
+        <p class="section-sub reveal d2">Pure movement drills train your body. Shot simulation drills train your mind. SquashGhostingX combines both — calling a court position and a shot type simultaneously so you're mentally preparing the stroke while your legs are still carrying you there. By match day, the connection is automatic.</p>
+        <div style="display:flex;flex-direction:column;gap:.85rem;margin-top:2rem">
+          <div class="reveal d2" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:1rem 1.25rem;display:flex;gap:.85rem;align-items:flex-start;transition:border-color .3s" onmouseover="this.style.borderColor='var(--borderacc)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="font-size:1.25rem;width:38px;text-align:center;padding-top:.1rem">🎯</div>
+            <div>
+              <div style="font-family:var(--font-display);font-size:.95rem;font-weight:800;color:var(--white);margin-bottom:.2rem">Drops &amp; Kills</div>
+              <div style="font-size:.83rem;color:var(--gray1);line-height:1.55">"Front Left — Drop Shot" trains tight-angle swing preparation while your body is still moving toward the corner.</div>
+            </div>
+          </div>
+          <div class="reveal d3" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:1rem 1.25rem;display:flex;gap:.85rem;align-items:flex-start;transition:border-color .3s" onmouseover="this.style.borderColor='var(--borderacc)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="font-size:1.25rem;width:38px;text-align:center;padding-top:.1rem">🏃</div>
+            <div>
+              <div style="font-family:var(--font-display);font-size:.95rem;font-weight:800;color:var(--white);margin-bottom:.2rem">Drives &amp; Cross Courts</div>
+              <div style="font-size:.83rem;color:var(--gray1);line-height:1.55">"Back Right — Drive" programs the long stride, shoulder rotation, and swing path together — not separately.</div>
+            </div>
+          </div>
+          <div class="reveal d3" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:1rem 1.25rem;display:flex;gap:.85rem;align-items:flex-start;transition:border-color .3s" onmouseover="this.style.borderColor='var(--borderacc)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="font-size:1.25rem;width:38px;text-align:center;padding-top:.1rem">🔺</div>
+            <div>
+              <div style="font-family:var(--font-display);font-size:.95rem;font-weight:800;color:var(--white);margin-bottom:.2rem">Boasts, Lobs &amp; Volleys</div>
+              <div style="font-size:.83rem;color:var(--gray1);line-height:1.55">"Back Left — Boast" trains turning a defensive corner into an attacking shot — the most mentally demanding skill in squash.</div>
+            </div>
+          </div>
+          <div class="reveal d4" style="background:rgba(255,107,53,.07);border:1px solid var(--borderacc);border-radius:var(--r12);padding:1rem 1.25rem;display:flex;gap:.85rem;align-items:flex-start">
+            <div style="font-size:1.25rem;width:38px;text-align:center;padding-top:.1rem">🎮</div>
+            <div>
+              <div style="font-family:var(--font-display);font-size:.95rem;font-weight:800;color:var(--accent);margin-bottom:.2rem">Match Simulation Mode</div>
+              <div style="font-size:.83rem;color:var(--gray1);line-height:1.55">Realistic rally sequences combining position and shot type — so your training mirrors what actually happens during a match point.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Live call sequence visual -->
+      <div class="reveal d2" style="display:flex;justify-content:center">
+        <div style="background:var(--bg3);border:1px solid var(--borderacc);border-radius:var(--r16);padding:1.75rem;max-width:320px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.45),0 0 0 1px rgba(255,107,53,.1)">
+          <div style="font-family:var(--font-display);font-size:.72rem;font-weight:700;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between">
+            <span>Live Call Sequence</span>
+            <span style="background:var(--accent);color:#fff;padding:.18rem .55rem;border-radius:4px;font-size:.65rem">ACTIVE</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:.65rem">
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:var(--r8);padding:.8rem 1rem;display:flex;align-items:center;gap:.75rem;opacity:.5">
+              <div style="width:34px;height:34px;background:rgba(255,107,53,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.7rem;font-weight:900;color:var(--accent);flex-shrink:0">FL</div>
+              <div style="flex:1"><div style="font-size:.78rem;font-weight:700;color:var(--gray1)">Front Left</div><div style="font-size:.68rem;color:var(--gray2)">Drop Shot — done</div></div>
+              <div style="font-size:.65rem;color:var(--gray2)">✓ T</div>
+            </div>
+            <div style="background:rgba(255,107,53,.1);border:1.5px solid var(--accent);border-radius:var(--r8);padding:.8rem 1rem;display:flex;align-items:center;gap:.75rem">
+              <div style="width:34px;height:34px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.7rem;font-weight:900;color:#fff;flex-shrink:0">BR</div>
+              <div style="flex:1"><div style="font-size:.78rem;font-weight:700;color:var(--accent)">Back Right ← NOW</div><div style="font-size:.68rem;color:var(--accent-l)">Drive</div></div>
+              <div style="width:8px;height:8px;background:var(--accent);border-radius:50%;animation:pulse 1.5s infinite"></div>
+            </div>
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:var(--r8);padding:.8rem 1rem;display:flex;align-items:center;gap:.75rem;opacity:.35">
+              <div style="width:34px;height:34px;background:var(--bg4);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.7rem;font-weight:900;color:var(--gray2);flex-shrink:0">ML</div>
+              <div style="flex:1"><div style="font-size:.78rem;font-weight:700;color:var(--gray2)">Mid Left</div><div style="font-size:.68rem;color:var(--gray2)">Cross Court</div></div>
+              <div style="font-size:.65rem;color:var(--gray3)">next</div>
+            </div>
+            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:var(--r8);padding:.8rem 1rem;display:flex;align-items:center;gap:.75rem;opacity:.2">
+              <div style="width:34px;height:34px;background:var(--bg4);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.7rem;font-weight:900;color:var(--gray2);flex-shrink:0">BL</div>
+              <div style="flex:1"><div style="font-size:.78rem;font-weight:700;color:var(--gray2)">Back Left</div><div style="font-size:.68rem;color:var(--gray2)">Boast</div></div>
+              <div style="font-size:.65rem;color:var(--gray3)">—</div>
+            </div>
+          </div>
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:.7rem;color:var(--gray2)">Shot-Based · 6pt · Natural Tempo</span>
+            <span style="font-size:.68rem;color:var(--gray2)">→ T every rep</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- PATTERN INTELLIGENCE -->
 <section id="patterns">
   <div class="container">
     <div class="patterns-grid">
       <div>
         <div class="section-label reveal">AI Intelligence</div>
-        <h2 class="section-title reveal d1">Train Your <em>Weaknesses</em>,<br>Not Your Comfort Zone</h2>
-        <p class="section-sub reveal d2">The pattern engine analyses every session and surfaces the court zones you visit least — then builds sessions that specifically target those gaps.</p>
+        <h2 class="section-title reveal d1">Train Your <em>Weaknesses</em>.<br>Eliminate Every Gap.</h2>
+        <p class="section-sub reveal d2">Most players ghost the positions they're already comfortable with. SquashGhostingX analyses every session and pinpoints the zones you're avoiding — then builds the next drill to fix them before they cost you a match.</p>
         <div class="pattern-cards">
           <div class="pattern-card reveal d2">
             <div class="pattern-card-icon">🗂️</div>
             <div>
               <h4>Zone Frequency Analysis</h4>
-              <p>Tracks how often you visit each court position across all sessions, revealing habitual patterns and neglected areas.</p>
+              <p>Tracks how often you visit each of the 10 court positions across every session — exposing the habitual patterns and neglected corners that define your current ceiling.</p>
             </div>
           </div>
           <div class="pattern-card reveal d3">
             <div class="pattern-card-icon">🎯</div>
             <div>
-              <h4>Smart Session Suggestions</h4>
-              <p>AI recommends the next session type based on your recent zone distribution to correct imbalances before they become habits.</p>
+              <h4>Targeted Session Intelligence</h4>
+              <p>AI identifies your weakest zone distribution and recommends the next session type to correct the imbalance — before it becomes a match habit your opponents exploit.</p>
             </div>
           </div>
           <div class="pattern-card reveal d4">
             <div class="pattern-card-icon">📈</div>
             <div>
-              <h4>Progressive Overload</h4>
-              <p>Session difficulty adapts as you improve — automatically increasing pace and pattern complexity to keep you in the optimal training zone.</p>
+              <h4>Progressive Overload Built In</h4>
+              <p>Tempo, duration, and pattern complexity all scale with your improvement. The app never lets you stagnate — every level has a harder version waiting for you.</p>
             </div>
           </div>
         </div>
@@ -1723,8 +1905,8 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
 <section id="cta">
   <div class="container">
     <div class="cta-inner reveal">
-      <h2 class="cta-title">Your Feet Should Move<br>Before Your Brain Does.</h2>
-      <p class="cta-sub">Join 2,500+ players across 40+ countries who are training smarter with SquashGhostingX. Free to download. No account required.</p>
+      <h2 class="cta-title">Dominate Every Corner.<br><em>Own the T.</em></h2>
+      <p class="cta-sub">Join 2,500+ players across 40+ countries training with AI voice coaching, shot simulation, and pattern intelligence. Free forever. No subscription. No excuses.</p>
       <div class="cta-actions">
         <a href="https://apps.apple.com/app/squashghostingx/id6744036820" class="store-btn" target="_blank" rel="noopener">
           <span class="store-btn-icon"></span>

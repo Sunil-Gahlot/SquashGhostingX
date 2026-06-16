@@ -7,8 +7,8 @@ import { Position, CourtSystem, CourtMode } from '../../types';
 import { POSITION_INFO, POSITIONS_6PT, POSITIONS_10PT } from '../../constants/positions';
 import { Colors } from '../../constants/colors';
 
-// ─── Real-court palette ─────────────────────────────────────────────────────
-const REAL_WOOD = {
+// ─── Wooden-court palette ────────────────────────────────────────────────────
+const WOODEN_PALETTE = {
   surround:    '#0D0D0D',   // out-of-bounds dark area around the court
   floorA:      '#E0A840',   // primary plank — warm golden maple (PSA-accurate)
   floorB:      '#D09830',   // alternating plank — slightly deeper tone
@@ -46,7 +46,7 @@ const SERVICE_BOX_W = 160;
 const SERVICE_BOX_H = 160;
 const PULSE_R = 44;
 
-// Inner court geometry — shared by both hero and real court.
+// Inner court geometry — shared by both glass and wooden court.
 // CIX/CIY=8 matches the original position coordinate mapping (toSvgX/toSvgY).
 // Boundary rect center is at (5,5) with strokeWidth=6 → outer edge at (2,2), inner at (8,8)=CIX/CIY.
 // Shrinking strokeWidth from 8→6 (not moving CIX) keeps court lines in sync with player positions.
@@ -107,13 +107,13 @@ function poseDims(pos: Position, isActive: boolean): { w: number; h: number } {
 }
 
 // ─── Themes ────────────────────────────────────────────────────────────────
-// HERO MODE — GhostingX stadium style.
+// GLASS MODE — GhostingX stadium style.
 //   Floor: ocean-blue midnight surface (lighter than before, clearly visible)
 //   Zones: front-court gets a blue tint, back-court gets an orange tint
 //   Center: radial spotlight approximation centered on the T — concentric
 //           blue-tinted circles create a subtle "arena lighting" depth effect
 //   Lines: brand-orange glowing boundary and court markings
-const HERO_THEME = {
+const GLASS_THEME = {
   surround:     '#020812',                    // near-black navy out-of-bounds
   courtSurface: '#0C1C2E',                    // ocean-blue floor (lighter, vibrant)
   frontZone:    'rgba(10,132,255,0.09)',       // front court: visible blue zone
@@ -135,7 +135,7 @@ const HERO_THEME = {
   pulseColor:   Colors.activePulse,
 };
 
-const REAL_THEME = {
+const WOODEN_THEME = {
   arrowColor: Colors.brand,
   pulseColor: Colors.brand,
 };
@@ -161,11 +161,11 @@ export default function CourtCanvas({
   courtSystem,
   dominantHand,
   gender,
-  courtMode = 'hero',
+  courtMode = 'wooden',
   style,
 }: CourtCanvasProps) {
 
-  const isReal = courtMode === 'real';
+  const isWooden = courtMode === 'wooden';
 
   // ── Container pixel dimensions (resolved via onLayout) ───────────────────
   // Percentage top/left on absolute children don't resolve when the parent's
@@ -200,7 +200,7 @@ export default function CourtCanvas({
   // SVG mirror transform for left-handed players
   const mirror = dominantHand === 'left' ? `scale(-1,1) translate(-${VB_W},0)` : undefined;
 
-  const T = isReal ? REAL_THEME : HERO_THEME;
+  const T = isWooden ? WOODEN_THEME : GLASS_THEME;
 
   // ── Pose image layer (React Native Images, NOT SvgImage) ──────────────────
   // SvgImage from react-native-svg does not reliably load local require() assets.
@@ -283,15 +283,15 @@ export default function CourtCanvas({
     );
   })() : null;
 
-  // ─── REAL COURT RENDER ──────────────────────────────────────────────────
+  // ─── WOODEN COURT RENDER ────────────────────────────────────────────────
   // Pure SVG warm-wood court — no PNG, no artifacts, WSF-accurate line positions.
-  if (isReal) {
+  if (isWooden) {
 
     return (
       <View style={[styles.container, style]} onLayout={(e) => { setCw(e.nativeEvent.layout.width); setCh(e.nativeEvent.layout.height); }}>
         <Svg viewBox={`0 0 ${VB_W} ${VB_H}`} width="100%" height="100%">
           {/* ── Out-of-bounds dark surround ── */}
-          <Rect x="0" y="0" width={VB_W} height={VB_H} fill={REAL_WOOD.surround} />
+          <Rect x="0" y="0" width={VB_W} height={VB_H} fill={WOODEN_PALETTE.surround} />
 
           {/* ── Wood floor — vertical planks strictly within court boundary ── */}
           {Array.from({ length: NUM_PLANKS }, (_, i) => {
@@ -301,7 +301,7 @@ export default function CourtCanvas({
             return (
               <Rect key={`p${i}`}
                 x={px} y={CIY} width={pw} height={CIH}
-                fill={i % 2 === 0 ? REAL_WOOD.floorA : REAL_WOOD.floorB}
+                fill={i % 2 === 0 ? WOODEN_PALETTE.floorA : WOODEN_PALETTE.floorB}
               />
             );
           })}
@@ -314,7 +314,7 @@ export default function CourtCanvas({
             return (
               <Line key={`j${i}`}
                 x1={CIX + offset} y1={y} x2={CIX + CIW} y2={y}
-                stroke={REAL_WOOD.jointLine} strokeWidth="1.2" opacity={0.45}
+                stroke={WOODEN_PALETTE.jointLine} strokeWidth="1.2" opacity={0.45}
               />
             );
           })}
@@ -322,25 +322,25 @@ export default function CourtCanvas({
           <G transform={mirror}>
             {/* ── Court boundary — centered on wood edge (CIX/CIY), strokeWidth=6 → 3px on surround + 3px on wood ── */}
             <Rect x={CIX} y={CIY} width={CIW} height={CIH}
-              fill="none" stroke={REAL_WOOD.boundary} strokeWidth="6" />
+              fill="none" stroke={WOODEN_PALETTE.boundary} strokeWidth="6" />
 
             {/* ── Tin strip — marks front-wall base inside the boundary ── */}
             <Rect x={CIX} y={CIY} width={CIW} height="14"
-              fill={REAL_WOOD.tin} opacity={0.85} />
+              fill={WOODEN_PALETTE.tin} opacity={0.85} />
 
             {/* ── Short line (4.26 m from front wall) ── */}
             <Line x1={CIX} y1={SHORT_LINE_Y} x2={CIX + CIW} y2={SHORT_LINE_Y}
-              stroke={REAL_WOOD.courtLine} strokeWidth="5" />
+              stroke={WOODEN_PALETTE.courtLine} strokeWidth="5" />
 
             {/* ── Half-court line (short line → back wall) ── */}
             <Line x1={HALF_COURT_X} y1={SHORT_LINE_Y} x2={HALF_COURT_X} y2={CIY + CIH}
-              stroke={REAL_WOOD.courtLine} strokeWidth="5" />
+              stroke={WOODEN_PALETTE.courtLine} strokeWidth="5" />
 
             {/* ── Service boxes (1.6 m × 1.6 m each side) ── */}
             <Rect x={CIX} y={SHORT_LINE_Y} width={SERVICE_BOX_W} height={SERVICE_BOX_H}
-              fill="none" stroke={REAL_WOOD.courtLine} strokeWidth="4" />
+              fill="none" stroke={WOODEN_PALETTE.courtLine} strokeWidth="4" />
             <Rect x={CIX + CIW - SERVICE_BOX_W} y={SHORT_LINE_Y} width={SERVICE_BOX_W} height={SERVICE_BOX_H}
-              fill="none" stroke={REAL_WOOD.courtLine} strokeWidth="4" />
+              fill="none" stroke={WOODEN_PALETTE.courtLine} strokeWidth="4" />
 
           </G>
 
@@ -354,14 +354,14 @@ export default function CourtCanvas({
     );
   }
 
-  // ─── HERO COURT RENDER — GhostingX dark/neon mode ──────────────────────
-  // Completely distinct from the real wood court:
+  // ─── GLASS COURT RENDER — GhostingX dark/neon mode ─────────────────────
+  // Completely distinct from the wooden court:
   //   • Very dark navy surface (no planks)
   //   • Front/back zone colour tints
   //   • Faint training grid background
   //   • Glowing brand-orange boundary and court lines
   //   • Glowing T-junction dot at the intersection
-  const HT = HERO_THEME;
+  const HT = GLASS_THEME;
   const gridStepY = CIH / 10;
   const gridStepX = CIW / 5;
   return (

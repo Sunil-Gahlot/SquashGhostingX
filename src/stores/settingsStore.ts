@@ -41,7 +41,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   defaultShotGroups: ['mixed'],
   keepScreenAwake: true,
   reducedMotion: false,
-  courtMode: 'hero',
+  courtMode: 'wooden',
   movementPaceExtraMs: 0,
 };
 

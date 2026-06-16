@@ -9,7 +9,7 @@ export type Position =
   | 'T';                  // T-Position — recovery hub
 
 export type CourtSystem = '6pt' | '10pt';
-export type CourtMode = 'hero' | 'real';
+export type CourtMode = 'glass' | 'wooden';
 export type Zone = 'front' | 'mid' | 'back';
 
 // ─── Session Configuration ────────────────────────────────────────────────────

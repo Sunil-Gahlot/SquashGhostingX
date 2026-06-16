@@ -330,12 +330,12 @@ export default function SettingsScreen() {
           <SettingsRow
             icon="tennisball" iconBg={`${Colors.brand}22`} iconColor={Colors.brand}
             label="Court Style"
-            sub={settings.courtMode === 'real' ? 'Real Court — wood floor + red lines' : 'Hero Court — dark premium theme'}
+            sub={settings.courtMode === 'wooden' ? 'Wooden Court — warm wood floor + red lines' : 'Glass Court — dark premium stadium theme'}
             right={
               <PillSelector
-                options={[{ label: 'Hero', value: 'hero' }, { label: 'Real', value: 'real' }]}
-                selected={settings.courtMode ?? 'hero'}
-                onSelect={(v) => updateSettings({ courtMode: v as 'hero' | 'real' })}
+                options={[{ label: 'Wooden', value: 'wooden' }, { label: 'Glass', value: 'glass' }]}
+                selected={settings.courtMode ?? 'wooden'}
+                onSelect={(v) => updateSettings({ courtMode: v as 'glass' | 'wooden' })}
                 size="sm"
               />
             }
