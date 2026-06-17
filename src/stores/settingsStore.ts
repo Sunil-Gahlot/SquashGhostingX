@@ -62,6 +62,22 @@ export const useSettingsStore = create<SettingsStore>()(
     {
       name: 'settings-storage',
       storage: createJSONStorage(() => AsyncStorage),
+      version: 2,
+      migrate: (persisted: any, version: number) => {
+        if (version < 1) {
+          const cm = persisted?.state?.settings?.courtMode;
+          if (cm === 'hero') persisted.state.settings.courtMode = 'glass';
+          if (cm === 'real') persisted.state.settings.courtMode = 'wooden';
+        }
+        if (version < 2) {
+          // Ensure courtMode is a valid value; default to 'wooden' if missing or stale
+          const cm = persisted?.state?.settings?.courtMode;
+          if (cm !== 'glass' && cm !== 'wooden') {
+            if (persisted?.state?.settings) persisted.state.settings.courtMode = 'wooden';
+          }
+        }
+        return persisted;
+      },
     }
   )
 );

@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>App Guide — SquashGhostingX</title>
+<meta name="description" content="Complete guide to SquashGhostingX. Learn court systems, positions, session settings, scoring and more.">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://squashghostingx.com/guide">
+<meta name="theme-color" content="#FF6B35">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23FF6B35'/%3E%3Ctext x='16' y='23' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='900' font-size='14'%3ESX%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080401;--bg2:#0F0700;--bg3:#170C02;--bg4:#1E1104;
+  --accent:#FF6B35;--accent-b:#CC4A18;--accent-l:#FF9268;
+  --glow:rgba(255,107,53,.08);--glow2:rgba(255,107,53,.14);--glow3:rgba(255,107,53,.28);
+  --borderacc:rgba(255,107,53,.25);--border:rgba(255,255,255,.07);
+  --gray1:#C4A896;--gray2:#806050;--gray3:#3D2820;
+  --white:#FFFFFF;--text:#E8D5C4;
+  --green:#00E676;--amber:#FF9F0A;--red:#FF453A;--blue:#0A84FF;--purple:#BF5AF2;
+  --r8:8px;--r12:12px;--r16:16px;--r24:24px;
+  --font-display:'Barlow Condensed',sans-serif;
+  --font-body:'DM Sans',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;overflow-x:hidden;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);line-height:1.7;overflow-x:hidden}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;padding:0 1.5rem;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,4,1,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-logo{display:flex;align-items:center;gap:.75rem;font-family:var(--font-display);font-size:1.55rem;font-weight:900;letter-spacing:-.025em;text-decoration:none}
+.nav-logo-icon{width:38px;height:38px;background:linear-gradient(135deg,#FF6B35 0%,#c0392b 100%);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:900;color:#fff;font-family:var(--font-display);box-shadow:0 0 18px rgba(255,107,53,.5),0 2px 8px rgba(0,0,0,.4);flex-shrink:0}
+.nav-logo-squash{color:#fff}
+.nav-logo-ghosting{background:linear-gradient(135deg,#FF6B35 0%,#ff9f6b 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-back{font-size:.85rem;font-weight:500;color:var(--gray1);display:flex;align-items:center;gap:.4rem;transition:color .2s}
+.nav-back:hover{color:var(--accent);text-decoration:none}
+
+/* PAGE */
+.page-wrap{max-width:720px;margin:0 auto;padding:4rem 1.5rem 6rem}
+
+/* HEADER */
+.pg-badge{display:inline-flex;align-items:center;gap:.4rem;background:var(--glow2);border:1px solid var(--borderacc);border-radius:100px;padding:.3rem .8rem;font-size:.72rem;font-weight:700;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;margin-bottom:1rem}
+.pg-title{font-family:var(--font-display);font-size:clamp(2.4rem,7vw,3.8rem);font-weight:900;color:var(--white);line-height:1.0;letter-spacing:-.02em;margin-bottom:.75rem}
+.pg-sub{font-size:1rem;color:var(--gray1);margin-bottom:2.5rem;line-height:1.7}
+
+/* QUICK NAV CHIPS */
+.chip-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:3rem}
+.chip{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:.35rem .9rem;font-size:.8rem;color:var(--gray1);cursor:pointer;transition:all .2s;text-decoration:none}
+.chip:hover{border-color:var(--borderacc);color:var(--accent);text-decoration:none}
+
+/* ACCORDION */
+.acc{border:1px solid var(--border);border-radius:var(--r16);overflow:hidden;margin-bottom:.75rem;background:var(--bg3);transition:border-color .2s}
+.acc.open{border-color:rgba(255,255,255,.12)}
+.acc-header{display:flex;align-items:center;gap:.9rem;padding:1.1rem 1.25rem;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.acc-header:hover .acc-title{color:var(--white)}
+.acc-icon{width:38px;height:38px;border-radius:var(--r8);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.15rem}
+.acc-title{flex:1;font-family:var(--font-display);font-size:1.1rem;font-weight:800;color:var(--gray1);letter-spacing:.02em;transition:color .2s}
+.acc.open .acc-title{color:var(--white)}
+.acc-chevron{font-size:.75rem;color:var(--gray2);transition:transform .25s;flex-shrink:0}
+.acc.open .acc-chevron{transform:rotate(180deg)}
+.acc-body{display:none;padding:0 1.25rem 1.4rem;border-top:1px solid var(--border)}
+.acc.open .acc-body{display:block}
+
+/* CONTENT PIECES */
+.acc-body p{font-size:.9rem;color:var(--gray1);line-height:1.7;margin-bottom:1rem}
+.acc-body p:last-child{margin-bottom:0}
+.sub-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:1.2rem 0 .4rem}
+.acc-body ul{list-style:none;display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+.acc-body ul li{display:flex;gap:.7rem;align-items:flex-start;font-size:.88rem;color:var(--gray1);line-height:1.6}
+.acc-body ul li::before{content:'›';color:var(--accent);font-weight:700;flex-shrink:0;line-height:1.6}
+.tip{background:var(--glow);border:1px solid var(--borderacc);border-radius:var(--r8);padding:.75rem 1rem;font-size:.85rem;color:var(--gray1);line-height:1.6;margin-top:.75rem}
+.tip strong{color:var(--white)}
+
+/* TWO-COL */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.card-sm{background:var(--bg4);border:1px solid var(--border);border-radius:var(--r12);padding:1.1rem;transition:border-color .2s}
+.card-sm:hover{border-color:var(--borderacc)}
+.card-sm-num{font-family:var(--font-display);font-size:2.4rem;font-weight:900;line-height:1;margin-bottom:.3rem}
+.card-sm-title{font-family:var(--font-display);font-size:1rem;font-weight:800;color:var(--white);margin-bottom:.3rem}
+.card-sm-desc{font-size:.82rem;color:var(--gray2);line-height:1.5}
+
+/* ACTION CARDS (Quick Start / New Session) */
+.action-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.action-card{background:var(--bg4);border-radius:var(--r12);padding:1rem;border:1px solid var(--border)}
+.action-name{font-weight:700;font-size:.95rem;margin-bottom:.3rem}
+.action-desc{font-size:.82rem;color:var(--gray2);line-height:1.5}
+
+/* COURT GRID */
+.court-tab-row{display:flex;gap:.5rem;margin-bottom:1rem}
+.court-tab{padding:.35rem .9rem;border-radius:20px;border:1px solid var(--border);background:var(--bg4);font-size:.8rem;font-weight:600;color:var(--gray2);cursor:pointer;transition:all .2s}
+.court-tab.active{background:var(--glow2);border-color:var(--borderacc);color:var(--accent)}
+.court-panel{display:none}
+.court-panel.active{display:block}
+.court-grid{display:flex;flex-direction:column;gap:.4rem;margin-bottom:.75rem}
+.court-row{display:grid;grid-template-columns:1fr 48px 1fr;gap:.4rem;align-items:center}
+.court-zone-row{text-align:center;font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gray3);padding:.15rem 0}
+.court-cell{border:1px solid;border-radius:6px;padding:.5rem .35rem;text-align:center}
+.court-cell-code{font-family:var(--font-display);font-size:.95rem;font-weight:900;letter-spacing:.02em;display:block}
+.court-cell-label{font-size:.62rem;color:var(--gray2);display:block;margin-top:1px}
+.court-t{width:42px;height:42px;border-radius:50%;background:var(--bg4);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto;font-family:var(--font-display);font-size:.85rem;font-weight:800;color:var(--gray2)}
+
+/* DIFFICULTY TABLE */
+.diff-table{width:100%;border-collapse:collapse;margin-bottom:1rem}
+.diff-table th{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gray2);padding:.5rem .75rem;text-align:left;border-bottom:1px solid var(--border)}
+.diff-table td{padding:.6rem .75rem;font-size:.88rem;color:var(--gray1);border-bottom:1px solid var(--border)}
+.diff-table tr:last-child td{border-bottom:none}
+.diff-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:.4rem;vertical-align:middle}
+
+/* SCORE CHIPS */
+.score-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin:1rem 0}
+.score-chip{border:1.5px solid;border-radius:var(--r12);padding:.9rem;text-align:center}
+.score-num{font-family:var(--font-display);font-size:1.5rem;font-weight:900;display:block;margin-bottom:.2rem}
+.score-lbl{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gray2)}
+
+/* FAQ */
+.faq-list{display:flex;flex-direction:column;gap:.75rem}
+.faq-item{background:var(--bg4);border:1px solid var(--border);border-radius:var(--r12);padding:1.1rem 1.25rem}
+.faq-q{font-weight:600;font-size:.92rem;color:var(--white);margin-bottom:.4rem}
+.faq-a{font-size:.85rem;color:var(--gray1);line-height:1.6}
+
+/* FOOTER */
+footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 1.5rem;text-align:center}
+.footer-copy{font-size:.82rem;color:var(--gray2);margin-bottom:.75rem}
+.footer-links-row{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap}
+.footer-links-row a{font-size:.82rem;color:var(--gray2);transition:color .2s}
+.footer-links-row a:hover{color:var(--accent);text-decoration:none}
+
+@media(max-width:620px){
+  .page-wrap{padding:2.5rem 1.1rem 4rem}
+  .two-col,.action-row,.court-row,.score-row{grid-template-columns:1fr 1fr}
+  .two-col{grid-template-columns:1fr}
+  .action-row{grid-template-columns:1fr}
+  .score-row{grid-template-columns:1fr 1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo" aria-label="SquashGhostingX Home">
+    <div class="nav-logo-icon">SX</div>
+    <span class="nav-logo-squash">Squash</span><span class="nav-logo-ghosting">GhostingX</span>
+  </a>
+  <a href="index.html" class="nav-back">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Back to home
+  </a>
+</nav>
+
+<div class="page-wrap">
+
+  <div class="pg-badge">📖 App Guide</div>
+  <h1 class="pg-title">How to Use<br>SquashGhostingX</h1>
+  <p class="pg-sub">Everything you need to train effectively — court systems, positions, session settings, voice coaching, and understanding your progress.</p>
+
+  <!-- Quick-jump chips -->
+  <div class="chip-row">
+    <a href="#sec-start"   class="chip">🚀 Getting Started</a>
+    <a href="#sec-courts"  class="chip">🏟 Court Systems</a>
+    <a href="#sec-pos"     class="chip">📍 Positions</a>
+    <a href="#sec-config"  class="chip">⚙️ Settings</a>
+    <a href="#sec-during"  class="chip">▶ During a Session</a>
+    <a href="#sec-score"   class="chip">📊 Your Score</a>
+    <a href="#sec-faq"     class="chip">❓ FAQ</a>
+  </div>
+
+  <!-- ── 1. Getting Started ──────────────────────────────────────────────────── -->
+  <div class="acc open" id="sec-start">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon" style="background:rgba(255,107,53,.15)">🚀</div>
+      <span class="acc-title">Getting Started</span>
+      <span class="acc-chevron">▼</span>
+    </div>
+    <div class="acc-body">
+      <p>SquashGhostingX coaches you through squash ghosting drills using real-time voice calls and court visuals. No opponent needed — just a squash court or any open space.</p>
+
+      <div class="sub-label">Your two main entry points</div>
+      <div class="action-row">
+        <div class="action-card" style="border-color:rgba(52,199,89,.3)">
+          <div class="action-name" style="color:#34C759">⚡ Quick Start</div>
+          <div class="action-desc">One tap — starts immediately using your last session's settings. Perfect when you just want to train without fuss.</div>
+        </div>
+        <div class="action-card" style="border-color:rgba(255,107,53,.3)">
+          <div class="action-name" style="color:#FF6B35">＋ New Session</div>
+          <div class="action-desc">Opens the full setup flow. Choose court system, difficulty, duration, drill type and more.</div>
+        </div>
+      </div>
+
+      <div class="sub-label">Basic flow</div>
+      <ul>
+        <li>Stand at the T (the T-junction centre line) before the session starts.</li>
+        <li>When the voice calls a position — e.g. "Front Left" — sprint there, play a phantom shot, and return to T.</li>
+        <li>Wait for the next call. Repeat until the session ends.</li>
+        <li>After each set, an automatic rest break fires. Catch your breath and prepare for the next set.</li>
+      </ul>
+      <div class="tip">💡 <strong>Tip:</strong> Tap <em>Repeat</em> on the Last Session card on the Home Screen to instantly replay your last drill with the same settings.</div>
+    </div>
+  </div>
+
+  <!-- ── 2. Court Systems ───────────────────────────────────────────────────── -->
+  <div class="acc" id="sec-courts">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon" style="background:rgba(10,132,255,.15)">🏟</div>
+      <span class="acc-title">Court Systems</span>
+      <span class="acc-chevron">▼</span>
+    </div>
+    <div class="acc-body">
+      <p>SquashGhostingX supports two court coverage systems. Both follow the same rules — stand at T, sprint to the called position, return — but they differ in the number of zones.</p>
+
+      <div class="two-col">
+        <div class="card-sm" style="border-color:rgba(255,107,53,.3)">
+          <div class="card-sm-num" style="color:#FF6B35">6</div>
+          <div class="card-sm-title">6-Point</div>
+          <div class="card-sm-desc">Classic squash ghosting. Front, Mid, and Back on both sides of the court. Ideal for all levels — the best place to start.</div>
+        </div>
+        <div class="card-sm" style="border-color:rgba(10,132,255,.3)">
+          <div class="card-sm-num" style="color:#0A84FF">10</div>
+          <div class="card-sm-title">10-Point</div>
+          <div class="card-sm-desc">Adds Front-Mid and Back-Mid positions for finer court coverage. Increases overall distance covered and demands sharper footwork.</div>
+        </div>
+      </div>
+
+      <div class="sub-label">Which should I choose?</div>
+      <ul>
+        <li><strong style="color:#FF6B35">6-Point</strong> — recommended for beginners and intermediate players. Clear and fast to learn.</li>
+        <li><strong style="color:#0A84FF">10-Point</strong> — for advanced to elite players wanting full-court coverage and variety.</li>
+        <li>You can switch court system in Settings or in the New Session setup flow at any time.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ── 3. Court Positions ─────────────────────────────────────────────────── -->
+  <div class="acc" id="sec-pos">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon" style="background:rgba(191,90,242,.15)">📍</div>
+      <span class="acc-title">Court Positions</span>
+      <span class="acc-chevron">▼</span>
+    </div>
+    <div class="acc-body">
+      <p>All positions are defined relative to a <strong style="color:#fff">right-handed player facing the front wall</strong>. If you are left-handed, the app automatically mirrors every call so your forehand side is always called correctly.</p>
+
+      <div class="court-tab-row">
+        <button class="court-tab active" onclick="switchCourtTab(this,'6pt')">6-Point</button>
+        <button class="court-tab"        onclick="switchCourtTab(this,'10pt')">10-Point</button>
+      </div>
+
+      <!-- 6pt panel -->
+      <div class="court-panel active" id="panel-6pt">
+        <div class="court-grid">
+          <div class="court-zone-row" style="grid-column:1/-1">FRONT WALL ↑</div>
+          <div class="court-row">
+            <div class="court-cell" style="border-color:rgba(255,107,53,.4);background:rgba(255,107,53,.08)">
+              <span class="court-cell-code" style="color:#FF6B35">FL</span>
+              <span class="court-cell-label">Front Left</span>
+            </div>
+            <div class="court-t">T</div>
+            <div class="court-cell" style="border-color:rgba(255,107,53,.4);background:rgba(255,107,53,.08)">
+              <span class="court-cell-code" style="color:#FF6B35">FR</span>
+              <span class="court-cell-label">Front Right</span>
+            </div>
+          </div>
+          <div class="court-row">
+            <div class="court-cell" style="border-color:rgba(10,132,255,.35);background:rgba(10,132,255,.07)">
+              <span class="court-cell-code" style="color:#0A84FF">ML</span>
+              <span class="court-cell-label">Mid Left</span>
+            </div>
+            <div class="court-t">T</div>
+            <div class="court-cell" style="border-color:rgba(10,132,255,.35);background:rgba(10,132,255,.07)">
+              <span class="court-cell-code" style="color:#0A84FF">MR</span>
+              <span class="court-cell-label">Mid Right</span>
+            </div>
+          </div>
+          <div class="court-row">
+            <div class="court-cell" style="border-color:rgba(0,230,118,.35);background:rgba(0,230,118,.07)">
+              <span class="court-cell-code" style="color:#00E676">BL</span>
+              <span class="court-cell-label">Back Left</span>
+            </div>
+            <div class="court-t">T</div>
+            <div class="court-cell" style="border-color:rgba(0,230,118,.35);background:rgba(0,230,118,.07)">
+              <span class="court-cell-code" style="color:#00E676">BR</span>
+              <span class="court-cell-label">Back Right</span>
+            </div>
+          </div>
+          <div class="court-zone-row" style="grid-column:1/-1">BACK WALL ↓</div>
+        </div>
+        <p style="font-size:.82rem;color:var(--gray2)">The T marker is your home base — always return to the T-junction after every position.</p>
+      </div>
+
+      <!-- 10pt panel -->
+      <div class="court-panel" id="panel-10pt">
+        <div class="court-grid">
+          <div class="court-zone-row" style="grid-column:1/-1">FRONT WALL ↑</div>
+          <div class="court-row">
+            <div class="court-cell" style="border-color:rgba(255,107,53,.4);background:rgba(255,107,53,.08)">
+              <span class="court-cell-code" style="color:#FF6B35">FL</span>
+              <span class="court-cell-label">Front Left</span>
+            </div>
+            <div style></div>
+            <div class="court-cell" style="border-color:rgba(255,107,53,.4);background:rgba(255,107,53,.08)">
+              <span class="court-cell-code" style="color:#FF6B35">FR</span>
+              <span class="court-cell-label">Front Right</span>
+            </div>
+          </div>
+          <div class="court-row">
+            <div class="court-cell" style="border-color:rgba(191,90,242,.35);background:rgba(191,90,242,.07)">
+              <span class="court-cell-code" style="color:#BF5AF2">FML</span>
+              <span class="court-cell-label">Front Mid L</span>
+            </div>
+            <div></div>
+            <div class="court-cell" style="border-color:rgba(191,90,242,.35);background:rgba(191,90,242,.07)">
+              <span class="court-cell-code" style="color:#BF5AF2">FMR</span>
+              <span class="court-cell-label">Front Mid R</span>
+            </div>
+          </div>
+          <div class="court-row">
+            <div class="court-cell" style="border-color:rgba(10,132,255,.35);background:rgba(10,132,255,.07)">
+              <span class="court-cell-code" style="color:#0A84FF">ML</span>
+              <span class="court-cell-label">Mid Left</span>
+            </div>
+            <div class="court-t">T</div>
+            <div class="court-cell" style="border-color:rgba(10,132,255,.35);background:rgba(10,132,255,.07)">
+              <span class="court-cell-code" style="color:#0A84FF">MR</span>
+              <span class="court-cell-label">Mid Right</span>
+            </div>
+          </div>
+          <div class="court-row">
+            <div class="court-cell" style="border-color:rgba(255,214,10,.35);background:rgba(255,214,10,.07)">
+              <span class="court-cell-code" style="color:#FFD60A">BML</span>
+              <span class="court-cell-label">Back Mid L</span>
+            </div>
+            <div></div>
+            <div class="court-cell" style="border-color:rgba(255,214,10,.35);background:rgba(255,214,10,.07)">
+              <span class="court-cell-code" style="color:#FFD60A">BMR</span>
+              <span class="court-cell-label">Back Mid R</span>
+            </div>
+          </div>
+          <div class="court-row">
+            <div class="court-cell" style="border-color:rgba(0,230,118,.35);background:rgba(0,230,118,.07)">
+              <span class="court-cell-code" style="color:#00E676">BL</span>
+              <span class="court-cell-label">Back Left</span>
+            </div>
+            <div></div>
+            <div class="court-cell" style="border-color:rgba(0,230,118,.35);background:rgba(0,230,118,.07)">
+              <span class="court-cell-code" style="color:#00E676">BR</span>
+              <span class="court-cell-label">Back Right</span>
+            </div>
+          </div>
+          <div class="court-zone-row" style="grid-column:1/-1">BACK WALL ↓</div>
+        </div>
+        <p style="font-size:.82rem;color:var(--gray2)">10-Point adds Front-Mid and Back-Mid zones, increasing total distances run per session.</p>
+      </div>
+
+      <div class="tip">💡 <strong>Left-handed?</strong> Enable left-handed mode in Settings → Profile. Every "Left" call becomes your forehand corner and vice versa — the app handles the mirror automatically.</div>
+    </div>
+  </div>
+
+  <!-- ── 4. Session Settings ─────────────────────────────────────────────────── -->
+  <div class="acc" id="sec-config">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon" style="background:rgba(255,214,10,.12)">⚙️</div>
+      <span class="acc-title">Session Settings</span>
+      <span class="acc-chevron">▼</span>
+    </div>
+    <div class="acc-body">
+
+      <div class="sub-label">Difficulty</div>
+      <p>Controls how fast position calls fire and how many reps are in each set. Higher difficulty = shorter interval between calls.</p>
+      <table class="diff-table">
+        <thead>
+          <tr>
+            <th>Level</th>
+            <th>Interval</th>
+            <th>Best for</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="diff-dot" style="background:#34C759"></span>Beginner</td>
+            <td>~12 s</td>
+            <td>Learning the movement pattern</td>
+          </tr>
+          <tr>
+            <td><span class="diff-dot" style="background:#0A84FF"></span>Intermediate</td>
+            <td>~10 s</td>
+            <td>Regular club player</td>
+          </tr>
+          <tr>
+            <td><span class="diff-dot" style="background:#FF9F0A"></span>Advanced</td>
+            <td>~8 s</td>
+            <td>Competitive club / regional</td>
+          </tr>
+          <tr>
+            <td><span class="diff-dot" style="background:#FF453A"></span>Elite</td>
+            <td>~6.5 s</td>
+            <td>Tournament level</td>
+          </tr>
+          <tr>
+            <td><span class="diff-dot" style="background:#BF5AF2"></span>Pro</td>
+            <td>~5.2 s</td>
+            <td>Maximum physical demand</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="sub-label">Tempo</div>
+      <ul>
+        <li><strong style="color:#fff">Slow</strong> — extra recovery time between calls within the selected difficulty.</li>
+        <li><strong style="color:#fff">Natural</strong> — balanced rhythm; the recommended starting point.</li>
+        <li><strong style="color:#fff">Explosive</strong> — maximum pace for your chosen difficulty.</li>
+      </ul>
+
+      <div class="sub-label">Movement Pace</div>
+      <p>Adds extra rest at T between each position call. Use <em>Recovery</em> or <em>Measured</em> while building fitness; switch to <em>Brisk</em> when match-fit.</p>
+      <ul>
+        <li><strong style="color:#fff">Brisk</strong> — no extra pause. Fastest possible rhythm.</li>
+        <li><strong style="color:#fff">Steady</strong> — +1 second at T.</li>
+        <li><strong style="color:#fff">Measured</strong> — +2 seconds at T.</li>
+        <li><strong style="color:#fff">Recovery</strong> — +3 seconds at T. Great for high-intensity work with full reset time.</li>
+      </ul>
+
+      <div class="sub-label">Duration</div>
+      <p>Session length in minutes. Auto rest breaks are inserted between sets — actual moving time is typically 60–70% of the duration.</p>
+
+      <div class="sub-label">Court Style</div>
+      <p>Choose between <strong style="color:#fff">Wooden Court</strong> (warm hardwood with red lines) and <strong style="color:#fff">Glass Court</strong> (dark premium stadium theme) for the in-session court visuals.</p>
+
+      <div class="tip">💡 <strong>Default settings</strong> (difficulty, tempo, court system) are saved in the Settings screen so Quick Start always uses your preferred starting point.</div>
+    </div>
+  </div>
+
+  <!-- ── 5. During a Session ────────────────────────────────────────────────── -->
+  <div class="acc" id="sec-during">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon" style="background:rgba(52,199,89,.13)">▶</div>
+      <span class="acc-title">During a Session</span>
+      <span class="acc-chevron">▼</span>
+    </div>
+    <div class="acc-body">
+
+      <div class="sub-label">Session flow</div>
+      <ul>
+        <li>A 3-second countdown fires before each set begins — get to the T.</li>
+        <li>Voice calls the next position: <em>"Front Left"</em>, <em>"Back Right"</em>, etc.</li>
+        <li>Sprint to that corner, play your phantom shot.</li>
+        <li><em>"Recover to T!"</em> fires — run back to the T-line.</li>
+        <li>Stand at T, wait for the next call. Repeat.</li>
+      </ul>
+
+      <div class="sub-label">Live Pace Control</div>
+      <p>Use the <strong style="color:#fff">+/−</strong> buttons on the session screen to speed up or slow down on the fly — 7 steps from <em>Recovery (+3 s)</em> to <em>Turbo (−3 s)</em>. Your selection resets at the start of the next session.</p>
+
+      <div class="sub-label">Auto Rest Breaks</div>
+      <p>After completing a set, an automatic rest break fires. Duration scales inversely with difficulty — harder levels take shorter breaks to simulate match-intensity. A countdown plays before the next set begins.</p>
+
+      <div class="sub-label">Shot Calls</div>
+      <p>Mid-movement, the app may call a shot type (<em>"Drive!"</em>, <em>"Boast!"</em>, <em>"Drop!"</em>). This trains match decision-making alongside footwork. Shot calls can be customised or disabled in the drill configuration.</p>
+
+      <div class="sub-label">Voice Settings</div>
+      <ul>
+        <li>Toggle voice on/off in Settings → Voice Instructions.</li>
+        <li>Adjust speed with Speech Rate (0.9× / 1.0× / 1.1×).</li>
+        <li>Choose Female or Male coach voice in Settings → Profile → Voice.</li>
+        <li>15+ languages supported — set your preferred language in Profile.</li>
+      </ul>
+
+      <div class="tip">💡 No sound? Turn off Voice Instructions and follow the <strong>court highlight visuals only</strong> — the active zone glows on screen as each call fires.</div>
+    </div>
+  </div>
+
+  <!-- ── 6. Understanding Your Score ───────────────────────────────────────── -->
+  <div class="acc" id="sec-score">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon" style="background:rgba(10,132,255,.15)">📊</div>
+      <span class="acc-title">Understanding Your Score</span>
+      <span class="acc-chevron">▼</span>
+    </div>
+    <div class="acc-body">
+      <p>Your <strong style="color:#fff">Intensity Score (0–100)</strong> reflects overall session quality, calculated from difficulty, tempo, and how much of the session you completed.</p>
+
+      <div class="score-row">
+        <div class="score-chip" style="border-color:rgba(0,230,118,.4);background:rgba(0,230,118,.08)">
+          <span class="score-num" style="color:#00E676">70+</span>
+          <span class="score-lbl">Excellent</span>
+        </div>
+        <div class="score-chip" style="border-color:rgba(255,159,10,.4);background:rgba(255,159,10,.08)">
+          <span class="score-num" style="color:#FF9F0A">40–69</span>
+          <span class="score-lbl">Good</span>
+        </div>
+        <div class="score-chip" style="border-color:rgba(255,69,58,.4);background:rgba(255,69,58,.08)">
+          <span class="score-num" style="color:#FF453A">&lt; 40</span>
+          <span class="score-lbl">Building</span>
+        </div>
+      </div>
+
+      <div class="sub-label">Session stats breakdown</div>
+      <ul>
+        <li><strong style="color:#fff">Reps</strong> — total position calls completed during the session.</li>
+        <li><strong style="color:#fff">Done %</strong> — how much of your target duration you completed.</li>
+        <li><strong style="color:#fff">Mins</strong> — total active session time (excluding rest breaks).</li>
+      </ul>
+
+      <div class="sub-label">Where to see your progress</div>
+      <ul>
+        <li>The <strong style="color:#fff">Last Session card</strong> on the Home Screen shows a colour-coded border and score badge — green, amber, or red.</li>
+        <li>The <strong style="color:#fff">Progress screen</strong> shows session history, weekly stats, zone distribution, and personal bests.</li>
+        <li>Tap <em>Full Progress</em> on the Last Session card to open the full Progress screen.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ── 7. FAQ ──────────────────────────────────────────────────────────────── -->
+  <div class="acc" id="sec-faq">
+    <div class="acc-header" onclick="toggleAcc(this)">
+      <div class="acc-icon" style="background:rgba(255,255,255,.05)">❓</div>
+      <span class="acc-title">Frequently Asked Questions</span>
+      <span class="acc-chevron">▼</span>
+    </div>
+    <div class="acc-body">
+      <div class="faq-list">
+
+        <div class="faq-item">
+          <div class="faq-q">Do I need an internet connection?</div>
+          <div class="faq-a">No. SquashGhostingX is fully offline. All your training data is stored on your device — nothing is sent to any server.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">Can I train without sound?</div>
+          <div class="faq-a">Yes. Turn off Voice Instructions in Settings and follow the court highlight visuals only. The active position zone glows on screen as each call fires.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">The voice seems slightly out of sync with the screen — is this normal?</div>
+          <div class="faq-a">The app pre-fires voice ~150 ms before the visual to compensate for iOS/Android TTS startup latency, so they should feel aligned. If you still notice a gap, try Speech Rate 1.0× in Settings → Audio.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">What does Left-Handed mode do?</div>
+          <div class="faq-a">It mirrors all position calls Left ↔ Right so "Front Right" is your forehand corner and "Front Left" is your backhand. Set it in Settings → Profile → Dominant Hand.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">Can I train without a real squash court?</div>
+          <div class="faq-a">Yes. Any open space roughly court-sized works fine. Mark out the T position with tape if it helps. The app is position-agnostic — it relies on your effort, not GPS.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">How do I replay my last session?</div>
+          <div class="faq-a">Tap <em>Repeat</em> on the Last Session card on the Home Screen. It starts immediately with the same drill type, court system, and difficulty.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">Where is my training data stored?</div>
+          <div class="faq-a">Entirely on your device using a local SQLite database. Deleting the app removes all data. There is no cloud sync or backup — this is intentional for privacy.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">Can I change my skill level later?</div>
+          <div class="faq-a">Yes, at any time via Settings → Profile. Your historical data is unaffected — only future sessions use the new difficulty as the default.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q">How many languages are supported?</div>
+          <div class="faq-a">15+ languages including English (US & UK), Spanish, French, German, Italian, Portuguese, Dutch, Hindi, Arabic, Chinese, Japanese, and Korean. Change language in Settings → Profile → Language.</div>
+        </div>
+
+      </div>
+
+      <div style="margin-top:1.5rem">
+        <p>Still have questions? <a href="support.html">Contact our support team</a> — we typically respond within 24 hours.</p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.page-wrap -->
+
+<footer>
+  <div class="footer-copy">© 2026 SquashGhostingX · All rights reserved</div>
+  <div class="footer-links-row">
+    <a href="index.html">Home</a>
+    <a href="guide.html" style="color:var(--accent)">App Guide</a>
+    <a href="support.html">Support</a>
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="terms.html">Terms of Use</a>
+  </div>
+</footer>
+
+<script>
+function toggleAcc(header) {
+  var acc = header.parentElement;
+  acc.classList.toggle('open');
+}
+
+function switchCourtTab(btn, system) {
+  var row = btn.parentElement;
+  row.querySelectorAll('.court-tab').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  var body = btn.closest('.acc-body');
+  body.querySelectorAll('.court-panel').forEach(function(p){ p.classList.remove('active'); });
+  body.querySelector('#panel-' + system).classList.add('active');
+}
+
+// Auto-open the section that matches the URL hash
+(function(){
+  if (!location.hash) return;
+  var target = document.querySelector(location.hash);
+  if (target && target.classList.contains('acc')) {
+    target.classList.add('open');
+  }
+})();
+</script>
+
+</body>
+</html>

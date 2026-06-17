@@ -329,15 +329,15 @@ export function useSessionEngine(db: SQLiteDatabase) {
     }, AUDIO_OFFSETS.positionCallMs));
 
     if (ssettings.voiceEnabled && !isBeepMode && config.voiceMode !== 'visual-only') {
-      // Voice fires at same delay as visual (registered second → fires after court updates).
+      // Voice fires 150ms before the visual update so that TTS startup latency (~150ms on iOS)
+      // brings the spoken word into sync with the court highlight appearing at positionCallMs.
       addTimer(setTimeout(() => {
         if (store.getState().session?.state !== 'active') return;
         const posLabel  = getPositionLabel(move.position, config.dominantHand);
         const posInfo   = POSITION_ZONE[move.position];
-        // Read nextPosition after setNextPosition has already fired (visual setTimeout above).
-        const freshSession = store.getState().session;
-        const nextLabel = freshSession?.nextPosition
-          ? getPositionLabel(freshSession.nextPosition, config.dominantHand) : null;
+        // Read directly from engine — independent of store state since we fire before setNextPosition.
+        const nextPos   = engine.peekNextPosition();
+        const nextLabel = nextPos ? getPositionLabel(nextPos, config.dominantHand) : null;
 
         const callText = buildVoiceCall({
           drillType:         config.drillType,
@@ -349,7 +349,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
         });
 
         speak(callText);
-      }, AUDIO_OFFSETS.positionCallMs));
+      }, AUDIO_OFFSETS.voiceCallMs));
 
       // Recovery cue fires at end of movement phase for ALL drill types.
       // Signals the player to run back to T before the next position call.
@@ -380,10 +380,11 @@ export function useSessionEngine(db: SQLiteDatabase) {
     // T+intervalMs: trigger next cycle.
     // Live pace step (0–4) offsets the interval; clamped so T-pose always clears
     // before the next call (minimum = movementPhase + 1500 ms).
-    const livePaceStep = store.getState().session?.livePaceStep ?? PACE_DEFAULT_STEP;
-    const paceOffset   = PACE_STEPS_MS[livePaceStep] ?? 0;
+    const livePaceStep  = store.getState().session?.livePaceStep ?? PACE_DEFAULT_STEP;
+    const paceOffset    = PACE_STEPS_MS[livePaceStep] ?? 0;
+    const extraPaceMs   = getSettings().movementPaceExtraMs ?? 0;
     const movementPhase = MOVEMENT_PHASE_MS[config.difficulty][config.tempo];
-    const effectiveInterval = Math.max(movementPhase + 1500, move.intervalMs + paceOffset);
+    const effectiveInterval = Math.max(movementPhase + 1500, move.intervalMs + paceOffset + extraPaceMs);
     loopTimer.current = setTimeout(() => {
       if (store.getState().session?.state !== 'active') return;
 

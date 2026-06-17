@@ -234,13 +234,17 @@ export default function RoutinesScreen() {
         {/* Bottom — flex: 2, takes ~35% of remaining height */}
         <View style={styles.bottomArea}>
 
-          {/* Recommended */}
-          <View style={[styles.recCard, { borderTopColor: suggestedMeta.color }]}>
-            <Text style={[styles.recEyebrow, { color: suggestedMeta.color }]}>
-              RECOMMENDED FOR YOU
-            </Text>
+          {/* Recommended — tinted highlight card */}
+          <View style={[styles.recCard, {
+            backgroundColor: `${suggestedMeta.color}0E`,
+            borderColor: `${suggestedMeta.color}30`,
+          }]}>
+            <View style={styles.recEyebrowRow}>
+              <Ionicons name="sparkles" size={10} color={suggestedMeta.color} />
+              <Text style={[styles.recEyebrow, { color: suggestedMeta.color }]}>RECOMMENDED FOR YOU</Text>
+            </View>
             <View style={styles.recMiddle}>
-              <View style={[styles.recIconWrap, { backgroundColor: `${suggestedMeta.color}1A` }]}>
+              <View style={[styles.recIconWrap, { backgroundColor: `${suggestedMeta.color}22` }]}>
                 <Ionicons name={suggestedIcon as any} size={20} color={suggestedMeta.color} />
               </View>
               <View style={styles.recTextCol}>
@@ -267,9 +271,7 @@ export default function RoutinesScreen() {
           {/* Coaching tip */}
           <View style={styles.tipCard}>
             <View style={styles.tipHeader}>
-              <View style={styles.tipIconWrap}>
-                <Ionicons name="bulb-outline" size={15} color={Colors.brand} />
-              </View>
+              <Ionicons name="bulb" size={14} color={Colors.brand} />
               <Text style={styles.tipLabel}>COACHING TIP</Text>
             </View>
             <Text style={styles.tipText} numberOfLines={3}>{todayTip}</Text>
@@ -294,7 +296,7 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.xs,
   },
   eyebrow: {
-    fontSize: FontSize.micro, fontWeight: FontWeight.bold,
+    fontSize: FontSize.caption, fontWeight: FontWeight.bold,
     color: Colors.accentRoutines, letterSpacing: 1.5, marginBottom: 2,
   },
   title: {
@@ -336,8 +338,8 @@ const styles = StyleSheet.create({
     marginBottom: 3,
   },
   cardDesc: {
-    fontSize: 10, color: Colors.textMuted,
-    lineHeight: 14, marginBottom: Spacing.xs,
+    fontSize: 11, color: Colors.textMuted,
+    lineHeight: 15, marginBottom: Spacing.xs,
   },
   cardFooter: {
     flexDirection: 'row', alignItems: 'center',
@@ -359,19 +361,20 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
 
-  // Recommended card — flex: 1 within bottomArea
+  // Recommended card — tinted highlight (not plain surface like grid cards)
   recCard: {
     flex: 1,
-    backgroundColor: Colors.surface,
     borderRadius: BorderRadius.xl,
-    borderWidth: 1, borderColor: Colors.border,
-    borderTopWidth: 3,
+    borderWidth: 1.5,
     padding: Spacing.md,
     justifyContent: 'space-between',
   },
+  recEyebrowRow: {
+    flexDirection: 'row', alignItems: 'center',
+    gap: 5, marginBottom: Spacing.xs,
+  },
   recEyebrow: {
     fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1.3,
-    marginBottom: Spacing.xs,
   },
   recMiddle: {
     flexDirection: 'row', alignItems: 'center',
@@ -407,30 +410,32 @@ const styles = StyleSheet.create({
     fontSize: FontSize.caption, fontWeight: FontWeight.bold, color: '#fff',
   },
 
-  // Coaching tip card — flex: 1 within bottomArea
+  // Coaching tip card — dark premium card, distinct from surface/grid cards
   tipCard: {
     flex: 1,
-    backgroundColor: Colors.surface,
+    backgroundColor: '#1A0E03',
     borderRadius: BorderRadius.xl,
-    borderWidth: 1, borderColor: Colors.border,
-    borderLeftWidth: 3, borderLeftColor: Colors.brand,
+    borderWidth: 1,
+    borderColor: `${Colors.brand}28`,
+    borderTopWidth: 3,
+    borderTopColor: Colors.brand,
     padding: Spacing.md,
+    gap: Spacing.sm,
   },
   tipHeader: {
-    flexDirection: 'row', alignItems: 'center',
-    gap: Spacing.xs, marginBottom: Spacing.sm,
-  },
-  tipIconWrap: {
-    width: 26, height: 26, borderRadius: BorderRadius.sm,
-    backgroundColor: Colors.brandMuted,
-    alignItems: 'center', justifyContent: 'center',
+    flexDirection: 'row', alignItems: 'center', gap: 6,
   },
   tipLabel: {
-    fontSize: 9, fontWeight: FontWeight.bold,
-    color: Colors.brand, letterSpacing: 1.2,
+    fontSize: FontSize.caption,
+    fontWeight: FontWeight.bold,
+    color: Colors.brand,
+    letterSpacing: 1.5,
   },
   tipText: {
-    fontSize: FontSize.caption, color: Colors.textSecondary, lineHeight: 18,
+    fontSize: FontSize.label,
+    color: Colors.textPrimary,
+    lineHeight: 20,
+    flex: 1,
   },
 
   // ── Detail view

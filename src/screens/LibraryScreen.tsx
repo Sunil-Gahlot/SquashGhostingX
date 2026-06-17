@@ -672,11 +672,11 @@ export default function LibraryScreen() {
           ))}
         </View>
 
-        {/* ── COACHING ARTICLES ──────────────────────────────────── */}
+        {/* ── TRAINING TIPS ──────────────────────────────────────── */}
         <View style={[styles.sectionRow, { marginTop: Spacing.lg }]}>
           <View style={styles.sectionLeft}>
             <Ionicons name="book-outline" size={18} color={Colors.accentLibrary} />
-            <Text style={styles.sectionTitle}>Coaching Articles</Text>
+            <Text style={styles.sectionTitle}>Training Tips</Text>
           </View>
           <Text style={styles.sectionCount}>{ARTICLES.length} articles</Text>
         </View>

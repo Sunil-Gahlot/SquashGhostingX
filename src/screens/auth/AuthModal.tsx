@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   Modal, View, Text, StyleSheet, TouchableOpacity, TextInput,
   ScrollView, KeyboardAvoidingView, Platform, Animated, Alert,
-  ActivityIndicator, Linking,
+  ActivityIndicator, Linking, FlatList, useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import * as SecureStore from 'expo-secure-store';
@@ -96,41 +96,37 @@ function WelcomePage({
   onSignIn: () => void;
   onGuest: () => void;
 }) {
-  const [idx, setIdx] = useState(0);
-  const fadeAnim   = useRef(new Animated.Value(1)).current;
-  const liftAnim   = useRef(new Animated.Value(0)).current;
-  const glowAnim   = useRef(new Animated.Value(0.5)).current;
-  const bgGlowAnim = useRef(new Animated.Value(0.10)).current;
-  const idxRef     = useRef(0);
+  const { width: SCREEN_W } = useWindowDimensions();
+  const [idx, setIdx]       = useState(0);
+  const glowAnim            = useRef(new Animated.Value(0.5)).current;
+  const bgGlowAnim          = useRef(new Animated.Value(0.10)).current;
+  const idxRef              = useRef(0);
+  const flatListRef         = useRef<FlatList>(null);
+  const isSwipingRef        = useRef(false);
+  const timerRef            = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const slide = SLIDES[idx];
-  const stats = SLIDE_STATS[idx];
 
-  const advanceTo = useCallback((next: number) => {
-    idxRef.current = next;
-    Animated.timing(fadeAnim, { toValue: 0, duration: 220, useNativeDriver: true }).start(() => {
-      setIdx(next);
-      liftAnim.setValue(20);
-      Animated.parallel([
-        Animated.timing(fadeAnim, { toValue: 1, duration: 280, useNativeDriver: true }),
-        Animated.spring(liftAnim, { toValue: 0, useNativeDriver: true, tension: 130, friction: 9 }),
-      ]).start();
-    });
-  }, [fadeAnim, liftAnim]);
-
-  useEffect(() => {
-    const t = setInterval(() => {
+  function startAutoRotate() {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      if (isSwipingRef.current) return;
       const next = (idxRef.current + 1) % SLIDES.length;
       idxRef.current = next;
-      advanceTo(next);
+      flatListRef.current?.scrollToIndex({ index: next, animated: true });
+      setIdx(next);
     }, 4200);
-    return () => clearInterval(t);
-  }, [advanceTo]);
+  }
+
+  useEffect(() => {
+    startAutoRotate();
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, []);
 
   useEffect(() => {
     const iconLoop = Animated.loop(
       Animated.sequence([
-        Animated.timing(glowAnim,   { toValue: 1.0, duration: 1800, useNativeDriver: false }),
+        Animated.timing(glowAnim,   { toValue: 1.0,  duration: 1800, useNativeDriver: false }),
         Animated.timing(glowAnim,   { toValue: 0.35, duration: 1800, useNativeDriver: false }),
       ])
     );
@@ -140,14 +136,60 @@ function WelcomePage({
         Animated.timing(bgGlowAnim, { toValue: 0.07, duration: 3200, useNativeDriver: false }),
       ])
     );
-    iconLoop.start();
-    bgLoop.start();
+    iconLoop.start(); bgLoop.start();
     return () => { iconLoop.stop(); bgLoop.stop(); };
   }, []);
 
+  function scrollToIdx(i: number) {
+    idxRef.current = i;
+    flatListRef.current?.scrollToIndex({ index: i, animated: true });
+    setIdx(i);
+    startAutoRotate();
+  }
+
+  function onScrollBeginDrag() {
+    isSwipingRef.current = true;
+  }
+
+  function onMomentumScrollEnd(e: any) {
+    const newIdx = Math.round(e.nativeEvent.contentOffset.x / SCREEN_W);
+    idxRef.current = newIdx;
+    setIdx(newIdx);
+    isSwipingRef.current = false;
+    startAutoRotate();
+  }
+
+  const renderSlide = useCallback(({ item, index }: { item: typeof SLIDES[number]; index: number }) => {
+    const stats = SLIDE_STATS[index];
+    return (
+      <View style={{ width: SCREEN_W, height: '100%', paddingHorizontal: Spacing.base }}>
+        <View style={[wStyles.card, { borderTopColor: item.color }]}>
+          <Animated.View style={[wStyles.cardCornerGlow, { backgroundColor: item.color, opacity: glowAnim }]} />
+          <View style={[wStyles.labelBadge, { backgroundColor: `${item.color}18`, borderColor: `${item.color}35` }]}>
+            <Ionicons name={item.icon} size={11} color={item.color} />
+            <Text style={[wStyles.slideLabel, { color: item.color }]}>{item.label}</Text>
+          </View>
+          <View style={[wStyles.iconCircle, { backgroundColor: `${item.color}15` }]}>
+            <Ionicons name={item.icon} size={52} color={item.color} />
+          </View>
+          <Text style={wStyles.slideTitle}>{item.title}</Text>
+          <Text style={wStyles.slideSub}>{item.sub}</Text>
+          <View style={wStyles.statsRow}>
+            {stats.map((stat, i) => (
+              <React.Fragment key={stat}>
+                <Text style={wStyles.statText}>{stat}</Text>
+                {i < stats.length - 1 && <View style={wStyles.statDot} />}
+              </React.Fragment>
+            ))}
+          </View>
+        </View>
+      </View>
+    );
+  }, [SCREEN_W, glowAnim]);
+
   return (
     <View style={wStyles.container}>
-      {/* Atmospheric background glow — renders first so it's behind everything */}
+      {/* Atmospheric background glow */}
       <Animated.View
         style={[wStyles.bgGlow, { backgroundColor: slide.color, opacity: bgGlowAnim }]}
         pointerEvents="none"
@@ -165,50 +207,27 @@ function WelcomePage({
         <Text style={wStyles.brandName}>SquashGhostingX</Text>
       </View>
 
-      {/* Main slide card — fills all available vertical space */}
-      <Animated.View
-        style={[
-          wStyles.card,
-          { borderTopColor: slide.color, opacity: fadeAnim, transform: [{ translateY: liftAnim }] },
-        ]}
-      >
-        {/* Corner glow */}
-        <Animated.View style={[wStyles.cardCornerGlow, { backgroundColor: slide.color, opacity: glowAnim }]} />
-
-        {/* Label badge */}
-        <View style={[wStyles.labelBadge, { backgroundColor: `${slide.color}18`, borderColor: `${slide.color}35` }]}>
-          <Ionicons name={slide.icon} size={11} color={slide.color} />
-          <Text style={[wStyles.slideLabel, { color: slide.color }]}>{slide.label}</Text>
-        </View>
-
-        {/* Icon */}
-        <View style={[wStyles.iconCircle, { backgroundColor: `${slide.color}15` }]}>
-          <Ionicons name={slide.icon} size={52} color={slide.color} />
-        </View>
-
-        {/* Text */}
-        <Text style={wStyles.slideTitle}>{slide.title}</Text>
-        <Text style={wStyles.slideSub}>{slide.sub}</Text>
-
-        {/* Stats row */}
-        <View style={wStyles.statsRow}>
-          {stats.map((stat, i) => (
-            <React.Fragment key={stat}>
-              <Text style={wStyles.statText}>{stat}</Text>
-              {i < stats.length - 1 && <View style={wStyles.statDot} />}
-            </React.Fragment>
-          ))}
-        </View>
-      </Animated.View>
+      {/* Slides — native horizontal paging */}
+      <FlatList
+        ref={flatListRef}
+        data={SLIDES as unknown as any[]}
+        keyExtractor={(item) => item.id}
+        renderItem={renderSlide}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        scrollEventThrottle={16}
+        onScrollBeginDrag={onScrollBeginDrag}
+        onMomentumScrollEnd={onMomentumScrollEnd}
+        getItemLayout={(_, index) => ({ length: SCREEN_W, offset: SCREEN_W * index, index })}
+        style={[wStyles.flatList, { marginHorizontal: -Spacing.base }]}
+      />
 
       {/* Pagination dots */}
       <View style={wStyles.dots}>
         {SLIDES.map((s, i) => (
-          <TouchableOpacity key={s.id} onPress={() => advanceTo(i)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-            <Animated.View style={[
-              wStyles.dot,
-              i === idx && { width: 28, backgroundColor: slide.color },
-            ]} />
+          <TouchableOpacity key={s.id} onPress={() => scrollToIdx(i)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+            <View style={[wStyles.dot, i === idx && { width: 28, backgroundColor: slide.color }]} />
           </TouchableOpacity>
         ))}
       </View>
@@ -281,10 +300,16 @@ const wStyles = StyleSheet.create({
     flex: 1,
     flexShrink: 1,
   },
-  // Main slide card — no maxHeight, fills all available space
+  // FlatList — fills remaining vertical space; escape container's horizontal padding via negative margin
+  flatList: {
+    flex: 1,
+    alignSelf: 'stretch',
+    marginBottom: Spacing.lg,
+  },
+
+  // Slide card — fills the item height
   card: {
     flex: 1,
-    width: '100%',
     backgroundColor: Colors.surface,
     borderRadius: BorderRadius.xxl,
     borderTopWidth: 3,
@@ -295,7 +320,6 @@ const wStyles = StyleSheet.create({
     justifyContent: 'center',
     gap: Spacing.sm,
     overflow: 'hidden',
-    marginBottom: Spacing.lg,
   },
   cardCornerGlow: {
     position: 'absolute',

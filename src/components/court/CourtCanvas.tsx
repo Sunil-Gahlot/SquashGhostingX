@@ -100,10 +100,10 @@ function getPoseSource(
 // Pose image dimensions in SVG viewport units (images are portrait, ~3:4 ratio).
 // Active poses render at ~90px wide on a typical phone — clearly visible on court.
 function poseDims(pos: Position, isActive: boolean): { w: number; h: number } {
-  if (pos === 'T') return { w: 165, h: 220 };
+  if (pos === 'T') return { w: 190, h: 253 };
   const is10pt = !POSITIONS_6PT.includes(pos as any);
-  if (isActive) return is10pt ? { w: 145, h: 193 } : { w: 160, h: 213 };
-  return is10pt ? { w: 105, h: 140 } : { w: 120, h: 160 };
+  if (isActive) return is10pt ? { w: 167, h: 222 } : { w: 184, h: 245 };
+  return is10pt ? { w: 121, h: 161 } : { w: 138, h: 184 };
 }
 
 // ─── Themes ────────────────────────────────────────────────────────────────

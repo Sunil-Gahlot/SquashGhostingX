@@ -15,11 +15,12 @@ interface PillSelectorProps {
   onSelect: (value: string) => void;
   multiSelect?: boolean;
   scrollable?: boolean;
+  wrap?: boolean;
   size?: 'sm' | 'md';
 }
 
 export default function PillSelector({
-  options, selected, onSelect, multiSelect, scrollable, size = 'md',
+  options, selected, onSelect, multiSelect, scrollable, wrap, size = 'md',
 }: PillSelectorProps) {
   const isSelected = (value: string) =>
     Array.isArray(selected) ? selected.includes(value) : selected === value;
@@ -55,12 +56,16 @@ export default function PillSelector({
       </ScrollView>
     );
   }
+  if (wrap) {
+    return <View style={styles.wrapFlow}>{pills}</View>;
+  }
   return <View style={styles.wrap}>{pills}</View>;
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', gap: Spacing.sm, paddingHorizontal: Spacing.base },
-  wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
+  row:      { flexDirection: 'row', gap: Spacing.sm, paddingHorizontal: Spacing.base },
+  wrap:     { flexDirection: 'row', flexWrap: 'nowrap', flexShrink: 0, gap: Spacing.sm },
+  wrapFlow: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
   pill: {
     paddingHorizontal: Spacing.base,
     paddingVertical: Spacing.sm,

@@ -18,6 +18,7 @@ import { getIntervalMs, MOVES_PER_SET } from '../constants/timing';
 import { Language } from '../types';
 import * as Audio from '../engine/audioEngine';
 import ProfileScreen from './ProfileScreen';
+import HelpModal from './HelpModal';
 
 // ─── Row components ───────────────────────────────────────────────────────────
 
@@ -37,16 +38,17 @@ const grpStyles = StyleSheet.create({
 });
 
 function SettingsRow({
-  icon, iconBg, iconColor, label, sub, right, onPress, isLast,
+  icon, iconBg, iconColor, label, sub, right, bottom, onPress, isLast,
 }: {
   icon: string; iconBg: string; iconColor: string;
   label: string; sub?: string;
   right?: React.ReactNode;
+  bottom?: React.ReactNode;
   onPress?: () => void;
   isLast?: boolean;
 }) {
-  const Inner = (
-    <View style={[rowStyles.row, isLast && rowStyles.rowLast]}>
+  const topContent = (
+    <>
       <View style={[rowStyles.iconBox, { backgroundColor: iconBg }]}>
         <Ionicons name={icon as any} size={18} color={iconColor} />
       </View>
@@ -54,7 +56,18 @@ function SettingsRow({
         <Text style={rowStyles.label}>{label}</Text>
         {sub && <Text style={rowStyles.sub}>{sub}</Text>}
       </View>
-      <View style={rowStyles.right}>{right}</View>
+      {right && <View style={rowStyles.right}>{right}</View>}
+    </>
+  );
+
+  const Inner = bottom ? (
+    <View style={[rowStyles.row, rowStyles.rowStacked, isLast && rowStyles.rowLast]}>
+      <View style={rowStyles.rowTop}>{topContent}</View>
+      <View style={rowStyles.bottom}>{bottom}</View>
+    </View>
+  ) : (
+    <View style={[rowStyles.row, isLast && rowStyles.rowLast]}>
+      {topContent}
     </View>
   );
   if (onPress) {
@@ -70,12 +83,15 @@ const rowStyles = StyleSheet.create({
     gap: Spacing.md,
     borderBottomWidth: 1, borderBottomColor: Colors.border,
   },
-  rowLast:  { borderBottomWidth: 0 },
-  iconBox:  { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  text:     { flex: 1 },
-  label:    { fontSize: FontSize.label, fontWeight: FontWeight.medium, color: Colors.textPrimary },
-  sub:      { fontSize: FontSize.caption, color: Colors.textMuted, marginTop: 2 },
-  right:    { alignItems: 'flex-end', maxWidth: '56%' },
+  rowLast:    { borderBottomWidth: 0 },
+  rowStacked: { flexDirection: 'column', alignItems: 'stretch', gap: 0 },
+  rowTop:     { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
+  iconBox:    { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  text:       { flex: 1 },
+  label:      { fontSize: FontSize.label, fontWeight: FontWeight.medium, color: Colors.textPrimary },
+  sub:        { fontSize: FontSize.caption, color: Colors.textMuted, marginTop: 2 },
+  right:      { alignItems: 'flex-end', maxWidth: '56%' },
+  bottom:     { paddingTop: Spacing.sm, paddingLeft: 36 + Spacing.md },
 });
 
 // ─── Skill colour map ─────────────────────────────────────────────────────────
@@ -115,6 +131,7 @@ export default function SettingsScreen() {
   const { clearCache } = useProgressStore();
 
   const [profileVisible, setProfileVisible] = useState(false);
+  const [helpVisible, setHelpVisible]       = useState(false);
 
   const displayName = profile.name.trim() || 'Player';
   const skillColor  = SKILL_COLORS[profile.skillLevel] ?? Colors.levelIntermediate;
@@ -203,6 +220,8 @@ export default function SettingsScreen() {
       >
         <ProfileScreen onClose={() => setProfileVisible(false)} />
       </Modal>
+
+      <HelpModal visible={helpVisible} onClose={() => setHelpVisible(false)} />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
@@ -306,7 +325,7 @@ export default function SettingsScreen() {
             icon="play-circle" iconBg={`${Colors.gold}22`} iconColor={Colors.gold}
             label="Test Voice"
             sub={`${langLabel} · ${profile.voiceGender === 'female' ? 'Female' : 'Male'} voice`}
-            right={<Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />}
+            right={<Ionicons name="volume-high" size={18} color={Colors.gold} />}
             onPress={testVoice}
             isLast
           />
@@ -378,13 +397,13 @@ export default function SettingsScreen() {
             icon="hourglass-outline" iconBg={`${Colors.rest}22`} iconColor={Colors.rest}
             label="Movement Pace"
             sub="Extra pause at T between each call"
-            right={
+            bottom={
               <PillSelector
                 options={[
-                  { label: 'Normal', value: '0'    },
-                  { label: '+1s',    value: '1000' },
-                  { label: '+2s',    value: '2000' },
-                  { label: '+3s',    value: '3000' },
+                  { label: 'Brisk',    value: '0'    },
+                  { label: 'Steady',   value: '1000' },
+                  { label: 'Measured', value: '2000' },
+                  { label: 'Recovery', value: '3000' },
                 ]}
                 selected={String(settings.movementPaceExtraMs ?? 0)}
                 onSelect={(v) => updateSettings({ movementPaceExtraMs: Number(v) })}
@@ -463,6 +482,30 @@ export default function SettingsScreen() {
             sub="Permanently removes all data and credentials"
             right={<Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />}
             onPress={handleDeleteAccount}
+            isLast
+          />
+        </SettingsGroup>
+
+        {/* ── HELP & GUIDE ──────────────────────────────────── */}
+        <Text style={styles.sectionLabel}>HELP & GUIDE</Text>
+        <SettingsGroup>
+          <SettingsRow
+            icon="book-outline"
+            iconBg={Colors.brandMuted}
+            iconColor={Colors.brand}
+            label="How to Use the App"
+            sub="Court systems, positions, settings and drills explained"
+            right={<Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />}
+            onPress={() => setHelpVisible(true)}
+          />
+          <SettingsRow
+            icon="help-circle-outline"
+            iconBg={`${Colors.rest}22`}
+            iconColor={Colors.rest}
+            label="FAQ"
+            sub="Common questions and troubleshooting"
+            right={<Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />}
+            onPress={() => setHelpVisible(true)}
             isLast
           />
         </SettingsGroup>

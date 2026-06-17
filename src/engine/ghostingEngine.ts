@@ -3,6 +3,7 @@ import {
   POSITIONS_6PT, POSITIONS_10PT,
   FIXED_ORDER_6PT, FIXED_ORDER_10PT,
   COVERAGE_FILTER, HAND_MIRROR,
+  POSITION_ZONE,
   getPositionsForSystem,
 } from '../constants/positions';
 import {
@@ -66,22 +67,42 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-/** Fisher-Yates with no consecutive repeats. */
+/**
+ * Zone-aware shuffle with anti-streak logic.
+ * Rules:
+ *  1. No position repeats back-to-back.
+ *  2. No position repeats two slots ago (avoids A-B-A ping-pong).
+ *  3. After two positions in the same zone, the next pick prefers a different zone.
+ *  4. Re-shuffles the pool at every full cycle so identical patterns never repeat.
+ */
 function shuffleNoRepeat(pool: Position[], count: number): Position[] {
+  if (pool.length === 0) return [];
+  if (pool.length === 1) return Array(count).fill(pool[0]);
+
   const result: Position[] = [];
-  let last: Position | null = null;
-  const p = shuffle(pool);
+  let p = shuffle([...pool]);
+  let prev1: Position | null = null;
+  let prev2: Position | null = null;
 
   for (let i = 0; i < count; i++) {
-    let pos = p[i % p.length];
-    // Swap with the next slot if it repeats
-    if (pos === last && p.length > 1) {
-      const next = (i + 1) % p.length;
-      [p[i % p.length], p[next]] = [p[next], p[i % p.length]];
-      pos = p[i % p.length];
+    // Re-shuffle at every new cycle so patterns don't repeat identically
+    if (i > 0 && i % pool.length === 0) p = shuffle([...pool]);
+
+    // Build candidates excluding the last two positions
+    let candidates = p.filter(pos => pos !== prev1 && pos !== prev2);
+    if (candidates.length === 0) candidates = p.filter(pos => pos !== prev1);
+    if (candidates.length === 0) candidates = [...p];
+
+    // Zone balancing: if last two were in same zone, prefer a different zone
+    if (prev1 && prev2 && POSITION_ZONE[prev1] === POSITION_ZONE[prev2]) {
+      const diffZone = candidates.filter(pos => POSITION_ZONE[pos] !== POSITION_ZONE[prev1!]);
+      if (diffZone.length > 0) candidates = diffZone;
     }
-    result.push(pos);
-    last = pos;
+
+    const next = candidates[Math.floor(Math.random() * candidates.length)];
+    result.push(next);
+    prev2 = prev1;
+    prev1 = next;
   }
   return result;
 }

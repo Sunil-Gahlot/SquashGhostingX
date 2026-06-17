@@ -79,9 +79,9 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
 
   const [langVisible, setLangVisible] = useState(false);
   const [localName,   setLocalName]   = useState(profile.name);
-  const [dobDay,      setDobDay]      = useState('');
-  const [dobMonth,    setDobMonth]    = useState('');
-  const [dobYear,     setDobYear]     = useState('');
+  const [dobDay,      setDobDay]      = useState(profile.dobDay   ?? '');
+  const [dobMonth,    setDobMonth]    = useState(profile.dobMonth ?? '');
+  const [dobYear,     setDobYear]     = useState(profile.dobYear  ?? '');
 
   const displayName = profile.name.trim() || 'Player';
   const skillColor  = SKILL_COLORS[profile.skillLevel] ?? Colors.primary;
@@ -255,7 +255,7 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
                 <TextInput
                   style={sStyles.dobSegment}
                   value={dobDay}
-                  onChangeText={(t) => { setDobDay(t); const a = calcAge(t, dobMonth, dobYear); if (a !== null) setProfile({ age: a }); }}
+                  onChangeText={(t) => { setDobDay(t); setProfile({ dobDay: t }); const a = calcAge(t, dobMonth, dobYear); if (a !== null) setProfile({ age: a }); }}
                   placeholder="DD"
                   placeholderTextColor={Colors.textMuted}
                   keyboardType="number-pad"
@@ -265,7 +265,7 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
                 <TextInput
                   style={sStyles.dobSegment}
                   value={dobMonth}
-                  onChangeText={(t) => { setDobMonth(t); const a = calcAge(dobDay, t, dobYear); if (a !== null) setProfile({ age: a }); }}
+                  onChangeText={(t) => { setDobMonth(t); setProfile({ dobMonth: t }); const a = calcAge(dobDay, t, dobYear); if (a !== null) setProfile({ age: a }); }}
                   placeholder="MM"
                   placeholderTextColor={Colors.textMuted}
                   keyboardType="number-pad"
@@ -275,7 +275,7 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
                 <TextInput
                   style={[sStyles.dobSegment, sStyles.dobSegmentYear]}
                   value={dobYear}
-                  onChangeText={(t) => { setDobYear(t); const a = calcAge(dobDay, dobMonth, t); if (a !== null) setProfile({ age: a }); }}
+                  onChangeText={(t) => { setDobYear(t); setProfile({ dobYear: t }); const a = calcAge(dobDay, dobMonth, t); if (a !== null) setProfile({ age: a }); }}
                   placeholder="YYYY"
                   placeholderTextColor={Colors.textMuted}
                   keyboardType="number-pad"
@@ -318,7 +318,7 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
                 options={SKILL_OPTIONS}
                 selected={profile.skillLevel}
                 onSelect={(v) => setProfile({ skillLevel: v as SkillLevel })}
-                scrollable
+                wrap
               />
             </View>
             <Div />
@@ -333,7 +333,7 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
                 options={GOAL_OPTIONS}
                 selected={profile.trainingGoal}
                 onSelect={(v) => setProfile({ trainingGoal: v as TrainingGoal })}
-                scrollable
+                wrap
               />
             </View>
             <Div />

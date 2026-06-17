@@ -20,7 +20,7 @@ export type Tempo = 'slow' | 'natural' | 'explosive';
 export type Difficulty = 'beginner' | 'intermediate' | 'advanced' | 'elite' | 'pro';
 export type DrillType = 'movement' | 'shot-based' | 'match-sim' | 'custom';
 export type VoiceMode = 'voice+visual' | 'voice-only' | 'visual-only' | 'beep';
-export type ShotGroup = 'drives' | 'drops' | 'boasts' | 'volleys' | 'lobs' | 'kills' | 'cross' | 'mixed';
+export type ShotGroup = 'drives' | 'drops' | 'boasts' | 'volleys' | 'lobs' | 'kills' | 'cross' | 'mixed' | 'rails' | 'diagonals' | 'front-court';
 export type RestMode = 'auto' | 'manual';
 
 export interface SessionConfig {
@@ -122,6 +122,9 @@ export interface UserProfile {
   id: string;
   name: string;
   age: number | null;
+  dobDay: string;
+  dobMonth: string;
+  dobYear: string;
   gender: string | null;
   photoUri: string | null;
   dominantHand: DominantHand;

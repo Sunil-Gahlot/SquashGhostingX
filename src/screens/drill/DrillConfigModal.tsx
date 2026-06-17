@@ -65,14 +65,17 @@ const PATTERN_OPTS_ALL: StepOption[] = [
 ];
 
 const SHOT_GROUP_OPTIONS = [
-  { label: 'Mixed (all)',  value: 'mixed'   },
-  { label: 'Drives',       value: 'drives'  },
-  { label: 'Cross Shots',  value: 'cross'   },
-  { label: 'Drops',        value: 'drops'   },
-  { label: 'Volleys',      value: 'volleys' },
-  { label: 'Boasts',       value: 'boasts'  },
-  { label: 'Lobs',         value: 'lobs'    },
-  { label: 'Kill Shots',   value: 'kills'   },
+  { label: 'Mixed (all)',  value: 'mixed'       },
+  { label: 'Drives',       value: 'drives'      },
+  { label: 'Rails',        value: 'rails'       },
+  { label: 'Cross Shots',  value: 'cross'       },
+  { label: 'Diagonals',    value: 'diagonals'   },
+  { label: 'Drops',        value: 'drops'       },
+  { label: 'Front Court',  value: 'front-court' },
+  { label: 'Volleys',      value: 'volleys'     },
+  { label: 'Boasts',       value: 'boasts'      },
+  { label: 'Lobs',         value: 'lobs'        },
+  { label: 'Kill Shots',   value: 'kills'       },
 ];
 
 const DURATION_OPTIONS = [

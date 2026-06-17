@@ -74,7 +74,8 @@ export const T_START_PAUSE_MS = 3000;
 // All offsets relative to T+0 (moment position-call event fires).
 export const AUDIO_OFFSETS = {
   prepBeepMs: 0,          // preparation beep — fires at interval start
-  positionCallMs: 500,    // position voice call
+  positionCallMs: 500,    // court visual highlight + state update
+  voiceCallMs: 350,       // voice fires 150ms before visual to offset TTS startup latency (~150ms on iOS)
   courtHighlightMs: 500,  // court zone highlight animates on
   textOverlayMs: 550,     // voice text overlay fades in
   shotCallFactor: 0.55,   // shot call fires at (intervalMs × 0.55)

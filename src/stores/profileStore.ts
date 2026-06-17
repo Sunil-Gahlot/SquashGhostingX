@@ -7,7 +7,10 @@ const DEFAULT_PROFILE: UserProfile = {
   id: '',
   name: '',
   age: null,
-  gender: null,
+  dobDay: '',
+  dobMonth: '',
+  dobYear: '',
+  gender: 'male',
   photoUri: null,
   dominantHand: 'right',
   skillLevel: 'intermediate',
@@ -67,10 +70,20 @@ export const useProfileStore = create<ProfileStore>()(
     {
       name: 'profile-storage',
       storage: createJSONStorage(() => AsyncStorage),
-      version: 1,
+      version: 2,
       migrate: (persisted: any, version: number) => {
         if (version < 1) {
-          return { ...persisted, hasCompletedAuth: false };
+          persisted = { ...persisted, hasCompletedAuth: false };
+        }
+        if (version < 2) {
+          // Add DOB fields and normalise null gender
+          if (persisted?.state?.profile) {
+            const p = persisted.state.profile;
+            if (!p.dobDay)   p.dobDay   = '';
+            if (!p.dobMonth) p.dobMonth = '';
+            if (!p.dobYear)  p.dobYear  = '';
+            if (!p.gender)   p.gender   = 'male';
+          }
         }
         return persisted;
       },
