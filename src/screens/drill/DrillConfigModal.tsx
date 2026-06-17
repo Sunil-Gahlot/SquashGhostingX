@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Modal, View, Text, StyleSheet, ScrollView, TouchableOpacity,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Colors } from '../../constants/colors';
@@ -243,6 +243,11 @@ export default function DrillConfigModal() {
       setTempo(settings.defaultTempo);
       setDuration(settings.defaultDuration);
       setVoiceMode(settings.defaultVoiceMode);
+      setPatternType('random');
+      setCoverage('full');
+      setShotGroups(['mixed']);
+      setRestMode('auto');
+      setRestSeconds(15);
     }
   }, [drillConfigVisible]);
 
@@ -285,11 +290,7 @@ export default function DrillConfigModal() {
     }
   }
 
-  const nextEnabled = (() => {
-    if (stepKey === 'drillType') return true;
-    if (stepKey === 'difficulty') return true;
-    return true;
-  })();
+  const nextEnabled = true;
 
   return (
     <Modal
@@ -298,6 +299,7 @@ export default function DrillConfigModal() {
       presentationStyle="formSheet"
       onRequestClose={closeDrillConfig}
     >
+      <SafeAreaProvider>
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
 
         {/* ── ORANGE HEADER BAR ─────────────────────────────── */}
@@ -462,6 +464,7 @@ export default function DrillConfigModal() {
         </View>
 
       </SafeAreaView>
+      </SafeAreaProvider>
     </Modal>
   );
 }

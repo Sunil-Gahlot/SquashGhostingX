@@ -18,7 +18,7 @@ import { useBadgesStore, BADGE_DEFS } from '../stores/badgesStore';
 
 // ─── Weekly activity bar chart ────────────────────────────────────────────────
 
-const DAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+const DAYS = ['M', 'Tu', 'W', 'Th', 'F', 'Sa', 'Su'];
 const BAR_W = 28; const BAR_GAP = 12;
 const CHART_W = DAYS.length * (BAR_W + BAR_GAP) - BAR_GAP;
 const CHART_H = 72;

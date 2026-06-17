@@ -10,7 +10,7 @@ import { createGhostingEngine, type GhostingEngine } from '../engine/ghostingEng
 import * as Audio from '../engine/audioEngine';
 import * as Haptics from '../engine/hapticsEngine';
 
-import { SessionConfig, SessionRecord, MovementRecord } from '../types';
+import { SessionConfig, SessionRecord, MovementRecord, ProgressStats } from '../types';
 import {
   getPositionLabel, POSITION_ZONE, POSITION_INFO,
 } from '../constants/positions';
@@ -21,6 +21,7 @@ import {
 } from '../constants/timing';
 import {
   saveSession, saveMovements, saveCheckpoint, deleteCheckpoint, upsertPersonalBest,
+  getProgressStats,
 } from '../db/queries';
 import { useBadgesStore } from '../stores/badgesStore';
 
@@ -125,11 +126,12 @@ export function useSessionEngine(db: SQLiteDatabase) {
   const lastVoiceCallMsRef = useRef<number>(0);
 
   // Timer refs
-  const moveTimers   = useRef<TimerId[]>([]);
-  const loopTimer    = useRef<TimerId | null>(null);
-  const restTimer    = useRef<TimerId | null>(null);
-  const secondTimer  = useRef<IntervalId | null>(null);
-  const cpTimer      = useRef<IntervalId | null>(null);
+  const moveTimers      = useRef<TimerId[]>([]);
+  const loopTimer       = useRef<TimerId | null>(null);
+  const restTimer       = useRef<TimerId | null>(null);
+  const secondTimer     = useRef<IntervalId | null>(null);
+  const cpTimer         = useRef<IntervalId | null>(null);
+  const isCompletingRef = useRef(false);
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -162,11 +164,14 @@ export function useSessionEngine(db: SQLiteDatabase) {
   // ── Session completion ─────────────────────────────────────────────────────
 
   const completeSession = useCallback(async (abandoned: boolean) => {
+    if (isCompletingRef.current) return;
+    isCompletingRef.current = true;
+
     clearAllTimers();
     Audio.stopAudio();
 
     const s = store.getState().session;
-    if (!s) return;
+    if (!s) { isCompletingRef.current = false; return; }
 
     store.getState().setState(abandoned ? 'abandoned' : 'complete');
 
@@ -225,23 +230,30 @@ export function useSessionEngine(db: SQLiteDatabase) {
       console.warn('[Session] SQLite save failed:', e);
     }
 
-    // ── Upsert personal bests ───────────────────────────────────────────────
-    try {
-      const endAt = record.endedAt;
-      await upsertPersonalBest(db as any, record.drillType, 'movements',  record.movementsTotal,  record.id, endAt);
-      await upsertPersonalBest(db as any, record.drillType, 'completion', record.completionPct,   record.id, endAt);
-      await upsertPersonalBest(db as any, record.drillType, 'intensity',  record.intensityScore,  record.id, endAt);
-    } catch (e) {
-      console.warn('[Session] PB upsert failed:', e);
+    // ── Upsert personal bests (completed sessions only) ────────────────────
+    if (!abandoned) {
+      try {
+        const endAt = record.endedAt;
+        await upsertPersonalBest(db as any, record.drillType, 'movements',  record.movementsTotal,  record.id, endAt);
+        await upsertPersonalBest(db as any, record.drillType, 'completion', record.completionPct,   record.id, endAt);
+        await upsertPersonalBest(db as any, record.drillType, 'intensity',  record.intensityScore,  record.id, endAt);
+      } catch (e) {
+        console.warn('[Session] PB upsert failed:', e);
+      }
+    }
+
+    // Query fresh stats from DB so badge checks see the just-saved session
+    let freshStats: ProgressStats | null = null;
+    if (!abandoned) {
+      try { freshStats = await getProgressStats(db as any); } catch {}
     }
 
     progressStore.addSession(record);
     progressStore.markSessionCompleted();   // triggers reactive reload in Home + Progress
 
     // ── Badge checks ────────────────────────────────────────────────────────
-    if (!abandoned) {
+    if (!abandoned && freshStats) {
       const badges = useBadgesStore.getState();
-      const freshStats = useProgressStore.getState().stats;
 
       if (freshStats.totalSessions <= 1)           badges.awardBadge('first_session');
       if (freshStats.currentStreak >= 7)           badges.awardBadge('streak_7');
@@ -251,6 +263,8 @@ export function useSessionEngine(db: SQLiteDatabase) {
       }
       if (record.completionPct >= 100)             badges.awardBadge('perfect_session');
     }
+
+    isCompletingRef.current = false;
   }, [db, settings]);
 
   // ── Rest period ────────────────────────────────────────────────────────────
@@ -411,6 +425,16 @@ export function useSessionEngine(db: SQLiteDatabase) {
   const startActive = useCallback(() => {
     store.getState().setState('active');
 
+    // Restore from checkpoint if resuming an interrupted session
+    const resume = store.getState().resumeFromCheckpoint;
+    if (resume) {
+      store.getState().setElapsedSeconds(resume.elapsedSeconds);
+      store.getState().setRepCount(resume.repCount);
+      // Shift the session start time so elapsed calc stays correct
+      sessionStartRef.current = Date.now() - resume.elapsedSeconds * 1000;
+      store.getState().setResumeFromCheckpoint(null);
+    }
+
     // 1-second elapsed ticker + coaching cues
     secondTimer.current = setInterval(() => {
       store.getState().tickElapsed();
@@ -501,6 +525,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
     recoveryCueIdxRef.current  = 0;
     callIndexRef.current       = 0;
     lastVoiceCallMsRef.current = 0;
+    isCompletingRef.current    = false;
     engineRef.current         = createGhostingEngine(fullConfig);
     sessionStartRef.current  = Date.now();
 
@@ -521,17 +546,15 @@ export function useSessionEngine(db: SQLiteDatabase) {
 
   const pauseSession = useCallback(() => {
     if (store.getState().session?.state !== 'active') return;
-    clearMoveTimers();
-    if (restTimer.current) { clearTimeout(restTimer.current); restTimer.current = null; }
+    clearAllTimers();   // stops move loop + secondTimer + cpTimer
     Audio.stopAudio();
     store.getState().setState('paused');
   }, []);
 
   const resumeSession = useCallback(() => {
     if (store.getState().session?.state !== 'paused') return;
-    store.getState().setState('active');
-    fireMoveLoop();
-  }, [fireMoveLoop]);
+    startActive();   // restarts secondTimer, cpTimer, and fires first move after T-pause
+  }, [startActive]);
 
   const skipRest = useCallback(() => {
     if (restTimer.current) { clearTimeout(restTimer.current); restTimer.current = null; }

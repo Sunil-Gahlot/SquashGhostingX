@@ -61,12 +61,14 @@ export async function saveMovements(
   db: DB,
   movements: MovementRecord[]
 ): Promise<void> {
-  for (const m of movements) {
-    await db.runAsync(
-      'INSERT INTO movements (session_id, position, shot, timestamp_offset_ms, set_index) VALUES (?,?,?,?,?)',
-      m.sessionId, m.position, m.shot ?? null, m.timestampOffsetMs, m.setIndex
-    );
-  }
+  await db.withTransactionAsync(async () => {
+    for (const m of movements) {
+      await db.runAsync(
+        'INSERT INTO movements (session_id, position, shot, timestamp_offset_ms, set_index) VALUES (?,?,?,?,?)',
+        m.sessionId, m.position, m.shot ?? null, m.timestampOffsetMs, m.setIndex
+      );
+    }
+  });
 }
 
 // ─── Checkpoints ─────────────────────────────────────────────────────────────

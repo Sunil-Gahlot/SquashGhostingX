@@ -369,6 +369,7 @@ export default function SettingsScreen() {
                   { label: 'Inter.', value: 'intermediate' },
                   { label: 'Adv.',   value: 'advanced'     },
                   { label: 'Elite',  value: 'elite'        },
+                  { label: 'Pro',    value: 'pro'          },
                 ]}
                 selected={settings.defaultDifficulty}
                 onSelect={(v) => updateSettings({ defaultDifficulty: v as any })}

@@ -14,6 +14,8 @@ interface SessionStore {
   drillConfigVisible: boolean;
   /** Checkpoint found on startup — drives ResumePromptModal */
   pendingCheckpoint: SessionCheckpoint | null;
+  /** Set by ResumePromptModal — engine reads this in startActive to restore time/reps */
+  resumeFromCheckpoint: { elapsedSeconds: number; repCount: number } | null;
 
   // Drill config modal
   openDrillConfig: () => void;
@@ -21,6 +23,7 @@ interface SessionStore {
 
   // Checkpoint
   setPendingCheckpoint: (cp: SessionCheckpoint | null) => void;
+  setResumeFromCheckpoint: (data: { elapsedSeconds: number; repCount: number } | null) => void;
 
   // Lifecycle
   initSession: (config: SessionConfig, totalPlanned: number) => void;
@@ -46,6 +49,8 @@ interface SessionStore {
   setWorkSecsRemaining: (secs: number) => void;
   setRestSecsRemaining: (secs: number) => void;
   tickElapsed: () => void;
+  setElapsedSeconds: (secs: number) => void;
+  setRepCount: (count: number) => void;
 }
 
 export const useSessionStore = create<SessionStore>((set) => ({
@@ -53,11 +58,13 @@ export const useSessionStore = create<SessionStore>((set) => ({
   pendingConfig: null,
   drillConfigVisible: false,
   pendingCheckpoint: null,
+  resumeFromCheckpoint: null,
 
   openDrillConfig:  () => set({ drillConfigVisible: true }),
   closeDrillConfig: () => set({ drillConfigVisible: false }),
 
   setPendingCheckpoint: (cp) => set({ pendingCheckpoint: cp }),
+  setResumeFromCheckpoint: (data) => set({ resumeFromCheckpoint: data }),
 
   setPendingConfig:  (config) => set({ pendingConfig: config }),
   clearPendingConfig: ()      => set({ pendingConfig: null }),
@@ -119,4 +126,10 @@ export const useSessionStore = create<SessionStore>((set) => ({
   tickElapsed: () =>
     set((s) =>
       s.session ? { session: { ...s.session, elapsedSeconds: s.session.elapsedSeconds + 1 } } : s),
+
+  setElapsedSeconds: (secs) =>
+    set((s) => s.session ? { session: { ...s.session, elapsedSeconds: secs } } : s),
+
+  setRepCount: (count) =>
+    set((s) => s.session ? { session: { ...s.session, repCount: count } } : s),
 }));

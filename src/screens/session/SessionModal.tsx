@@ -94,7 +94,7 @@ function ActiveTrainingView({
 
   const elapsed   = session.elapsedSeconds;
   const total     = session.config.duration * 60;
-  const remaining = total - elapsed;
+  const remaining = Math.max(0, total - elapsed);
   const rmm = String(Math.floor(remaining / 60)).padStart(2, '0');
   const rss = String(remaining % 60).padStart(2, '0');
 
@@ -452,10 +452,10 @@ function SessionSummaryView({
 
   const completion  = session.totalMovementsPlanned > 0
     ? Math.round((session.repCount / session.totalMovementsPlanned) * 100) : 0;
-  const avgReact    = session.repCount > 0
+  const avgReact      = session.repCount > 0
     ? (durationSecs / session.repCount).toFixed(1) : '—';
-  const avgRecovery = session.config.restSeconds ?? 15;
-  const calories    = Math.round(session.repCount * 0.8);
+  const setsCompleted = session.setIndex;
+  const calories      = Math.round(session.repCount * 0.8);
 
   const sameDrillPrev = recentSessions.filter(
     (s, i) => i > 0 && s.drillType === session.config.drillType,
@@ -519,8 +519,8 @@ function SessionSummaryView({
           value={`${avgReact}s`} label="Avg React"
         />
         <SummaryStatCard
-          icon="locate" iconBg={`${Colors.accentLibrary}22`} iconColor={Colors.accentLibrary}
-          value={`${avgRecovery}s`} label="Avg Recovery"
+          icon="repeat" iconBg={`${Colors.accentLibrary}22`} iconColor={Colors.accentLibrary}
+          value={String(setsCompleted)} label="Sets"
         />
         <SummaryStatCard
           icon="bar-chart" iconBg={`${Colors.accentProgress}22`} iconColor={Colors.accentProgress}

@@ -12,7 +12,7 @@ import { deleteCheckpoint } from '../../db/queries';
 
 export default function ResumePromptModal() {
   const db = useSQLiteContext() as any;
-  const { pendingCheckpoint, setPendingCheckpoint, setPendingConfig } = useSessionStore();
+  const { pendingCheckpoint, setPendingCheckpoint, setPendingConfig, setResumeFromCheckpoint } = useSessionStore();
 
   if (!pendingCheckpoint) return null;
 
@@ -27,7 +27,11 @@ export default function ResumePromptModal() {
   const ss = String(cp.elapsedSeconds % 60).padStart(2, '0');
 
   function handleResume() {
-    // Restore session config — session engine will handle checkpoint restoration
+    // Store restore data so startActive() applies elapsed time + rep count
+    setResumeFromCheckpoint({
+      elapsedSeconds: cp.elapsedSeconds,
+      repCount: cp.movementsCompleted,
+    });
     setPendingConfig(cp.config);
     setPendingCheckpoint(null);
   }

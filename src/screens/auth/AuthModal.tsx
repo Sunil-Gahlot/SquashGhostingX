@@ -543,6 +543,11 @@ function AuthPage({
           setLoading(false);
           return;
         }
+        if (creds) {
+          setError(`An account (${creds.email}) already exists on this device. Sign in to that account, or use Forgot Password to reset it first.`);
+          setLoading(false);
+          return;
+        }
         const passwordHash = await hashPassword(password);
         await SecureStore.setItemAsync(
           AUTH_CREDENTIALS_KEY,

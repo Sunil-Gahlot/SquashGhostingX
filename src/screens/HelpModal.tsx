@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Colors } from '../constants/colors';
@@ -366,6 +366,7 @@ export default function HelpModal({ visible, onClose }: { visible: boolean; onCl
       presentationStyle="fullScreen"
       onRequestClose={onClose}
     >
+      <SafeAreaProvider>
       <SafeAreaView style={s.safe} edges={['top']}>
         {/* Header */}
         <View style={s.header}>
@@ -421,6 +422,7 @@ export default function HelpModal({ visible, onClose }: { visible: boolean; onCl
           </View>
         </ScrollView>
       </SafeAreaView>
+      </SafeAreaProvider>
     </Modal>
   );
 }
