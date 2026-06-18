@@ -1,9 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useRoute, RouteProp } from '@react-navigation/native';
 import {
   View, Text, Image, StyleSheet, ScrollView, TouchableOpacity,
   Modal, Platform, StatusBar, Dimensions,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/colors';
@@ -443,20 +444,54 @@ Personal bests track peak performance across specific drill types and metrics. R
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function LibraryScreen() {
-  const [modalVideo,     setModalVideo]     = useState<VideoItem | null>(null);
-  const [readingArticle, setReadingArticle] = useState<ArticleItem | null>(null);
+  const route = useRoute<RouteProp<{ Library: { articleId?: string } }, 'Library'>>();
+  const [modalVideo,      setModalVideo]      = useState<VideoItem | null>(null);
+  const [readingArticle,  setReadingArticle]  = useState<ArticleItem | null>(null);
+  // BUG-023: track navigation history so ← goes back through prev/next chain.
+  const [articleHistory,  setArticleHistory]  = useState<ArticleItem[]>([]);
+  const [failedThumbs,    setFailedThumbs]    = useState<Set<string>>(new Set());
   const articleScrollRef = useRef<ScrollView>(null);
-  const insets = useSafeAreaInsets();
-  const AM_BTN_TOP = insets.top + 8;
+
+  // Open a specific article when navigated from HomeScreen Training Tips
+  useEffect(() => {
+    const articleId = route.params?.articleId;
+    if (!articleId) return;
+    const target = ARTICLES.find((a) => a.id === articleId);
+    if (target) {
+      setReadingArticle(target);
+      setArticleHistory([]);
+      setTimeout(() => articleScrollRef.current?.scrollTo({ y: 0, animated: false }), 30);
+    }
+  }, [route.params?.articleId]);
 
   const articleIdx  = readingArticle ? ARTICLES.findIndex(a => a.id === readingArticle.id) : -1;
   const prevArticle = articleIdx > 0 ? ARTICLES[articleIdx - 1] : null;
   const nextArticle = articleIdx < ARTICLES.length - 1 ? ARTICLES[articleIdx + 1] : null;
 
   function openArticle(a: ArticleItem) {
+    if (readingArticle) {
+      setArticleHistory(prev => [...prev, readingArticle]);
+    }
     setReadingArticle(a);
-    // key on ScrollView handles reset; belt-and-suspenders scroll for same-article re-tap
     setTimeout(() => articleScrollRef.current?.scrollTo({ y: 0, animated: false }), 30);
+  }
+
+  // BUG-023: ← goes back in reading history; if history is empty, closes the modal.
+  function goBackArticle() {
+    if (articleHistory.length > 0) {
+      const last = articleHistory[articleHistory.length - 1];
+      setArticleHistory(prev => prev.slice(0, -1));
+      setReadingArticle(last);
+      setTimeout(() => articleScrollRef.current?.scrollTo({ y: 0, animated: false }), 30);
+    } else {
+      setReadingArticle(null);
+      setArticleHistory([]);
+    }
+  }
+
+  function closeArticleReader() {
+    setReadingArticle(null);
+    setArticleHistory([]);
   }
 
   return (
@@ -469,51 +504,54 @@ export default function LibraryScreen() {
         statusBarTranslucent
         onRequestClose={() => setModalVideo(null)}
       >
-        <View style={styles.vmContainer}>
-          <StatusBar barStyle="light-content" backgroundColor="#000" />
-          <View style={styles.vmHeader}>
-            <View style={styles.vmTitleRow}>
-              <Ionicons name="logo-youtube" size={16} color="#FF0000" />
-              <Text style={styles.vmTitle} numberOfLines={1}>{modalVideo?.title}</Text>
-            </View>
-            <TouchableOpacity
-              onPress={() => setModalVideo(null)}
-              style={styles.vmClose}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="close" size={20} color="#FFFFFF" />
-              <Text style={styles.vmCloseLabel}>Close</Text>
-            </TouchableOpacity>
-          </View>
-          {modalVideo && (
-            <WebView
-              source={{ uri: watchUrl(modalVideo.youtubeId) }}
-              style={styles.vmWebView}
-              userAgent={SAFARI_UA}
-              javaScriptEnabled
-              domStorageEnabled
-              allowsInlineMediaPlayback
-              allowsFullscreenVideo
-              mediaPlaybackRequiresUserAction={false}
-              sharedCookiesEnabled={Platform.OS === 'ios'}
-              startInLoadingState
-              onShouldStartLoadWithRequest={(req) => {
-                // Block youtube:// and intent:// schemes that would open the native app
-                const u = req.url;
-                if (u.startsWith('youtube://') || u.startsWith('vnd.youtube') || u.startsWith('intent://')) {
-                  return false;
-                }
-                return true;
-              }}
-              renderLoading={() => (
-                <View style={styles.vmLoading}>
-                  <Ionicons name="logo-youtube" size={48} color="#FF0000" />
-                  <Text style={styles.vmLoadingText}>Loading…</Text>
+        <SafeAreaProvider>
+          <View style={styles.vmContainer}>
+            <StatusBar barStyle="light-content" backgroundColor="#000" />
+            <SafeAreaView edges={['top']} style={{ backgroundColor: '#111' }}>
+              <View style={styles.vmHeader}>
+                <View style={styles.vmTitleRow}>
+                  <Ionicons name="logo-youtube" size={16} color="#FF0000" />
+                  <Text style={styles.vmTitle} numberOfLines={1}>{modalVideo?.title}</Text>
                 </View>
-              )}
-            />
-          )}
-        </View>
+                <TouchableOpacity
+                  onPress={() => setModalVideo(null)}
+                  style={styles.vmClose}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="close" size={20} color="#FFFFFF" />
+                  <Text style={styles.vmCloseLabel}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </SafeAreaView>
+            {modalVideo && (
+              <WebView
+                source={{ uri: watchUrl(modalVideo.youtubeId) }}
+                style={styles.vmWebView}
+                userAgent={SAFARI_UA}
+                javaScriptEnabled
+                domStorageEnabled
+                allowsInlineMediaPlayback
+                allowsFullscreenVideo
+                mediaPlaybackRequiresUserAction={false}
+                sharedCookiesEnabled={Platform.OS === 'ios'}
+                startInLoadingState
+                onShouldStartLoadWithRequest={(req) => {
+                  const u = req.url;
+                  if (u.startsWith('youtube://') || u.startsWith('vnd.youtube') || u.startsWith('intent://')) {
+                    return false;
+                  }
+                  return true;
+                }}
+                renderLoading={() => (
+                  <View style={styles.vmLoading}>
+                    <Ionicons name="logo-youtube" size={48} color="#FF0000" />
+                    <Text style={styles.vmLoadingText}>Loading…</Text>
+                  </View>
+                )}
+              />
+            )}
+          </View>
+        </SafeAreaProvider>
       </Modal>
 
       {/* ── ARTICLE READER MODAL ────────────────────────────────── */}
@@ -521,9 +559,10 @@ export default function LibraryScreen() {
         visible={readingArticle !== null}
         animationType="slide"
         statusBarTranslucent
-        onRequestClose={() => setReadingArticle(null)}
+        onRequestClose={goBackArticle}
       >
-        <View style={styles.amContainer}>
+        <SafeAreaProvider>
+          <View style={styles.amContainer}>
           <StatusBar barStyle="light-content" backgroundColor="transparent" />
 
           {/* Scrollable content — starts from very top (behind floating header) */}
@@ -602,26 +641,32 @@ export default function LibraryScreen() {
             </View>
           </ScrollView>
 
-          {/* Floating back button — absolutely positioned so touch always works */}
-          <TouchableOpacity
-            style={[styles.amFloatBtn, { position: 'absolute', top: AM_BTN_TOP, left: Spacing.base, zIndex: 30 }]}
-            onPress={() => setReadingArticle(null)}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            activeOpacity={0.7}
+          {/* Floating nav row — SafeAreaView handles correct top inset inside modal */}
+          <SafeAreaView
+            edges={['top']}
+            style={styles.amFloatBar}
+            pointerEvents="box-none"
           >
-            <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
-          </TouchableOpacity>
-
-          {/* Floating close button */}
-          <TouchableOpacity
-            style={[styles.amFloatBtn, { position: 'absolute', top: AM_BTN_TOP, right: Spacing.base, zIndex: 30 }]}
-            onPress={() => setReadingArticle(null)}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="close" size={22} color="#FFFFFF" />
-          </TouchableOpacity>
-        </View>
+            {/* BUG-023: ← navigates back through reading history; × always closes */}
+            <TouchableOpacity
+              style={styles.amFloatBtn}
+              onPress={goBackArticle}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              activeOpacity={0.7}
+            >
+              <Ionicons name={articleHistory.length > 0 ? 'arrow-back' : 'arrow-back'} size={22} color="#FFFFFF" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.amFloatBtn}
+              onPress={closeArticleReader}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="close" size={22} color="#FFFFFF" />
+            </TouchableOpacity>
+          </SafeAreaView>
+          </View>
+        </SafeAreaProvider>
       </Modal>
 
       {/* ── MAIN SCROLL ─────────────────────────────────────────── */}
@@ -651,7 +696,18 @@ export default function LibraryScreen() {
               activeOpacity={0.85}
             >
               <View style={styles.vcThumbWrap}>
-                <Image source={{ uri: thumbUrl(v.youtubeId) }} style={styles.vcThumb} resizeMode="cover" />
+                {failedThumbs.has(v.youtubeId) ? (
+                  <View style={[styles.vcThumb, styles.vcThumbFallback]}>
+                    <Ionicons name="logo-youtube" size={28} color="rgba(255,255,255,0.3)" />
+                  </View>
+                ) : (
+                  <Image
+                    source={{ uri: thumbUrl(v.youtubeId) }}
+                    style={styles.vcThumb}
+                    resizeMode="cover"
+                    onError={() => setFailedThumbs(prev => new Set([...prev, v.youtubeId]))}
+                  />
+                )}
                 <View style={styles.vcOverlay} />
                 {/* Play button centred */}
                 <View style={styles.vcPlayCircle}>
@@ -754,6 +810,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surfaceElevated, marginBottom: 6,
   },
   vcThumb:           { width: '100%', height: '100%' },
+  vcThumbFallback:   { alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surfaceElevated },
   vcOverlay:         { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.28)' },
   vcPlayCircle:      { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center' },
   vcPlayCircleInner: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.55)', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.30)', alignItems: 'center', justifyContent: 'center' },
@@ -791,8 +848,7 @@ const styles = StyleSheet.create({
   vmHeader: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: Spacing.base,
-    paddingTop: Platform.OS === 'ios' ? 56 : (StatusBar.currentHeight ?? 0) + 8,
-    paddingBottom: Spacing.sm,
+    paddingVertical: Spacing.sm,
     backgroundColor: '#111',
   },
   vmTitleRow:    { flex: 1, flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, marginRight: Spacing.md },
@@ -813,7 +869,13 @@ const styles = StyleSheet.create({
   // ── Article modal ────────────────────────────────────────────────────────────
   amContainer: { flex: 1, backgroundColor: Colors.background },
 
-  // Floating buttons (positioned directly on amContainer, no wrapper)
+  // Floating nav row — absolutely positioned, SafeAreaView inside provides top inset
+  amFloatBar: {
+    position: 'absolute', top: 0, left: 0, right: 0, zIndex: 30,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: Spacing.base, paddingBottom: Spacing.sm,
+  },
+
   amFloatBtn: {
     width: 44, height: 44, borderRadius: 22,
     backgroundColor: 'rgba(0,0,0,0.42)',

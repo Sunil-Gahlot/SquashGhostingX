@@ -20,8 +20,8 @@ export type Tempo = 'slow' | 'natural' | 'explosive';
 export type Difficulty = 'beginner' | 'intermediate' | 'advanced' | 'elite' | 'pro';
 export type DrillType = 'movement' | 'shot-based' | 'match-sim' | 'custom';
 export type VoiceMode = 'voice+visual' | 'voice-only' | 'visual-only' | 'beep';
-export type ShotGroup = 'drives' | 'drops' | 'boasts' | 'volleys' | 'lobs' | 'kills' | 'cross' | 'mixed' | 'rails' | 'diagonals' | 'front-court';
-export type RestMode = 'auto' | 'manual';
+export type ShotGroup = 'drives' | 'lengths' | 'drops' | 'kills' | 'lobs' | 'boasts' | 'volleys' | 'deception' | 'mixed';
+export type RestMode = 'auto' | 'manual' | 'none';
 
 export interface SessionConfig {
   drillType: DrillType;

@@ -207,6 +207,17 @@ function WelcomePage({
         <Text style={wStyles.brandName}>SquashGhostingX</Text>
       </View>
 
+      {/* Tagline */}
+      <Text style={wStyles.tagline}>
+        {'Train '}
+        <Text style={wStyles.taglineGreen}>Smart.</Text>
+        <Text style={wStyles.taglineSep}>{' · '}</Text>
+        {'Move '}
+        <Text style={wStyles.taglineOrange}>Faster.</Text>
+        <Text style={wStyles.taglineSep}>{' · '}</Text>
+        {'Dominate the Court.'}
+      </Text>
+
       {/* Slides — native horizontal paging */}
       <FlatList
         ref={flatListRef}
@@ -246,10 +257,9 @@ function WelcomePage({
         <Text style={wStyles.signInBtnText}>Sign In</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={wStyles.guestRow} onPress={onGuest} activeOpacity={0.7}>
-        <Ionicons name="person-outline" size={13} color={Colors.textMuted} />
-        <Text style={wStyles.guestRowText}>Continue as Guest</Text>
-        <Ionicons name="chevron-forward" size={11} color={Colors.textMuted} />
+      <TouchableOpacity style={wStyles.guestBtn} onPress={onGuest} activeOpacity={0.75}>
+        <Ionicons name="person-outline" size={14} color={Colors.textSecondary} />
+        <Text style={wStyles.guestBtnText}>Continue as Guest</Text>
       </TouchableOpacity>
     </View>
   );
@@ -300,6 +310,20 @@ const wStyles = StyleSheet.create({
     flex: 1,
     flexShrink: 1,
   },
+
+  // Tagline
+  tagline: {
+    fontSize: FontSize.caption,
+    fontWeight: FontWeight.semiBold,
+    color: Colors.textMuted,
+    letterSpacing: 0.3,
+    textAlign: 'center',
+    marginBottom: Spacing.md,
+  },
+  taglineGreen:  { color: '#34C759', fontWeight: FontWeight.bold },
+  taglineOrange: { color: Colors.brand, fontWeight: FontWeight.bold },
+  taglineSep:    { color: 'rgba(255,255,255,0.35)', fontWeight: FontWeight.regular },
+
   // FlatList — fills remaining vertical space; escape container's horizontal padding via negative margin
   flatList: {
     flex: 1,
@@ -440,16 +464,20 @@ const wStyles = StyleSheet.create({
     color: Colors.textPrimary,
   },
 
-  guestRow: {
+  guestBtn: {
+    width: '100%',
+    height: 44,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1,
+    borderColor: Colors.border,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: Spacing.xs,
-    paddingVertical: Spacing.sm,
   },
-  guestRowText: {
-    fontSize: FontSize.caption,
-    color: Colors.textMuted,
+  guestBtnText: {
+    fontSize: FontSize.label,
+    color: Colors.textSecondary,
     fontWeight: FontWeight.medium,
   },
 });
@@ -543,11 +571,9 @@ function AuthPage({
           setLoading(false);
           return;
         }
-        if (creds) {
-          setError(`An account (${creds.email}) already exists on this device. Sign in to that account, or use Forgot Password to reset it first.`);
-          setLoading(false);
-          return;
-        }
+        // BUG-004: allow a different email to register — overwrite the stored credentials
+        // so a second user (family member, new owner) can use the device.
+        // The previous account data remains in the local DB but the new credentials take over.
         const passwordHash = await hashPassword(password);
         await SecureStore.setItemAsync(
           AUTH_CREDENTIALS_KEY,
@@ -612,7 +638,7 @@ function AuthPage({
 
     Alert.alert(
       'Reset Password',
-      `Reset the password for ${trimmedEmail}?\n\nThis will clear your saved credentials on this device. You can then create a new password.`,
+      `This app stores your password locally on this device only — there is no server reset link.\n\nTapping Reset will clear the saved password for ${trimmedEmail}. You can then register again with a new password. Your training data will not be affected.`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -985,21 +1011,37 @@ const aStyles = StyleSheet.create({
 // ─── Main modal ───────────────────────────────────────────────────────────────
 
 export default function AuthModal() {
-  const { profile, hasCompletedAuth, completeAuth, completeOnboarding, setProfile } = useProfileStore();
+  const { profile, hasCompletedAuth, isOnboardingComplete, completeAuth, completeOnboarding, setProfile } = useProfileStore();
 
-  const [page, setPage] = useState<'welcome' | 'register' | 'login'>('welcome');
+  const [page, setPage] = useState<'welcome' | 'register' | 'login' | 'guest-name' | 'guest-prefs'>('welcome');
 
   if (hasCompletedAuth) return null;
 
   function handleAuthComplete(email?: string) {
-    const isGuest = !email;
-    if (email && !profile.name) {
+    if (!email) {
+      // Returning guest — already has a name from a previous session, skip name entry
+      if (profile.name.trim() && isOnboardingComplete) {
+        completeAuth(undefined);
+        return;
+      }
+      setPage('guest-name');
+      return;
+    }
+    if (!profile.name) {
       setProfile({ name: email.split('@')[0] });
     }
     completeAuth(email);
-    if (isGuest) {
-      completeOnboarding();
-    }
+  }
+
+  function handleGuestNameContinue(name: string) {
+    if (name.trim()) setProfile({ name: name.trim() });
+    setPage('guest-prefs');
+  }
+
+  function handleGuestPrefsContinue(skill: string, hand: string, voiceGender: string) {
+    setProfile({ skillLevel: skill as any, dominantHand: hand as any, voiceGender: voiceGender as any });
+    completeAuth(undefined);
+    completeOnboarding();
   }
 
   return (
@@ -1024,6 +1066,18 @@ export default function AuthModal() {
             onBack={() => setPage('welcome')}
           />
         )}
+        {page === 'guest-name' && (
+          <GuestNamePage
+            onContinue={handleGuestNameContinue}
+            onBack={() => setPage('welcome')}
+          />
+        )}
+        {page === 'guest-prefs' && (
+          <GuestPrefsPage
+            onContinue={handleGuestPrefsContinue}
+            onBack={() => setPage('guest-name')}
+          />
+        )}
       </SafeAreaView>
       </SafeAreaProvider>
     </Modal>
@@ -1032,4 +1086,195 @@ export default function AuthModal() {
 
 const modalStyles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
+});
+
+// ─── GuestNamePage ────────────────────────────────────────────────────────────
+
+function GuestNamePage({
+  onContinue,
+  onBack,
+}: {
+  onContinue: (name: string) => void;
+  onBack: () => void;
+}) {
+  const [name, setName] = useState('');
+  return (
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+      <ScrollView
+        style={gnStyles.scroll}
+        contentContainerStyle={gnStyles.content}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <TouchableOpacity
+          onPress={onBack}
+          style={aStyles.backBtn}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons name="arrow-back" size={22} color={Colors.textSecondary} />
+        </TouchableOpacity>
+
+        <View style={gnStyles.iconCircle}>
+          <Ionicons name="person" size={40} color={Colors.brand} />
+        </View>
+
+        <Text style={gnStyles.heading}>{"What should we\ncall you?"}</Text>
+        <Text style={gnStyles.sub}>Optional — you can change this anytime in Profile.</Text>
+
+        <View style={[aStyles.inputWrap, gnStyles.inputWrap]}>
+          <Ionicons name="person-outline" size={18} color={Colors.textMuted} style={aStyles.inputIcon} />
+          <TextInput
+            style={aStyles.input}
+            value={name}
+            onChangeText={setName}
+            placeholder="Your name"
+            placeholderTextColor={Colors.textMuted}
+            autoCapitalize="words"
+            returnKeyType="done"
+            onSubmitEditing={() => onContinue(name)}
+            maxLength={32}
+            autoFocus
+          />
+        </View>
+
+        <TouchableOpacity
+          style={aStyles.submitBtn}
+          onPress={() => onContinue(name)}
+          activeOpacity={0.88}
+        >
+          <Text style={aStyles.submitText}>{name.trim() ? 'Continue' : 'Skip'}</Text>
+          <Ionicons name="arrow-forward" size={18} color={Colors.textInverse} />
+        </TouchableOpacity>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  );
+}
+
+const gnStyles = StyleSheet.create({
+  scroll:     { flex: 1, backgroundColor: Colors.background },
+  content:    { padding: Spacing.base, paddingTop: Spacing.lg, paddingBottom: Spacing.xl },
+  iconCircle: {
+    width: 88, height: 88, borderRadius: 44,
+    backgroundColor: Colors.brandMuted,
+    alignItems: 'center', justifyContent: 'center',
+    marginBottom: Spacing.xl, marginTop: Spacing.xl,
+  },
+  heading: {
+    fontSize: 30, fontWeight: FontWeight.black, color: Colors.textPrimary,
+    lineHeight: 38, marginBottom: Spacing.sm, letterSpacing: -0.5,
+  },
+  sub: {
+    fontSize: FontSize.label, color: Colors.textMuted,
+    lineHeight: 22, marginBottom: Spacing.xl,
+  },
+  inputWrap: { marginBottom: Spacing.xl },
+});
+
+// ─── GuestPrefsPage ───────────────────────────────────────────────────────────
+
+function GuestPrefsPage({
+  onContinue,
+  onBack,
+}: {
+  onContinue: (skill: string, hand: string, voiceGender: string) => void;
+  onBack: () => void;
+}) {
+  const [skill, setSkill]       = useState('intermediate');
+  const [hand,  setHand]        = useState('right');
+  const [voice, setVoice]       = useState('female');
+
+  const SKILLS = [
+    { value: 'beginner',     label: 'Beginner' },
+    { value: 'intermediate', label: 'Intermediate' },
+    { value: 'advanced',     label: 'Advanced' },
+    { value: 'elite',        label: 'Elite' },
+  ];
+
+  return (
+    <ScrollView
+      style={gpStyles.scroll}
+      contentContainerStyle={gpStyles.content}
+      showsVerticalScrollIndicator={false}
+    >
+      <TouchableOpacity onPress={onBack} style={aStyles.backBtn} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+        <Ionicons name="arrow-back" size={22} color={Colors.textSecondary} />
+      </TouchableOpacity>
+
+      <Text style={gpStyles.heading}>Quick Setup</Text>
+      <Text style={gpStyles.sub}>Personalises your first session. Takes 10 seconds.</Text>
+
+      <Text style={gpStyles.sectionLabel}>SKILL LEVEL</Text>
+      <View style={gpStyles.pillRow}>
+        {SKILLS.map((s) => (
+          <TouchableOpacity
+            key={s.value}
+            style={[gpStyles.pill, skill === s.value && gpStyles.pillSel]}
+            onPress={() => setSkill(s.value)}
+            activeOpacity={0.75}
+          >
+            <Text style={[gpStyles.pillText, skill === s.value && gpStyles.pillTextSel]}>{s.label}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <Text style={gpStyles.sectionLabel}>DOMINANT HAND</Text>
+      <View style={gpStyles.pillRow}>
+        {[{ value: 'right', label: 'Right' }, { value: 'left', label: 'Left' }].map((h) => (
+          <TouchableOpacity
+            key={h.value}
+            style={[gpStyles.pill, gpStyles.pillHalf, hand === h.value && gpStyles.pillSel]}
+            onPress={() => setHand(h.value)}
+            activeOpacity={0.75}
+          >
+            <Text style={[gpStyles.pillText, hand === h.value && gpStyles.pillTextSel]}>{h.label}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <Text style={gpStyles.sectionLabel}>COACH VOICE</Text>
+      <View style={gpStyles.pillRow}>
+        {[{ value: 'female', label: 'Female' }, { value: 'male', label: 'Male' }].map((v) => (
+          <TouchableOpacity
+            key={v.value}
+            style={[gpStyles.pill, gpStyles.pillHalf, voice === v.value && gpStyles.pillSel]}
+            onPress={() => setVoice(v.value)}
+            activeOpacity={0.75}
+          >
+            <Text style={[gpStyles.pillText, voice === v.value && gpStyles.pillTextSel]}>{v.label}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <TouchableOpacity
+        style={aStyles.submitBtn}
+        onPress={() => onContinue(skill, hand, voice)}
+        activeOpacity={0.88}
+      >
+        <Text style={aStyles.submitText}>Start Training</Text>
+        <Ionicons name="arrow-forward" size={18} color={Colors.textInverse} />
+      </TouchableOpacity>
+    </ScrollView>
+  );
+}
+
+const gpStyles = StyleSheet.create({
+  scroll:   { flex: 1, backgroundColor: Colors.background },
+  content:  { padding: Spacing.base, paddingTop: Spacing.lg, paddingBottom: Spacing.xl },
+  heading:  { fontSize: 30, fontWeight: FontWeight.black, color: Colors.textPrimary, lineHeight: 38, marginBottom: Spacing.sm, letterSpacing: -0.5, marginTop: Spacing.xl },
+  sub:      { fontSize: FontSize.label, color: Colors.textMuted, lineHeight: 22, marginBottom: Spacing.xl },
+  sectionLabel: {
+    fontSize: FontSize.micro, fontWeight: FontWeight.bold, color: Colors.textDisabled,
+    letterSpacing: 1.3, marginBottom: Spacing.sm, marginTop: Spacing.lg,
+  },
+  pillRow:  { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm, marginBottom: Spacing.sm },
+  pill:     {
+    paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1.5, borderColor: Colors.border,
+    backgroundColor: Colors.surface,
+  },
+  pillHalf: { flex: 1 },
+  pillSel:  { borderColor: Colors.brand, backgroundColor: Colors.brandSoft },
+  pillText: { fontSize: FontSize.label, color: Colors.textSecondary, fontWeight: FontWeight.medium, textAlign: 'center' },
+  pillTextSel: { color: Colors.brand, fontWeight: FontWeight.bold },
 });

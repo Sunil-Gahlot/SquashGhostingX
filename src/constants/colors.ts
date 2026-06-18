@@ -53,7 +53,7 @@ export const Colors = {
   textPrimary:   '#FFFFFF',
   textSecondary: '#BEBEBE',
   textMuted:     '#9A9A9A',
-  textDisabled:  '#2E2E2E',
+  textDisabled:  '#636363',
   textInverse:   '#0A0A0A',
 
   // ─── Semantic ─────────────────────────────────────────────────────────────

@@ -152,6 +152,7 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
                 onPress={async () => {
                   setProfile({ language: item.value });
                   setLangVisible(false);
+                  if (!settings.voiceEnabled) return;
                   await Audio.initAudioSession();
                   Audio.speakText('Front Left. Recover to T.', settings.speechRate, item.value, profile.voiceGender);
                 }}
@@ -281,9 +282,8 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
                   keyboardType="number-pad"
                   maxLength={4}
                 />
-                {calcAge(dobDay, dobMonth, dobYear) !== null && (
-                  <Text style={sStyles.ageCalc}>{calcAge(dobDay, dobMonth, dobYear)} yrs</Text>
-                )}
+                {/* BUG-032: compute calcAge once to avoid calling it twice */}
+                {(() => { const a = calcAge(dobDay, dobMonth, dobYear); return a !== null ? <Text style={sStyles.ageCalc}>{a} yrs</Text> : null; })()}
               </View>
             </View>
             <Div />
@@ -292,14 +292,18 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
                 <Ionicons name="person-circle-outline" size={17} color={Colors.textMuted} />
               </View>
               <Text style={sStyles.fieldLabel}>Gender</Text>
+              {/* BUG-021: gender and voiceGender are decoupled — changing gender no longer auto-sets voice. */}
+              {/* BUG-034: added Non-Binary option. */}
               <PillSelector
-                options={[{ label: 'Male', value: 'male' }, { label: 'Female', value: 'female' }]}
+                options={[
+                  { label: 'Male',       value: 'male'      },
+                  { label: 'Female',     value: 'female'    },
+                  { label: 'Non-Binary', value: 'nonbinary' },
+                ]}
                 selected={profile.gender ?? 'male'}
-                onSelect={(v) => {
-                  setProfile({ gender: v });
-                  if (v === 'male' || v === 'female') setProfile({ voiceGender: v as VoiceGender });
-                }}
+                onSelect={(v) => setProfile({ gender: v })}
                 size="sm"
+                scrollable
               />
             </View>
           </Card>
@@ -365,6 +369,7 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
                 onSelect={async (v) => {
                   const gender = v as VoiceGender;
                   setProfile({ voiceGender: gender });
+                  if (!settings.voiceEnabled) return;
                   await Audio.initAudioSession();
                   Audio.speakText('Front Left. Recover to T.', settings.speechRate, profile.language, gender);
                 }}

@@ -102,11 +102,11 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 1.5
 <body>
 
 <nav>
-  <a href="index.html" class="nav-logo" aria-label="SquashGhostingX Home">
+  <a href="/" class="nav-logo" aria-label="SquashGhostingX Home">
     <div class="nav-logo-icon">SX</div>
     <span class="nav-logo-squash">Squash</span><span class="nav-logo-ghosting">GhostingX</span>
   </a>
-  <a href="index.html" class="nav-back">
+  <a href="/" class="nav-back">
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     Back to home
   </a>
@@ -132,7 +132,6 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 1.5
   </div>
 
   <div class="form-card">
-    <!-- Formspree integration — replace YOUR_FORM_ID after signing up at formspree.io -->
     <form id="support-form">
       <input type="hidden" name="_subject" value="SquashGhostingX Support Request">
       <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
@@ -186,15 +185,14 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 1.5
 <footer>
   <div class="footer-copy">© 2026 SquashGhostingX · All rights reserved</div>
   <div class="footer-links-row">
-    <a href="index.html">Home</a>
-    <a href="privacy.html">Privacy Policy</a>
-    <a href="terms.html">Terms of Use</a>
-    <a href="support.html">Support</a>
+    <a href="/">Home</a>
+    <a href="/privacy">Privacy Policy</a>
+    <a href="/terms">Terms of Use</a>
+    <a href="/support">Support</a>
   </div>
 </footer>
 
 <script>
-/* Formspree integration — replace YOUR_FORM_ID after signing up at formspree.io */
 (function() {
   var form    = document.getElementById('support-form');
   var btn     = document.getElementById('s-btn');
@@ -205,7 +203,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 1.5
     btn.textContent = 'Sending…';
     success.classList.remove('show');
     var data = new FormData(form);
-    fetch('https://formspree.io/f/YOUR_FORM_ID', {
+    fetch('https://formsubmit.co/ajax/squash.ghostingx@gmail.com', {
       method: 'POST',
       body: data,
       headers: { 'Accept': 'application/json' }

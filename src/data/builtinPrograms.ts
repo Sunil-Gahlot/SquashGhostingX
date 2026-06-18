@@ -22,7 +22,7 @@ export const BUILTIN_PROGRAMS: Program[] = [
   {
     id: 'first-steps',
     name: 'First Steps',
-    description: '4-corner drill at a forgiving pace. Learn the court.',
+    description: 'Front corners (FL & FR) at a forgiving pace. Learn your first two positions.',
     level: 'beginner', estimatedMinutes: 8, isBuiltin: true,
     tags: ['beginner', 'footwork'],
     config: { ...base, drillType: 'movement', courtSystem: '6pt', coverage: 'front', patternType: 'fixed', tempo: 'slow', difficulty: 'beginner', duration: 8, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
@@ -64,7 +64,7 @@ export const BUILTIN_PROGRAMS: Program[] = [
   {
     id: 'cross-court-pattern',
     name: 'Cross Court Pattern',
-    description: 'FL→BR→FR→BL diagonal pattern to build width.',
+    description: 'Fixed sequence across all 6 positions. Build consistency and court range.',
     level: 'intermediate', estimatedMinutes: 12, isBuiltin: true,
     tags: ['intermediate', 'pattern', 'diagonal'],
     config: { ...base, drillType: 'movement', courtSystem: '6pt', coverage: 'full', patternType: 'fixed', tempo: 'natural', difficulty: 'intermediate', duration: 12, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
@@ -109,7 +109,7 @@ export const BUILTIN_PROGRAMS: Program[] = [
     description: '6-point at pro tempo. Race the clock.',
     level: 'advanced', estimatedMinutes: 15, isBuiltin: true,
     tags: ['advanced', 'speed', 'explosive'],
-    config: { ...base, drillType: 'movement', courtSystem: '6pt', coverage: 'full', patternType: 'random', tempo: 'explosive', difficulty: 'elite', duration: 15, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
+    config: { ...base, drillType: 'movement', courtSystem: '6pt', coverage: 'full', patternType: 'random', tempo: 'explosive', difficulty: 'advanced', duration: 15, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
   },
 
   // ─── Pro ──────────────────────────────────────────────────────────────────
@@ -143,7 +143,7 @@ export const BUILTIN_PROGRAMS: Program[] = [
     description: '30 minutes continuous at explosive pace. No mercy — pure sustained output.',
     level: 'pro', estimatedMinutes: 30, isBuiltin: true,
     tags: ['pro', 'explosive', 'endurance', 'no-rest'],
-    config: { ...base, drillType: 'movement', courtSystem: '6pt', coverage: 'full', patternType: 'random', tempo: 'explosive', difficulty: 'pro', duration: 30, restMode: 'manual', restSeconds: 0, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
+    config: { ...base, drillType: 'movement', courtSystem: '6pt', coverage: 'full', patternType: 'random', tempo: 'explosive', difficulty: 'pro', duration: 30, restMode: 'none', restSeconds: 0, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
   },
   {
     id: 'total-court-mastery',
@@ -169,7 +169,7 @@ export const BUILTIN_PROGRAMS: Program[] = [
     description: '5 minutes continuous. No rest. Pure endurance.',
     level: 'elite', estimatedMinutes: 5, isBuiltin: true,
     tags: ['elite', 'endurance', 'no-rest'],
-    config: { ...base, drillType: 'movement', courtSystem: '6pt', coverage: 'full', patternType: 'random', tempo: 'natural', difficulty: 'elite', duration: 5, restMode: 'manual', restSeconds: 0, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
+    config: { ...base, drillType: 'movement', courtSystem: '6pt', coverage: 'full', patternType: 'random', tempo: 'natural', difficulty: 'elite', duration: 5, restMode: 'none', restSeconds: 0, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
   },
   {
     id: 'cool-down',
@@ -219,11 +219,12 @@ export function getSuggestedDrill(
   const pool = varied.length > 0 ? varied : levelPrograms;
 
   if (pool.length > 0) {
-    return { program: pool[0], reason: totalSessions === 0 ? 'Start here' : 'Matched to your level' };
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    return { program: pick, reason: totalSessions === 0 ? 'Start here' : 'Matched to your level' };
   }
 
   return {
-    program: BUILTIN_PROGRAMS.find((p) => p.id === 'court-coverage')!,
+    program: BUILTIN_PROGRAMS.find((p) => p.id === 'court-coverage') ?? BUILTIN_PROGRAMS[0],
     reason: 'Your daily ghosting session',
   };
 }

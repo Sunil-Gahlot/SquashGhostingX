@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal,
 } from 'react-native';
+import Svg, { Rect, Line, Circle, Text as SvgText, G, Defs, LinearGradient as SvgGradient, Stop } from 'react-native-svg';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -19,73 +20,203 @@ function Bullet({ text }: { text: string }) {
   );
 }
 
-function CourtCell({ code, label, color }: { code: string; label: string; color: string }) {
+// ─── Glass Court Diagram ─────────────────────────────────────────────────────
+const VB_W = 320;
+const VB_H = 496;
+const CL   = 20;   // court left x in SVG units
+const CT   = 24;   // court top y in SVG units
+const CW   = 280;  // court width in SVG units  (= real 6.4 m)
+const CH   = 448;  // court height in SVG units (= real 9.75 m)
+function sX(x: number) { return CL + ((x + 3.2) / 6.4) * CW; }
+function sY(z: number) { return CT + (z / 9.75) * CH; }
+const SHORT_Y   = sY(4.26);
+const SERVICE_Y = sY(4.26 + 1.6);
+const HALF_X    = sX(0);
+type ZoneName = 'front' | 'mid' | 'back';
+const ZC: Record<ZoneName, string> = { front: '#FF6B35', mid: '#0A84FF', back: '#34C759' };
+type PosItem = { code: string; label: string; sx: number; sy: number; z: ZoneName };
+
+const POS6: PosItem[] = [
+  { code: 'FL',  label: 'Front Left',  sx: sX(-2.2), sy: sY(1.0), z: 'front' },
+  { code: 'FR',  label: 'Front Right', sx: sX( 2.2), sy: sY(1.0), z: 'front' },
+  { code: 'ML',  label: 'Mid Left',    sx: sX(-2.0), sy: sY(4.6), z: 'mid'   },
+  { code: 'MR',  label: 'Mid Right',   sx: sX( 2.0), sy: sY(4.6), z: 'mid'   },
+  { code: 'BL',  label: 'Back Left',   sx: sX(-2.2), sy: sY(8.5), z: 'back'  },
+  { code: 'BR',  label: 'Back Right',  sx: sX( 2.2), sy: sY(8.5), z: 'back'  },
+];
+
+const POS10: PosItem[] = [
+  { code: 'FL',  label: 'Front Left',  sx: sX(-2.2), sy: sY(1.0), z: 'front' },
+  { code: 'FR',  label: 'Front Right', sx: sX( 2.2), sy: sY(1.0), z: 'front' },
+  { code: 'FML', label: 'Front Mid L', sx: sX(-2.0), sy: sY(2.8), z: 'front' },
+  { code: 'FMR', label: 'Front Mid R', sx: sX( 2.0), sy: sY(2.8), z: 'front' },
+  { code: 'ML',  label: 'Mid Left',    sx: sX(-2.0), sy: sY(4.6), z: 'mid'   },
+  { code: 'MR',  label: 'Mid Right',   sx: sX( 2.0), sy: sY(4.6), z: 'mid'   },
+  { code: 'BML', label: 'Back Mid L',  sx: sX(-2.0), sy: sY(6.5), z: 'back'  },
+  { code: 'BMR', label: 'Back Mid R',  sx: sX( 2.0), sy: sY(6.5), z: 'back'  },
+  { code: 'BL',  label: 'Back Left',   sx: sX(-2.2), sy: sY(8.5), z: 'back'  },
+  { code: 'BR',  label: 'Back Right',  sx: sX( 2.2), sy: sY(8.5), z: 'back'  },
+];
+
+function GlassCourtDiagram({ system }: { system: '6pt' | '10pt' }) {
+  const positions = system === '10pt' ? POS10 : POS6;
+  const R = 15;
+  const pairs: [PosItem, PosItem | null][] = [];
+  for (let i = 0; i < positions.length; i += 2) pairs.push([positions[i], positions[i + 1] ?? null]);
+
   return (
-    <View style={[s.courtPos, { backgroundColor: `${color}20`, borderColor: `${color}40` }]}>
-      <Text style={[s.courtPosCode, { color }]}>{code}</Text>
-      <Text style={s.courtPosLabel}>{label}</Text>
+    <View>
+      <View style={cs.svgWrap}>
+        <Svg viewBox={`0 0 ${VB_W} ${VB_H}`} width="100%" height="100%">
+          <Defs>
+            <SvgGradient id="cg" x1="0" y1="0" x2="0" y2="1">
+              <Stop offset="0"   stopColor="#071828" stopOpacity="1" />
+              <Stop offset="0.5" stopColor="#050F1C" stopOpacity="1" />
+              <Stop offset="1"   stopColor="#030A14" stopOpacity="1" />
+            </SvgGradient>
+          </Defs>
+
+          {/* Outer background */}
+          <Rect x={0} y={0} width={VB_W} height={VB_H} fill="#020810" />
+
+          {/* Glass court floor */}
+          <Rect x={CL} y={CT} width={CW} height={CH} fill="url(#cg)" />
+
+          {/* Subtle zone tints */}
+          <Rect x={CL} y={CT}       width={CW} height={sY(2.2) - CT}      fill="rgba(255,107,53,0.06)" />
+          <Rect x={CL} y={sY(2.2)}  width={CW} height={sY(7.0) - sY(2.2)} fill="rgba(10,132,255,0.04)" />
+          <Rect x={CL} y={sY(7.0)}  width={CW} height={CT + CH - sY(7.0)} fill="rgba(52,199,89,0.06)"  />
+
+          {/* Court outer boundary */}
+          <Rect x={CL} y={CT} width={CW} height={CH}
+            fill="none" stroke="rgba(180,220,255,0.9)" strokeWidth={2.5} />
+
+          {/* Short line (full width) */}
+          <Line x1={CL} y1={SHORT_Y} x2={CL + CW} y2={SHORT_Y}
+            stroke="rgba(180,220,255,0.75)" strokeWidth={1.5} />
+
+          {/* Half-court line: short line to back wall */}
+          <Line x1={HALF_X} y1={SHORT_Y} x2={HALF_X} y2={CT + CH}
+            stroke="rgba(180,220,255,0.6)" strokeWidth={1.5} />
+
+          {/* Service box end line */}
+          <Line x1={CL} y1={SERVICE_Y} x2={CL + CW} y2={SERVICE_Y}
+            stroke="rgba(180,220,255,0.35)" strokeWidth={1} />
+
+          {/* Service box inner verticals */}
+          <Line x1={CL + CW * 0.25} y1={SHORT_Y} x2={CL + CW * 0.25} y2={SERVICE_Y}
+            stroke="rgba(180,220,255,0.25)" strokeWidth={1} />
+          <Line x1={CL + CW * 0.75} y1={SHORT_Y} x2={CL + CW * 0.75} y2={SERVICE_Y}
+            stroke="rgba(180,220,255,0.25)" strokeWidth={1} />
+
+          {/* Front wall / back wall labels */}
+          <SvgText x={VB_W / 2} y={16} textAnchor="middle"
+            fill="rgba(180,220,255,0.5)" fontSize={8} fontWeight="bold" letterSpacing={2}>
+            {'▲  FRONT WALL  ▲'}
+          </SvgText>
+          <SvgText x={VB_W / 2} y={VB_H - 6} textAnchor="middle"
+            fill="rgba(180,220,255,0.5)" fontSize={8} fontWeight="bold" letterSpacing={2}>
+            {'▼  BACK WALL  ▼'}
+          </SvgText>
+
+          {/* T junction marker */}
+          <Circle cx={HALF_X} cy={SHORT_Y} r={12}
+            fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.7)" strokeWidth={1.5} />
+          <SvgText x={HALF_X} y={SHORT_Y + 4} textAnchor="middle"
+            fill="white" fontSize={9} fontWeight="bold">T</SvgText>
+
+          {/* Position circles */}
+          {positions.map((p) => {
+            const color = ZC[p.z];
+            return (
+              <G key={p.code}>
+                {/* Soft outer glow */}
+                <Circle cx={p.sx} cy={p.sy} r={R + 6} fill={`${color}0C`} />
+                {/* Main circle */}
+                <Circle cx={p.sx} cy={p.sy} r={R}
+                  fill={`${color}22`} stroke={color} strokeWidth={2} />
+                {/* Position code */}
+                <SvgText x={p.sx} y={p.sy + (system === '10pt' ? 3 : 4)}
+                  textAnchor="middle" fill="white"
+                  fontSize={system === '10pt' ? 8 : 9} fontWeight="bold">
+                  {p.code}
+                </SvgText>
+              </G>
+            );
+          })}
+        </Svg>
+      </View>
+
+      {/* Position legend */}
+      <View style={cs.legend}>
+        {pairs.map(([left, right], i) => (
+          <View key={i} style={cs.legendRow}>
+            <View style={cs.legendItem}>
+              <View style={[cs.legendDot, { backgroundColor: ZC[left.z] }]} />
+              <Text style={[cs.legendCode, { color: ZC[left.z] }]}>{left.code}</Text>
+              <Text style={cs.legendLabel}>{left.label}</Text>
+            </View>
+            {right ? (
+              <View style={cs.legendItem}>
+                <View style={[cs.legendDot, { backgroundColor: ZC[right.z] }]} />
+                <Text style={[cs.legendCode, { color: ZC[right.z] }]}>{right.code}</Text>
+                <Text style={cs.legendLabel}>{right.label}</Text>
+              </View>
+            ) : (
+              <View style={cs.legendItem} />
+            )}
+          </View>
+        ))}
+      </View>
     </View>
   );
 }
 
-function CourtGrid({ system }: { system: '6pt' | '10pt' }) {
-  if (system === '6pt') {
-    return (
-      <View style={s.courtGrid}>
-        <Text style={s.courtZoneLabel}>FRONT WALL</Text>
-        <View style={s.courtRow}>
-          <CourtCell code="FL" label="Front Left" color={Colors.brand} />
-          <View style={s.courtGap} />
-          <CourtCell code="FR" label="Front Right" color={Colors.brand} />
-        </View>
-        <View style={s.courtRow}>
-          <CourtCell code="ML" label="Mid Left" color={Colors.rest} />
-          <View style={[s.courtTPos]}>
-            <Text style={s.courtTPosText}>T</Text>
-          </View>
-          <CourtCell code="MR" label="Mid Right" color={Colors.rest} />
-        </View>
-        <View style={s.courtRow}>
-          <CourtCell code="BL" label="Back Left" color={Colors.accentProgress} />
-          <View style={s.courtGap} />
-          <CourtCell code="BR" label="Back Right" color={Colors.accentProgress} />
-        </View>
-        <Text style={s.courtZoneLabel}>BACK WALL</Text>
-      </View>
-    );
-  }
-  return (
-    <View style={s.courtGrid}>
-      <Text style={s.courtZoneLabel}>FRONT WALL</Text>
-      <View style={s.courtRow}>
-        <CourtCell code="FL"  label="Front Left"      color={Colors.brand} />
-        <View style={s.courtGap} />
-        <CourtCell code="FR"  label="Front Right"     color={Colors.brand} />
-      </View>
-      <View style={s.courtRow}>
-        <CourtCell code="FML" label="Front Mid L"     color={Colors.accentLibrary} />
-        <View style={s.courtGap} />
-        <CourtCell code="FMR" label="Front Mid R"     color={Colors.accentLibrary} />
-      </View>
-      <View style={s.courtRow}>
-        <CourtCell code="ML"  label="Mid Left"        color={Colors.rest} />
-        <View style={[s.courtTPos]}><Text style={s.courtTPosText}>T</Text></View>
-        <CourtCell code="MR"  label="Mid Right"       color={Colors.rest} />
-      </View>
-      <View style={s.courtRow}>
-        <CourtCell code="BML" label="Back Mid L"      color={Colors.warning} />
-        <View style={s.courtGap} />
-        <CourtCell code="BMR" label="Back Mid R"      color={Colors.warning} />
-      </View>
-      <View style={s.courtRow}>
-        <CourtCell code="BL"  label="Back Left"       color={Colors.accentProgress} />
-        <View style={s.courtGap} />
-        <CourtCell code="BR"  label="Back Right"      color={Colors.accentProgress} />
-      </View>
-      <Text style={s.courtZoneLabel}>BACK WALL</Text>
-    </View>
-  );
-}
+const cs = StyleSheet.create({
+  svgWrap: {
+    width: '100%',
+    aspectRatio: VB_W / VB_H,
+    borderRadius: BorderRadius.lg,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(180,220,255,0.15)',
+  },
+  legend: {
+    marginTop: Spacing.sm,
+    gap: 4,
+  },
+  legendRow: {
+    flexDirection: 'row',
+    gap: Spacing.xs,
+  },
+  legendItem: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 5,
+    paddingHorizontal: Spacing.sm,
+    backgroundColor: Colors.surfaceElevated,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  legendDot: {
+    width: 7, height: 7, borderRadius: 4,
+    flexShrink: 0,
+  },
+  legendCode: {
+    fontSize: FontSize.caption,
+    fontWeight: FontWeight.bold,
+    minWidth: 30,
+    flexShrink: 0,
+  },
+  legendLabel: {
+    fontSize: 10,
+    color: Colors.textMuted,
+    flex: 1,
+  },
+});
 
 // ─── Section types ────────────────────────────────────────────────────────────
 
@@ -195,7 +326,7 @@ export default function HelpModal({ visible, onClose }: { visible: boolean; onCl
               </TouchableOpacity>
             ))}
           </View>
-          <CourtGrid system={courtTab} />
+          <GlassCourtDiagram system={courtTab} />
           <Text style={s.tip}>💡 The T (centre mark) is your home base. Always return there after each position.</Text>
         </View>
       ),
@@ -514,28 +645,6 @@ const s = StyleSheet.create({
   courtTabActive:    { backgroundColor: Colors.brandMuted, borderColor: Colors.brand },
   courtTabTxt:       { fontSize: FontSize.caption, fontWeight: FontWeight.medium, color: Colors.textMuted },
   courtTabTxtActive: { color: Colors.brand },
-
-  courtGrid:     { gap: Spacing.xs },
-  courtRow:      { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs },
-  courtZoneLabel: {
-    fontSize: 9, fontWeight: FontWeight.bold, color: Colors.textDisabled,
-    letterSpacing: 1, textAlign: 'center', paddingVertical: 2,
-  },
-  courtPos: {
-    flex: 1, borderRadius: BorderRadius.sm, borderWidth: 1,
-    paddingVertical: Spacing.sm, paddingHorizontal: 4,
-    alignItems: 'center', gap: 2,
-  },
-  courtPosCode:  { fontSize: FontSize.caption, fontWeight: FontWeight.bold, letterSpacing: 0.3 },
-  courtPosLabel: { fontSize: 9, color: Colors.textMuted, textAlign: 'center' },
-  courtGap:      { flex: 1, alignItems: 'center' },
-  courtTPos:     {
-    width: 34, height: 34, borderRadius: BorderRadius.full,
-    backgroundColor: Colors.surfaceHighlight,
-    borderWidth: 1.5, borderColor: Colors.border,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  courtTPosText: { fontSize: 11, fontWeight: FontWeight.bold, color: Colors.textMuted },
 
   levelRow:  { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.sm, paddingVertical: 2 },
   levelDot:  { width: 8, height: 8, borderRadius: 4, marginTop: 5, flexShrink: 0 },

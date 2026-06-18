@@ -14,8 +14,8 @@ interface SessionStore {
   drillConfigVisible: boolean;
   /** Checkpoint found on startup — drives ResumePromptModal */
   pendingCheckpoint: SessionCheckpoint | null;
-  /** Set by ResumePromptModal — engine reads this in startActive to restore time/reps */
-  resumeFromCheckpoint: { elapsedSeconds: number; repCount: number } | null;
+  /** Set by ResumePromptModal — engine reads this in startActive to restore time/reps + sessionId + setIndex */
+  resumeFromCheckpoint: { elapsedSeconds: number; repCount: number; sessionId?: string; setIndex?: number } | null;
 
   // Drill config modal
   openDrillConfig: () => void;
@@ -23,7 +23,8 @@ interface SessionStore {
 
   // Checkpoint
   setPendingCheckpoint: (cp: SessionCheckpoint | null) => void;
-  setResumeFromCheckpoint: (data: { elapsedSeconds: number; repCount: number } | null) => void;
+  setResumeFromCheckpoint: (data: { elapsedSeconds: number; repCount: number; sessionId?: string; setIndex?: number } | null) => void;
+  setSessionId: (id: string) => void;
 
   // Lifecycle
   initSession: (config: SessionConfig, totalPlanned: number) => void;
@@ -125,11 +126,18 @@ export const useSessionStore = create<SessionStore>((set) => ({
 
   tickElapsed: () =>
     set((s) =>
-      s.session ? { session: { ...s.session, elapsedSeconds: s.session.elapsedSeconds + 1 } } : s),
+      s.session ? { session: {
+        ...s.session,
+        elapsedSeconds: s.session.elapsedSeconds + 1,
+        workSecsRemaining: Math.max(0, s.session.workSecsRemaining - 1),
+      } } : s),
 
   setElapsedSeconds: (secs) =>
     set((s) => s.session ? { session: { ...s.session, elapsedSeconds: secs } } : s),
 
   setRepCount: (count) =>
     set((s) => s.session ? { session: { ...s.session, repCount: count } } : s),
+
+  setSessionId: (id) =>
+    set((s) => s.session ? { session: { ...s.session, sessionId: id } } : s),
 }));

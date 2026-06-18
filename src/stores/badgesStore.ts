@@ -57,23 +57,34 @@ export const BADGE_DEFS: BadgeDef[] = [
 
 interface BadgesStore {
   earned: Partial<Record<BadgeId, string>>;
+  justEarned: BadgeId[];
   awardBadge: (id: BadgeId) => void;
   hasBadge: (id: BadgeId) => boolean;
+  resetBadges: () => void;
+  clearJustEarned: () => void;
 }
 
 export const useBadgesStore = create<BadgesStore>()(
   persist(
     (set, get) => ({
       earned: {},
+      justEarned: [],
       awardBadge: (id) =>
-        set((s) => ({
-          earned: s.earned[id] ? s.earned : { ...s.earned, [id]: new Date().toISOString() },
-        })),
+        set((s) => {
+          if (s.earned[id]) return s;
+          return {
+            earned: { ...s.earned, [id]: new Date().toISOString() },
+            justEarned: [...s.justEarned, id],
+          };
+        }),
       hasBadge: (id) => !!get().earned[id],
+      resetBadges: () => set({ earned: {}, justEarned: [] }),
+      clearJustEarned: () => set({ justEarned: [] }),
     }),
     {
       name: 'badges-storage',
       storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => ({ earned: state.earned }),
     }
   )
 );

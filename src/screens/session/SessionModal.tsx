@@ -1,8 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import {
   Modal, View, Text, StyleSheet, TouchableOpacity,
-  Animated, ScrollView,
+  Animated, ScrollView, Alert, AppState, AppStateStatus,
 } from 'react-native';
+import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { useSQLiteContext } from 'expo-sqlite';
 import * as Brightness from 'expo-brightness';
@@ -15,10 +16,11 @@ import { useSessionStore } from '../../stores/sessionStore';
 import { useProgressStore } from '../../stores/progressStore';
 import { useSettingsStore } from '../../stores/settingsStore';
 import { useProfileStore } from '../../stores/profileStore';
+import { useBadgesStore, BADGE_DEFS } from '../../stores/badgesStore';
 import { useSessionEngine } from '../../hooks/useSessionEngine';
-import { ActiveSession } from '../../types';
+import { ActiveSession, Difficulty } from '../../types';
 import { POSITION_INFO } from '../../constants/positions';
-import { PACE_STEPS_MS, PACE_STEP_LABELS } from '../../constants/timing';
+import { PACE_STEPS_MS, PACE_STEP_LABELS, MOVES_PER_SET, getIntervalMs, AUTO_REST_FACTOR } from '../../constants/timing';
 
 // ─── CountdownView ────────────────────────────────────────────────────────────
 
@@ -147,7 +149,7 @@ function ActiveTrainingView({
         dominantHand={session.config.dominantHand}
         gender={gender}
         courtMode={courtMode}
-        showLabels={false}
+
         style={atStyles.court}
       />
 
@@ -342,10 +344,16 @@ function PausedView({
   courtMode: 'glass' | 'wooden';
   gender: string | null;
 }) {
+  const em = String(Math.floor(session.elapsedSeconds / 60)).padStart(2, '0');
+  const es = String(session.elapsedSeconds % 60).padStart(2, '0');
   return (
     <View style={pvStyles.container}>
       <Text style={pvStyles.title}>Paused</Text>
-      <Text style={pvStyles.reps}>{session.repCount} reps so far</Text>
+      <View style={pvStyles.statsRow}>
+        <Text style={pvStyles.reps}>{session.repCount} reps</Text>
+        <Text style={pvStyles.statSep}>·</Text>
+        <Text style={pvStyles.elapsed}>{em}:{es} elapsed</Text>
+      </View>
       <CourtCanvas
         activePosition={session.currentPosition}
         courtSystem={session.config.courtSystem}
@@ -353,7 +361,7 @@ function PausedView({
         gender={gender}
         courtMode={courtMode}
         style={pvStyles.court}
-        showLabels={false}
+
       />
       <View style={pvStyles.actions}>
         <TouchableOpacity onPress={onResume} style={[pvStyles.btn, pvStyles.btnPrimary]}>
@@ -370,7 +378,10 @@ function PausedView({
 const pvStyles = StyleSheet.create({
   container: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: Spacing.xl, gap: Spacing.xl },
   title:     { fontSize: FontSize.hero, fontWeight: FontWeight.bold, color: Colors.textPrimary },
+  statsRow:  { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
   reps:      { fontSize: FontSize.body, color: Colors.textMuted },
+  statSep:   { fontSize: FontSize.body, color: Colors.textDisabled },
+  elapsed:   { fontSize: FontSize.body, color: Colors.brand, fontWeight: FontWeight.medium },
   court:     { width: '80%', aspectRatio: 640 / 975 },
   actions:   { width: '100%', gap: Spacing.md },
   btn:       { width: '100%', height: ButtonHeight.lg, borderRadius: BorderRadius.full, alignItems: 'center', justifyContent: 'center' },
@@ -393,7 +404,7 @@ function RestView({ session, onSkip, courtMode, gender }: { session: ActiveSessi
         gender={gender}
         courtMode={courtMode}
         style={rvStyles.court}
-        showLabels={false}
+
       />
       <Text style={rvStyles.nextLabel}>
         {session.nextPosition
@@ -443,8 +454,8 @@ function SessionSummaryView({
   onDone:  () => void;
   onAgain: () => void;
 }) {
-  const { recentSessions, stats } = useProgressStore();
-  const record = recentSessions[0];
+  const { stats, newPBSessionId, recentSessions } = useProgressStore();
+  const { justEarned, clearJustEarned } = useBadgesStore();
 
   const durationSecs = session.elapsedSeconds;
   const mm = String(Math.floor(durationSecs / 60)).padStart(2, '0');
@@ -452,16 +463,27 @@ function SessionSummaryView({
 
   const completion  = session.totalMovementsPlanned > 0
     ? Math.round((session.repCount / session.totalMovementsPlanned) * 100) : 0;
-  const avgReact      = session.repCount > 0
-    ? (durationSecs / session.repCount).toFixed(1) : '—';
-  const setsCompleted = session.setIndex;
-  const calories      = Math.round(session.repCount * 0.8);
 
-  const sameDrillPrev = recentSessions.filter(
-    (s, i) => i > 0 && s.drillType === session.config.drillType,
-  );
-  const prevBestReps = sameDrillPrev.reduce((m, s) => Math.max(m, s.movementsTotal), 0);
-  const isNewPB = sameDrillPrev.length > 0 && session.repCount > prevBestReps;
+  // BUG-018: include partial set so "0 sets" never shows for a completed session.
+  const setsCompleted = session.setIndex + (session.moveIndex > 0 ? 1 : 0);
+
+  // BUG-019: rep rate should reflect movement tempo, not total time (which includes rest).
+  // Estimate active work time by subtracting rest periods.
+  const cfg = session.config;
+  const restPerSetSecs = cfg.restMode === 'none' ? 0 :
+    cfg.restMode === 'manual' ? cfg.restSeconds :
+    Math.round(MOVES_PER_SET[cfg.difficulty] * getIntervalMs(cfg.difficulty, cfg.tempo) * AUTO_REST_FACTOR / 1000);
+  const totalRestSecs   = session.setIndex * restPerSetSecs;
+  const activeTimeSecs  = Math.max(1, durationSecs - totalRestSecs);
+  const avgReact = session.repCount > 0 ? (activeTimeSecs / session.repCount).toFixed(1) : '—';
+
+  // BUG-020: calories should scale with difficulty (higher difficulty = more intense = more calories).
+  const calPerRep: Record<Difficulty, number> = {
+    beginner: 1.2, intermediate: 1.8, advanced: 2.4, elite: 3.0, pro: 3.6,
+  };
+  const calories = Math.round(session.repCount * (calPerRep[cfg.difficulty] ?? 1.8));
+
+  const isNewPB = newPBSessionId === session.sessionId;
 
   const DIFFICULTY_NEXT: Record<string, string> = {
     beginner: 'intermediate', intermediate: 'advanced', advanced: 'elite', elite: 'pro',
@@ -488,7 +510,9 @@ function SessionSummaryView({
       <Text style={ssStyles.headline}>
         {wasComplete ? 'Session Complete!' : 'Session Ended'}
       </Text>
-      <Text style={ssStyles.subline}>Great effort. Keep the streak going.</Text>
+      <Text style={ssStyles.subline}>
+        {wasComplete ? 'Great effort. Keep the streak going.' : 'Good work. Every session counts.'}
+      </Text>
       {wasComplete && (
         <View style={ssStyles.savedRow}>
           <Ionicons name="checkmark-circle" size={16} color={Colors.primary} />
@@ -504,6 +528,31 @@ function SessionSummaryView({
         </View>
       )}
 
+      {/* Badge unlocks */}
+      {justEarned.length > 0 && (
+        <View style={ssStyles.badgeUnlockWrap}>
+          <Text style={ssStyles.badgeUnlockLabel}>
+            <Ionicons name="medal" size={12} color={Colors.gold} />
+            {' '}BADGE{justEarned.length > 1 ? 'S' : ''} UNLOCKED
+          </Text>
+          {justEarned.map((id) => {
+            const def = BADGE_DEFS.find((b) => b.id === id);
+            if (!def) return null;
+            return (
+              <View key={id} style={ssStyles.badgeUnlockRow}>
+                <View style={[ssStyles.badgeUnlockIcon, { backgroundColor: `${def.color}22`, borderColor: `${def.color}55` }]}>
+                  <Ionicons name={def.icon as any} size={20} color={def.color} />
+                </View>
+                <View>
+                  <Text style={[ssStyles.badgeUnlockName, { color: def.color }]}>{def.label}</Text>
+                  <Text style={ssStyles.badgeUnlockDesc}>{def.description}</Text>
+                </View>
+              </View>
+            );
+          })}
+        </View>
+      )}
+
       {/* 2×3 stat card grid — matches ref16 exactly */}
       <View style={ssStyles.statGrid}>
         <SummaryStatCard
@@ -516,7 +565,7 @@ function SessionSummaryView({
         />
         <SummaryStatCard
           icon="flash" iconBg={Colors.brandMuted} iconColor={Colors.brand}
-          value={`${avgReact}s`} label="Avg React"
+          value={`${avgReact}s`} label="Rep Speed"
         />
         <SummaryStatCard
           icon="repeat" iconBg={`${Colors.accentLibrary}22`} iconColor={Colors.accentLibrary}
@@ -551,11 +600,11 @@ function SessionSummaryView({
       )}
 
       {/* DONE button + Train Again link */}
-      <TouchableOpacity style={ssStyles.doneBtn} onPress={onDone} activeOpacity={0.85}>
+      <TouchableOpacity style={ssStyles.doneBtn} onPress={() => { clearJustEarned(); onDone(); }} activeOpacity={0.85}>
         <Text style={ssStyles.doneBtnText}>DONE</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={onAgain} style={ssStyles.trainAgain}>
+      <TouchableOpacity onPress={() => { clearJustEarned(); onAgain(); }} style={ssStyles.trainAgain} activeOpacity={0.75}>
         <Text style={ssStyles.trainAgainText}>Train Again</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -627,6 +676,34 @@ const ssStyles = StyleSheet.create({
   nudgeTitle: { fontSize: FontSize.label, fontWeight: FontWeight.semiBold, color: Colors.brand },
   nudgeBody:  { fontSize: FontSize.caption, color: Colors.textSecondary, lineHeight: 18 },
 
+  // Badge unlocks
+  badgeUnlockWrap: {
+    width: '100%',
+    backgroundColor: `${Colors.gold}0D`,
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1, borderColor: `${Colors.gold}33`,
+    padding: Spacing.md,
+    gap: Spacing.sm,
+  },
+  badgeUnlockLabel: {
+    fontSize: FontSize.micro, fontWeight: FontWeight.bold,
+    color: Colors.gold, letterSpacing: 1.2,
+  },
+  badgeUnlockRow: {
+    flexDirection: 'row', alignItems: 'center', gap: Spacing.md,
+  },
+  badgeUnlockIcon: {
+    width: 38, height: 38, borderRadius: BorderRadius.md,
+    alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1.5,
+  },
+  badgeUnlockName: {
+    fontSize: FontSize.label, fontWeight: FontWeight.bold,
+  },
+  badgeUnlockDesc: {
+    fontSize: FontSize.caption, color: Colors.textMuted,
+  },
+
   // Buttons
   doneBtn: {
     width: '100%', height: ButtonHeight.xl,
@@ -646,6 +723,10 @@ export default function SessionModal() {
   const { session, pendingConfig, clearPendingConfig } = useSessionStore();
   const settings = useSettingsStore((s) => s.settings);
   const gender   = useProfileStore((s) => s.profile.gender);
+  const {
+    hasSeenCourtTutorial, hasSeenPaceTutorial,
+    markCourtTutorialSeen, markPaceTutorialSeen,
+  } = useProfileStore();
   const db = useSQLiteContext() as any;
   const engine = useSessionEngine(db);
   const savedBrightnessRef = useRef<number | null>(null);
@@ -658,13 +739,23 @@ export default function SessionModal() {
     }
   }, [pendingConfig]);
 
-  // Boost brightness when active/rest/countdown, restore when done/dismissed
+  // Boost brightness when active/rest/countdown, restore when done/dismissed.
+  // BUG-029: also restore on AppState background so brightness is not stuck at 1.0
+  // if the user exits mid-session via the home button.
   useEffect(() => {
     const isRunning = session !== null &&
       session.state !== 'complete' &&
       session.state !== 'abandoned';
 
     if (!settings.keepScreenAwake) return;
+
+    const restoreBrightness = () => {
+      const saved = savedBrightnessRef.current;
+      if (saved !== null) {
+        Brightness.setBrightnessAsync(saved).catch(() => {});
+        savedBrightnessRef.current = null;
+      }
+    };
 
     if (isRunning) {
       Brightness.getBrightnessAsync()
@@ -674,15 +765,41 @@ export default function SessionModal() {
         })
         .catch(() => {});
     } else {
-      const saved = savedBrightnessRef.current;
-      if (saved !== null) {
-        Brightness.setBrightnessAsync(saved).catch(() => {});
-        savedBrightnessRef.current = null;
-      }
+      restoreBrightness();
     }
+
+    const sub = AppState.addEventListener('change', (state: AppStateStatus) => {
+      if (state === 'background' || state === 'inactive') restoreBrightness();
+    });
+    return () => sub.remove();
   }, [session?.state, settings.keepScreenAwake]);
 
   const visible = session !== null;
+
+  // Keep screen awake for entire session lifecycle (countdown → active → rest → summary).
+  // Deactivates when session modal closes so normal screen-timeout resumes.
+  // Respects the keepScreenAwake setting — if disabled, never activates.
+  useEffect(() => {
+    if (!settings.keepScreenAwake) return;
+    if (visible) {
+      activateKeepAwakeAsync('squash-session').catch(() => {});
+    } else {
+      try { deactivateKeepAwake('squash-session'); } catch {}
+    }
+    return () => { try { deactivateKeepAwake('squash-session'); } catch {} };
+  }, [visible, settings.keepScreenAwake]);
+
+  // Auto-pause when app goes to background (screen lock, home button, incoming call).
+  // Covers active, countdown, and rest states so timers never drift while backgrounded.
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (nextState: AppStateStatus) => {
+      const state = useSessionStore.getState().session?.state;
+      if (nextState === 'background' && (state === 'active' || state === 'countdown' || state === 'rest')) {
+        engine.pauseSession();
+      }
+    });
+    return () => sub.remove();
+  }, []); // pauseSession reads store directly — no stale-closure risk
 
   return (
     <Modal
@@ -703,28 +820,80 @@ export default function SessionModal() {
               dominantHand={session.config.dominantHand}
               gender={gender}
               courtMode={settings.courtMode ?? 'wooden'}
-              showLabels={false}
+      
               style={idleStyles.court}
             />
           </View>
         )}
         {session?.state === 'countdown' && (
-          <CountdownView session={session} />
+          <>
+            <CountdownView session={session} />
+            {!hasSeenCourtTutorial && (
+              <View style={tutStyles.overlay} pointerEvents="box-none">
+                <View style={tutStyles.card}>
+                  <Text style={tutStyles.title}>Court Positions</Text>
+                  <Text style={tutStyles.body}>
+                    {'T = centre T-junction — your home base.\nFront/Back = near & far ends.\nNumbers = corner & mid positions.\nAlways recover to T between calls.'}
+                  </Text>
+                  <TouchableOpacity
+                    style={tutStyles.btn}
+                    onPress={markCourtTutorialSeen}
+                    activeOpacity={0.85}
+                  >
+                    <Text style={tutStyles.btnText}>Got it — Let's Go!</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+          </>
         )}
         {session?.state === 'active' && (
+          <>
+          {!hasSeenPaceTutorial && (
+            <View style={tutStyles.paceTooltip} pointerEvents="box-none">
+              <Ionicons name="information-circle" size={14} color={Colors.brand} />
+              <Text style={tutStyles.paceTooltipText}>
+                Use − and + to adjust pace live
+              </Text>
+              <TouchableOpacity onPress={markPaceTutorialSeen} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                <Ionicons name="close-circle" size={16} color={Colors.textMuted} />
+              </TouchableOpacity>
+            </View>
+          )}
           <ActiveTrainingView
             session={session}
             onPause={engine.pauseSession}
-            onEnd={engine.endSession}
+            onEnd={() => {
+              // BUG-017: confirm before ending so data isn't lost accidentally.
+              engine.pauseSession();
+              Alert.alert(
+                'End Session?',
+                `${session.repCount} movements done. Your session progress will be saved.`,
+                [
+                  { text: 'Keep Going', style: 'cancel', onPress: engine.resumeSession },
+                  { text: 'End & Save', style: 'destructive', onPress: engine.endSession },
+                ]
+              );
+            }}
             courtMode={settings.courtMode ?? 'wooden'}
             gender={gender}
           />
+          </>
         )}
         {session?.state === 'paused' && (
           <PausedView
             session={session}
             onResume={engine.resumeSession}
-            onEnd={engine.endSession}
+            onEnd={() => {
+              Alert.alert(
+                'End Session?',
+                `${session.repCount} movements done. Your session progress will be saved.`,
+                [
+                  { text: 'Cancel', style: 'cancel' },
+                  { text: 'End & Save', style: 'destructive', onPress: engine.endSession },
+                ]
+              );
+            }}
             courtMode={settings.courtMode ?? 'wooden'}
             gender={gender}
           />
@@ -738,8 +907,9 @@ export default function SessionModal() {
             onDone={engine.dismissSession}
             onAgain={() => {
               const config = session.config;
+              // BUG-031: clear PB flag so it doesn't bleed into the next session's summary.
+              useProgressStore.getState().setNewPBFlag(null);
               engine.dismissSession();
-              // Re-queue config to start a new session
               setTimeout(() => {
                 useSessionStore.getState().setPendingConfig(config);
               }, 300);
@@ -754,6 +924,55 @@ export default function SessionModal() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
+});
+
+const tutStyles = StyleSheet.create({
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'flex-end',
+    paddingHorizontal: Spacing.base,
+    paddingBottom: Spacing.xxl,
+  },
+  card: {
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.xl,
+    borderWidth: 1, borderColor: Colors.border,
+    padding: Spacing.base,
+    gap: Spacing.sm,
+    shadowColor: '#000', shadowOpacity: 0.4, shadowRadius: 20, shadowOffset: { width: 0, height: 8 },
+    elevation: 12,
+  },
+  title: { fontSize: FontSize.body, fontWeight: FontWeight.bold, color: Colors.textPrimary },
+  body:  { fontSize: FontSize.label, color: Colors.textSecondary, lineHeight: 22 },
+  btn: {
+    height: 48, backgroundColor: Colors.brand,
+    borderRadius: BorderRadius.full,
+    alignItems: 'center', justifyContent: 'center',
+    marginTop: Spacing.xs,
+  },
+  btnText: { fontSize: FontSize.body, fontWeight: FontWeight.bold, color: Colors.textPrimary },
+
+  paceTooltip: {
+    position: 'absolute',
+    bottom: 115,
+    left: Spacing.base,
+    right: Spacing.base,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    backgroundColor: `${Colors.brand}18`,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1, borderColor: `${Colors.brand}40`,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    zIndex: 10,
+  },
+  paceTooltipText: {
+    flex: 1,
+    fontSize: FontSize.caption,
+    color: Colors.textPrimary,
+    fontWeight: FontWeight.medium,
+  },
 });
 
 const idleStyles = StyleSheet.create({

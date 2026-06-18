@@ -4,7 +4,7 @@ import { Position, PositionInfo, CourtSystem, Zone } from '../types';
 // Origin: front-wall center. X = left(-)/right(+). Z = depth from front wall.
 export const POSITION_INFO: Record<Position, PositionInfo> = {
   T: {
-    code: 'T', label: 'T Position', shortLabel: 'T',
+    code: 'T', label: 'the T', shortLabel: 'T',
     zone: 'mid', x: 0, z: 4.26,
     courtSystems: ['6pt', '10pt'],
   },
@@ -41,17 +41,19 @@ export const POSITION_INFO: Record<Position, PositionInfo> = {
     zone: 'back', x: 2.20, z: 8.50,
     courtSystems: ['6pt', '10pt'],
   },
-  // 10-point extra positions (bridging front↔mid and mid↔back):
+  // 10-point extra positions:
+  // FMCL/FMCR = Front Volley zones — early interception before the ball reaches the front corner
   FMCL: {
-    code: 'FMCL', label: 'Front Mid Left', shortLabel: 'FML',
-    zone: 'mid', x: -2.00, z: 2.80,
+    code: 'FMCL', label: 'Front Volley Left', shortLabel: 'FVL',
+    zone: 'front', x: -2.00, z: 2.80,
     courtSystems: ['10pt'],
   },
   FMCR: {
-    code: 'FMCR', label: 'Front Mid Right', shortLabel: 'FMR',
-    zone: 'mid', x: 2.00, z: 2.80,
+    code: 'FMCR', label: 'Front Volley Right', shortLabel: 'FVR',
+    zone: 'front', x: 2.00, z: 2.80,
     courtSystems: ['10pt'],
   },
+  // BMCL/BMCR = Back Mid diagonal positions — between the T and back corners
   BMCL: {
     code: 'BMCL', label: 'Back Mid Left', shortLabel: 'BML',
     zone: 'back', x: -2.00, z: 6.50,
@@ -64,12 +66,13 @@ export const POSITION_INFO: Record<Position, PositionInfo> = {
   },
 };
 
-export const POSITIONS_6PT: Position[] = ['FL', 'FR', 'ML', 'MR', 'BL', 'BR'];
-export const POSITIONS_10PT: Position[] = ['FL', 'FR', 'ML', 'MR', 'BL', 'BR', 'FMCL', 'FMCR', 'BMCL', 'BMCR'];
+// T is the 7th movement position — recovery hub and volley intercept point.
+export const POSITIONS_6PT: Position[] = ['FL', 'FR', 'ML', 'MR', 'BL', 'BR', 'T'];
+export const POSITIONS_10PT: Position[] = ['FL', 'FR', 'ML', 'MR', 'BL', 'BR', 'T', 'FMCL', 'FMCR', 'BMCL', 'BMCR'];
 
-// Fixed cyclic order per spec G3
-export const FIXED_ORDER_6PT: Position[] = ['FL', 'FR', 'ML', 'MR', 'BL', 'BR'];
-export const FIXED_ORDER_10PT: Position[] = ['FL', 'FR', 'FMCL', 'FMCR', 'ML', 'MR', 'BMCL', 'BMCR', 'BL', 'BR'];
+// Fixed cyclic order — T placed at the natural recovery break in each sequence
+export const FIXED_ORDER_6PT: Position[] = ['FL', 'FR', 'BL', 'BR', 'T', 'ML', 'MR'];
+export const FIXED_ORDER_10PT: Position[] = ['FL', 'FR', 'FMCL', 'FMCR', 'T', 'ML', 'MR', 'BMCL', 'BMCR', 'BL', 'BR'];
 
 // Handedness mirror: left-handed players swap all L↔R labels
 export const HAND_MIRROR: Record<Position, Position> = {
@@ -81,9 +84,10 @@ export const HAND_MIRROR: Record<Position, Position> = {
   BMCL: 'BMCR', BMCR: 'BMCL',
 };
 
-// Coverage filter sets — right-handed defaults; engine mirrors for left-handed
+// Coverage filter sets — right-handed defaults; engine mirrors for left-handed.
+// T is only in 'full' — it's center court so it doesn't belong in side-only filters.
 export const COVERAGE_FILTER: Record<string, Position[]> = {
-  full:      POSITIONS_10PT,
+  full:      POSITIONS_10PT,                                     // includes T via POSITIONS_10PT
   front:     ['FL', 'FR', 'FMCL', 'FMCR'],
   back:      ['BL', 'BR', 'BMCL', 'BMCR'],
   forehand:  ['FR', 'MR', 'BR', 'FMCR', 'BMCR'],
@@ -95,7 +99,7 @@ export const POSITION_ZONE: Record<Position, Zone> = {
   T:    'mid',
   FL:   'front', FR:   'front',
   ML:   'mid',   MR:   'mid',
-  FMCL: 'mid',   FMCR: 'mid',
+  FMCL: 'front', FMCR: 'front',   // Front Volley positions are in the front zone
   BL:   'back',  BR:   'back',
   BMCL: 'back',  BMCR: 'back',
 };

@@ -26,12 +26,16 @@ interface ProfileStore {
   profile: UserProfile;
   isOnboardingComplete: boolean;
   hasCompletedAuth: boolean;
+  hasSeenCourtTutorial: boolean;
+  hasSeenPaceTutorial: boolean;
 
   setProfile: (updates: Partial<UserProfile>) => void;
   completeOnboarding: () => void;
   completeAuth: (email?: string) => void;
   signOut: () => void;
   resetProfile: () => void;
+  markCourtTutorialSeen: () => void;
+  markPaceTutorialSeen: () => void;
 }
 
 export const useProfileStore = create<ProfileStore>()(
@@ -40,6 +44,8 @@ export const useProfileStore = create<ProfileStore>()(
       profile: DEFAULT_PROFILE,
       isOnboardingComplete: false,
       hasCompletedAuth: false,
+      hasSeenCourtTutorial: false,
+      hasSeenPaceTutorial: false,
 
       setProfile: (updates) =>
         set((s) => ({ profile: { ...s.profile, ...updates } })),
@@ -65,12 +71,15 @@ export const useProfileStore = create<ProfileStore>()(
         })),
 
       resetProfile: () =>
-        set({ profile: DEFAULT_PROFILE, isOnboardingComplete: false, hasCompletedAuth: false }),
+        set({ profile: DEFAULT_PROFILE, isOnboardingComplete: false, hasCompletedAuth: false, hasSeenCourtTutorial: false, hasSeenPaceTutorial: false }),
+
+      markCourtTutorialSeen: () => set({ hasSeenCourtTutorial: true }),
+      markPaceTutorialSeen: () => set({ hasSeenPaceTutorial: true }),
     }),
     {
       name: 'profile-storage',
       storage: createJSONStorage(() => AsyncStorage),
-      version: 2,
+      version: 3,
       migrate: (persisted: any, version: number) => {
         if (version < 1) {
           persisted = { ...persisted, hasCompletedAuth: false };
@@ -83,6 +92,12 @@ export const useProfileStore = create<ProfileStore>()(
             if (!p.dobMonth) p.dobMonth = '';
             if (!p.dobYear)  p.dobYear  = '';
             if (!p.gender)   p.gender   = 'male';
+          }
+        }
+        if (version < 3) {
+          if (persisted?.state) {
+            if (persisted.state.hasSeenCourtTutorial === undefined) persisted.state.hasSeenCourtTutorial = false;
+            if (persisted.state.hasSeenPaceTutorial === undefined)  persisted.state.hasSeenPaceTutorial  = false;
           }
         }
         return persisted;

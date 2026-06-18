@@ -25,12 +25,6 @@ const GENDER_PITCH: Record<VoiceGender, number> = {
   female: 1.15,
 };
 
-// Rate adjustments per gender — male coaches speak at a slightly lower, confident pace
-const GENDER_RATE_FACTOR: Record<VoiceGender, number> = {
-  male:   0.85,
-  female: 0.95,
-};
-
 // Voice name keywords (iOS: Alex/Aaron/Tom/Daniel = high-quality male; Samantha/Ava/Allison = female)
 // Ordered by preference — first match wins
 const MALE_VOICE_KEYWORDS   = ['aaron', 'alex', 'arthur', 'daniel', 'gordon', 'oliver', 'rishi', 'tom', 'fred', 'jorge', 'luca'];
@@ -72,23 +66,34 @@ function pickVoice(language: string, gender: VoiceGender): string | undefined {
     }
   }
 
-  // No named voice found — return undefined so pitch fallback applies cleanly
-  return undefined;
+  // No keyword match — return first available Enhanced (or any) voice for the language
+  // so non-Latin-script languages (Arabic, Chinese, Japanese, Korean…) still use a
+  // correct locale voice rather than falling back to the system default (often English).
+  return candidates[0]?.identifier;
 }
 
 export async function initAudioSession(): Promise<void> {
-  // Configure the iOS audio session to play through the speaker even when the
-  // ringer/silent switch is off. Without this, expo-speech is silenced on iOS
-  // whenever the phone is on silent mode.
-  // shouldPlayInBackground aligns with UIBackgroundModes: ["audio"] in app.json.
+  // Configure audio session for court training:
+  //   iOS: playsInSilentModeIOS  → audible even on silent/vibrate ring switch.
+  //        allowsRecordingIOS=false → forces AVAudioSessionCategoryPlayback so iOS
+  //          routes speech to Bluetooth A2DP speakers (not the earpiece).
+  //        interruptionModeIOS=1 (DoNotMix) → our audio takes priority; other apps duck.
+  //        staysActiveInBackground → keeps session alive so BT audio route persists
+  //          even when screen dims between calls.
+  //   Android: playThroughEarpieceAndroid=false → routes to loudspeaker, not earpiece,
+  //          so audio is audible when phone is placed outside the court.
+  //        shouldDuckAndroid=false → prevent Android from lowering our volume.
   try {
     await setAudioModeAsync({
-      playsInSilentMode: true,
-      interruptionMode: 'doNotMix',
-      shouldPlayInBackground: true,
-      allowsRecording: false,
-    });
-  } catch { /* non-critical on Android / web */ }
+      playsInSilentModeIOS:        true,
+      shouldPlayInBackground:      true,
+      staysActiveInBackground:     true,
+      allowsRecordingIOS:          false,  // forces playback category → Bluetooth A2DP
+      interruptionModeIOS:         1,      // DoNotMix — our audio owns the session
+      playThroughEarpieceAndroid:  false,  // loudspeaker, not earpiece
+      shouldDuckAndroid:           false,
+    } as any);
+  } catch { /* non-critical on web / simulator */ }
 
   // Load available voices once for gender/language selection
   try {
@@ -112,7 +117,7 @@ export function speakText(
   try {
     Speech.stop();
     const voiceId = pickVoice(language, voiceGender);
-    const adjustedRate = Math.min(1.5, Math.max(0.5, rate * GENDER_RATE_FACTOR[voiceGender]));
+    const adjustedRate = Math.min(1.5, Math.max(0.5, rate));
     // Don't include `voice` when undefined — passing it explicitly as undefined
     // can cause silent failures on some platform/TTS combinations.
     Speech.speak(text, {

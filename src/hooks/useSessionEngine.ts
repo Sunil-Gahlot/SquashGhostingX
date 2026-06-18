@@ -1,4 +1,5 @@
 import { useRef, useCallback, useEffect } from 'react';
+import { AppState } from 'react-native';
 import { type SQLiteDatabase } from 'expo-sqlite';
 
 import { useSessionStore } from '../stores/sessionStore';
@@ -18,6 +19,7 @@ import {
   AUDIO_OFFSETS, MOVEMENT_PHASE_MS, MOVES_PER_SET, getIntervalMs,
   getAutoRestMs, CHECKPOINT_INTERVAL_MS, COUNTDOWN_SECONDS,
   T_POSE_CLEAR_DELAY_MS, T_START_PAUSE_MS, PACE_STEPS_MS, PACE_DEFAULT_STEP,
+  estimateTotalMoves,
 } from '../constants/timing';
 import {
   saveSession, saveMovements, saveCheckpoint, deleteCheckpoint, upsertPersonalBest,
@@ -63,14 +65,12 @@ function buildVoiceCall(opts: {
       return `${positionLabel}, ${getMovementModifier(positionZone, callIndex)}`;
 
     case 'shot-based':
-      return shot
-        ? `${positionLabel}, ${shot}`
-        : positionLabel;
+      // BUG-026: T position shots need context — player is already there, no movement required.
+      if (positionLabel === 'the T' && shot) return `From the T, ${shot}`;
+      return shot ? `${positionLabel}, ${shot}` : positionLabel;
 
     case 'match-sim':
-      if (shot && nextPositionLabel) {
-        return `${positionLabel}, ${shot}. Next, ${nextPositionLabel}`;
-      }
+      // BUG-013: do NOT pre-announce next position — match-sim should feel like a real rally
       return shot ? `${positionLabel}, ${shot}` : positionLabel;
 
     case 'custom':
@@ -124,6 +124,8 @@ export function useSessionEngine(db: SQLiteDatabase) {
   // Timestamp of the last position/recovery voice call — used to guard coaching cues
   // from interrupting in-progress instructions (4 s = safe margin for any TTS phrase).
   const lastVoiceCallMsRef = useRef<number>(0);
+  // BUG-030: track last coaching cue elapsed time to avoid modulo miss on pause/resume
+  const lastCoachingCueSecsRef = useRef<number>(-COACHING_INTERVAL_SECS);
 
   // Timer refs
   const moveTimers      = useRef<TimerId[]>([]);
@@ -234,9 +236,10 @@ export function useSessionEngine(db: SQLiteDatabase) {
     if (!abandoned) {
       try {
         const endAt = record.endedAt;
-        await upsertPersonalBest(db as any, record.drillType, 'movements',  record.movementsTotal,  record.id, endAt);
+        const isMovementsPB = await upsertPersonalBest(db as any, record.drillType, 'movements',  record.movementsTotal,  record.id, endAt);
         await upsertPersonalBest(db as any, record.drillType, 'completion', record.completionPct,   record.id, endAt);
         await upsertPersonalBest(db as any, record.drillType, 'intensity',  record.intensityScore,  record.id, endAt);
+        if (isMovementsPB) progressStore.setNewPBFlag(record.id);
       } catch (e) {
         console.warn('[Session] PB upsert failed:', e);
       }
@@ -262,6 +265,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
         badges.awardBadge('elite_difficulty');
       }
       if (record.completionPct >= 100)             badges.awardBadge('perfect_session');
+      // justEarned is populated inside awardBadge only when a badge is newly earned.
     }
 
     isCompletingRef.current = false;
@@ -274,6 +278,14 @@ export function useSessionEngine(db: SQLiteDatabase) {
     if (!config) return;
 
     clearMoveTimers();
+
+    // BUG-005: restMode 'none' means skip rest entirely — go straight to next set.
+    if (config.restMode === 'none') {
+      store.getState().advanceSet();
+      fireMoveLoop();
+      return;
+    }
+
     store.getState().setState('rest');
     store.getState().advanceSet();
 
@@ -333,13 +345,23 @@ export function useSessionEngine(db: SQLiteDatabase) {
       isBeepMode ? Haptics.onPositionCallBeep() : Haptics.onPositionCall();
     }
 
+    // Pre-compute effective interval here so T-pose clear can clamp against it (BUG-006)
+    const livePaceStep    = store.getState().session?.livePaceStep ?? PACE_DEFAULT_STEP;
+    const paceOffset      = PACE_STEPS_MS[livePaceStep] ?? 0;
+    const extraPaceMs     = getSettings().movementPaceExtraMs ?? 0;
+    const movementPhase   = MOVEMENT_PHASE_MS[config.difficulty][config.tempo];
+    // Floor = movementPhase + 800 ms so T_POSE_CLEAR (600ms) + 100ms buffer always
+    // fires before the next call. Was +1500; reduced so Fast/Fast+/Turbo have real effect.
+    const effectiveIntervalMs = Math.max(movementPhase + 800, move.intervalMs + paceOffset + extraPaceMs);
+
     // T+positionCallMs: court and voice update simultaneously.
-    // Holding the T pose until the call fires gives the player a composed moment
-    // at T before court and voice confirm the new position at the same instant.
+    // BUG-007: skip visual update in voice-only mode (voice-only = no court highlight).
     addTimer(setTimeout(() => {
       if (store.getState().session?.state !== 'active') return;
-      s.setCurrentPosition(move.position, move.shot);
-      s.setNextPosition(engine.peekNextPosition());
+      if (config.voiceMode !== 'voice-only') {
+        s.setCurrentPosition(move.position, move.shot);
+        s.setNextPosition(engine.peekNextPosition());
+      }
     }, AUDIO_OFFSETS.positionCallMs));
 
     if (ssettings.voiceEnabled && !isBeepMode && config.voiceMode !== 'visual-only') {
@@ -373,15 +395,16 @@ export function useSessionEngine(db: SQLiteDatabase) {
         const recoveryCue = Audio.getRecoveryCue(recoveryCueIdxRef.current++);
         speak(recoveryCue);
       }, recoveryCallMs));
-
-      // Clear active position T_POSE_CLEAR_DELAY_MS after recovery cue starts speaking.
-      // This makes the T pose appear at full opacity while the player runs back and pauses at T.
-      addTimer(setTimeout(() => {
-        if (store.getState().session?.state === 'active') {
-          store.getState().setCurrentPosition(null, null);
-        }
-      }, recoveryCallMs + T_POSE_CLEAR_DELAY_MS));
     }
+
+    // T-pose clear fires in ALL voiceModes (voice+visual, voice-only, visual-only, beep).
+    // BUG-006: clamp so clear always fires before the next cycle starts.
+    const tPoseClearMs = Math.min(movementPhase + T_POSE_CLEAR_DELAY_MS, effectiveIntervalMs - 100);
+    addTimer(setTimeout(() => {
+      if (store.getState().session?.state === 'active') {
+        store.getState().setCurrentPosition(null, null);
+      }
+    }, tPoseClearMs));
 
     // Haptic "return to T" fires with recovery cue at end of movement phase
     const recoveryMs = MOVEMENT_PHASE_MS[config.difficulty][config.tempo];
@@ -391,14 +414,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
       }, recoveryMs));
     }
 
-    // T+intervalMs: trigger next cycle.
-    // Live pace step (0–4) offsets the interval; clamped so T-pose always clears
-    // before the next call (minimum = movementPhase + 1500 ms).
-    const livePaceStep  = store.getState().session?.livePaceStep ?? PACE_DEFAULT_STEP;
-    const paceOffset    = PACE_STEPS_MS[livePaceStep] ?? 0;
-    const extraPaceMs   = getSettings().movementPaceExtraMs ?? 0;
-    const movementPhase = MOVEMENT_PHASE_MS[config.difficulty][config.tempo];
-    const effectiveInterval = Math.max(movementPhase + 1500, move.intervalMs + paceOffset + extraPaceMs);
+    // T+intervalMs: trigger next cycle using pre-computed effectiveIntervalMs.
     loopTimer.current = setTimeout(() => {
       if (store.getState().session?.state !== 'active') return;
 
@@ -416,22 +432,30 @@ export function useSessionEngine(db: SQLiteDatabase) {
       }
 
       fireMoveLoop();
-    }, effectiveInterval);
+    }, effectiveIntervalMs);
 
   }, [settings, completeSession, startRest]);
 
   // ── Active state setup ─────────────────────────────────────────────────────
 
-  const startActive = useCallback(() => {
+  // BUG-001: isResume=true skips the T_START_PAUSE_MS delay (no 3-second dead time on resume)
+  const startActive = useCallback((isResume = false) => {
     store.getState().setState('active');
 
-    // Restore from checkpoint if resuming an interrupted session
+    // BUG-002: Restore checkpoint data including the original sessionId so the resumed
+    // session continues under the same DB record rather than creating a new one.
     const resume = store.getState().resumeFromCheckpoint;
     if (resume) {
       store.getState().setElapsedSeconds(resume.elapsedSeconds);
       store.getState().setRepCount(resume.repCount);
       // Shift the session start time so elapsed calc stays correct
       sessionStartRef.current = Date.now() - resume.elapsedSeconds * 1000;
+      if (resume.sessionId) store.getState().setSessionId(resume.sessionId);
+      // Seek engine to the checkpointed set so match-sim speed progression and
+      // set count are correct (engine can't restore exact positions since they're random).
+      if (engineRef.current && typeof resume.setIndex === 'number' && resume.setIndex > 0) {
+        engineRef.current.seekToSet(resume.setIndex);
+      }
       store.getState().setResumeFromCheckpoint(null);
     }
 
@@ -449,19 +473,35 @@ export function useSessionEngine(db: SQLiteDatabase) {
       // Guard: skip if a position/recovery call was spoken within the last 4 s
       // to avoid the coaching phrase interrupting an in-progress instruction.
       const s2 = getSettings();
+      // BUG-030: use elapsed-time delta instead of modulo so cues never miss on pause/resume
       if (
         s2.coachingCues &&
         s2.voiceEnabled &&
         s.config.voiceMode !== 'visual-only' &&
         s.config.voiceMode !== 'beep' &&
         s.elapsedSeconds > 0 &&
-        s.elapsedSeconds % COACHING_INTERVAL_SECS === 0 &&
+        s.elapsedSeconds - lastCoachingCueSecsRef.current >= COACHING_INTERVAL_SECS &&
         Date.now() - lastVoiceCallMsRef.current > 4000
       ) {
+        lastCoachingCueSecsRef.current = s.elapsedSeconds;
         const cueIdx = Math.floor(s.elapsedSeconds / COACHING_INTERVAL_SECS) - 1;
         speakCoach(Audio.getCoachingPhrase(cueIdx));
       }
     }, 1000);
+
+    // Save checkpoint immediately so a resume prompt is available from the very first second.
+    const s0 = store.getState().session;
+    if (s0) {
+      saveCheckpoint(db as any, {
+        sessionId: s0.sessionId,
+        config: s0.config,
+        setIndex: s0.setIndex,
+        moveIndex: s0.moveIndex,
+        movementsCompleted: s0.repCount,
+        elapsedSeconds: s0.elapsedSeconds,
+        savedAt: new Date().toISOString(),
+      }).catch(() => {});
+    }
 
     // 15-second checkpoint saver
     cpTimer.current = setInterval(async () => {
@@ -480,9 +520,9 @@ export function useSessionEngine(db: SQLiteDatabase) {
       } catch {}
     }, CHECKPOINT_INTERVAL_MS);
 
-    // Pause at T before first call so the player is standing at T when the first
-    // instruction fires — mirrors the T-pause that happens between every subsequent rep.
-    addTimer(setTimeout(fireMoveLoop, T_START_PAUSE_MS));
+    // Pause at T before first call. On resume, use a short 300ms delay instead of the
+    // full T_START_PAUSE_MS — the player is already at T, no need to wait 3 seconds.
+    addTimer(setTimeout(fireMoveLoop, isResume ? 300 : T_START_PAUSE_MS));
   }, [db, completeSession, fireMoveLoop]);
 
   // ── Countdown ─────────────────────────────────────────────────────────────
@@ -504,7 +544,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
       addTimer(setTimeout(() => {
         if (s.voiceEnabled) speak('Go!');
         if (s.hapticsEnabled) Haptics.onSessionStart();
-        addTimer(setTimeout(startActive, 700));
+        addTimer(setTimeout(() => startActive(false), 700));
       }, 300));
     }
   }, [startActive]);
@@ -520,18 +560,25 @@ export function useSessionEngine(db: SQLiteDatabase) {
       language: profile.language,
     };
 
-    configRef.current          = fullConfig;
-    movementsRef.current       = [];
-    recoveryCueIdxRef.current  = 0;
-    callIndexRef.current       = 0;
-    lastVoiceCallMsRef.current = 0;
-    isCompletingRef.current    = false;
+    configRef.current                = fullConfig;
+    movementsRef.current             = [];
+    recoveryCueIdxRef.current        = 0;
+    callIndexRef.current             = 0;
+    lastVoiceCallMsRef.current       = 0;
+    lastCoachingCueSecsRef.current   = -COACHING_INTERVAL_SECS;  // BUG-030
+    isCompletingRef.current          = false;
     engineRef.current         = createGhostingEngine(fullConfig);
     sessionStartRef.current  = Date.now();
 
     await Audio.initAudioSession();
 
-    const totalMoves = engineRef.current.estimatedTotalMoves();
+    const ssettings = getSettings();
+    const totalMoves = estimateTotalMoves(
+      fullConfig.duration,
+      fullConfig.difficulty,
+      fullConfig.tempo,
+      ssettings.movementPaceExtraMs ?? 0,
+    );
     store.getState().initSession(fullConfig, totalMoves);
 
     // Announce "Move to the T" before countdown numbers begin
@@ -545,15 +592,20 @@ export function useSessionEngine(db: SQLiteDatabase) {
   }, [profile, runCountdown]);
 
   const pauseSession = useCallback(() => {
-    if (store.getState().session?.state !== 'active') return;
-    clearAllTimers();   // stops move loop + secondTimer + cpTimer
+    const state = store.getState().session?.state;
+    if (state !== 'active' && state !== 'countdown' && state !== 'rest') return;
+    clearAllTimers();   // stops move loop + secondTimer + cpTimer + restTimer
     Audio.stopAudio();
     store.getState().setState('paused');
   }, []);
 
   const resumeSession = useCallback(() => {
     if (store.getState().session?.state !== 'paused') return;
-    startActive();   // restarts secondTimer, cpTimer, and fires first move after T-pause
+    // BUG-001: clear ALL timers (incl. any lingering restTimer) before resuming to prevent
+    // both the rest countdown and the move loop from firing simultaneously.
+    clearAllTimers();
+    Audio.stopAudio();
+    startActive(true);  // isResume=true skips the 3-second T-start pause
   }, [startActive]);
 
   const skipRest = useCallback(() => {
@@ -572,6 +624,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
   const dismissSession = useCallback(() => {
     clearAllTimers();
     Audio.stopAudio();
+    progressStore.setNewPBFlag(null);
     store.getState().endSession();
   }, []);
 
@@ -582,6 +635,18 @@ export function useSessionEngine(db: SQLiteDatabase) {
       clearAllTimers();
       Audio.stopAudio();
     };
+  }, []);
+
+  // Re-initialise the audio session when the app returns to the foreground.
+  // Handles cases where the audio session was interrupted by a phone call,
+  // system sound, or OS audio-focus change while the app was backgrounded.
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (nextState) => {
+      if (nextState === 'active') {
+        Audio.initAudioSession().catch(() => {});
+      }
+    });
+    return () => sub.remove();
   }, []);
 
   return {

@@ -1,6 +1,5 @@
-import { SessionConfig, Position } from '../types';
+import { SessionConfig, Position, ShotGroup } from '../types';
 import {
-  POSITIONS_6PT, POSITIONS_10PT,
   FIXED_ORDER_6PT, FIXED_ORDER_10PT,
   COVERAGE_FILTER, HAND_MIRROR,
   POSITION_ZONE,
@@ -36,24 +35,102 @@ export interface GhostingEngine {
   estimatedTotalMoves(): number;
   /** Reset to the start of set 0 (used for resume / re-run). */
   reset(): void;
+  /** Advance the engine to the given set index and rebuild the set sequence.
+   *  Preserves match-sim progressive speed (setIndex drives the 10% reduction).
+   *  Cannot restore the exact position sequence (it is random), but ensures
+   *  the engine continues from the correct set count rather than repeating set 0. */
+  seekToSet(targetSetIndex: number): void;
 }
 
-// ─── Match simulation rally templates (spec Part H) ──────────────────────────
-// Each entry is the ordered list of destination positions (T implied between each).
+// ─── Shot-group → preferred court positions ───────────────────────────────────
+// Each group maps to positions where those shots have primary or secondary weight.
+// Used to constrain shot-based drills so positions are always tactically realistic.
 
-const MATCH_SIM_PATTERNS_6PT: Position[][] = [
-  ['BR', 'FR', 'BL', 'FL'],             // Drive-Drop Rally
-  ['BL', 'FR', 'BR', 'FL'],             // Boast-Drive
-  ['BR', 'FL', 'BR', 'FL', 'BR', 'FL'], // Boast-Drop-Drive (extended)
-  ['BR', 'FL', 'BR', 'FL'],             // Cross-Court Rally
-  ['BR', 'BR', 'FL', 'BL'],             // Drive-Drive-Boast
-  ['FR', 'BR', 'FL', 'BL'],             // Front-Back Blitz
+const SHOT_GROUP_POSITIONS: Partial<Record<ShotGroup, Position[]>> = {
+  drives:     ['BR', 'BL', 'BMCR', 'BMCL', 'MR', 'ML', 'FR', 'FL'],
+  lengths:    ['BR', 'BL', 'BMCR', 'BMCL', 'MR', 'ML'],
+  drops:      ['FR', 'FL', 'FMCR', 'FMCL', 'MR', 'ML', 'BR', 'BL'],
+  kills:      ['FR', 'FL', 'FMCR', 'FMCL', 'T'],
+  lobs:       ['BR', 'BL', 'BMCR', 'BMCL', 'MR', 'ML', 'FR', 'FL', 'FMCR', 'FMCL'],
+  boasts:     ['BR', 'BL', 'BMCR', 'BMCL', 'MR', 'ML', 'FR', 'FL'],
+  volleys:    ['T', 'FMCR', 'FMCL', 'MR', 'ML'],
+  deception:  ['T', 'FMCR', 'FMCL', 'MR', 'ML', 'BR', 'BL'],
+  // 'mixed' omitted — means all positions are valid
+};
+
+// ─── Match simulation rally templates ─────────────────────────────────────────
+// Each template is a predefined rally sequence of (position + contextual shot).
+// Shots are specific to the rally context — not drawn from the generic matrix.
+// Right-handed layout; mirrored for left-handed players at voice-call time.
+
+interface MatchSimEntry {
+  position: Position;
+  shot: string | null;
+}
+
+const MATCH_SIM_PATTERNS_6PT: MatchSimEntry[][] = [
+  // Classic Drive-Drop: drive length from deep, attack with drop at front
+  [
+    { position: 'BR', shot: 'straight drive'     },
+    { position: 'FR', shot: 'straight drop'      },
+    { position: 'BL', shot: 'straight drive'     },
+    { position: 'FL', shot: 'straight drop'      },
+  ],
+  // Boast-Drive: defensive boast from back, straight drive return from front
+  [
+    { position: 'BL', shot: 'defensive boast'    },
+    { position: 'FR', shot: 'straight drive'     },
+    { position: 'BR', shot: 'defensive boast'    },
+    { position: 'FL', shot: 'straight drive'     },
+  ],
+  // Boast-Drop (3-shot repeat): sustained attacking pattern
+  [
+    { position: 'BR', shot: 'defensive boast'    },
+    { position: 'FL', shot: 'straight drop'      },
+    { position: 'BR', shot: 'defensive boast'    },
+    { position: 'FL', shot: 'straight drop'      },
+    { position: 'BR', shot: 'defensive boast'    },
+    { position: 'FL', shot: 'straight drop'      },
+  ],
+  // Crosscourt Exchange: sustained crosscourt drives
+  [
+    { position: 'BR', shot: 'crosscourt drive'   },
+    { position: 'FL', shot: 'crosscourt drive'   },
+    { position: 'BR', shot: 'crosscourt drive'   },
+    { position: 'FL', shot: 'crosscourt drive'   },
+  ],
+  // Drive-Boast-Drop: drive long, recover to T, boast from back, attack with drop
+  [
+    { position: 'BR', shot: 'straight drive'     },
+    { position: 'T',  shot: null                 },
+    { position: 'BL', shot: 'defensive boast'    },
+    { position: 'FR', shot: 'straight drop'      },
+  ],
+  // T Volley Intercept: attack from the T, opponent pushed deep
+  [
+    { position: 'T',  shot: 'volley drive'       },
+    { position: 'BR', shot: 'hard length'        },
+    { position: 'T',  shot: 'volley drop'        },
+    { position: 'FL', shot: 'straight drive'     },
+  ],
 ];
 
-const MATCH_SIM_PATTERNS_10PT: Position[][] = [
+const MATCH_SIM_PATTERNS_10PT: MatchSimEntry[][] = [
   ...MATCH_SIM_PATTERNS_6PT,
-  ['BMCR', 'FMCL', 'BMCL', 'FMCR'],    // Pressure Rally (10pt only)
-  ['FMCR', 'BL', 'FMCL', 'BR'],         // Volley-Drive
+  // Front Volley Pressure (10pt): intercept at front volley zone
+  [
+    { position: 'BMCR', shot: 'straight drive'   },
+    { position: 'FMCL', shot: 'volley drop'      },
+    { position: 'BMCL', shot: 'straight drive'   },
+    { position: 'FMCR', shot: 'volley drop'      },
+  ],
+  // Volley-Drive Attack (10pt): intercept early and drive opponent deep
+  [
+    { position: 'FMCR', shot: 'volley drive'     },
+    { position: 'BL',   shot: 'straight drive'   },
+    { position: 'FMCL', shot: 'volley drive'     },
+    { position: 'BR',   shot: 'straight drive'   },
+  ],
 ];
 
 // ─── Private helpers ──────────────────────────────────────────────────────────
@@ -121,24 +198,55 @@ function buildPool(config: SessionConfig): Position[] {
   return pool.length >= 2 ? pool : base.slice(0, 2);
 }
 
+/**
+ * Filters the base position pool to positions where the selected shot groups
+ * have primary or secondary shots. This ensures shot-based drills only visit
+ * positions where calling those shots is tactically realistic.
+ * Falls back to the full pool when the filter produces fewer than 2 positions.
+ */
+function buildShotBasedPool(basePool: Position[], shotGroups: ShotGroup[]): Position[] {
+  if (shotGroups.includes('mixed')) return basePool;
+  const preferred = new Set<Position>();
+  for (const group of shotGroups) {
+    (SHOT_GROUP_POSITIONS[group] ?? []).forEach(p => preferred.add(p as Position));
+  }
+  const filtered = basePool.filter(p => preferred.has(p));
+  return filtered.length >= 2 ? filtered : basePool;
+}
+
 function fixedSet(config: SessionConfig, pool: Position[], count: number): Position[] {
   const order = config.courtSystem === '6pt' ? FIXED_ORDER_6PT : FIXED_ORDER_10PT;
   const filtered = order.filter((p) => pool.includes(p));
   if (filtered.length === 0) return shuffleNoRepeat(pool, count);
-
   return Array.from({ length: count }, (_, i) => filtered[i % filtered.length]);
 }
 
-function matchSimSet(config: SessionConfig, pool: Position[], count: number): Position[] {
+function matchSimSet(
+  config: SessionConfig,
+  pool: Position[],
+  count: number,
+): { positions: Position[]; shots: (string | null)[] } {
   const templates =
     config.courtSystem === '10pt' ? MATCH_SIM_PATTERNS_10PT : MATCH_SIM_PATTERNS_6PT;
 
-  const compatible = templates.filter((t) => t.every((p) => pool.includes(p)));
-  if (compatible.length === 0) return shuffleNoRepeat(pool, count);
+  // Only use templates whose positions are all in the active pool
+  const compatible = templates.filter(t => t.every(e => pool.includes(e.position)));
+
+  if (compatible.length === 0) {
+    // No compatible template — fall back to random positions, no template shots
+    const positions = shuffleNoRepeat(pool, count);
+    return { positions, shots: new Array(count).fill(null) };
+  }
 
   const pattern = compatible[Math.floor(Math.random() * compatible.length)];
-  return Array.from({ length: count }, (_, i) => pattern[i % pattern.length]);
+  const positions = Array.from({ length: count }, (_, i) => pattern[i % pattern.length].position);
+  const shots     = Array.from({ length: count }, (_, i) => pattern[i % pattern.length].shot);
+  return { positions, shots };
 }
+
+// Shot names are position-agnostic (no forehand/backhand prefix), so no
+// mirroring is needed for left-handed players — the position label already
+// communicates which hand is used.
 
 // ─── Factory ──────────────────────────────────────────────────────────────────
 
@@ -147,9 +255,10 @@ export function createGhostingEngine(config: SessionConfig): GhostingEngine {
   const movesPerSet    = MOVES_PER_SET[config.difficulty];
   const pool           = buildPool(config);
 
-  let setIndex  = 0;
-  let moveIndex = 0;
-  let sequence: Position[] = [];
+  let setIndex      = 0;
+  let moveIndex     = 0;
+  let sequence:     Position[]          = [];
+  let sequenceShots: (string | null)[]  = [];
 
   function effectiveInterval(): number {
     if (config.patternType !== 'match-sim') return baseIntervalMs;
@@ -158,18 +267,44 @@ export function createGhostingEngine(config: SessionConfig): GhostingEngine {
     return Math.max(baseIntervalMs * 0.60, baseIntervalMs * (1 - reduction));
   }
 
-  function buildSet(): Position[] {
+  function buildSet(): void {
+    const nullShots = (positions: Position[]) => ({
+      positions,
+      shots: new Array(positions.length).fill(null) as (string | null)[],
+    });
+
+    let result: { positions: Position[]; shots: (string | null)[] };
+
     switch (config.patternType) {
-      case 'fixed':      return fixedSet(config, pool, movesPerSet);
+      case 'fixed':
+        result = nullShots(fixedSet(config, pool, movesPerSet));
+        break;
+      case 'shot-based':
+        // Filter positions to where the selected shot groups are tactically meaningful
+        result = nullShots(shuffleNoRepeat(buildShotBasedPool(pool, config.shotGroups), movesPerSet));
+        break;
+      case 'match-sim':
+        // Use predefined rally templates with contextual shots
+        result = matchSimSet(config, pool, movesPerSet);
+        break;
       case 'random':
-      case 'shot-based': return shuffleNoRepeat(pool, movesPerSet);
-      case 'match-sim':  return matchSimSet(config, pool, movesPerSet);
-      default:           return shuffleNoRepeat(pool, movesPerSet);
+      default:
+        // BUG-008: if drillType is shot-based, apply position filtering even for random pattern
+        // so positions are always tactically relevant for the selected shot groups.
+        if (config.drillType === 'shot-based') {
+          result = nullShots(shuffleNoRepeat(buildShotBasedPool(pool, config.shotGroups), movesPerSet));
+        } else {
+          result = nullShots(shuffleNoRepeat(pool, movesPerSet));
+        }
+        break;
     }
+
+    sequence      = result.positions;
+    sequenceShots = result.shots;
   }
 
   // Initialise first set
-  sequence = buildSet();
+  buildSet();
 
   return {
     getNextMove(): SessionMove {
@@ -177,22 +312,29 @@ export function createGhostingEngine(config: SessionConfig): GhostingEngine {
       if (moveIndex >= sequence.length) {
         setIndex++;
         moveIndex = 0;
-        sequence = buildSet();
+        buildSet();
       }
 
       const position    = sequence[moveIndex];
       const interval    = effectiveInterval();
+      const templateShot = sequenceShots[moveIndex] ?? null;
 
-      // Shot selection for non-movement drills.
-      // For left-handed players the pool was mirrored (e.g. FL = their forehand corner).
-      // The shot matrix is keyed on the right-handed layout (FR=forehand, FL=backhand).
-      // Unmirror the position before the shot lookup so labels match the player's hand.
+      // Shot selection:
+      // - movement drills: never call shots
+      // - match-sim: use the template's contextual shot (mirrored for left-handed)
+      // - shot-based / random / fixed with shot drillType: pick from position-shot matrix
       let shot: string | null = null;
       if (config.drillType !== 'movement') {
-        const shotLookupPos = config.dominantHand === 'left' ? HAND_MIRROR[position] : position;
-        const shots = getShotsForPosition(shotLookupPos, config.shotGroups);
-        const entry = pickShot(shots);
-        shot = entry?.voiceText ?? null;
+        if (templateShot !== null) {
+          shot = templateShot;
+        } else {
+          // For left-handed players the pool was mirrored; unmirror before shot lookup
+          // so the shot matrix (keyed on right-handed layout) returns the correct hand.
+          const shotLookupPos = config.dominantHand === 'left' ? HAND_MIRROR[position] : position;
+          const shots = getShotsForPosition(shotLookupPos, config.shotGroups);
+          const entry = pickShot(shots);
+          shot = entry?.voiceText ?? null;
+        }
       }
 
       const move: SessionMove = {
@@ -211,20 +353,38 @@ export function createGhostingEngine(config: SessionConfig): GhostingEngine {
 
     peekNextPosition(): Position | null {
       if (moveIndex < sequence.length) return sequence[moveIndex];
-      // Peek into what the next set would start with
-      const next = buildSet();
-      return next[0] ?? null;
+      // Peek into what the next set would start with — save/restore state
+      const savedMoveIndex = moveIndex;
+      const savedSetIndex  = setIndex;
+      const savedSeq       = sequence;
+      const savedShots     = sequenceShots;
+      setIndex++;
+      moveIndex = 0;
+      buildSet();
+      const next = sequence[0] ?? null;
+      // Restore
+      setIndex      = savedSetIndex;
+      moveIndex     = savedMoveIndex;
+      sequence      = savedSeq;
+      sequenceShots = savedShots;
+      return next;
     },
 
-    isSetComplete():        boolean  { return moveIndex >= sequence.length; },
-    getSetIndex():          number   { return setIndex; },
-    getMoveIndex():         number   { return moveIndex; },
-    estimatedTotalMoves(): number   { return estimateTotalMoves(config.duration, config.difficulty, config.tempo); },
+    isSetComplete():        boolean { return moveIndex >= sequence.length; },
+    getSetIndex():          number  { return setIndex; },
+    getMoveIndex():         number  { return moveIndex; },
+    estimatedTotalMoves(): number  { return estimateTotalMoves(config.duration, config.difficulty, config.tempo); },
 
     reset(): void {
       setIndex  = 0;
       moveIndex = 0;
-      sequence  = buildSet();
+      buildSet();
+    },
+
+    seekToSet(targetSetIndex: number): void {
+      setIndex  = Math.max(0, targetSetIndex);
+      moveIndex = 0;
+      buildSet();
     },
   };
 }

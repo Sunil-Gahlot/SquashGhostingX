@@ -10,7 +10,9 @@ import { Colors } from '../../constants/colors';
 import { FontSize, FontWeight, Spacing, BorderRadius, ButtonHeight } from '../../constants/layout';
 import PillSelector from '../../components/ui/PillSelector';
 import { useProfileStore } from '../../stores/profileStore';
-import { SkillLevel, TrainingGoal, DominantHand, VoiceGender } from '../../types';
+import { SkillLevel, TrainingGoal, DominantHand, VoiceGender, Language } from '../../types';
+import { LANGUAGE_OPTIONS, getLanguageLabel } from '../../constants/languages';
+import * as Audio from '../../engine/audioEngine';
 
 // ─── Step options ─────────────────────────────────────────────────────────────
 
@@ -72,7 +74,22 @@ function Step1({
   return (
     <View style={stepStyles.container}>
       <Text style={stepStyles.title}>Welcome to SquashGhostingX</Text>
+      <Text style={stepStyles.tagline}>
+        {'Train '}
+        <Text style={stepStyles.taglineGreen}>Smart.</Text>
+        {'  Move '}
+        <Text style={stepStyles.taglineOrange}>Faster.</Text>
+        {'  Dominate the Court.'}
+      </Text>
       <Text style={stepStyles.sub}>Let's personalise your training.</Text>
+
+      {/* Ghosting explainer (PQA-01) */}
+      <View style={stepStyles.explainerCard}>
+        <Ionicons name="information-circle-outline" size={18} color={Colors.brand} />
+        <Text style={stepStyles.explainerText}>
+          {'Squash ghosting is solo court movement training — you shadow match footwork without a ball. The app calls positions and tracks your pace.'}
+        </Text>
+      </View>
 
       <Text style={stepStyles.sectionLabel}>WHAT'S YOUR LEVEL?</Text>
       <View style={stepStyles.pillWrap}>
@@ -119,9 +136,11 @@ function Step1({
   );
 }
 
+// BUG-034: added Non-Binary option
 const GENDER_OPTIONS = [
-  { label: 'Male',   value: 'male'   },
-  { label: 'Female', value: 'female' },
+  { label: 'Male',       value: 'male'      },
+  { label: 'Female',     value: 'female'    },
+  { label: 'Non-Binary', value: 'nonbinary' },
 ];
 
 // ─── Step 2: Hand + Voice + Name + Age + Gender ───────────────────────────────
@@ -158,7 +177,11 @@ function Step2({
       <TextInput
         style={stepStyles.input}
         value={age}
-        onChangeText={onAge}
+        onChangeText={(t) => {
+          const digits = t.replace(/[^0-9]/g, '');
+          const num = Number(digits);
+          if (digits === '' || (num >= 1 && num <= 120)) onAge(digits);
+        }}
         placeholder="Your age…"
         placeholderTextColor={Colors.textMuted}
         keyboardType="number-pad"
@@ -193,36 +216,110 @@ function Step2({
   );
 }
 
+// ─── Step 3: Language ─────────────────────────────────────────────────────────
+
+function Step3({
+  language, voice,
+  onLanguage,
+}: {
+  language: Language;
+  voice: VoiceGender;
+  onLanguage: (v: Language) => void;
+}) {
+  return (
+    <View style={stepStyles.container}>
+      <Text style={stepStyles.title}>Coaching Language</Text>
+      <Text style={stepStyles.sub}>Pick the language for position calls.</Text>
+
+      <View style={langStyles.grid}>
+        {LANGUAGE_OPTIONS.map((opt) => {
+          const active = opt.value === language;
+          return (
+            <TouchableOpacity
+              key={opt.value}
+              style={[langStyles.chip, active && langStyles.chipActive]}
+              onPress={() => onLanguage(opt.value)}
+              activeOpacity={0.75}
+            >
+              <Text style={[langStyles.chipLabel, active && langStyles.chipLabelActive]}>
+                {opt.label}
+              </Text>
+              {active && <Ionicons name="checkmark" size={13} color={Colors.brand} />}
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+
+      <TouchableOpacity
+        style={langStyles.previewBtn}
+        onPress={() => Audio.speakText('Front Left. Recover to T.', 0.9, language, voice)}
+        activeOpacity={0.75}
+      >
+        <Ionicons name="volume-high-outline" size={16} color={Colors.brand} />
+        <Text style={langStyles.previewText}>Preview Voice</Text>
+      </TouchableOpacity>
+      <Text style={langStyles.previewHint}>
+        Plays: "Front Left. Recover to T." in {getLanguageLabel(language)}
+      </Text>
+    </View>
+  );
+}
+
+const langStyles = StyleSheet.create({
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm, marginBottom: Spacing.xl },
+  chip: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1.5, borderColor: Colors.border,
+    backgroundColor: Colors.surface,
+  },
+  chipActive:       { borderColor: Colors.brand, backgroundColor: Colors.brandSoft },
+  chipLabel:        { fontSize: FontSize.caption, fontWeight: FontWeight.medium, color: Colors.textMuted },
+  chipLabelActive:  { color: Colors.brand, fontWeight: FontWeight.semiBold },
+  previewBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: Spacing.sm,
+    height: ButtonHeight.md, borderRadius: BorderRadius.full,
+    borderWidth: 1.5, borderColor: Colors.brand,
+    backgroundColor: Colors.brandSoft, marginBottom: Spacing.sm,
+  },
+  previewText:  { fontSize: FontSize.label, fontWeight: FontWeight.semiBold, color: Colors.brand },
+  previewHint:  { fontSize: FontSize.caption, color: Colors.textMuted, textAlign: 'center' },
+});
+
 // ─── Main modal ───────────────────────────────────────────────────────────────
 
 export default function OnboardingModal() {
   const { isOnboardingComplete, hasCompletedAuth, profile, setProfile, completeOnboarding } = useProfileStore();
 
-  const [step,   setStep]   = useState(0);
-  const [skill,  setSkill]  = useState<SkillLevel>(profile.skillLevel);
-  const [goal,   setGoal]   = useState<TrainingGoal>(profile.trainingGoal);
-  const [hand,   setHand]   = useState<DominantHand>(profile.dominantHand);
-  const [voice,  setVoice]  = useState<VoiceGender>(profile.voiceGender);
-  const [name,   setName]   = useState(profile.name);
-  const [age,    setAge]    = useState(profile.age ? String(profile.age) : '');
-  const [gender, setGender] = useState(profile.gender ?? '');
+  const [step,     setStep]     = useState(0);
+  const [skill,    setSkill]    = useState<SkillLevel>(profile.skillLevel);
+  const [goal,     setGoal]     = useState<TrainingGoal>(profile.trainingGoal);
+  const [hand,     setHand]     = useState<DominantHand>(profile.dominantHand);
+  const [voice,    setVoice]    = useState<VoiceGender>(profile.voiceGender);
+  const [name,     setName]     = useState(profile.name);
+  const [age,      setAge]      = useState(profile.age ? String(profile.age) : '');
+  const [gender,   setGender]   = useState(profile.gender ?? '');
+  const [language, setLanguage] = useState<Language>(profile.language ?? 'en-US');
 
   function handleGender(v: string) {
     setGender(v);
-    if (v === 'male' || v === 'female') setVoice(v as VoiceGender);
   }
 
   function handleNext() {
-    if (step < 1) { setStep(step + 1); }
+    if (step < 2) { setStep(step + 1); }
     else { finish(); }
   }
 
   function finish() {
+    // BUG-022: fall back to 'Player' if name was left blank so profile.name is never empty.
+    const finalName = name.trim() || 'Player';
     setProfile({
       skillLevel: skill, trainingGoal: goal, dominantHand: hand,
-      voiceGender: voice, name,
+      voiceGender: voice, name: finalName,
       age: age ? Number(age) : null,
       gender: gender || null,
+      language,
     });
     completeOnboarding();
   }
@@ -237,7 +334,7 @@ export default function OnboardingModal() {
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-            <ProgressDots total={2} current={step} />
+            <ProgressDots total={3} current={step} />
 
             {step === 0 && (
               <Step1
@@ -252,6 +349,12 @@ export default function OnboardingModal() {
                 onAge={setAge} onGender={handleGender}
               />
             )}
+            {step === 2 && (
+              <Step3
+                language={language} voice={voice}
+                onLanguage={setLanguage}
+              />
+            )}
           </ScrollView>
 
           <View style={styles.footer}>
@@ -262,7 +365,7 @@ export default function OnboardingModal() {
             )}
             <TouchableOpacity onPress={handleNext} style={styles.nextBtn}>
               <Text style={styles.nextText}>
-                {step < 1 ? 'Next  →' : '▶  Start Training'}
+                {step < 2 ? 'Next  →' : '▶  Start Training'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -276,7 +379,17 @@ export default function OnboardingModal() {
 const stepStyles = StyleSheet.create({
   container:      { flex: 1 },
   title:          { fontSize: FontSize.hero, fontWeight: FontWeight.bold, color: Colors.textPrimary, marginBottom: Spacing.xs },
+  tagline:        { fontSize: FontSize.caption, fontWeight: FontWeight.semiBold, color: Colors.textMuted, letterSpacing: 0.2, marginBottom: Spacing.sm },
+  taglineGreen:   { color: '#34C759', fontWeight: FontWeight.bold },
+  taglineOrange:  { color: Colors.brand, fontWeight: FontWeight.bold },
   sub:            { fontSize: FontSize.body, color: Colors.textMuted, marginBottom: Spacing.xl },
+  explainerCard:  {
+    flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.sm,
+    backgroundColor: `${Colors.brand}12`, borderRadius: BorderRadius.md,
+    borderWidth: 1, borderColor: `${Colors.brand}30`,
+    padding: Spacing.md, marginBottom: Spacing.xl,
+  },
+  explainerText:  { flex: 1, fontSize: FontSize.caption, color: Colors.textMuted, lineHeight: 18 },
   sectionLabel:   {
     fontSize: FontSize.caption, fontWeight: FontWeight.bold,
     color: Colors.textMuted, letterSpacing: 1.2, marginBottom: Spacing.sm,

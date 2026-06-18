@@ -26,13 +26,14 @@ type StepOption = {
   icon: keyof typeof Ionicons.glyphMap;
   iconColor: string;
   iconBg: string;
+  comingSoon?: boolean;
 };
 
 // ─── Step data ────────────────────────────────────────────────────────────────
 
 const DRILL_TYPE_OPTS: StepOption[] = [
   { value: 'shot-based', title: 'Shot-Based Training', desc: 'Movement drills with shot-type voice calls. e.g. "Move to Front Left and hit Drive".', icon: 'golf',      iconColor: Colors.brand,          iconBg: Colors.brandMuted },
-  { value: 'match-sim',  title: 'Match Simulation',    desc: 'Predefined match sequences. Focus on realistic point-play flows.',                     icon: 'trophy',    iconColor: Colors.gold,           iconBg: `${Colors.gold}22` },
+  { value: 'match-sim',  title: 'Match Simulation',    desc: 'Predefined match sequences. Focus on realistic point-play flows.',                     icon: 'trophy',    iconColor: Colors.gold,           iconBg: `${Colors.gold}22`, comingSoon: true },
   { value: 'movement',   title: 'Movement Only',       desc: 'Pure ghosting footwork. Focus purely on court coverage without any shot calls.',        icon: 'walk',      iconColor: Colors.accentProgress, iconBg: `${Colors.accentProgress}22` },
   { value: 'custom',     title: 'Custom Drill',        desc: 'Build your own routine. Pick specific positions and shots for a tailored session.',     icon: 'construct', iconColor: Colors.accentLibrary,  iconBg: `${Colors.accentLibrary}22` },
 ];
@@ -64,19 +65,6 @@ const PATTERN_OPTS_ALL: StepOption[] = [
   { value: 'shot-based', title: 'Shot-Based', desc: 'Sequence driven by your shot group selection.',     icon: 'golf',    iconColor: Colors.accentRoutines, iconBg: `${Colors.accentRoutines}22` },
 ];
 
-const SHOT_GROUP_OPTIONS = [
-  { label: 'Mixed (all)',  value: 'mixed'       },
-  { label: 'Drives',       value: 'drives'      },
-  { label: 'Rails',        value: 'rails'       },
-  { label: 'Cross Shots',  value: 'cross'       },
-  { label: 'Diagonals',    value: 'diagonals'   },
-  { label: 'Drops',        value: 'drops'       },
-  { label: 'Front Court',  value: 'front-court' },
-  { label: 'Volleys',      value: 'volleys'     },
-  { label: 'Boasts',       value: 'boasts'      },
-  { label: 'Lobs',         value: 'lobs'        },
-  { label: 'Kill Shots',   value: 'kills'       },
-];
 
 const DURATION_OPTIONS = [
   { label: '5 min',  value: '5'  },
@@ -93,7 +81,9 @@ const TEMPO_OPTIONS = [
 ];
 
 const REST_MODE_OPTIONS = [
-  { label: 'Auto (40% of set)', value: 'auto' }, { label: 'Manual', value: 'manual' },
+  { label: 'Auto (40% of set)', value: 'auto' },
+  { label: 'Manual', value: 'manual' },
+  { label: 'No Rest', value: 'none' },
 ];
 
 const REST_SECONDS_OPTIONS = [
@@ -154,7 +144,7 @@ function OptionCard({ option, selected, onPress }: {
 }) {
   return (
     <TouchableOpacity
-      style={[ocStyles.card, selected && ocStyles.selected]}
+      style={[ocStyles.card, selected && ocStyles.selected, option.comingSoon && ocStyles.cardDim]}
       onPress={onPress}
       activeOpacity={0.75}
     >
@@ -162,7 +152,14 @@ function OptionCard({ option, selected, onPress }: {
         <Ionicons name={option.icon} size={26} color={selected ? Colors.brand : option.iconColor} />
       </View>
       <View style={ocStyles.textBlock}>
-        <Text style={[ocStyles.title, selected && ocStyles.titleSel]}>{option.title}</Text>
+        <View style={ocStyles.titleRow}>
+          <Text style={[ocStyles.title, selected && ocStyles.titleSel]}>{option.title}</Text>
+          {option.comingSoon && (
+            <View style={ocStyles.comingSoonBadge}>
+              <Text style={ocStyles.comingSoonText}>COMING SOON</Text>
+            </View>
+          )}
+        </View>
         <Text style={ocStyles.desc}>{option.desc}</Text>
       </View>
       <View style={[ocStyles.check, selected && ocStyles.checkSel]}>
@@ -184,12 +181,121 @@ const ocStyles = StyleSheet.create({
   selected: { borderColor: Colors.brand, backgroundColor: Colors.brandSoft },
   iconBox:  { width: 56, height: 56, borderRadius: BorderRadius.md, alignItems: 'center', justifyContent: 'center' },
   textBlock:{ flex: 1, gap: 3 },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs, flexWrap: 'wrap' },
   title:    { fontSize: FontSize.label, fontWeight: FontWeight.semiBold, color: Colors.textPrimary },
   titleSel: { color: Colors.brand },
   desc:     { fontSize: FontSize.caption, color: Colors.textMuted, lineHeight: 17 },
   check:    { width: 22, height: 22, borderRadius: 11, borderWidth: 1.5, borderColor: Colors.border, alignItems: 'center', justifyContent: 'center' },
   checkSel: { backgroundColor: Colors.brand, borderColor: Colors.brand },
+  cardDim:  { opacity: 0.65 },
+  comingSoonBadge: {
+    backgroundColor: `${Colors.gold}22`,
+    borderRadius: BorderRadius.sm,
+    borderWidth: 1, borderColor: `${Colors.gold}55`,
+    paddingHorizontal: 5, paddingVertical: 1,
+  },
+  comingSoonText: {
+    fontSize: 8, fontWeight: FontWeight.bold, color: Colors.gold, letterSpacing: 0.8,
+  },
 });
+
+// ─── Shot group grid ─────────────────────────────────────────────────────────
+
+const SHOT_ITEMS = [
+  { label: 'Mixed (all)', value: 'mixed',     icon: 'shuffle'              },
+  { label: 'Drives',      value: 'drives',    icon: 'arrow-up'             },
+  { label: 'Lengths',     value: 'lengths',   icon: 'git-branch'           },
+  { label: 'Drops',       value: 'drops',     icon: 'arrow-down'           },
+  { label: 'Kills',       value: 'kills',     icon: 'flame'                },
+  { label: 'Lobs',        value: 'lobs',      icon: 'cloud'                },
+  { label: 'Boasts',      value: 'boasts',    icon: 'return-down-forward'  },
+  { label: 'Volleys',     value: 'volleys',   icon: 'flash'                },
+  { label: 'Deception',   value: 'deception', icon: 'eye-off'              },
+] as const;
+
+function ShotGroupSelector({
+  selectedGroups,
+  onSelect,
+}: {
+  selectedGroups: ShotGroup[];
+  onSelect: (v: string) => void;
+}) {
+  return (
+    <View style={sgStyles.grid}>
+      {SHOT_ITEMS.map((item) => {
+        const active = selectedGroups.includes(item.value as ShotGroup);
+        return (
+          <TouchableOpacity
+            key={item.value}
+            style={[sgStyles.chip, active && sgStyles.chipActive]}
+            onPress={() => onSelect(item.value)}
+            activeOpacity={0.75}
+          >
+            <Ionicons name={item.icon as any} size={14} color={active ? Colors.brand : Colors.textMuted} />
+            <Text style={[sgStyles.chipLabel, active && sgStyles.chipLabelActive]}>{item.label}</Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+}
+
+const sgStyles = StyleSheet.create({
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
+  chip: {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1.5, borderColor: Colors.border,
+    backgroundColor: Colors.surface,
+  },
+  chipActive:       { borderColor: Colors.brand, backgroundColor: Colors.brandSoft },
+  chipLabel:        { fontSize: FontSize.caption, fontWeight: FontWeight.semiBold, color: Colors.textMuted },
+  chipLabelActive:  { color: Colors.brand },
+});
+
+// ─── Context info card ────────────────────────────────────────────────────────
+
+function TipCard({ icon, title, body }: { icon: string; title: string; body: string }) {
+  return (
+    <View style={tipStyles.card}>
+      <View style={tipStyles.iconWrap}>
+        <Ionicons name={icon as any} size={18} color={Colors.accentProgress} />
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={tipStyles.title}>{title}</Text>
+        <Text style={tipStyles.body}>{body}</Text>
+      </View>
+    </View>
+  );
+}
+
+const tipStyles = StyleSheet.create({
+  card: {
+    flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.md,
+    backgroundColor: `${Colors.accentProgress}0E`,
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1, borderColor: `${Colors.accentProgress}25`,
+    padding: Spacing.md,
+    marginTop: Spacing.md,
+  },
+  iconWrap: {
+    width: 34, height: 34, borderRadius: BorderRadius.sm,
+    backgroundColor: `${Colors.accentProgress}18`,
+    alignItems: 'center', justifyContent: 'center',
+    flexShrink: 0,
+  },
+  title: { fontSize: FontSize.label, fontWeight: FontWeight.semiBold, color: Colors.textPrimary, marginBottom: 4 },
+  body:  { fontSize: FontSize.caption, color: Colors.textMuted, lineHeight: 18 },
+});
+
+// ─── Pattern tip lookup ───────────────────────────────────────────────────────
+
+const PATTERN_TIP: Record<string, { title: string; body: string }> = {
+  random:      { title: 'Random Sequence', body: 'Every call is unpredictable — exactly like a real match. Best for building reaction speed and match-readiness.' },
+  fixed:       { title: 'Fixed Sequence',  body: 'Positions repeat in the same order. Drill a specific movement pattern until it becomes muscle memory.' },
+  'shot-based':{ title: 'Shot-Based Flow', body: 'Positions are driven by your selected shot groups. Combines court movement with shot-type decision making.' },
+};
 
 function CompactSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -202,8 +308,8 @@ function CompactSection({ title, children }: { title: string; children: React.Re
   );
 }
 
-function IntervalPreview({ difficulty, tempo }: { difficulty: Difficulty; tempo: Tempo }) {
-  const ms = getIntervalMs(difficulty, tempo);
+function IntervalPreview({ difficulty, tempo, extraMs = 0 }: { difficulty: Difficulty; tempo: Tempo; extraMs?: number }) {
+  const ms = getIntervalMs(difficulty, tempo) + extraMs;
   const perMin = Math.round(60_000 / ms);
   return (
     <View style={{ backgroundColor: Colors.brandSoft, borderRadius: BorderRadius.sm, padding: Spacing.sm, marginBottom: Spacing.lg, alignItems: 'center' }}>
@@ -268,9 +374,15 @@ export default function DrillConfigModal() {
     setCurrentStep((s) => s - 1);
   }
   function handleStart() {
+    // match-sim skips the pattern step, so patternType stays at its default 'random'.
+    // Enforce the correct patternType so the engine uses rally templates.
+    const effectivePatternType: PatternType =
+      drillType === 'match-sim' ? 'match-sim' : patternType;
+
     const config: SessionConfig = {
-      drillType, courtSystem, coverage, patternType, shotGroups,
-      duration, tempo, difficulty, restMode, restSeconds, voiceMode,
+      drillType, courtSystem, coverage,
+      patternType: effectivePatternType,
+      shotGroups, duration, tempo, difficulty, restMode, restSeconds, voiceMode,
       dominantHand: profile.dominantHand,
       voiceGender:  profile.voiceGender,
       language:     profile.language,
@@ -339,11 +451,18 @@ export default function DrillConfigModal() {
             <Text style={styles.stepSub}>{STEP_SUB[stepKey]}</Text>
           ) : null}
 
-          {/* Drill Type */}
           {stepKey === 'drillType' && DRILL_TYPE_OPTS.map((opt) => (
             <OptionCard key={opt.value} option={opt}
               selected={drillType === opt.value}
-              onPress={() => setDrillType(opt.value as DrillType)}
+              onPress={() => {
+                setDrillType(opt.value as DrillType);
+                // BUG-016: reset step to 1 whenever drill type changes to prevent
+                // landing on an out-of-range step when switching between 5/6-step flows.
+                setCurrentStep(1);
+                // Pre-set the most meaningful patternType for each drill type.
+                if (opt.value === 'shot-based') setPatternType('shot-based');
+                else if (opt.value === 'movement' || opt.value === 'custom') setPatternType('random');
+              }}
             />
           ))}
 
@@ -372,12 +491,25 @@ export default function DrillConfigModal() {
           )}
 
           {/* Coverage */}
-          {stepKey === 'coverage' && COVERAGE_OPTS.map((opt) => (
-            <OptionCard key={opt.value} option={opt}
-              selected={coverage === opt.value}
-              onPress={() => setCoverage(opt.value as CoverageMode)}
-            />
-          ))}
+          {stepKey === 'coverage' && (
+            <>
+              {COVERAGE_OPTS.map((opt) => (
+                <OptionCard key={opt.value} option={opt}
+                  selected={coverage === opt.value}
+                  onPress={() => setCoverage(opt.value as CoverageMode)}
+                />
+              ))}
+              {/* BUG-009: warn when match-sim + non-full coverage */}
+              {drillType === 'match-sim' && coverage !== 'full' && (
+                <View style={styles.warnCard}>
+                  <Ionicons name="warning-outline" size={16} color={Colors.gold} />
+                  <Text style={styles.warnText}>
+                    Match Simulation rally templates require Full Court. This selection will fall back to random movement with no shot calls.
+                  </Text>
+                </View>
+              )}
+            </>
+          )}
 
           {/* Court System */}
           {stepKey === 'courtSystem' && (
@@ -388,11 +520,14 @@ export default function DrillConfigModal() {
                   onPress={() => setCourtSystem(opt.value as CourtSystem)}
                 />
               ))}
-              {courtSystem === '10pt' && (
-                <Text style={styles.hint}>
-                  10-point adds 4 mid-diagonal positions — recommended Advanced+
-                </Text>
-              )}
+              <TipCard
+                icon={courtSystem === '10pt' ? 'grid-outline' : 'apps-outline'}
+                title={courtSystem === '10pt' ? '10-Point: Advanced coverage' : '6-Point: The classic layout'}
+                body={courtSystem === '10pt'
+                  ? 'Adds 4 mid-diagonal positions to the 6 corners + T. Trains more realistic angles and court movement — recommended for Advanced level and above.'
+                  : '6 positions: 4 corners, the T, and the front centre. The standard ghosting layout used at all levels. Simple to learn, hard to master.'
+                }
+              />
             </>
           )}
 
@@ -406,14 +541,16 @@ export default function DrillConfigModal() {
                 />
               ))}
               {showShots && (
-                <CompactSection title="SHOT GROUPS">
-                  <PillSelector
-                    options={SHOT_GROUP_OPTIONS}
-                    selected={shotGroups}
-                    onSelect={handleShotGroupSelect}
-                    multiSelect
-                  />
+                <CompactSection title="SHOT GROUPS  (multi-select)">
+                  <ShotGroupSelector selectedGroups={shotGroups} onSelect={handleShotGroupSelect} />
                 </CompactSection>
+              )}
+              {!showShots && PATTERN_TIP[patternType] && (
+                <TipCard
+                  icon="information-circle-outline"
+                  title={PATTERN_TIP[patternType].title}
+                  body={PATTERN_TIP[patternType].body}
+                />
               )}
             </>
           )}
@@ -429,7 +566,7 @@ export default function DrillConfigModal() {
                 <PillSelector options={TEMPO_OPTIONS} selected={tempo}
                   onSelect={(v) => setTempo(v as Tempo)} />
               </CompactSection>
-              <IntervalPreview difficulty={difficulty} tempo={tempo} />
+              <IntervalPreview difficulty={difficulty} tempo={tempo} extraMs={settings.movementPaceExtraMs ?? 0} />
               <CompactSection title="REST INTERVAL">
                 <PillSelector options={REST_MODE_OPTIONS} selected={restMode}
                   onSelect={(v) => setRestMode(v as RestMode)} />
@@ -439,6 +576,9 @@ export default function DrillConfigModal() {
                     <PillSelector options={REST_SECONDS_OPTIONS} selected={String(restSeconds)}
                       onSelect={(v) => setRestSeconds(Number(v))} scrollable />
                   </View>
+                )}
+                {restMode === 'none' && (
+                  <Text style={styles.hint}>No rest between sets — continuous training.</Text>
                 )}
               </CompactSection>
               <CompactSection title="VOICE MODE">
@@ -534,6 +674,15 @@ const styles = StyleSheet.create({
 
   restRow:   { flexDirection: 'row', alignItems: 'center', marginTop: Spacing.sm, gap: Spacing.sm },
   restLabel: { fontSize: FontSize.label, color: Colors.textSecondary, width: 72 },
+
+  warnCard: {
+    flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.sm,
+    backgroundColor: `${Colors.gold}18`,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1, borderColor: `${Colors.gold}44`,
+    padding: Spacing.md, marginBottom: Spacing.sm,
+  },
+  warnText: { flex: 1, fontSize: FontSize.caption, color: Colors.textSecondary, lineHeight: 18 },
 
   footer: {
     padding: Spacing.base,

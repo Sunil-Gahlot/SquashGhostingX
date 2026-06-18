@@ -1,8 +1,8 @@
 import React from 'react';
 import {
-  Modal, View, Text, StyleSheet, TouchableOpacity,
+  Modal, View, Text, StyleSheet, TouchableOpacity, Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { useSQLiteContext } from 'expo-sqlite';
 
 import { Colors } from '../../constants/colors';
@@ -27,23 +27,39 @@ export default function ResumePromptModal() {
   const ss = String(cp.elapsedSeconds % 60).padStart(2, '0');
 
   function handleResume() {
-    // Store restore data so startActive() applies elapsed time + rep count
+    // Store restore data so startActive() applies elapsed time, rep count, sessionId AND set position
     setResumeFromCheckpoint({
       elapsedSeconds: cp.elapsedSeconds,
       repCount: cp.movementsCompleted,
+      sessionId: cp.sessionId,
+      setIndex: cp.setIndex,
     });
     setPendingConfig(cp.config);
     setPendingCheckpoint(null);
   }
 
   function handleDiscard() {
-    deleteCheckpoint(db).catch(() => {});
-    setPendingCheckpoint(null);
+    Alert.alert(
+      'Discard Session?',
+      'Your paused session progress will be permanently lost.',
+      [
+        { text: 'Keep', style: 'cancel' },
+        {
+          text: 'Discard',
+          style: 'destructive',
+          onPress: () => {
+            deleteCheckpoint(db).catch(() => {});
+            setPendingCheckpoint(null);
+          },
+        },
+      ]
+    );
   }
 
   return (
-    <Modal visible transparent animationType="fade">
+    <Modal visible transparent animationType="fade" onRequestClose={handleDiscard}>
       <View style={styles.backdrop}>
+        <SafeAreaProvider>
         <SafeAreaView edges={['bottom']}>
           <View style={styles.sheet}>
             {/* Header */}
@@ -82,6 +98,7 @@ export default function ResumePromptModal() {
             </TouchableOpacity>
           </View>
         </SafeAreaView>
+        </SafeAreaProvider>
       </View>
     </Modal>
   );

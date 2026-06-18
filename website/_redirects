@@ -1,0 +1,5 @@
+# Clean URL redirects — map extensionless paths the app uses to .html files
+/privacy    /privacy.html   200
+/terms      /terms.html     200
+/guide      /guide.html     200
+/support    /support.html   200

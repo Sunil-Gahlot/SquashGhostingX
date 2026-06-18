@@ -115,11 +115,13 @@ function greeting(): string {
 }
 
 export default function HomeScreen({ navigation }: any) {
-  const { profile, signOut } = useProfileStore();
+  const { profile, signOut, hasCompletedAuth } = useProfileStore();
   const { stats, lastSessionCompletedAt, recentSessions } = useProgressStore();
   const settings = useSettingsStore((s) => s.settings);
   const { setPendingConfig, openDrillConfig } = useSessionStore();
   const { loadData } = useProgressLoader();
+  const scrollRef      = useRef<ScrollView>(null);
+  const prevAuthRef    = useRef(hasCompletedAuth);
   const glowAnim       = useRef(new Animated.Value(0.5)).current;
   const headlineFade   = useRef(new Animated.Value(1)).current;
   const headlineLift   = useRef(new Animated.Value(0)).current;
@@ -205,6 +207,14 @@ export default function HomeScreen({ navigation }: any) {
 
   useEffect(() => { loadData(); }, [lastSessionCompletedAt]);
 
+  // Scroll to top whenever the user completes a fresh sign-in
+  useEffect(() => {
+    if (hasCompletedAuth && !prevAuthRef.current) {
+      scrollRef.current?.scrollTo({ y: 0, animated: false });
+    }
+    prevAuthRef.current = hasCompletedAuth;
+  }, [hasCompletedAuth]);
+
   function handleStartGhosting() {
     setPendingConfig({
       ...suggestion.program.config,
@@ -269,6 +279,7 @@ export default function HomeScreen({ navigation }: any) {
       <HelpModal visible={helpVisible} onClose={() => setHelpVisible(false)} />
       <SafeAreaView style={styles.safe} edges={['top']}>
         <ScrollView
+          ref={scrollRef}
           style={styles.scroll}
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
@@ -314,6 +325,15 @@ export default function HomeScreen({ navigation }: any) {
                 ))}
               </View>
             </View>
+
+            {/* Tagline */}
+            <Text style={styles.heroTagline}>
+              {'Train '}
+              <Text style={styles.heroTaglineGreen}>Smart.</Text>
+              {'  Move '}
+              <Text style={styles.heroTaglineOrange}>Faster.</Text>
+              {'  Dominate the Court.'}
+            </Text>
 
             {/* Two-button CTA row */}
             <View style={styles.heroBtns}>
@@ -518,7 +538,7 @@ export default function HomeScreen({ navigation }: any) {
             <TouchableOpacity
               key={a.id}
               style={styles.articleTile}
-              onPress={() => navigation.navigate('Library')}
+              onPress={() => navigation.navigate('Library', { articleId: a.id } as any)}
               activeOpacity={0.82}
             >
               <View style={[styles.articleIconBox, { backgroundColor: `${a.tagColor}18` }]}>
@@ -549,10 +569,13 @@ export default function HomeScreen({ navigation }: any) {
 function LibraryTile({ title, duration, youtubeId, onPress }: {
   title: string; duration: string; youtubeId: string; onPress: () => void;
 }) {
+  const [imgError, setImgError] = useState(false);
   const thumbUri = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
   return (
     <TouchableOpacity style={libStyles.tile} onPress={onPress} activeOpacity={0.82}>
-      <Image source={{ uri: thumbUri }} style={libStyles.thumb} resizeMode="cover" />
+      {!imgError && (
+        <Image source={{ uri: thumbUri }} style={libStyles.thumb} resizeMode="cover" onError={() => setImgError(true)} />
+      )}
       <View style={libStyles.overlay} />
       <View style={libStyles.playBtn}>
         <Ionicons name="play" size={16} color={Colors.textPrimary} />
@@ -669,8 +692,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   headlineDots: {
-    flexDirection: 'row', gap: 5, marginBottom: Spacing.lg,
+    flexDirection: 'row', gap: 5, marginBottom: Spacing.sm,
   },
+  heroTagline: {
+    fontSize: FontSize.caption,
+    fontWeight: FontWeight.semiBold,
+    color: 'rgba(255,255,255,0.45)',
+    letterSpacing: 0.3,
+    textAlign: 'center',
+    marginBottom: Spacing.lg,
+  },
+  heroTaglineGreen:  { color: '#34C759', fontWeight: FontWeight.bold },
+  heroTaglineOrange: { color: Colors.brand, fontWeight: FontWeight.bold },
   headlineDot: {
     width: 5, height: 5, borderRadius: 3,
     backgroundColor: 'rgba(255,255,255,0.25)',

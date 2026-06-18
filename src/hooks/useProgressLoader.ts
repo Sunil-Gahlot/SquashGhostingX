@@ -17,7 +17,7 @@ export function useProgressLoader() {
     try {
       const [stats, sessions] = await Promise.all([
         getProgressStats(db),
-        getRecentSessions(db, 30),
+        getRecentSessions(db, 100),
       ]);
       setStats(stats);
       setRecentSessions(sessions);

@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, TouchableOpacity,
+  View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
-import Svg, { Rect } from 'react-native-svg';
+import Svg, { Rect, Defs, LinearGradient as SvgGradient, Stop } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Colors } from '../constants/colors';
@@ -16,12 +16,15 @@ import { useProfileStore } from '../stores/profileStore';
 import { getProgramById } from '../data/builtinPrograms';
 import { useBadgesStore, BADGE_DEFS } from '../stores/badgesStore';
 
+const SCREEN_W = Dimensions.get('window').width;
+
 // ─── Weekly activity bar chart ────────────────────────────────────────────────
 
 const DAYS = ['M', 'Tu', 'W', 'Th', 'F', 'Sa', 'Su'];
-const BAR_W = 28; const BAR_GAP = 12;
+const BAR_W = 32;
+const BAR_GAP = 10;
 const CHART_W = DAYS.length * (BAR_W + BAR_GAP) - BAR_GAP;
-const CHART_H = 72;
+const CHART_H = 80;
 
 function WeeklyBars({
   weeklyActivity,
@@ -34,11 +37,21 @@ function WeeklyBars({
   return (
     <View>
       <Svg width={CHART_W} height={CHART_H}>
+        <Defs>
+          <SvgGradient id="gradActive" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0%"   stopColor={Colors.accentProgress} stopOpacity="1"   />
+            <Stop offset="100%" stopColor={Colors.accentProgress} stopOpacity="0.25" />
+          </SvgGradient>
+          <SvgGradient id="gradToday" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0%"   stopColor={Colors.brand} stopOpacity="1"   />
+            <Stop offset="100%" stopColor={Colors.brand} stopOpacity="0.35" />
+          </SvgGradient>
+        </Defs>
         {DAYS.map((_, i) => {
           const dow      = (i + 1) % 7;
           const activity = weeklyActivity.find((a) => new Date(a.date).getDay() === dow);
           const val      = activity?.movements ?? 0;
-          const barH     = val > 0 ? Math.max(8, Math.round((val / maxVal) * CHART_H)) : 4;
+          const barH     = val > 0 ? Math.max(10, Math.round((val / maxVal) * CHART_H)) : 5;
           const x        = i * (BAR_W + BAR_GAP);
           const y        = CHART_H - barH;
           const isToday  = todayDow === dow;
@@ -46,23 +59,26 @@ function WeeklyBars({
             <Rect
               key={i}
               x={x} y={y} width={BAR_W} height={barH}
-              rx={6} ry={6}
+              rx={7} ry={7}
               fill={
                 val > 0
-                  ? isToday ? Colors.accentProgress : `${Colors.accentProgress}55`
+                  ? isToday ? 'url(#gradToday)' : 'url(#gradActive)'
                   : Colors.surfaceElevated
               }
             />
           );
         })}
       </Svg>
-      <View style={styles.dayRow}>
+      <View style={chartStyles.dayRow}>
         {DAYS.map((d, i) => {
           const isToday = new Date().getDay() === (i + 1) % 7;
           return (
-            <Text key={i} style={[styles.dayLabel, isToday && styles.dayLabelToday]}>
-              {d}
-            </Text>
+            <View key={i} style={chartStyles.dayCell}>
+              {isToday && <View style={chartStyles.todayDot} />}
+              <Text style={[chartStyles.dayLabel, isToday && chartStyles.dayLabelToday]}>
+                {d}
+              </Text>
+            </View>
           );
         })}
       </View>
@@ -70,7 +86,15 @@ function WeeklyBars({
   );
 }
 
-// ─── Court balance — single tricolor bar ─────────────────────────────────────
+const chartStyles = StyleSheet.create({
+  dayRow:       { flexDirection: 'row', marginTop: 8 },
+  dayCell:      { width: BAR_W, marginRight: BAR_GAP, alignItems: 'center' },
+  todayDot:     { width: 4, height: 4, borderRadius: 2, backgroundColor: Colors.brand, marginBottom: 3 },
+  dayLabel:     { fontSize: 10, color: Colors.textMuted, fontWeight: FontWeight.medium },
+  dayLabelToday:{ color: Colors.brand, fontWeight: FontWeight.bold },
+});
+
+// ─── Court balance — tricolor bar ─────────────────────────────────────────────
 
 function CourtBalance({
   distribution,
@@ -82,34 +106,31 @@ function CourtBalance({
     { label: 'Mid',   pct: Math.round(distribution.mid),   color: Colors.accentProgress },
     { label: 'Back',  pct: Math.round(distribution.back),  color: Colors.accentRoutines },
   ];
-
   return (
     <View>
-      {/* Tricolor segmented bar */}
-      <View style={styles.triBar}>
+      <View style={courtStyles.triBar}>
         {zones.map((z, idx) => (
           <View
             key={z.label}
             style={[
-              styles.triSegment,
+              courtStyles.triSeg,
               {
-                flex:            Math.max(2, z.pct),
-                backgroundColor: z.color,
-                borderTopLeftRadius:     idx === 0 ? 6 : 0,
-                borderBottomLeftRadius:  idx === 0 ? 6 : 0,
-                borderTopRightRadius:    idx === 2 ? 6 : 0,
-                borderBottomRightRadius: idx === 2 ? 6 : 0,
+                flex:                    Math.max(2, z.pct),
+                backgroundColor:         z.color,
+                borderTopLeftRadius:     idx === 0 ? 8 : 0,
+                borderBottomLeftRadius:  idx === 0 ? 8 : 0,
+                borderTopRightRadius:    idx === 2 ? 8 : 0,
+                borderBottomRightRadius: idx === 2 ? 8 : 0,
               },
             ]}
           />
         ))}
       </View>
-      {/* Labels */}
-      <View style={styles.triLabels}>
+      <View style={courtStyles.triLabels}>
         {zones.map((z) => (
-          <View key={z.label} style={styles.triLabelItem}>
-            <Text style={[styles.triPct, { color: z.color }]}>{z.pct}%</Text>
-            <Text style={styles.triZoneName}>{z.label}</Text>
+          <View key={z.label} style={courtStyles.triItem}>
+            <Text style={[courtStyles.triPct, { color: z.color }]}>{z.pct}%</Text>
+            <Text style={courtStyles.triName}>{z.label}</Text>
           </View>
         ))}
       </View>
@@ -117,8 +138,19 @@ function CourtBalance({
   );
 }
 
+const courtStyles = StyleSheet.create({
+  triBar:    { flexDirection: 'row', height: 16, borderRadius: 8, overflow: 'hidden', gap: 2, marginBottom: Spacing.md },
+  triSeg:    { height: '100%' },
+  triLabels: { flexDirection: 'row', justifyContent: 'space-between' },
+  triItem:   { alignItems: 'center', flex: 1 },
+  triPct:    { fontSize: FontSize.label, fontWeight: FontWeight.bold },
+  triName:   { fontSize: FontSize.caption, color: Colors.textMuted, marginTop: 2 },
+});
+
+// ─── Drill constants ───────────────────────────────────────────────────────────
+
 const DRILL_COLOR = {
-  'movement':  Colors.brand,
+  'movement':   Colors.brand,
   'shot-based': Colors.accentRoutines,
   'match-sim':  Colors.accentLibrary,
   'custom':     Colors.accentProgress,
@@ -139,18 +171,17 @@ export default function ProgressScreen() {
   const { profile } = useProfileStore();
   const { loadData }  = useProgressLoader();
   const earnedBadges = useBadgesStore((s) => s.earned);
+  const [selectedSession, setSelectedSession] = useState<typeof recentSessions[number] | null>(null);
 
-  // Load on tab focus
   useFocusEffect(useCallback(() => { loadData(); }, []));
-  // Also reload whenever a session completes (even if Progress tab is already active)
   useEffect(() => { if (lastSessionCompletedAt > 0) loadData(); }, [lastSessionCompletedAt]);
 
-  // Formatted totals
-  const totalHours = stats.totalMinutes >= 60
-    ? `${Math.floor(stats.totalMinutes / 60)}h ${stats.totalMinutes % 60}m`
-    : `${stats.totalMinutes}m`;
+  // ── Fix: round to whole minutes before formatting
+  const roundedMinutes = Math.round(stats.totalMinutes);
+  const totalHours = roundedMinutes >= 60
+    ? `${Math.floor(roundedMinutes / 60)}h ${roundedMinutes % 60}m`
+    : `${roundedMinutes}m`;
 
-  // Coach insight
   const coachWeakZone = stats.totalSessions >= 5
     ? (stats.zoneDistribution.back  < 25 ? 'back'
       : stats.zoneDistribution.front < 25 ? 'front' : null)
@@ -169,127 +200,152 @@ export default function ProgressScreen() {
   };
 
   const hasData = recentSessions.length > 0;
+  const weekTotal = stats.weeklyActivity.reduce((s, a) => s + a.movements, 0);
+  const streakPct = stats.longestStreak > 0
+    ? Math.min(100, (stats.currentStreak / stats.longestStreak) * 100)
+    : 0;
+
+  const statTiles = [
+    { val: String(stats.totalSessions),           lbl: 'Sessions',   icon: 'calendar',     color: Colors.brand          },
+    { val: totalHours,                             lbl: 'On Court',   icon: 'time',         color: Colors.accentProgress },
+    { val: stats.totalMovements.toLocaleString(),  lbl: 'Total Reps', icon: 'walk',         color: Colors.accentRoutines },
+  ] as const;
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
-        {/* ── Header ──────────────────────────────────────────── */}
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.eyebrow}>PROGRESS</Text>
-            <Text style={styles.title}>Your Journey</Text>
+        {/* ── HERO HEADER ──────────────────────────────────── */}
+        <View style={styles.hero}>
+          <View style={styles.heroTop}>
+            <View style={styles.heroEyebrow}>
+              <Ionicons name="trending-up" size={11} color={Colors.accentProgress} />
+              <Text style={styles.heroEyebrowText}>PROGRESS</Text>
+            </View>
+            {stats.lastSessionAt && (
+              <Text style={styles.heroDate}>
+                Last · {formatDate(stats.lastSessionAt)}
+              </Text>
+            )}
           </View>
-          {stats.lastSessionAt && (
-            <Text style={styles.lastSeen}>
-              Last session {formatDate(stats.lastSessionAt)}
-            </Text>
-          )}
+          <Text style={styles.heroTitle}>Your Journey</Text>
+          <View style={styles.heroAccent} />
         </View>
 
-        {/* ── 3-stat strip ─────────────────────────────────────── */}
-        <View style={styles.statsStrip}>
-          <View style={styles.stripStat}>
-            <Text style={styles.stripVal}>{stats.totalSessions}</Text>
-            <Text style={styles.stripLbl}>Sessions</Text>
-          </View>
-          <View style={styles.stripDiv} />
-          <View style={styles.stripStat}>
-            <Text style={styles.stripVal}>{totalHours}</Text>
-            <Text style={styles.stripLbl}>On Court</Text>
-          </View>
-          <View style={styles.stripDiv} />
-          <View style={styles.stripStat}>
-            <Text style={[styles.stripVal, { color: Colors.accentProgress }]}>
-              {stats.totalMovements.toLocaleString()}
-            </Text>
-            <Text style={styles.stripLbl}>Total Reps</Text>
-          </View>
+        {/* ── STAT TILES ──────────────────────────────────── */}
+        <View style={styles.statRow}>
+          {statTiles.map((t, i) => (
+            <View key={i} style={[styles.statTile, { borderTopColor: t.color }]}>
+              <View style={[styles.statIconWrap, { backgroundColor: `${t.color}1A` }]}>
+                <Ionicons name={t.icon as any} size={14} color={t.color} />
+              </View>
+              <Text style={[styles.statVal, { color: t.color }]} numberOfLines={1} adjustsFontSizeToFit>
+                {t.val}
+              </Text>
+              <Text style={styles.statLbl}>{t.lbl}</Text>
+            </View>
+          ))}
         </View>
 
-        {/* ── Streak card ──────────────────────────────────────── */}
-        <View style={[
-          styles.streakCard,
-          stats.currentStreak > 0 && styles.streakCardActive,
-        ]}>
-          <View style={styles.streakRow}>
-            <View>
-              <Text style={[
-                styles.streakNum,
-                { color: stats.currentStreak > 0 ? Colors.brand : Colors.textMuted },
-              ]}>
+        {/* ── STREAK CARD ──────────────────────────────────── */}
+        <View style={[styles.streakCard, stats.currentStreak > 0 && styles.streakCardActive]}>
+          <View style={styles.streakInner}>
+            <View style={styles.streakLeft}>
+              <Text style={[styles.streakNum, { color: stats.currentStreak > 0 ? Colors.brand : Colors.textMuted }]}>
                 {stats.currentStreak}
               </Text>
-              <Text style={styles.streakDayLabel}>
+              <Text style={styles.streakUnit}>
                 Day{stats.currentStreak !== 1 ? 's' : ''} Streak
               </Text>
-              {stats.currentStreak === 0 ? (
-                <Text style={styles.streakCta}>Train today to start your streak</Text>
-              ) : (
-                <Text style={styles.streakBest}>
-                  Personal best: {stats.longestStreak} days
-                </Text>
-              )}
+              <Text style={styles.streakSub}>
+                {stats.currentStreak === 0
+                  ? 'Train today to ignite your streak'
+                  : `Best: ${stats.longestStreak} day${stats.longestStreak !== 1 ? 's' : ''}`}
+              </Text>
             </View>
             <Ionicons
               name={stats.currentStreak > 0 ? 'flame' : 'flame-outline'}
-              size={40}
+              size={52}
               color={stats.currentStreak > 0 ? Colors.brand : Colors.textMuted}
-              style={{ opacity: stats.currentStreak > 0 ? 1 : 0.4 }}
+              style={{ opacity: stats.currentStreak > 0 ? 1 : 0.25 }}
             />
           </View>
+          {stats.longestStreak > 0 && (
+            <View style={styles.streakBarRow}>
+              <View style={styles.streakBarBg}>
+                <View style={[styles.streakBarFill, { width: `${streakPct}%` as any }]} />
+              </View>
+              <Text style={styles.streakBarPct}>{Math.round(streakPct)}%</Text>
+            </View>
+          )}
         </View>
 
-        {/* ── Weekly Load ──────────────────────────────────────── */}
+        {/* ── WEEKLY LOAD ──────────────────────────────────── */}
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <View>
               <Text style={styles.cardTitle}>Weekly Load</Text>
-              <Text style={styles.cardSub}>Reps per day this week</Text>
+              <Text style={styles.cardSub}>Movement reps per day</Text>
             </View>
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>
-                {stats.weeklyActivity.reduce((s, a) => s + a.movements, 0)} reps
-              </Text>
+            <View style={[styles.pill, { backgroundColor: `${Colors.accentProgress}18`, borderColor: `${Colors.accentProgress}30` }]}>
+              <Ionicons name="walk" size={11} color={Colors.accentProgress} />
+              <Text style={[styles.pillText, { color: Colors.accentProgress }]}>{weekTotal.toLocaleString()} reps</Text>
             </View>
           </View>
           <WeeklyBars weeklyActivity={stats.weeklyActivity} />
         </View>
 
-        {/* ── Achievements ─────────────────────────────────────── */}
+        {/* ── ACHIEVEMENTS ─────────────────────────────────── */}
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <View>
               <Text style={styles.cardTitle}>Achievements</Text>
               <Text style={styles.cardSub}>
-                {Object.keys(earnedBadges).length} of {BADGE_DEFS.length} unlocked
+                {Object.keys(earnedBadges).length === 0
+                  ? 'Train to unlock these'
+                  : `${Object.keys(earnedBadges).length} of ${BADGE_DEFS.length} unlocked`}
               </Text>
             </View>
-            <Ionicons name="medal-outline" size={20} color={Colors.gold} />
+            <View style={[styles.pill, { backgroundColor: `${Colors.gold}18`, borderColor: `${Colors.gold}30` }]}>
+              <Ionicons name="medal" size={12} color={Colors.gold} />
+              <Text style={[styles.pillText, { color: Colors.gold }]}>
+                {Object.keys(earnedBadges).length}/{BADGE_DEFS.length}
+              </Text>
+            </View>
           </View>
-          <View style={styles.achievementRow}>
+          <View style={styles.achieveGrid}>
             {BADGE_DEFS.map((b) => {
               const unlocked = !!earnedBadges[b.id];
               return (
-                <View key={b.id} style={styles.achievementItem}>
+                <View key={b.id} style={styles.achieveItem}>
                   <View style={[
-                    styles.achievementIcon,
+                    styles.achieveIcon,
                     {
-                      backgroundColor: unlocked ? `${b.color}22` : Colors.surfaceElevated,
-                      borderColor:     unlocked ? `${b.color}55` : Colors.border,
+                      backgroundColor: unlocked ? `${b.color}22` : `${b.color}10`,
+                      borderColor:     unlocked ? `${b.color}55` : `${b.color}28`,
+                      ...(unlocked && {
+                        shadowColor: b.color, shadowOpacity: 0.4,
+                        shadowRadius: 8, shadowOffset: { width: 0, height: 0 }, elevation: 4,
+                      }),
                     },
                   ]}>
                     <Ionicons
                       name={b.icon as any}
                       size={22}
-                      color={unlocked ? b.color : Colors.textDisabled}
+                      color={unlocked ? b.color : `${b.color}70`}
+                      style={{ opacity: unlocked ? 1 : 0.55 }}
                     />
+                    {!unlocked && (
+                      <View style={styles.achieveLockBadge}>
+                        <Ionicons name="lock-closed" size={8} color={Colors.textMuted} />
+                      </View>
+                    )}
                   </View>
-                  <Text
-                    style={[styles.achievementLabel, !unlocked && styles.achievementLocked]}
-                    numberOfLines={2}
-                  >
+                  <Text style={[styles.achieveLabel, !unlocked && styles.achieveLockedLabel]} numberOfLines={1}>
                     {b.label}
+                  </Text>
+                  <Text style={styles.achieveHint} numberOfLines={2}>
+                    {b.description}
                   </Text>
                 </View>
               );
@@ -297,7 +353,7 @@ export default function ProgressScreen() {
           </View>
         </View>
 
-        {/* ── Court Balance ────────────────────────────────────── */}
+        {/* ── COURT BALANCE ────────────────────────────────── */}
         {hasData && (
           <View style={styles.card}>
             <View style={styles.cardHeader}>
@@ -305,21 +361,31 @@ export default function ProgressScreen() {
                 <Text style={styles.cardTitle}>Court Balance</Text>
                 <Text style={styles.cardSub}>
                   {coachWeakZone
-                    ? `${coachWeakZone === 'back' ? 'Back' : 'Front'} court needs work`
-                    : 'Well balanced court coverage'}
+                    ? `${coachWeakZone === 'back' ? 'Back' : 'Front'} court needs more work`
+                    : 'Balanced court coverage'}
                 </Text>
               </View>
-              <Ionicons
-                name={coachWeakZone ? 'warning-outline' : 'checkmark-circle-outline'}
-                size={20}
-                color={coachWeakZone ? Colors.warning : Colors.accentRoutines}
-              />
+              <View style={[
+                styles.pill,
+                coachWeakZone
+                  ? { backgroundColor: `${Colors.warning}18`, borderColor: `${Colors.warning}30` }
+                  : { backgroundColor: `${Colors.accentRoutines}18`, borderColor: `${Colors.accentRoutines}30` },
+              ]}>
+                <Ionicons
+                  name={coachWeakZone ? 'warning' : 'checkmark-circle'}
+                  size={12}
+                  color={coachWeakZone ? Colors.warning : Colors.accentRoutines}
+                />
+                <Text style={[styles.pillText, { color: coachWeakZone ? Colors.warning : Colors.accentRoutines }]}>
+                  {coachWeakZone ? 'Imbalanced' : 'Balanced'}
+                </Text>
+              </View>
             </View>
             <CourtBalance distribution={stats.zoneDistribution} />
           </View>
         )}
 
-        {/* ── Coach Insight ────────────────────────────────────── */}
+        {/* ── COACH INSIGHT ────────────────────────────────── */}
         {coachProgram && coachWeakZone && (
           <TouchableOpacity
             style={styles.insightCard}
@@ -331,25 +397,27 @@ export default function ProgressScreen() {
               language:     profile.language,
             })}
           >
-            <View style={styles.insightIcon}>
+            <View style={styles.insightIconWrap}>
               <Ionicons name="bulb" size={22} color={Colors.brand} />
             </View>
-            <View style={styles.insightText}>
-              <Text style={styles.insightLabel}>COACH INSIGHT</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.insightEyebrow}>COACH INSIGHT</Text>
               <Text style={styles.insightMsg}>
-                {coachWeakZone === 'back'
-                  ? 'Your back court is underworked'
-                  : 'Your front court needs attention'}
+                {coachWeakZone === 'back' ? 'Your back court is underworked' : 'Your front court needs attention'}
               </Text>
               <Text style={styles.insightLink}>{coachProgram.name} →</Text>
             </View>
+            <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />
           </TouchableOpacity>
         )}
 
-        {/* ── Personal Bests ───────────────────────────────────── */}
+        {/* ── PERSONAL BESTS ───────────────────────────────── */}
         {stats.personalBests.length > 0 && (
           <>
-            <Text style={styles.sectionLabel}>PERSONAL BESTS</Text>
+            <View style={styles.sectionRow}>
+              <View style={styles.sectionAccent} />
+              <Text style={styles.sectionLabel}>PERSONAL BESTS</Text>
+            </View>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -361,8 +429,10 @@ export default function ProgressScreen() {
                   : pb.metric === 'completion' ? Colors.accentProgress : Colors.brand;
                 const icon   = isReps ? 'walk' : pb.metric === 'completion' ? 'checkmark-circle' : 'flash';
                 return (
-                  <View key={`${pb.drillType}-${pb.metric}`} style={[styles.pbCard, { borderTopColor: color }]}>
-                    <Ionicons name={icon as any} size={18} color={color} style={{ marginBottom: 6 }} />
+                  <View key={`${pb.drillType}-${pb.metric}`} style={[styles.pbCard, { borderTopColor: color, shadowColor: color }]}>
+                    <View style={[styles.pbIconWrap, { backgroundColor: `${color}18` }]}>
+                      <Ionicons name={icon as any} size={16} color={color} />
+                    </View>
                     <Text style={[styles.pbVal, { color }]}>
                       {isReps ? Math.round(pb.value) : `${Math.round(pb.value)}%`}
                     </Text>
@@ -379,87 +449,192 @@ export default function ProgressScreen() {
           </>
         )}
 
-        {/* ── Recent Sessions ──────────────────────────────────── */}
-        <Text style={styles.sectionLabel}>RECENT SESSIONS</Text>
+        {/* ── RECENT SESSIONS ──────────────────────────────── */}
+        <View style={styles.sectionRow}>
+          <View style={styles.sectionAccent} />
+          <Text style={styles.sectionLabel}>RECENT SESSIONS</Text>
+        </View>
 
         {!hasData ? (
           <View style={styles.emptyCard}>
-            <Ionicons name="bar-chart-outline" size={40} color={Colors.textMuted} />
+            <View style={styles.emptyIconWrap}>
+              <Ionicons name="bar-chart-outline" size={36} color={Colors.accentProgress} />
+            </View>
             <Text style={styles.emptyTitle}>No sessions yet</Text>
             <Text style={styles.emptyBody}>
-              Complete your first ghosting session to see your progress here.
+              Complete your first ghosting session to start tracking your progress.
             </Text>
             <TouchableOpacity onPress={openDrillConfig} style={styles.emptyBtn}>
-              <Text style={styles.emptyBtnText}>Start a Session →</Text>
+              <Ionicons name="play" size={14} color={Colors.background} />
+              <Text style={styles.emptyBtnText}>Start a Session</Text>
             </TouchableOpacity>
           </View>
         ) : (
-          recentSessions.slice(0, 5).map((s) => {
+          recentSessions.slice(0, 10).map((s) => {
             const good       = s.completionPct >= 80;
             const barColor   = good ? Colors.accentRoutines : Colors.warning;
             const drillColor = DRILL_COLOR[s.drillType as keyof typeof DRILL_COLOR] ?? Colors.brand;
             const drillIcon  = DRILL_ICON[s.drillType as keyof typeof DRILL_ICON]  ?? 'body-outline';
             const clampedPct = Math.min(100, Math.max(0, s.completionPct));
             return (
-              <View
-                key={s.id}
-                style={[styles.sessionCard, { borderLeftColor: drillColor }]}
-              >
-                {/* Top: icon + drill name + score */}
-                <View style={styles.sessionTop}>
+              <TouchableOpacity key={s.id} style={[styles.sessionCard, { borderLeftColor: drillColor }]} onPress={() => setSelectedSession(s)} activeOpacity={0.78}>
+                {/* Header row */}
+                <View style={styles.sessionHead}>
                   <View style={[styles.sessionIconWrap, { backgroundColor: `${drillColor}18` }]}>
                     <Ionicons name={drillIcon as any} size={15} color={drillColor} />
                   </View>
                   <Text style={styles.sessionDrill} numberOfLines={1}>
                     {s.drillType.replace(/-/g, ' ')}
                   </Text>
-                  <View style={styles.sessionScoreWrap}>
-                    <Text style={[styles.sessionScore, { color: drillColor }]}>
+                  <View style={[styles.sessionScoreBadge, { backgroundColor: `${drillColor}18`, borderColor: `${drillColor}35` }]}>
+                    <Text style={[styles.sessionScoreNum, { color: drillColor }]}>
                       {Math.round(s.intensityScore)}
                     </Text>
-                    <Text style={styles.sessionScoreLbl}>score</Text>
+                    <Text style={styles.sessionScoreLbl}>pts</Text>
                   </View>
                 </View>
 
-                {/* Middle: meta chips */}
-                <View style={styles.sessionMetaRow}>
-                  <Ionicons name="calendar-outline" size={11} color={Colors.textMuted} />
-                  <Text style={styles.sessionMetaTxt}>{formatDate(s.startedAt)}</Text>
-                  <Text style={styles.sessionMetaDot}>·</Text>
-                  <Ionicons name="time-outline" size={11} color={Colors.textMuted} />
-                  <Text style={styles.sessionMetaTxt}>{formatDuration(s.durationSeconds)}</Text>
-                  <Text style={styles.sessionMetaDot}>·</Text>
-                  <Ionicons name="walk-outline" size={11} color={Colors.textMuted} />
-                  <Text style={styles.sessionMetaTxt}>{s.movementsTotal} reps</Text>
-                  <Text style={styles.sessionMetaDot}>·</Text>
-                  <Text style={[styles.sessionCourtBadge, { color: drillColor }]}>
-                    {s.courtSystem.toUpperCase()}
-                  </Text>
+                {/* Meta row */}
+                <View style={styles.sessionMeta}>
+                  <View style={styles.sessionChip}>
+                    <Ionicons name="calendar-outline" size={10} color={Colors.textMuted} />
+                    <Text style={styles.sessionChipText}>{formatDate(s.startedAt)}</Text>
+                  </View>
+                  <View style={styles.sessionChip}>
+                    <Ionicons name="time-outline" size={10} color={Colors.textMuted} />
+                    <Text style={styles.sessionChipText}>{formatDuration(s.durationSeconds)}</Text>
+                  </View>
+                  <View style={styles.sessionChip}>
+                    <Ionicons name="walk-outline" size={10} color={Colors.textMuted} />
+                    <Text style={styles.sessionChipText}>{s.movementsTotal} reps</Text>
+                  </View>
+                  <View style={[styles.sessionChip, { borderColor: `${drillColor}40`, backgroundColor: `${drillColor}10` }]}>
+                    <Text style={[styles.sessionChipText, { color: drillColor, fontWeight: FontWeight.bold }]}>
+                      {s.courtSystem.toUpperCase()}
+                    </Text>
+                  </View>
                 </View>
 
-                {/* Bottom: completion bar */}
+                {/* Completion bar */}
                 <View style={styles.sessionBarRow}>
                   <View style={styles.sessionBarBg}>
-                    <View
-                      style={[
-                        styles.sessionBarFill,
-                        { width: `${clampedPct}%` as any, backgroundColor: barColor },
-                      ]}
-                    />
+                    <View style={[styles.sessionBarFill, { width: `${clampedPct}%` as any, backgroundColor: barColor }]} />
                   </View>
-                  <Text style={[styles.sessionBarPct, { color: barColor }]}>
-                    {Math.round(clampedPct)}%
-                  </Text>
+                  <Text style={[styles.sessionBarPct, { color: barColor }]}>{Math.round(clampedPct)}%</Text>
                 </View>
-              </View>
+              </TouchableOpacity>
             );
           })
         )}
 
       </ScrollView>
+
+      {/* Session Detail Modal (PQA-08) */}
+      {selectedSession && (() => {
+        const s = selectedSession;
+        const drillColor = DRILL_COLOR[s.drillType as keyof typeof DRILL_COLOR] ?? Colors.brand;
+        const good = s.completionPct >= 80;
+        const barColor = good ? Colors.accentRoutines : Colors.warning;
+        const clampedPct = Math.min(100, Math.max(0, s.completionPct));
+        const mm = String(Math.floor(s.durationSeconds / 60)).padStart(2, '0');
+        const ss2 = String(s.durationSeconds % 60).padStart(2, '0');
+        const avgRep = s.movementsTotal > 0
+          ? (s.durationSeconds / s.movementsTotal).toFixed(1)
+          : '—';
+        return (
+          <Modal visible transparent animationType="slide" onRequestClose={() => setSelectedSession(null)}>
+            <View style={sdStyles.backdrop}>
+              <View style={sdStyles.sheet}>
+                {/* Handle */}
+                <View style={sdStyles.handle} />
+
+                {/* Header */}
+                <View style={sdStyles.header}>
+                  <View style={[sdStyles.drillDot, { backgroundColor: drillColor }]} />
+                  <Text style={sdStyles.drillName}>{s.drillType.replace(/-/g, ' ')}</Text>
+                  <TouchableOpacity onPress={() => setSelectedSession(null)} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+                    <Ionicons name="close" size={22} color={Colors.textMuted} />
+                  </TouchableOpacity>
+                </View>
+
+                <Text style={sdStyles.date}>{formatDate(s.startedAt)}</Text>
+
+                {/* Stats grid */}
+                <View style={sdStyles.grid}>
+                  {[
+                    { label: 'Duration',    value: `${mm}:${ss2}` },
+                    { label: 'Reps',        value: `${s.movementsTotal}` },
+                    { label: 'Rep Speed',   value: `${avgRep}s` },
+                    { label: 'Score',       value: `${Math.round(s.intensityScore)}` },
+                    { label: 'Difficulty',  value: s.difficulty ?? '—' },
+                    { label: 'Court',       value: s.courtSystem.toUpperCase() },
+                  ].map(({ label, value }) => (
+                    <View key={label} style={sdStyles.gridCell}>
+                      <Text style={sdStyles.cellValue}>{value}</Text>
+                      <Text style={sdStyles.cellLabel}>{label}</Text>
+                    </View>
+                  ))}
+                </View>
+
+                {/* Completion */}
+                <Text style={sdStyles.sectionLabel}>COMPLETION</Text>
+                <View style={sdStyles.barRow}>
+                  <View style={sdStyles.barBg}>
+                    <View style={[sdStyles.barFill, { width: `${clampedPct}%` as any, backgroundColor: barColor }]} />
+                  </View>
+                  <Text style={[sdStyles.barPct, { color: barColor }]}>{Math.round(clampedPct)}%</Text>
+                </View>
+
+                <TouchableOpacity style={sdStyles.closeBtn} onPress={() => setSelectedSession(null)} activeOpacity={0.85}>
+                  <Text style={sdStyles.closeBtnText}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+        );
+      })()}
     </SafeAreaView>
   );
 }
+
+// ─── Session Detail Styles ─────────────────────────────────────────────────────
+
+const sdStyles = StyleSheet.create({
+  backdrop:   { flex: 1, backgroundColor: Colors.overlay, justifyContent: 'flex-end' },
+  sheet: {
+    backgroundColor: Colors.surface,
+    borderTopLeftRadius: BorderRadius.xl, borderTopRightRadius: BorderRadius.xl,
+    padding: Spacing.base, paddingBottom: Spacing.xxxl,
+    borderTopWidth: 1, borderTopColor: Colors.border,
+  },
+  handle: {
+    alignSelf: 'center', width: 36, height: 4,
+    backgroundColor: Colors.border, borderRadius: 2, marginBottom: Spacing.md,
+  },
+  header: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, marginBottom: 4 },
+  drillDot: { width: 10, height: 10, borderRadius: 5 },
+  drillName: { flex: 1, fontSize: FontSize.body, fontWeight: FontWeight.bold, color: Colors.textPrimary, textTransform: 'capitalize' },
+  date: { fontSize: FontSize.caption, color: Colors.textMuted, marginBottom: Spacing.base },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm, marginBottom: Spacing.base },
+  gridCell: {
+    flex: 1, minWidth: '28%',
+    backgroundColor: Colors.background, borderRadius: BorderRadius.md,
+    borderWidth: 1, borderColor: Colors.border,
+    padding: Spacing.md, alignItems: 'center',
+  },
+  cellValue: { fontSize: FontSize.body, fontWeight: FontWeight.bold, color: Colors.textPrimary },
+  cellLabel: { fontSize: FontSize.micro, color: Colors.textMuted, marginTop: 2 },
+  sectionLabel: { fontSize: FontSize.micro, fontWeight: FontWeight.bold, color: Colors.textDisabled, letterSpacing: 1.2, marginBottom: Spacing.xs },
+  barRow:  { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, marginBottom: Spacing.xl },
+  barBg:   { flex: 1, height: 8, backgroundColor: Colors.surfaceElevated, borderRadius: 4, overflow: 'hidden' },
+  barFill: { height: '100%', borderRadius: 4 },
+  barPct:  { fontSize: FontSize.label, fontWeight: FontWeight.bold, width: 36, textAlign: 'right' },
+  closeBtn: {
+    height: 48, backgroundColor: Colors.surfaceElevated, borderRadius: BorderRadius.full,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  closeBtnText: { fontSize: FontSize.body, color: Colors.textMuted, fontWeight: FontWeight.medium },
+});
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
@@ -467,72 +642,104 @@ const styles = StyleSheet.create({
   safe:    { flex: 1, backgroundColor: Colors.background },
   content: { paddingBottom: Spacing.xxxl },
 
-  // ── Header
-  header: {
+  // ── Hero
+  hero: {
     paddingHorizontal: Spacing.base,
-    paddingTop: Spacing.md, paddingBottom: Spacing.lg,
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end',
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.lg,
   },
-  eyebrow: {
+  heroTop: {
+    flexDirection: 'row', justifyContent: 'space-between',
+    alignItems: 'center', marginBottom: Spacing.xs,
+  },
+  heroEyebrow: {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    backgroundColor: `${Colors.accentProgress}18`,
+    borderRadius: BorderRadius.full,
+    paddingHorizontal: Spacing.sm, paddingVertical: 4,
+    borderWidth: 1, borderColor: `${Colors.accentProgress}30`,
+  },
+  heroEyebrowText: {
     fontSize: FontSize.micro, fontWeight: FontWeight.bold,
-    color: Colors.accentProgress, letterSpacing: 1.5, marginBottom: 4,
+    color: Colors.accentProgress, letterSpacing: 1.2,
   },
-  title: {
-    fontSize: 30, fontWeight: FontWeight.black,
-    color: Colors.textPrimary, letterSpacing: -0.5,
+  heroDate: { fontSize: FontSize.caption, color: Colors.textMuted },
+  heroTitle: {
+    fontSize: 34, fontWeight: FontWeight.black,
+    color: Colors.textPrimary, letterSpacing: -0.8,
+    marginBottom: Spacing.sm,
   },
-  lastSeen: {
-    fontSize: FontSize.caption, color: Colors.textMuted,
-    alignSelf: 'flex-end',
+  heroAccent: {
+    width: 48, height: 3,
+    backgroundColor: Colors.brand,
+    borderRadius: 2,
   },
 
-  // ── Stats strip
-  statsStrip: {
-    flexDirection: 'row', alignItems: 'center',
+  // ── Stat tiles
+  statRow: {
+    flexDirection: 'row', gap: Spacing.sm,
+    marginHorizontal: Spacing.base, marginBottom: Spacing.base,
+  },
+  statTile: {
+    flex: 1,
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.xl,
+    borderWidth: 1, borderColor: Colors.border,
+    borderTopWidth: 3,
+    padding: Spacing.md,
+    alignItems: 'center', gap: 4,
+  },
+  statIconWrap: {
+    width: 28, height: 28, borderRadius: BorderRadius.md,
+    alignItems: 'center', justifyContent: 'center',
+    marginBottom: 2,
+  },
+  statVal: {
+    fontSize: FontSize.sectionHeader, fontWeight: FontWeight.black,
+    letterSpacing: -0.5,
+  },
+  statLbl: { fontSize: 10, color: Colors.textMuted, fontWeight: FontWeight.medium, textAlign: 'center' },
+
+  // ── Streak card
+  streakCard: {
     marginHorizontal: Spacing.base, marginBottom: Spacing.base,
     backgroundColor: Colors.surface,
     borderRadius: BorderRadius.xl,
     borderWidth: 1, borderColor: Colors.border,
-    paddingVertical: Spacing.md,
-  },
-  stripStat:  { flex: 1, alignItems: 'center' },
-  stripDiv:   { width: 1, height: 36, backgroundColor: Colors.border },
-  stripVal:   { fontSize: FontSize.title, fontWeight: FontWeight.bold, color: Colors.textPrimary },
-  stripLbl:   { fontSize: FontSize.micro, color: Colors.textMuted, marginTop: 3 },
-
-  // ── Streak card
-  streakCard: {
-    marginHorizontal: Spacing.base, marginBottom: Spacing.md,
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.xl,
-    borderWidth: 1, borderColor: Colors.border,
-    padding: Spacing.md,
+    padding: Spacing.base,
   },
   streakCardActive: {
     borderColor: `${Colors.brand}40`,
-    backgroundColor: `${Colors.brand}08`,
+    backgroundColor: `${Colors.brand}06`,
   },
-  streakRow: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-  },
+  streakInner: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: Spacing.md },
+  streakLeft:  { gap: 2 },
   streakNum: {
-    fontSize: 40, fontWeight: FontWeight.black,
-    lineHeight: 44, letterSpacing: -1,
+    fontSize: 48, fontWeight: FontWeight.black,
+    lineHeight: 52, letterSpacing: -2,
   },
-  streakDayLabel: {
+  streakUnit: {
     fontSize: FontSize.label, fontWeight: FontWeight.semiBold,
-    color: Colors.textSecondary, marginTop: 2,
+    color: Colors.textSecondary,
   },
-  streakBest: {
-    fontSize: FontSize.caption, color: Colors.textMuted, marginTop: 4,
+  streakSub: { fontSize: FontSize.caption, color: Colors.textMuted, marginTop: 2 },
+  streakBarRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
+  streakBarBg: {
+    flex: 1, height: 6, borderRadius: 3,
+    backgroundColor: Colors.surfaceElevated, overflow: 'hidden',
   },
-  streakCta: {
-    fontSize: FontSize.caption, color: Colors.textMuted, marginTop: 4,
+  streakBarFill: {
+    height: '100%', borderRadius: 3,
+    backgroundColor: Colors.brand,
+  },
+  streakBarPct: {
+    fontSize: FontSize.micro, fontWeight: FontWeight.bold,
+    color: Colors.brand, minWidth: 30, textAlign: 'right',
   },
 
   // ── Shared card
   card: {
-    marginHorizontal: Spacing.base, marginBottom: Spacing.md,
+    marginHorizontal: Spacing.base, marginBottom: Spacing.base,
     backgroundColor: Colors.surface,
     borderRadius: BorderRadius.xl,
     borderWidth: 1, borderColor: Colors.border,
@@ -544,109 +751,102 @@ const styles = StyleSheet.create({
   },
   cardTitle: { fontSize: FontSize.body, fontWeight: FontWeight.bold, color: Colors.textPrimary },
   cardSub:   { fontSize: FontSize.caption, color: Colors.textMuted, marginTop: 3 },
-  badge: {
-    backgroundColor: `${Colors.accentProgress}18`,
-    borderRadius: BorderRadius.full,
+
+  // ── Pill badge
+  pill: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    borderRadius: BorderRadius.full, borderWidth: 1,
     paddingHorizontal: Spacing.sm, paddingVertical: 4,
   },
-  badgeText: { fontSize: FontSize.caption, fontWeight: FontWeight.bold, color: Colors.accentProgress },
+  pillText: { fontSize: FontSize.caption, fontWeight: FontWeight.bold },
 
   // ── Achievements
-  achievementRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  achieveGrid: {
+    flexDirection: 'row', justifyContent: 'space-between',
   },
-  achievementItem: {
-    alignItems: 'center',
-    flex: 1,
-    gap: Spacing.xs,
-  },
-  achievementIcon: {
-    width: 48, height: 48,
-    borderRadius: BorderRadius.lg,
+  achieveItem: { alignItems: 'center', flex: 1, gap: 4 },
+  achieveIcon: {
+    width: 52, height: 52, borderRadius: BorderRadius.lg,
     alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1,
+    borderWidth: 1.5,
+    position: 'relative',
   },
-  achievementLabel: {
-    fontSize: 10,
-    fontWeight: FontWeight.semiBold,
-    color: Colors.textSecondary,
-    textAlign: 'center',
+  achieveLockBadge: {
+    position: 'absolute', bottom: -3, right: -3,
+    width: 16, height: 16, borderRadius: 8,
+    backgroundColor: Colors.surfaceElevated,
+    borderWidth: 1, borderColor: Colors.border,
+    alignItems: 'center', justifyContent: 'center',
   },
-  achievementLocked: {
-    color: Colors.textDisabled,
+  achieveLabel: {
+    fontSize: 10, fontWeight: FontWeight.bold,
+    color: Colors.textSecondary, textAlign: 'center',
   },
-
-  // ── Section label
-  sectionLabel: {
-    fontSize: FontSize.caption, fontWeight: FontWeight.bold,
-    color: Colors.textMuted, letterSpacing: 1.2,
-    paddingHorizontal: Spacing.base,
-    marginBottom: Spacing.sm, marginTop: Spacing.sm,
+  achieveLockedLabel: { color: Colors.textMuted, fontWeight: FontWeight.medium },
+  achieveHint: {
+    fontSize: FontSize.micro, color: Colors.textMuted,
+    textAlign: 'center', lineHeight: 14,
+    paddingHorizontal: 2,
   },
-
-  // ── Weekly chart
-  dayRow: {
-    flexDirection: 'row', marginTop: 8,
-    width: CHART_W,
-  },
-  dayLabel: {
-    width: BAR_W, textAlign: 'center',
-    fontSize: 10, color: Colors.textMuted,
-    marginRight: BAR_GAP,
-  },
-  dayLabelToday: { color: Colors.accentProgress, fontWeight: FontWeight.bold },
-
-  // ── Court balance
-  triBar: {
-    flexDirection: 'row', height: 14,
-    borderRadius: 7, overflow: 'hidden',
-    gap: 2, marginBottom: Spacing.md,
-  },
-  triSegment: { height: '100%' },
-  triLabels:  { flexDirection: 'row', justifyContent: 'space-between' },
-  triLabelItem:  { alignItems: 'center', flex: 1 },
-  triPct:     { fontSize: FontSize.label, fontWeight: FontWeight.bold },
-  triZoneName:{ fontSize: FontSize.caption, color: Colors.textMuted, marginTop: 2 },
 
   // ── Coach insight
   insightCard: {
-    marginHorizontal: Spacing.base, marginBottom: Spacing.md,
+    marginHorizontal: Spacing.base, marginBottom: Spacing.base,
     backgroundColor: Colors.surface,
     borderRadius: BorderRadius.xl,
-    borderWidth: 1, borderColor: Colors.borderBrand,
+    borderWidth: 1, borderColor: `${Colors.brand}35`,
     padding: Spacing.base,
     flexDirection: 'row', alignItems: 'center', gap: Spacing.md,
   },
-  insightIcon: {
-    width: 44, height: 44, borderRadius: BorderRadius.md,
+  insightIconWrap: {
+    width: 46, height: 46, borderRadius: BorderRadius.md,
     backgroundColor: Colors.brandMuted,
     alignItems: 'center', justifyContent: 'center',
   },
-  insightText:  { flex: 1 },
-  insightLabel: {
+  insightEyebrow: {
     fontSize: FontSize.micro, fontWeight: FontWeight.bold,
     color: Colors.textMuted, letterSpacing: 1, marginBottom: 3,
   },
   insightMsg:  { fontSize: FontSize.label, color: Colors.textPrimary, marginBottom: 3 },
   insightLink: { fontSize: FontSize.label, fontWeight: FontWeight.semiBold, color: Colors.brand },
 
-  // ── Personal bests
-  pbScroll: {
-    paddingHorizontal: Spacing.base, gap: Spacing.sm,
-    paddingBottom: Spacing.sm,
+  // ── Section header
+  sectionRow: {
+    flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
+    paddingHorizontal: Spacing.base,
+    marginBottom: Spacing.sm, marginTop: Spacing.xs,
   },
+  sectionAccent: {
+    width: 3, height: 14, borderRadius: 2,
+    backgroundColor: Colors.brand,
+  },
+  sectionLabel: {
+    fontSize: FontSize.caption, fontWeight: FontWeight.bold,
+    color: Colors.textMuted, letterSpacing: 1.3,
+  },
+
+  // ── Personal bests
+  pbScroll: { paddingHorizontal: Spacing.base, gap: Spacing.sm, paddingBottom: Spacing.sm },
   pbCard: {
     backgroundColor: Colors.surface,
     borderRadius: BorderRadius.xl,
     borderWidth: 1, borderColor: Colors.border,
     borderTopWidth: 3,
     padding: Spacing.md,
-    width: 110, alignItems: 'flex-start',
+    width: 115, gap: 3,
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
   },
-  pbVal:    { fontSize: 22, fontWeight: FontWeight.black, marginBottom: 2 },
+  pbIconWrap: {
+    width: 30, height: 30, borderRadius: BorderRadius.md,
+    alignItems: 'center', justifyContent: 'center',
+    marginBottom: 4,
+  },
+  pbVal:    { fontSize: 22, fontWeight: FontWeight.black },
   pbMetric: { fontSize: FontSize.caption, fontWeight: FontWeight.semiBold, color: Colors.textSecondary },
-  pbDrill:  { fontSize: 10, color: Colors.textMuted, textTransform: 'capitalize', marginTop: 2 },
+  pbDrill:  { fontSize: 10, color: Colors.textMuted, textTransform: 'capitalize' },
 
   // ── Session cards
   sessionCard: {
@@ -654,47 +854,42 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     borderRadius: BorderRadius.xl,
     borderWidth: 1, borderColor: Colors.border,
-    borderLeftWidth: 3,
+    borderLeftWidth: 4,
     padding: Spacing.md,
     gap: Spacing.sm,
   },
-  sessionTop: {
-    flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
-  },
+  sessionHead: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
   sessionIconWrap: {
-    width: 28, height: 28, borderRadius: BorderRadius.md,
+    width: 30, height: 30, borderRadius: BorderRadius.md,
     alignItems: 'center', justifyContent: 'center',
     flexShrink: 0,
   },
   sessionDrill: {
-    flex: 1,
-    fontSize: FontSize.label, fontWeight: FontWeight.semiBold,
+    flex: 1, fontSize: FontSize.label, fontWeight: FontWeight.semiBold,
     color: Colors.textPrimary, textTransform: 'capitalize',
   },
-  sessionScoreWrap: { alignItems: 'center', minWidth: 36 },
-  sessionScore: {
-    fontSize: FontSize.title, fontWeight: FontWeight.black, lineHeight: 24,
+  sessionScoreBadge: {
+    flexDirection: 'row', alignItems: 'baseline', gap: 2,
+    borderRadius: BorderRadius.md, borderWidth: 1,
+    paddingHorizontal: Spacing.sm, paddingVertical: 3,
   },
+  sessionScoreNum: { fontSize: FontSize.label, fontWeight: FontWeight.black },
   sessionScoreLbl: { fontSize: FontSize.micro, color: Colors.textMuted },
-  sessionMetaRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 4, flexWrap: 'wrap',
+  sessionMeta: { flexDirection: 'row', gap: 5, flexWrap: 'wrap' },
+  sessionChip: {
+    flexDirection: 'row', alignItems: 'center', gap: 3,
+    backgroundColor: Colors.surfaceElevated,
+    borderRadius: BorderRadius.sm, borderWidth: 1, borderColor: Colors.border,
+    paddingHorizontal: 6, paddingVertical: 3,
   },
-  sessionMetaTxt: { fontSize: FontSize.caption, color: Colors.textMuted },
-  sessionMetaDot: { fontSize: FontSize.caption, color: Colors.textDisabled },
-  sessionCourtBadge: {
-    fontSize: FontSize.caption, fontWeight: FontWeight.bold, letterSpacing: 0.5,
-  },
-  sessionBarRow: {
-    flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, marginTop: 2,
-  },
+  sessionChipText: { fontSize: 10, color: Colors.textMuted },
+  sessionBarRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, marginTop: 2 },
   sessionBarBg: {
     flex: 1, height: 5, borderRadius: 3,
     backgroundColor: Colors.surfaceElevated, overflow: 'hidden',
   },
   sessionBarFill: { height: '100%', borderRadius: 3 },
-  sessionBarPct: {
-    fontSize: FontSize.micro, fontWeight: FontWeight.bold, minWidth: 30, textAlign: 'right',
-  },
+  sessionBarPct: { fontSize: FontSize.micro, fontWeight: FontWeight.bold, minWidth: 30, textAlign: 'right' },
 
   // ── Empty state
   emptyCard: {
@@ -705,19 +900,25 @@ const styles = StyleSheet.create({
     padding: Spacing.xxl,
     alignItems: 'center', gap: Spacing.md,
   },
-  emptyTitle: {
-    fontSize: FontSize.sectionHeader, fontWeight: FontWeight.bold, color: Colors.textPrimary,
+  emptyIconWrap: {
+    width: 72, height: 72, borderRadius: 36,
+    backgroundColor: `${Colors.accentProgress}15`,
+    borderWidth: 1, borderColor: `${Colors.accentProgress}30`,
+    alignItems: 'center', justifyContent: 'center',
   },
+  emptyTitle: { fontSize: FontSize.sectionHeader, fontWeight: FontWeight.bold, color: Colors.textPrimary },
   emptyBody: {
     fontSize: FontSize.label, color: Colors.textMuted,
     textAlign: 'center', lineHeight: 22,
   },
   emptyBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
     paddingHorizontal: Spacing.xl, paddingVertical: Spacing.md,
     borderRadius: BorderRadius.full,
-    borderWidth: 1.5, borderColor: Colors.accentProgress,
+    backgroundColor: Colors.accentProgress,
+    marginTop: Spacing.sm,
   },
   emptyBtnText: {
-    fontSize: FontSize.label, color: Colors.accentProgress, fontWeight: FontWeight.semiBold,
+    fontSize: FontSize.label, color: Colors.background, fontWeight: FontWeight.bold,
   },
 });

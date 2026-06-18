@@ -13,8 +13,9 @@ import PillSelector from '../components/ui/PillSelector';
 import { useProfileStore } from '../stores/profileStore';
 import { useSettingsStore } from '../stores/settingsStore';
 import { useProgressStore } from '../stores/progressStore';
+import { useBadgesStore } from '../stores/badgesStore';
 import { getLanguageLabel } from '../constants/languages';
-import { getIntervalMs, MOVES_PER_SET } from '../constants/timing';
+import { getIntervalMs, MOVES_PER_SET, MOVEMENT_PHASE_MS } from '../constants/timing';
 import { Language } from '../types';
 import * as Audio from '../engine/audioEngine';
 import ProfileScreen from './ProfileScreen';
@@ -136,7 +137,10 @@ export default function SettingsScreen() {
   const displayName = profile.name.trim() || 'Player';
   const skillColor  = SKILL_COLORS[profile.skillLevel] ?? Colors.levelIntermediate;
 
-  const interval    = getIntervalMs(settings.defaultDifficulty, settings.defaultTempo);
+  const extraMs     = settings.movementPaceExtraMs ?? 0;
+  const rawInterval = getIntervalMs(settings.defaultDifficulty, settings.defaultTempo) + extraMs;
+  const movPhase    = MOVEMENT_PHASE_MS[settings.defaultDifficulty][settings.defaultTempo];
+  const interval    = Math.max(movPhase + 800, rawInterval);
   const movesPerSet = MOVES_PER_SET[settings.defaultDifficulty];
   const repsPerMin  = Math.round(60_000 / interval);
   const langLabel   = getLanguageLabel(profile.language);
@@ -160,6 +164,9 @@ export default function SettingsScreen() {
             console.warn('[Settings] SQLite reset failed:', e);
           }
           clearCache();
+          useBadgesStore.getState().resetBadges();
+          // BUG-014: trigger screens watching lastSessionCompletedAt to reload.
+          useProgressStore.getState().markSessionCompleted();
         },
       },
     ]);
@@ -168,10 +175,30 @@ export default function SettingsScreen() {
   function handleSignOut() {
     Alert.alert(
       'Sign Out',
-      "Your training data stays on this device. You'll need to sign in again on next launch.",
+      'Would you like to clear your training history from this device when signing out?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Sign Out', style: 'destructive', onPress: () => signOut() },
+        {
+          text: 'Keep Data & Sign Out',
+          onPress: () => signOut(),
+        },
+        {
+          text: 'Clear Data & Sign Out',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await db.execAsync(
+                'DELETE FROM sessions; DELETE FROM movements; DELETE FROM personal_bests; DELETE FROM checkpoints;'
+              );
+            } catch (e) {
+              console.warn('[Settings] clear data on sign-out failed:', e);
+            }
+            clearCache();
+            useBadgesStore.getState().resetBadges();
+            useProgressStore.getState().markSessionCompleted();
+            signOut();
+          },
+        },
       ]
     );
   }
@@ -179,7 +206,14 @@ export default function SettingsScreen() {
   function handleResetAll() {
     Alert.alert('Reset All Settings', 'This resets your profile and all app settings to defaults. Cannot be undone.', [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Reset', style: 'destructive', onPress: () => { resetProfile(); resetSettings(); } },
+      {
+        text: 'Reset', style: 'destructive', onPress: () => {
+          resetProfile();
+          resetSettings();
+          clearCache();
+          useBadgesStore.getState().resetBadges();
+        },
+      },
     ]);
   }
 
@@ -200,6 +234,8 @@ export default function SettingsScreen() {
             } catch {}
             await SecureStore.deleteItemAsync('sgx-user-credentials').catch(() => {});
             await SecureStore.deleteItemAsync('sgx-auth-attempts').catch(() => {});
+            clearCache();
+            useBadgesStore.getState().resetBadges();
             resetProfile();
             resetSettings();
           },
@@ -233,7 +269,13 @@ export default function SettingsScreen() {
             </View>
             <Text style={styles.heroAppName}>SquashGhostingX</Text>
           </View>
-          <Text style={styles.heroTitle}>Settings</Text>
+          <View style={styles.heroTitleRow}>
+            <Text style={styles.heroTitle}>Settings</Text>
+            <TouchableOpacity onPress={handleSignOut} style={styles.signOutBtn} activeOpacity={0.7}>
+              <Ionicons name="log-out-outline" size={15} color={Colors.danger} />
+              <Text style={styles.signOutBtnText}>Sign Out</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* ── PROFILE CARD ──────────────────────────────────── */}
@@ -284,16 +326,20 @@ export default function SettingsScreen() {
           <SettingsRow
             icon="speedometer" iconBg={`${Colors.accentRoutines}22`} iconColor={Colors.accentRoutines}
             label="Speech Rate"
+            sub="Use 0.7×–0.8× for Bluetooth/speaker use on court"
             right={
               <PillSelector
                 options={[
+                  { label: '0.7×', value: '0.7' },
+                  { label: '0.8×', value: '0.8' },
                   { label: '0.9×', value: '0.9' },
                   { label: '1.0×', value: '1.0' },
                   { label: '1.1×', value: '1.1' },
                 ]}
-                selected={settings.speechRate.toFixed(1)}
+                selected={String(Math.round(settings.speechRate * 10) / 10)}
                 onSelect={(v) => updateSettings({ speechRate: Number(v) })}
                 size="sm"
+                scrollable
               />
             }
           />
@@ -324,7 +370,7 @@ export default function SettingsScreen() {
           <SettingsRow
             icon="play-circle" iconBg={`${Colors.gold}22`} iconColor={Colors.gold}
             label="Test Voice"
-            sub={`${langLabel} · ${profile.voiceGender === 'female' ? 'Female' : 'Male'} voice`}
+            sub={`${langLabel} · ${profile.voiceGender === 'female' ? 'Female' : 'Male'} · raise system volume for Bluetooth/court use`}
             right={<Ionicons name="volume-high" size={18} color={Colors.gold} />}
             onPress={testVoice}
             isLast
@@ -397,18 +443,39 @@ export default function SettingsScreen() {
           <SettingsRow
             icon="hourglass-outline" iconBg={`${Colors.rest}22`} iconColor={Colors.rest}
             label="Movement Pace"
-            sub="Extra pause at T between each call"
+            sub="Adjust the T-pause relative to the base difficulty"
             bottom={
               <PillSelector
                 options={[
-                  { label: 'Brisk',    value: '0'    },
-                  { label: 'Steady',   value: '1000' },
-                  { label: 'Measured', value: '2000' },
-                  { label: 'Recovery', value: '3000' },
+                  { label: 'Fast',     value: '-1000' },
+                  { label: 'Default',  value: '0'     },
+                  { label: 'Steady',   value: '1000'  },
+                  { label: 'Measured', value: '2000'  },
+                  { label: 'Recovery', value: '3000'  },
                 ]}
                 selected={String(settings.movementPaceExtraMs ?? 0)}
                 onSelect={(v) => updateSettings({ movementPaceExtraMs: Number(v) })}
                 size="sm"
+                scrollable
+              />
+            }
+          />
+          <SettingsRow
+            icon="eye" iconBg={`${Colors.accentLibrary}22`} iconColor={Colors.accentLibrary}
+            label="Default Voice Mode"
+            sub="How position calls are delivered"
+            bottom={
+              <PillSelector
+                options={[
+                  { label: 'Voice+Visual', value: 'voice+visual' },
+                  { label: 'Voice Only',   value: 'voice-only'   },
+                  { label: 'Visual Only',  value: 'visual-only'  },
+                  { label: 'Beep',         value: 'beep'         },
+                ]}
+                selected={settings.defaultVoiceMode}
+                onSelect={(v) => updateSettings({ defaultVoiceMode: v as any })}
+                size="sm"
+                scrollable
               />
             }
           />
@@ -490,21 +557,13 @@ export default function SettingsScreen() {
         {/* ── HELP & GUIDE ──────────────────────────────────── */}
         <Text style={styles.sectionLabel}>HELP & GUIDE</Text>
         <SettingsGroup>
+          {/* BUG-024: removed duplicate FAQ row — both pointed to the same modal */}
           <SettingsRow
             icon="book-outline"
             iconBg={Colors.brandMuted}
             iconColor={Colors.brand}
-            label="How to Use the App"
-            sub="Court systems, positions, settings and drills explained"
-            right={<Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />}
-            onPress={() => setHelpVisible(true)}
-          />
-          <SettingsRow
-            icon="help-circle-outline"
-            iconBg={`${Colors.rest}22`}
-            iconColor={Colors.rest}
-            label="FAQ"
-            sub="Common questions and troubleshooting"
+            label="Help & FAQ"
+            sub="Court systems, positions, drills and troubleshooting"
             right={<Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />}
             onPress={() => setHelpVisible(true)}
             isLast
@@ -615,7 +674,10 @@ const styles = StyleSheet.create({
   heroAppRow:  { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, marginBottom: Spacing.xs },
   heroAppIcon: { width: 26, height: 26, borderRadius: 7, backgroundColor: Colors.brandMuted, alignItems: 'center', justifyContent: 'center' },
   heroAppName: { fontSize: FontSize.caption, fontWeight: FontWeight.semiBold, color: Colors.brand, letterSpacing: 0.6 },
-  heroTitle:   { fontSize: 34, fontWeight: FontWeight.black, color: Colors.textPrimary, letterSpacing: -0.5 },
+  heroTitleRow:    { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  heroTitle:       { fontSize: 34, fontWeight: FontWeight.black, color: Colors.textPrimary, letterSpacing: -0.5 },
+  signOutBtn:      { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: `${Colors.danger}18`, borderWidth: 1, borderColor: `${Colors.danger}35`, borderRadius: BorderRadius.full, paddingHorizontal: Spacing.md, paddingVertical: 7 },
+  signOutBtnText:  { fontSize: FontSize.caption, fontWeight: FontWeight.semiBold, color: Colors.danger },
 
   sectionLabel: {
     fontSize: FontSize.caption, fontWeight: FontWeight.bold,

@@ -652,7 +652,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
     <a href="#programs">Programs</a>
     <a href="#videos">Videos</a>
     <a href="#founder">Team</a>
-    <a href="guide.html">Guide</a>
+    <a href="/guide">Guide</a>
     <a href="#cta" class="nav-cta">Download Free</a>
   </div>
   <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false">
@@ -670,7 +670,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
   <a href="#blog" onclick="closeMobileMenu()">Blog</a>
   <a href="#founder" onclick="closeMobileMenu()">Team</a>
   <a href="#faq" onclick="closeMobileMenu()">FAQ</a>
-  <a href="guide.html" onclick="closeMobileMenu()">App Guide</a>
+  <a href="/guide" onclick="closeMobileMenu()">App Guide</a>
   <a href="#contact" onclick="closeMobileMenu()">Contact</a>
   <a href="#cta" onclick="closeMobileMenu()" style="color:var(--accent);font-weight:700">⬇ Download Free</a>
 </div>
@@ -1961,7 +1961,6 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
         <div class="cf-success" id="cf-success">✅ Message sent! We'll reply within 24 hours.</div>
         <div class="cf-error" id="cf-error">Something went wrong — please try emailing us directly at squash.ghostingx@gmail.com</div>
         <form class="contact-form-card" id="contact-form">
-          <!-- Formspree: replace YOUR_FORM_ID after signing up at formspree.io -->
           <input type="hidden" name="_subject" value="SquashGhostingX Website Contact">
           <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
           <div class="cf-row">
@@ -2028,7 +2027,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       <div class="footer-col">
         <h4>Learn</h4>
         <div class="footer-links">
-          <a href="guide.html">App Guide</a>
+          <a href="/guide">App Guide</a>
           <a href="#blog">Training Blog</a>
           <a href="#videos">Demo Videos</a>
           <a href="#coaches">For Coaches</a>
@@ -2038,10 +2037,10 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       <div class="footer-col">
         <h4>Legal</h4>
         <div class="footer-links">
-          <a href="privacy.html">Privacy Policy</a>
-          <a href="terms.html">Terms of Use</a>
+          <a href="/privacy">Privacy Policy</a>
+          <a href="/terms">Terms of Use</a>
           <a href="#contact">Contact Us</a>
-          <a href="support.html">Support Page</a>
+          <a href="/support">Support</a>
         </div>
       </div>
     </div>
@@ -2312,7 +2311,7 @@ function openLightbox(src, alt) {
 }
 function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
 
-// ── CONTACT FORM (Formspree) ──
+// ── CONTACT FORM ──
 (function() {
   var form = document.getElementById('contact-form');
   if (!form) return;
@@ -2326,7 +2325,7 @@ function closeLightbox() { document.getElementById('lightbox').classList.remove(
     success.classList.remove('show');
     errBox.classList.remove('show');
     var data = new FormData(form);
-    fetch('https://formspree.io/f/YOUR_FORM_ID', {
+    fetch('https://formsubmit.co/ajax/squash.ghostingx@gmail.com', {
       method: 'POST',
       body: data,
       headers: { 'Accept': 'application/json' }
@@ -2336,7 +2335,7 @@ function closeLightbox() { document.getElementById('lightbox').classList.remove(
         form.reset();
         success.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       } else {
-        return res.json().then(function(d) { throw new Error(d.error || 'Error'); });
+        throw new Error('Error');
       }
     }).catch(function() {
       errBox.classList.add('show');

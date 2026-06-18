@@ -152,7 +152,6 @@ interface CourtCanvasProps {
   gender?:        string | null;
   courtMode?:     CourtMode;
   style?:         ViewStyle;
-  showLabels?:    boolean;  // ignored — position labels are never shown on court
 }
 
 export default function CourtCanvas({
@@ -283,6 +282,29 @@ export default function CourtCanvas({
     );
   })() : null;
 
+  // BUG-035: filled position indicator circles — solid dot at active, outline at next.
+  // These render in SVG so they are always visible regardless of pose image loading.
+  const posIndicatorsSvg = (
+    <>
+      {activePosition && activePosition !== 'T' && (() => {
+        const { vx, vy } = visualCoords(activePosition, dominantHand);
+        return (
+          <>
+            <Circle cx={vx} cy={vy} r={34} fill={T.pulseColor} opacity={0.18} />
+            <Circle cx={vx} cy={vy} r={18} fill={T.pulseColor} opacity={0.75} />
+          </>
+        );
+      })()}
+      {nextPosition && nextPosition !== 'T' && (() => {
+        const { vx, vy } = visualCoords(nextPosition, dominantHand);
+        return (
+          <Circle cx={vx} cy={vy} r={14} fill="none"
+            stroke={T.arrowColor} strokeWidth="3" opacity={0.45} />
+        );
+      })()}
+    </>
+  );
+
   // ─── WOODEN COURT RENDER ────────────────────────────────────────────────
   // Pure SVG warm-wood court — no PNG, no artifacts, WSF-accurate line positions.
   if (isWooden) {
@@ -344,7 +366,8 @@ export default function CourtCanvas({
 
           </G>
 
-          {/* Pulse ring (SVG circle, outside mirror group) */}
+          {/* Position indicators + pulse ring (outside mirror group) */}
+          {posIndicatorsSvg}
           {pulseRingSvg}
         </Svg>
 

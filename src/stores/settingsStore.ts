@@ -6,7 +6,6 @@ import { VoiceMode, CourtSystem, CourtMode, DrillType, Tempo, Difficulty, ShotGr
 export interface AppSettings {
   // Audio
   voiceEnabled: boolean;
-  beepEnabled: boolean;
   hapticsEnabled: boolean;
   speechRate: number;           // 0.6 – 1.2
   coachingCues: boolean;        // mid-session encouragement
@@ -28,7 +27,6 @@ export interface AppSettings {
 
 export const DEFAULT_SETTINGS: AppSettings = {
   voiceEnabled: true,
-  beepEnabled: true,
   hapticsEnabled: true,
   speechRate: 1.0,
   coachingCues: false,
@@ -62,7 +60,7 @@ export const useSettingsStore = create<SettingsStore>()(
     {
       name: 'settings-storage',
       storage: createJSONStorage(() => AsyncStorage),
-      version: 2,
+      version: 3,
       migrate: (persisted: any, version: number) => {
         if (version < 1) {
           const cm = persisted?.state?.settings?.courtMode;
@@ -70,10 +68,15 @@ export const useSettingsStore = create<SettingsStore>()(
           if (cm === 'real') persisted.state.settings.courtMode = 'wooden';
         }
         if (version < 2) {
-          // Ensure courtMode is a valid value; default to 'wooden' if missing or stale
           const cm = persisted?.state?.settings?.courtMode;
           if (cm !== 'glass' && cm !== 'wooden') {
             if (persisted?.state?.settings) persisted.state.settings.courtMode = 'wooden';
+          }
+        }
+        if (version < 3) {
+          // Remove unused beepEnabled field from persisted state
+          if (persisted?.state?.settings) {
+            delete persisted.state.settings.beepEnabled;
           }
         }
         return persisted;

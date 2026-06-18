@@ -128,43 +128,44 @@ export async function upsertPersonalBest(
   metric: string,
   value: number,
   sessionId: string,
-  achievedAt: string
+  achievedAt: string,
+  userId = 'local'
 ): Promise<boolean> {
   const existing = await db.getFirstAsync<{ value: number }>(
-    `SELECT value FROM personal_bests WHERE user_id = '' AND drill_type = ? AND metric = ?`,
-    drillType, metric
+    `SELECT value FROM personal_bests WHERE user_id = ? AND drill_type = ? AND metric = ?`,
+    userId, drillType, metric
   );
 
   if (existing && existing.value >= value) return false;
 
   await db.runAsync(
     `INSERT OR REPLACE INTO personal_bests (user_id, drill_type, metric, value, session_id, achieved_at)
-     VALUES ('', ?, ?, ?, ?, ?)`,
-    drillType, metric, value, sessionId, achievedAt
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    userId, drillType, metric, value, sessionId, achievedAt
   );
   return true;
 }
 
 // ─── Progress / Analytics ─────────────────────────────────────────────────────
 
-export async function getProgressStats(db: DB): Promise<ProgressStats> {
+export async function getProgressStats(db: DB, userId = 'local'): Promise<ProgressStats> {
   const totals = await db.getFirstAsync<{
     total_sessions: number; total_movements: number; total_minutes: number; last_at: string | null;
   }>(`
     SELECT COUNT(*) as total_sessions,
            SUM(movements_total) as total_movements,
-           SUM(duration_s / 60) as total_minutes,
+           SUM(CAST(duration_s AS REAL) / 60.0) as total_minutes,
            MAX(started_at) as last_at
     FROM sessions WHERE ended_at IS NOT NULL
   `);
 
   // Weekly activity (last 7 days)
   const weekRows = await db.getAllAsync<{ day: string; movements: number; intensity: number }>(`
-    SELECT date(started_at) as day,
+    SELECT date(started_at, 'localtime') as day,
            SUM(movements_total) as movements,
            AVG(intensity_score) as intensity
     FROM sessions
-    WHERE started_at >= date('now', '-6 days') AND ended_at IS NOT NULL
+    WHERE date(started_at, 'localtime') >= date('now', 'localtime', '-6 days') AND ended_at IS NOT NULL
     GROUP BY day ORDER BY day ASC
   `);
 
@@ -187,7 +188,7 @@ export async function getProgressStats(db: DB): Promise<ProgressStats> {
   // Streak calculation — compare consecutive rows rather than against today-minus-i
   // so gaps are detected correctly regardless of whether the user trained today.
   const dayRows = await db.getAllAsync<{ day: string }>(`
-    SELECT DISTINCT date(started_at) as day FROM sessions
+    SELECT DISTINCT date(started_at, 'localtime') as day FROM sessions
     WHERE ended_at IS NOT NULL ORDER BY day DESC
   `);
 
@@ -210,9 +211,10 @@ export async function getProgressStats(db: DB): Promise<ProgressStats> {
     }
     longestStreak = Math.max(longestStreak, run);
 
-    // Current streak: only active if the most recent training day is today or yesterday.
-    const todayStr     = new Date().toISOString().slice(0, 10);
-    const yesterdayStr = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
+    // BUG-010: use local date (not UTC) so streak is correct for non-UTC users.
+    // toLocaleDateString('en-CA') returns YYYY-MM-DD in the device's local timezone.
+    const todayStr     = new Date().toLocaleDateString('en-CA');
+    const yesterdayStr = new Date(Date.now() - 86_400_000).toLocaleDateString('en-CA');
     if (dayRows[0].day === todayStr || dayRows[0].day === yesterdayStr) {
       currentStreak = 1;
       for (let i = 1; i < dayRows.length; i++) {
@@ -229,9 +231,11 @@ export async function getProgressStats(db: DB): Promise<ProgressStats> {
   }
 
   // Personal bests
+  // BUG-011: query PBs by the actual userId, not hardcoded empty string.
+  // Also include legacy rows stored with '' for backwards compatibility.
   const pbRows = await db.getAllAsync<{
     drill_type: string; metric: string; value: number; session_id: string; achieved_at: string;
-  }>(`SELECT drill_type, metric, value, session_id, achieved_at FROM personal_bests WHERE user_id = ''`);
+  }>(`SELECT drill_type, metric, value, session_id, achieved_at FROM personal_bests WHERE user_id = ? OR user_id = ''`, userId);
 
   const personalBests: PersonalBest[] = pbRows.map((r) => ({
     drillType: r.drill_type as DrillType,
