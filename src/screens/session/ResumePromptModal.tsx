@@ -12,7 +12,7 @@ import { deleteCheckpoint } from '../../db/queries';
 
 export default function ResumePromptModal() {
   const db = useSQLiteContext() as any;
-  const { pendingCheckpoint, setPendingCheckpoint, setPendingConfig, setResumeFromCheckpoint } = useSessionStore();
+  const { pendingCheckpoint, setPendingCheckpoint, setPendingConfig, setResumeFromCheckpoint, openDrillConfig } = useSessionStore();
 
   if (!pendingCheckpoint) return null;
 
@@ -40,16 +40,17 @@ export default function ResumePromptModal() {
 
   function handleDiscard() {
     Alert.alert(
-      'Discard Session?',
-      'Your paused session progress will be permanently lost.',
+      'Start a New Session?',
+      'This will discard your paused session. Your progress will be permanently lost.',
       [
-        { text: 'Keep', style: 'cancel' },
+        { text: 'Keep Paused Session', style: 'cancel' },
         {
-          text: 'Discard',
+          text: 'Discard & Start New',
           style: 'destructive',
           onPress: () => {
             deleteCheckpoint(db).catch(() => {});
             setPendingCheckpoint(null);
+            openDrillConfig();
           },
         },
       ]
@@ -94,7 +95,7 @@ export default function ResumePromptModal() {
               <Text style={styles.resumeText}>▶  Resume Session</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleDiscard} style={styles.discardBtn}>
-              <Text style={styles.discardText}>Start Fresh</Text>
+              <Text style={styles.discardText}>Start New Session</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>

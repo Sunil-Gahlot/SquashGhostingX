@@ -1,4 +1,4 @@
-import { Tempo, Difficulty } from '../types';
+import { Tempo, Difficulty, Position } from '../types';
 
 // ─── 3-Phase Timing Model ──────────────────────────────────────────────────────
 //
@@ -13,11 +13,11 @@ import { Tempo, Difficulty } from '../types';
 //
 // MOVEMENT_PHASE_MS: time from loop-start until "Back to T!" fires.
 // Player's time at position ≈ MOVEMENT_PHASE_MS − positionCallMs − sprint_time.
-//   beginner/natural  → 4800 − 500 − 1500 ≈ 2.8 s at position  ✓
-//   intermediate/natural → 4000 − 500 − 1200 ≈ 2.3 s  ✓
-//   advanced/natural  → 3000 − 500 − 1000 ≈ 1.5 s  ✓
-//   elite/natural     → 2400 − 500 −  800 ≈ 1.1 s  ✓
-//   pro/natural       → 1700 − 500 −  600 ≈ 0.6 s  ✓
+//   beginner/natural  → 4800 − 150 − 1500 ≈ 3.15 s at position  ✓
+//   intermediate/natural → 4000 − 150 − 1200 ≈ 2.65 s  ✓
+//   advanced/natural  → 3000 − 150 − 1000 ≈ 1.85 s  ✓
+//   elite/natural     → 2400 − 150 −  800 ≈ 1.45 s  ✓
+//   pro/natural       → 1700 − 150 −  600 ≈ 0.95 s  ✓
 export const MOVEMENT_PHASE_MS: Record<Difficulty, Record<Tempo, number>> = {
   beginner:     { slow: 6500, natural: 4800, explosive: 3800 },
   intermediate: { slow: 5500, natural: 4000, explosive: 3100 },
@@ -67,18 +67,28 @@ export const PACE_DEFAULT_STEP = 3;
 // T-clear fires at min(movPhase+600, effectiveInterval-100) — always before next call.
 export const T_POSE_CLEAR_DELAY_MS = 600;
 
+// Extra movement-phase time per position — front corners require more time:
+// player is deeper into the corner with a lower body position and tighter swing.
+// Applied on top of MOVEMENT_PHASE_MS so the recovery cue fires later for these positions.
+export const POSITION_PHASE_OFFSET_MS: Partial<Record<Position, number>> = {
+  FL: 250, FR: 250,       // deep front corners
+  FMCL: 100, FMCR: 100,  // front volley zone
+};
+
 // Pause at T after "Go!" before the VERY FIRST position call of a set.
 // Gives the player time to physically stand at T and compose themselves.
 export const T_START_PAUSE_MS = 3000;
 
 // ─── Within-Interval Audio Offsets (spec Part F4) ────────────────────────────
 // All offsets relative to T+0 (moment position-call event fires).
+// voiceCallMs=0: speech issued at T+0; iOS TTS startup ~150ms so voice arrives at T+150ms.
+// positionCallMs=150: court visual fires at T+150ms — lands in sync with TTS arrival.
 export const AUDIO_OFFSETS = {
   prepBeepMs: 0,          // preparation beep — fires at interval start
-  positionCallMs: 500,    // court visual highlight + state update
-  voiceCallMs: 350,       // voice fires 150ms before visual to offset TTS startup latency (~150ms on iOS)
-  courtHighlightMs: 500,  // court zone highlight animates on
-  textOverlayMs: 550,     // voice text overlay fades in
+  positionCallMs: 150,    // court visual highlight + state update (was 300 — still felt sluggish)
+  voiceCallMs: 0,         // speech issued at T+0; TTS startup (~150ms) brings audio in sync with visual
+  courtHighlightMs: 150,  // court zone highlight animates on
+  textOverlayMs: 200,     // voice text overlay fades in
   shotCallFactor: 0.55,       // default: shot call fires at (intervalMs × 0.55)
   shotCallFactorFast: 0.65,  // for intervals < 5 s — player needs more time to arrive
   recoveryOffsetMs: 400,  // "recover to T" fires at (intervalMs − 400)

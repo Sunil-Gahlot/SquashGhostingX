@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Animated, Modal, Alert, PanResponder,
+  View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Animated, Modal, PanResponder, Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -115,7 +115,7 @@ function greeting(): string {
 }
 
 export default function HomeScreen({ navigation }: any) {
-  const { profile, signOut, hasCompletedAuth } = useProfileStore();
+  const { profile, signOut, hasCompletedAuth, hasStartedAnySession } = useProfileStore();
   const { stats, lastSessionCompletedAt, recentSessions } = useProgressStore();
   const settings = useSettingsStore((s) => s.settings);
   const { setPendingConfig, openDrillConfig } = useSessionStore();
@@ -224,6 +224,7 @@ export default function HomeScreen({ navigation }: any) {
       tempo:        settings.defaultTempo,
       difficulty:   settings.defaultDifficulty,
       courtSystem:  settings.defaultCourtSystem,
+      voiceMode:    settings.defaultVoiceMode,
     });
   }
 
@@ -256,6 +257,7 @@ export default function HomeScreen({ navigation }: any) {
         dominantHand: profile.dominantHand,
         voiceGender:  profile.voiceGender,
         language:     profile.language,
+        voiceMode:    settings.defaultVoiceMode,
       });
     }
   }
@@ -263,11 +265,11 @@ export default function HomeScreen({ navigation }: any) {
   function handleSignOut() {
     Alert.alert(
       'Sign Out',
-      "Your training data stays on this device. You'll need to sign in again on next launch.",
+      'Are you sure you want to sign out?',
       [
         { text: 'Cancel', style: 'cancel' },
         { text: 'Sign Out', style: 'destructive', onPress: () => signOut() },
-      ]
+      ],
     );
   }
 
@@ -351,6 +353,34 @@ export default function HomeScreen({ navigation }: any) {
             </View>
           </View>
 
+          {/* ── FIRST-RUN GUIDANCE (PQA-11) ───────────────────────── */}
+          {!hasStartedAnySession && (
+            <View style={styles.firstRunCard}>
+              <View style={styles.firstRunIconRow}>
+                <View style={styles.firstRunIconCircle}>
+                  <Ionicons name="rocket-outline" size={28} color={Colors.brand} />
+                </View>
+              </View>
+              <Text style={styles.firstRunTitle}>Your first session awaits</Text>
+              <Text style={styles.firstRunBody}>
+                Tap <Text style={styles.firstRunEmphasis}>Quick Start</Text> above for an instant session, or{' '}
+                <Text style={styles.firstRunEmphasis}>New Session</Text> to pick your drill type, difficulty, and duration.
+              </Text>
+              <View style={styles.firstRunSteps}>
+                {[
+                  { icon: 'footsteps-outline' as const, text: 'Start on the T in the middle of the court' },
+                  { icon: 'volume-high-outline' as const, text: 'Listen for position calls and move to each spot' },
+                  { icon: 'refresh-outline' as const, text: 'Always recover back to T between calls' },
+                ].map(({ icon, text }) => (
+                  <View key={text} style={styles.firstRunStep}>
+                    <Ionicons name={icon} size={16} color={Colors.brand} />
+                    <Text style={styles.firstRunStepText}>{text}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
           {/* ── LAST SESSION ──────────────────────────────────────── */}
           {lastSession && (
             <>
@@ -416,7 +446,7 @@ export default function HomeScreen({ navigation }: any) {
                     onPress={handleQuickStart}
                     activeOpacity={0.82}
                   >
-                    <Ionicons name="repeat" size={14} color="#000" />
+                    <Ionicons name="repeat" size={16} color="#000" />
                     <Text style={styles.lsRepeatTxt}>Repeat</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -425,7 +455,7 @@ export default function HomeScreen({ navigation }: any) {
                     activeOpacity={0.82}
                   >
                     <Text style={styles.lsProgressTxt}>Full Progress</Text>
-                    <Ionicons name="chevron-forward" size={13} color={Colors.brand} />
+                    <Ionicons name="chevron-forward" size={16} color={Colors.brand} />
                   </TouchableOpacity>
                 </View>
 
@@ -630,6 +660,30 @@ const styles = StyleSheet.create({
   safe:    { flex: 1, backgroundColor: Colors.background },
   scroll:  { flex: 1 },
   content: { paddingBottom: Spacing.xxxl },
+
+  // ── First-run guidance card
+  firstRunCard: {
+    marginHorizontal: Spacing.base,
+    marginTop: Spacing.base,
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.xl,
+    borderWidth: 1,
+    borderColor: `${Colors.brand}40`,
+    padding: Spacing.base,
+    gap: Spacing.sm,
+  },
+  firstRunIconRow:    { alignItems: 'center' },
+  firstRunIconCircle: {
+    width: 56, height: 56, borderRadius: 28,
+    backgroundColor: Colors.brandMuted,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  firstRunTitle:    { fontSize: FontSize.body, fontWeight: FontWeight.bold, color: Colors.textPrimary, textAlign: 'center' },
+  firstRunBody:     { fontSize: FontSize.label, color: Colors.textMuted, lineHeight: 20, textAlign: 'center' },
+  firstRunEmphasis: { color: Colors.brand, fontWeight: FontWeight.semiBold },
+  firstRunSteps:    { gap: Spacing.sm, marginTop: Spacing.xs },
+  firstRunStep:     { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
+  firstRunStepText: { flex: 1, fontSize: FontSize.caption, color: Colors.textSecondary, lineHeight: 18 },
 
   // ── Hero
   hero: {
@@ -1064,10 +1118,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: Spacing.xs,
     borderRadius: BorderRadius.lg,
-    paddingVertical: Spacing.sm + 2,
+    paddingVertical: Spacing.md,
   },
   lsRepeatTxt: {
-    fontSize: FontSize.caption,
+    fontSize: FontSize.label,
     fontWeight: FontWeight.bold,
     color: '#000',
   },
@@ -1076,14 +1130,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 3,
+    gap: Spacing.xs,
     borderRadius: BorderRadius.lg,
-    borderWidth: 1,
-    borderColor: `${Colors.brand}44`,
-    paddingVertical: Spacing.sm + 2,
+    borderWidth: 1.5,
+    borderColor: Colors.brand,
+    paddingVertical: Spacing.md,
   },
   lsProgressTxt: {
-    fontSize: FontSize.caption,
+    fontSize: FontSize.label,
     fontWeight: FontWeight.bold,
     color: Colors.brand,
   },

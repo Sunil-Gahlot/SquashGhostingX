@@ -28,7 +28,7 @@ export interface AppSettings {
 export const DEFAULT_SETTINGS: AppSettings = {
   voiceEnabled: true,
   hapticsEnabled: true,
-  speechRate: 1.0,
+  speechRate: 1.1,
   coachingCues: false,
   defaultDrillType: 'movement',
   defaultCourtSystem: '6pt',

@@ -1,5 +1,5 @@
 import * as Speech from 'expo-speech';
-import { setAudioModeAsync } from 'expo-audio';
+import { setAudioModeAsync, setIsAudioActiveAsync } from 'expo-audio';
 import { VoiceGender } from '../types';
 
 // Rotating recovery cues — natural coach-like calls, no abrupt "T!" shortcut
@@ -73,26 +73,23 @@ function pickVoice(language: string, gender: VoiceGender): string | undefined {
 }
 
 export async function initAudioSession(): Promise<void> {
-  // Configure audio session for court training:
-  //   iOS: playsInSilentModeIOS  → audible even on silent/vibrate ring switch.
-  //        allowsRecordingIOS=false → forces AVAudioSessionCategoryPlayback so iOS
-  //          routes speech to Bluetooth A2DP speakers (not the earpiece).
-  //        interruptionModeIOS=1 (DoNotMix) → our audio takes priority; other apps duck.
-  //        staysActiveInBackground → keeps session alive so BT audio route persists
-  //          even when screen dims between calls.
-  //   Android: playThroughEarpieceAndroid=false → routes to loudspeaker, not earpiece,
-  //          so audio is audible when phone is placed outside the court.
-  //        shouldDuckAndroid=false → prevent Android from lowering our volume.
+  // Configure audio session for court training with expo-audio v1.x API:
+  //   playsInSilentMode   → audible even when iOS silent/vibrate switch is on (critical for court use)
+  //   allowsRecording     → false forces AVAudioSessionCategoryPlayback → routes to Bluetooth A2DP speaker
+  //   interruptionMode    → 'doNotMix': our audio owns the session; other apps pause while we speak
+  //   shouldPlayInBackground → keeps session alive when screen dims between calls
+  //   shouldRouteThroughEarpiece → false: loudspeaker / Bluetooth, not earpiece
+  try {
+    await setIsAudioActiveAsync(true);
+  } catch { /* non-critical */ }
   try {
     await setAudioModeAsync({
-      playsInSilentModeIOS:        true,
-      shouldPlayInBackground:      true,
-      staysActiveInBackground:     true,
-      allowsRecordingIOS:          false,  // forces playback category → Bluetooth A2DP
-      interruptionModeIOS:         1,      // DoNotMix — our audio owns the session
-      playThroughEarpieceAndroid:  false,  // loudspeaker, not earpiece
-      shouldDuckAndroid:           false,
-    } as any);
+      playsInSilentMode:          true,
+      allowsRecording:            false,
+      interruptionMode:           'doNotMix',
+      shouldPlayInBackground:     true,
+      shouldRouteThroughEarpiece: false,
+    });
   } catch { /* non-critical on web / simulator */ }
 
   // Load available voices once for gender/language selection
@@ -110,19 +107,24 @@ export async function initAudioSession(): Promise<void> {
  */
 export function speakText(
   text: string,
-  rate = 0.9,
+  rate = 1.1,
   language = 'en-US',
   voiceGender: VoiceGender = 'female',
 ): void {
+  // Re-assert audio session before each utterance so iOS routes to loudspeaker
+  // and respects playsInSilentMode even if the session was deactivated between calls.
+  setIsAudioActiveAsync(true).catch(() => {});
   try {
     Speech.stop();
     const voiceId = pickVoice(language, voiceGender);
-    const adjustedRate = Math.min(1.5, Math.max(0.5, rate));
-    // Don't include `voice` when undefined — passing it explicitly as undefined
-    // can cause silent failures on some platform/TTS combinations.
+    // Court use: clamp between 0.7 (Bluetooth delay compensation) and 1.6 (max useful rate).
+    // Default raised to 1.1 so calls are punchy and cut through court noise.
+    const adjustedRate = Math.min(1.6, Math.max(0.7, rate));
     Speech.speak(text, {
       language,
       rate:   adjustedRate,
+      // Use neutral pitch when a named voice is found — the voice already handles gender.
+      // Apply gender pitch only as a fallback when the system gives us the default voice.
       pitch:  voiceId ? 1.0 : (GENDER_PITCH[voiceGender] ?? 1.0),
       volume: 1.0,
       ...(voiceId ? { voice: voiceId } : {}),

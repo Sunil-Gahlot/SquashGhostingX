@@ -105,7 +105,7 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
   function handleSignOut() {
     Alert.alert(
       'Sign Out',
-      "Your training data and settings stay on this device. You'll need to sign in again on next launch.",
+      'Are you sure you want to sign out?',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -116,7 +116,7 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
             signOut();
           },
         },
-      ]
+      ],
     );
   }
 
@@ -292,18 +292,14 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
                 <Ionicons name="person-circle-outline" size={17} color={Colors.textMuted} />
               </View>
               <Text style={sStyles.fieldLabel}>Gender</Text>
-              {/* BUG-021: gender and voiceGender are decoupled — changing gender no longer auto-sets voice. */}
-              {/* BUG-034: added Non-Binary option. */}
               <PillSelector
                 options={[
-                  { label: 'Male',       value: 'male'      },
-                  { label: 'Female',     value: 'female'    },
-                  { label: 'Non-Binary', value: 'nonbinary' },
+                  { label: 'Male',   value: 'male'   },
+                  { label: 'Female', value: 'female' },
                 ]}
                 selected={profile.gender ?? 'male'}
                 onSelect={(v) => setProfile({ gender: v })}
                 size="sm"
-                scrollable
               />
             </View>
           </Card>

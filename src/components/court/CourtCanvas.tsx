@@ -7,15 +7,19 @@ import { Position, CourtSystem, CourtMode } from '../../types';
 import { POSITION_INFO, POSITIONS_6PT, POSITIONS_10PT } from '../../constants/positions';
 import { Colors } from '../../constants/colors';
 
-// ─── Wooden-court palette ────────────────────────────────────────────────────
+// ─── Wooden-court palette — US Squash spec visual upgrade ───────────────────
+// Light blonde maple/beech — matches professional broadcast court look.
+// All red lines unified to single value (#CC1500) at consistent 5px stroke.
 const WOODEN_PALETTE = {
-  surround:    '#0D0D0D',   // out-of-bounds dark area around the court
-  floorA:      '#E0A840',   // primary plank — warm golden maple (PSA-accurate)
-  floorB:      '#D09830',   // alternating plank — slightly deeper tone
-  jointLine:   '#B07820',   // plank-end horizontal joints
-  boundary:    '#CC1500',   // WSF red boundary line
-  courtLine:   '#DD2000',   // short line, half-court, service boxes
-  tin:         '#AA1800',   // tin strip accent (front wall base)
+  surround:    '#0E0B06',   // near-black warm surround
+  floorBase:   '#DFBD78',   // base fill — prevents any gap bleed-through between planks
+  floorA:      '#EED592',   // primary plank — light warm maple
+  floorB:      '#E6CA84',   // standard plank — slightly deeper
+  floorC:      '#F3DC9E',   // highlight plank — natural bright variation
+  grainLine:   'rgba(145,92,18,0.048)',  // subtle cross-grain within planks
+  jointLine:   'rgba(155,98,20,0.28)',   // staggered plank-end joints
+  boundary:    '#CC1500',   // WSF/US Squash red — 2" line (5px at 100px/m)
+  courtLine:   '#CC1500',   // all court markings — identical vivid red
 };
 
 // ─── Player pose images ────────────────────────────────────────────────────
@@ -54,10 +58,12 @@ const CIX = 8;               // court inner left/right edge — MUST match posit
 const CIY = 8;               // court inner top/bottom edge
 const CIW = VB_W - 16;      // inner court width  (624)
 const CIH = VB_H - 16;      // inner court height (959)
-const PLANK_W       = 20;
-const JOINT_SPACING = 195;
+const PLANK_W       = 18;   // ~18cm planks — slightly narrower for realistic maple count
+const JOINT_SPACING = 120;  // joint every ~1.2m — more natural plank-end grain frequency
+const GRAIN_SPACING =  38;  // subtle cross-grain line every ~38cm
 const NUM_PLANKS    = Math.ceil(CIW / PLANK_W) + 1;
 const NUM_JOINTS    = Math.ceil(CIH / JOINT_SPACING);
+const NUM_GRAINS    = Math.ceil(CIH / GRAIN_SPACING);
 
 
 function toSvgX(x: number) { return (x + 3.20) * 100; }
@@ -235,8 +241,8 @@ export default function CourtCanvas({
 
   const poseLayer = (
     <>
-      {/* T pose — full opacity only when no active position (player standing at T) */}
-      {activePosition === null && (() => {
+      {/* T pose — shown when idle at T (null) OR when T is explicitly called as a position */}
+      {(activePosition === null || activePosition === 'T') && (() => {
         const src = getPoseSource('T', gender, dominantHand);
         const { vx, vy } = visualCoords('T', dominantHand);
         const { w, h } = poseDims('T', true);
@@ -282,24 +288,16 @@ export default function CourtCanvas({
     );
   })() : null;
 
-  // BUG-035: filled position indicator circles — solid dot at active, outline at next.
-  // These render in SVG so they are always visible regardless of pose image loading.
+  // Next-position preview: shown only between moves (activePosition === null = player at T).
+  // Hiding during active movement prevents a "second instruction" from appearing at the
+  // next target position while the player is still executing the current one.
   const posIndicatorsSvg = (
     <>
-      {activePosition && activePosition !== 'T' && (() => {
-        const { vx, vy } = visualCoords(activePosition, dominantHand);
-        return (
-          <>
-            <Circle cx={vx} cy={vy} r={34} fill={T.pulseColor} opacity={0.18} />
-            <Circle cx={vx} cy={vy} r={18} fill={T.pulseColor} opacity={0.75} />
-          </>
-        );
-      })()}
-      {nextPosition && nextPosition !== 'T' && (() => {
+      {activePosition === null && nextPosition && nextPosition !== 'T' && (() => {
         const { vx, vy } = visualCoords(nextPosition, dominantHand);
         return (
           <Circle cx={vx} cy={vy} r={14} fill="none"
-            stroke={T.arrowColor} strokeWidth="3" opacity={0.45} />
+            stroke={T.arrowColor} strokeWidth="3" opacity={0.40} />
         );
       })()}
     </>
@@ -315,60 +313,72 @@ export default function CourtCanvas({
           {/* ── Out-of-bounds dark surround ── */}
           <Rect x="0" y="0" width={VB_W} height={VB_H} fill={WOODEN_PALETTE.surround} />
 
-          {/* ── Wood floor — vertical planks strictly within court boundary ── */}
+          {/* ── Base floor fill — prevents gap bleed-through between planks ── */}
+          <Rect x={CIX} y={CIY} width={CIW} height={CIH} fill={WOODEN_PALETTE.floorBase} />
+
+          {/* ── Wood planks — 3-colour rotation for natural maple variation ── */}
           {Array.from({ length: NUM_PLANKS }, (_, i) => {
             const px = CIX + i * PLANK_W;
             if (px >= CIX + CIW) return null;
             const pw = Math.min(PLANK_W, CIX + CIW - px);
+            const PLANK_COLOURS = [WOODEN_PALETTE.floorA, WOODEN_PALETTE.floorB, WOODEN_PALETTE.floorC];
             return (
               <Rect key={`p${i}`}
                 x={px} y={CIY} width={pw} height={CIH}
-                fill={i % 2 === 0 ? WOODEN_PALETTE.floorA : WOODEN_PALETTE.floorB}
+                fill={PLANK_COLOURS[i % 3]}
               />
             );
           })}
 
-          {/* ── Staggered plank-end joints (clamped within court bounds) ── */}
+          {/* ── Subtle cross-grain lines — simulate natural wood grain within planks ── */}
+          {Array.from({ length: NUM_GRAINS }, (_, i) => {
+            const y = CIY + i * GRAIN_SPACING + ((i * 11) % 22);
+            if (y >= CIY + CIH) return null;
+            return (
+              <Line key={`gr${i}`}
+                x1={CIX + 1} y1={y} x2={CIX + CIW - 1} y2={y}
+                stroke={WOODEN_PALETTE.grainLine} strokeWidth="0.6"
+              />
+            );
+          })}
+
+          {/* ── Staggered plank-end joints — natural court board seaming ── */}
           {Array.from({ length: NUM_JOINTS }, (_, i) => {
             const y = CIY + (i + 1) * JOINT_SPACING;
             if (y >= CIY + CIH) return null;
-            const offset = i % 2 === 0 ? 0 : PLANK_W * 3;
+            const staggerGroups = [0, PLANK_W * 4, PLANK_W * 2, PLANK_W * 6, PLANK_W * 1];
+            const offset = staggerGroups[i % staggerGroups.length];
             return (
               <Line key={`j${i}`}
                 x1={CIX + offset} y1={y} x2={CIX + CIW} y2={y}
-                stroke={WOODEN_PALETTE.jointLine} strokeWidth="1.2" opacity={0.45}
+                stroke={WOODEN_PALETTE.jointLine} strokeWidth="1.0" opacity={0.60}
               />
             );
           })}
 
           <G transform={mirror}>
-            {/* ── Court boundary — centered on wood edge (CIX/CIY), strokeWidth=6 → 3px on surround + 3px on wood ── */}
+            {/* ── Court boundary — 5px WSF red (2" spec), centred on court edge ── */}
             <Rect x={CIX} y={CIY} width={CIW} height={CIH}
               fill="none" stroke={WOODEN_PALETTE.boundary} strokeWidth="6" />
 
-            {/* ── Tin strip — marks front-wall base inside the boundary ── */}
-            <Rect x={CIX} y={CIY} width={CIW} height="14"
-              fill={WOODEN_PALETTE.tin} opacity={0.85} />
-
-            {/* ── Short line (4.26 m from front wall) ── */}
+            {/* ── Short line — 4.26m from front wall (US Squash / WSF standard) ── */}
             <Line x1={CIX} y1={SHORT_LINE_Y} x2={CIX + CIW} y2={SHORT_LINE_Y}
               stroke={WOODEN_PALETTE.courtLine} strokeWidth="5" />
 
-            {/* ── Half-court line (short line → back wall) ── */}
+            {/* ── Half-court line — short line to back wall ── */}
             <Line x1={HALF_COURT_X} y1={SHORT_LINE_Y} x2={HALF_COURT_X} y2={CIY + CIH}
               stroke={WOODEN_PALETTE.courtLine} strokeWidth="5" />
 
-            {/* ── Service boxes (1.6 m × 1.6 m each side) ── */}
+            {/* ── Service boxes — 1.6m × 1.6m in back corners, uniform 5px line ── */}
             <Rect x={CIX} y={SHORT_LINE_Y} width={SERVICE_BOX_W} height={SERVICE_BOX_H}
-              fill="none" stroke={WOODEN_PALETTE.courtLine} strokeWidth="4" />
+              fill="none" stroke={WOODEN_PALETTE.courtLine} strokeWidth="5" />
             <Rect x={CIX + CIW - SERVICE_BOX_W} y={SHORT_LINE_Y} width={SERVICE_BOX_W} height={SERVICE_BOX_H}
-              fill="none" stroke={WOODEN_PALETTE.courtLine} strokeWidth="4" />
+              fill="none" stroke={WOODEN_PALETTE.courtLine} strokeWidth="5" />
 
           </G>
 
-          {/* Position indicators + pulse ring (outside mirror group) */}
+          {/* Next-position preview indicator (outside mirror group) */}
           {posIndicatorsSvg}
-          {pulseRingSvg}
         </Svg>
 
         {/* Player pose images — RN Images absolutely positioned over SVG */}

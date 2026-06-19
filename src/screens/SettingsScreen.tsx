@@ -20,6 +20,7 @@ import { Language } from '../types';
 import * as Audio from '../engine/audioEngine';
 import ProfileScreen from './ProfileScreen';
 import HelpModal from './HelpModal';
+import TermsConsentModal from './TermsConsentModal';
 
 // ─── Row components ───────────────────────────────────────────────────────────
 
@@ -133,6 +134,7 @@ export default function SettingsScreen() {
 
   const [profileVisible, setProfileVisible] = useState(false);
   const [helpVisible, setHelpVisible]       = useState(false);
+  const [termsVisible, setTermsVisible]     = useState(false);
 
   const displayName = profile.name.trim() || 'Player';
   const skillColor  = SKILL_COLORS[profile.skillLevel] ?? Colors.levelIntermediate;
@@ -175,31 +177,11 @@ export default function SettingsScreen() {
   function handleSignOut() {
     Alert.alert(
       'Sign Out',
-      'Would you like to clear your training history from this device when signing out?',
+      'Are you sure you want to sign out?',
       [
         { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Keep Data & Sign Out',
-          onPress: () => signOut(),
-        },
-        {
-          text: 'Clear Data & Sign Out',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await db.execAsync(
-                'DELETE FROM sessions; DELETE FROM movements; DELETE FROM personal_bests; DELETE FROM checkpoints;'
-              );
-            } catch (e) {
-              console.warn('[Settings] clear data on sign-out failed:', e);
-            }
-            clearCache();
-            useBadgesStore.getState().resetBadges();
-            useProgressStore.getState().markSessionCompleted();
-            signOut();
-          },
-        },
-      ]
+        { text: 'Sign Out', style: 'destructive', onPress: () => signOut() },
+      ],
     );
   }
 
@@ -258,6 +240,7 @@ export default function SettingsScreen() {
       </Modal>
 
       <HelpModal visible={helpVisible} onClose={() => setHelpVisible(false)} />
+      {termsVisible && <TermsConsentModal viewOnly onClose={() => setTermsVisible(false)} />}
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
@@ -326,21 +309,31 @@ export default function SettingsScreen() {
           <SettingsRow
             icon="speedometer" iconBg={`${Colors.accentRoutines}22`} iconColor={Colors.accentRoutines}
             label="Speech Rate"
-            sub="Use 0.7×–0.8× for Bluetooth/speaker use on court"
+            sub="0.7–0.9× for Bluetooth · 1.1–1.3× for loud court speaker"
             right={
-              <PillSelector
-                options={[
-                  { label: '0.7×', value: '0.7' },
-                  { label: '0.8×', value: '0.8' },
-                  { label: '0.9×', value: '0.9' },
-                  { label: '1.0×', value: '1.0' },
-                  { label: '1.1×', value: '1.1' },
-                ]}
-                selected={String(Math.round(settings.speechRate * 10) / 10)}
-                onSelect={(v) => updateSettings({ speechRate: Number(v) })}
-                size="sm"
-                scrollable
-              />
+              <View style={srStyles.stepper}>
+                <TouchableOpacity
+                  style={srStyles.stepBtn}
+                  onPress={() => {
+                    const next = Math.max(0.7, Math.round((settings.speechRate - 0.1) * 10) / 10);
+                    updateSettings({ speechRate: next });
+                  }}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <Ionicons name="remove" size={16} color={Colors.textPrimary} />
+                </TouchableOpacity>
+                <Text style={srStyles.stepVal}>{Math.round(settings.speechRate * 10) / 10}×</Text>
+                <TouchableOpacity
+                  style={srStyles.stepBtn}
+                  onPress={() => {
+                    const next = Math.min(1.6, Math.round((settings.speechRate + 0.1) * 10) / 10);
+                    updateSettings({ speechRate: next });
+                  }}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <Ionicons name="add" size={16} color={Colors.textPrimary} />
+                </TouchableOpacity>
+              </View>
             }
           />
           <SettingsRow
@@ -576,14 +569,16 @@ export default function SettingsScreen() {
           <SettingsRow
             icon="shield-checkmark" iconBg={`${Colors.accentProgress}22`} iconColor={Colors.accentProgress}
             label="Privacy Policy"
-            right={<Ionicons name="open-outline" size={16} color={Colors.textMuted} />}
-            onPress={() => Linking.openURL('https://squashghostingx.com/privacy')}
+            sub="All data stored locally — nothing leaves your device"
+            right={<Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />}
+            onPress={() => setTermsVisible(true)}
           />
           <SettingsRow
             icon="document-text" iconBg={`${Colors.accentProgress}22`} iconColor={Colors.accentProgress}
-            label="Terms of Use"
-            right={<Ionicons name="open-outline" size={16} color={Colors.textMuted} />}
-            onPress={() => Linking.openURL('https://squashghostingx.com/terms')}
+            label="Terms & Conditions"
+            sub="Liability, assumption of risk, and usage terms"
+            right={<Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />}
+            onPress={() => setTermsVisible(true)}
           />
           <SettingsRow
             icon="mail" iconBg={`${Colors.accentProgress}22`} iconColor={Colors.accentProgress}
@@ -702,4 +697,20 @@ const styles = StyleSheet.create({
   timingStatLbl:  { fontSize: FontSize.micro, color: Colors.textMuted, marginTop: 2 },
 
   footerText: { fontSize: FontSize.caption, color: Colors.textMuted, textAlign: 'center', paddingBottom: Spacing.xl },
+});
+
+const srStyles = StyleSheet.create({
+  stepper: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+  },
+  stepBtn: {
+    width: 30, height: 30, borderRadius: 15,
+    backgroundColor: Colors.surfaceElevated,
+    borderWidth: 1, borderColor: Colors.border,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  stepVal: {
+    fontSize: FontSize.body, fontWeight: FontWeight.semiBold,
+    color: Colors.textPrimary, minWidth: 36, textAlign: 'center',
+  },
 });

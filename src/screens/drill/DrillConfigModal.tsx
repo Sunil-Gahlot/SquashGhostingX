@@ -16,6 +16,7 @@ import {
   PatternType, ShotGroup, Tempo, Difficulty, RestMode, VoiceMode,
 } from '../../types';
 import { getIntervalMs } from '../../constants/timing';
+import { COVERAGE_FILTER, POSITIONS_6PT, POSITIONS_10PT } from '../../constants/positions';
 
 // ─── Step option type ─────────────────────────────────────────────────────────
 
@@ -27,15 +28,15 @@ type StepOption = {
   iconColor: string;
   iconBg: string;
   comingSoon?: boolean;
+  lockedReason?: string;  // set → option visible but not selectable; shows lock badge
 };
 
 // ─── Step data ────────────────────────────────────────────────────────────────
 
 const DRILL_TYPE_OPTS: StepOption[] = [
-  { value: 'shot-based', title: 'Shot-Based Training', desc: 'Movement drills with shot-type voice calls. e.g. "Move to Front Left and hit Drive".', icon: 'golf',      iconColor: Colors.brand,          iconBg: Colors.brandMuted },
-  { value: 'match-sim',  title: 'Match Simulation',    desc: 'Predefined match sequences. Focus on realistic point-play flows.',                     icon: 'trophy',    iconColor: Colors.gold,           iconBg: `${Colors.gold}22`, comingSoon: true },
-  { value: 'movement',   title: 'Movement Only',       desc: 'Pure ghosting footwork. Focus purely on court coverage without any shot calls.',        icon: 'walk',      iconColor: Colors.accentProgress, iconBg: `${Colors.accentProgress}22` },
-  { value: 'custom',     title: 'Custom Drill',        desc: 'Build your own routine. Pick specific positions and shots for a tailored session.',     icon: 'construct', iconColor: Colors.accentLibrary,  iconBg: `${Colors.accentLibrary}22` },
+  { value: 'movement',   title: 'Movement Only',    desc: 'Pure ghosting footwork with no shot calls. Focus entirely on court coverage and speed.',                       icon: 'walk',   iconColor: Colors.accentProgress, iconBg: `${Colors.accentProgress}22` },
+  { value: 'shot-based', title: 'Shot Training',    desc: 'Ghosting with voice shot calls. Choose your shot groups — drives, drops, boasts and more.',                    icon: 'golf',   iconColor: Colors.brand,          iconBg: Colors.brandMuted },
+  { value: 'match-sim',  title: 'Match Simulation', desc: 'Predefined rally sequences that mirror real match play. Trains realistic point-play court movement patterns.', icon: 'trophy', iconColor: Colors.gold,           iconBg: `${Colors.gold}22` },
 ];
 
 const DIFFICULTY_OPTS: StepOption[] = [
@@ -104,37 +105,70 @@ const VOICE_MODE_OPTIONS = [
   { label: 'Beep Only',      value: 'beep'         },
 ];
 
-// ─── Step routing ─────────────────────────────────────────────────────────────
+// ─── Constraint engine ────────────────────────────────────────────────────────
 
-const STEPS_FULL     = ['drillType', 'difficulty', 'coverage', 'courtSystem', 'pattern', 'session'] as const;
-const STEPS_MATCHSIM = ['drillType', 'difficulty', 'coverage', 'courtSystem',            'session'] as const;
-type StepKey = typeof STEPS_FULL[number];
+// Shot groups relevant to each coverage mode.
+// Irrelevant groups are dimmed and blocked in the shot group selector.
+const COVERAGE_SHOT_GROUPS: Record<CoverageMode, ShotGroup[]> = {
+  full:     ['mixed', 'drives', 'lengths', 'drops', 'kills', 'lobs', 'boasts', 'volleys', 'deception'],
+  front:    ['mixed', 'drops', 'kills', 'lobs', 'volleys', 'deception'],
+  back:     ['mixed', 'drives', 'lengths', 'lobs', 'boasts', 'deception'],
+  forehand: ['mixed', 'drives', 'lengths', 'drops', 'kills', 'lobs', 'boasts', 'volleys', 'deception'],
+  backhand: ['mixed', 'drives', 'lengths', 'drops', 'kills', 'lobs', 'boasts', 'volleys', 'deception'],
+};
+
+// Applies coverage-aware locks to drill type options.
+// Match Simulation requires the full court — lock it when a zone is selected.
+function buildDrillTypeOpts(coverage: CoverageMode): StepOption[] {
+  return DRILL_TYPE_OPTS.map((opt) =>
+    opt.value === 'match-sim' && coverage !== 'full'
+      ? { ...opt, lockedReason: 'Full Court only' }
+      : opt
+  );
+}
+
+// ─── Step routing ─────────────────────────────────────────────────────────────
+// Coverage is Step 1 — it is the primary zone constraint that filters every
+// downstream step. Steps are ordered: zone first, then how to train within it.
+
+const STEPS_BASE     = ['coverage', 'drillType', 'difficulty', 'courtSystem', 'pattern', 'session'] as const;
+const STEPS_MATCHSIM = ['coverage', 'drillType', 'difficulty', 'courtSystem',            'session'] as const;
+type StepKey = typeof STEPS_BASE[number];
 
 const STEP_HEADING: Record<StepKey, string> = {
+  coverage:    'Which court area will you train?',
   drillType:   'How do you want to train today?',
   difficulty:  'Choose your difficulty level',
-  coverage:    'Which zones will you target?',
   courtSystem: 'Choose your court layout',
   pattern:     'How should positions sequence?',
   session:     'Set up your session',
 };
 
 const STEP_SUBLABEL: Record<StepKey, string> = {
+  coverage:    'Court Zone',
   drillType:   'Drill Type',
   difficulty:  'Difficulty',
-  coverage:    'Coverage',
   courtSystem: 'Court System',
   pattern:     'Pattern & Shots',
   session:     'Session Setup',
 };
 
 const STEP_SUB: Record<StepKey, string> = {
+  coverage:    'Your zone selection constrains all available drill options in the next steps.',
   drillType:   '',
   difficulty:  'This affects shot variety, timing & position count.',
-  coverage:    'Focus your ghosting on specific court zones.',
   courtSystem: '',
   pattern:     'Controls how positions are called and sequenced.',
   session:     'Duration, tempo, rest and voice preferences.',
+};
+
+// Label shown in the active-zone constraint banner on steps 2–6
+const COVERAGE_LABEL: Record<CoverageMode, string> = {
+  full:     'Full Court',
+  front:    'Front Court',
+  back:     'Back Court',
+  forehand: 'Forehand Court',
+  backhand: 'Backhand Court',
 };
 
 // ─── Option card ─────────────────────────────────────────────────────────────
@@ -142,29 +176,45 @@ const STEP_SUB: Record<StepKey, string> = {
 function OptionCard({ option, selected, onPress }: {
   option: StepOption; selected: boolean; onPress: () => void;
 }) {
+  const isLocked = !!option.lockedReason;
   return (
     <TouchableOpacity
-      style={[ocStyles.card, selected && ocStyles.selected, option.comingSoon && ocStyles.cardDim]}
-      onPress={onPress}
-      activeOpacity={0.75}
+      style={[
+        ocStyles.card,
+        selected && !isLocked && ocStyles.selected,
+        (option.comingSoon || isLocked) && ocStyles.cardDim,
+      ]}
+      onPress={isLocked ? undefined : onPress}
+      activeOpacity={isLocked ? 1 : 0.75}
     >
-      <View style={[ocStyles.iconBox, { backgroundColor: selected ? `${Colors.brand}22` : option.iconBg }]}>
-        <Ionicons name={option.icon} size={26} color={selected ? Colors.brand : option.iconColor} />
+      <View style={[ocStyles.iconBox, { backgroundColor: selected && !isLocked ? `${Colors.brand}22` : option.iconBg }]}>
+        <Ionicons name={option.icon} size={26} color={selected && !isLocked ? Colors.brand : option.iconColor} />
       </View>
       <View style={ocStyles.textBlock}>
         <View style={ocStyles.titleRow}>
-          <Text style={[ocStyles.title, selected && ocStyles.titleSel]}>{option.title}</Text>
+          <Text style={[ocStyles.title, selected && !isLocked && ocStyles.titleSel]}>{option.title}</Text>
           {option.comingSoon && (
             <View style={ocStyles.comingSoonBadge}>
               <Text style={ocStyles.comingSoonText}>COMING SOON</Text>
             </View>
           )}
+          {isLocked && (
+            <View style={ocStyles.lockedBadge}>
+              <Ionicons name="lock-closed" size={8} color={Colors.textMuted} />
+              <Text style={ocStyles.lockedText}>{option.lockedReason}</Text>
+            </View>
+          )}
         </View>
         <Text style={ocStyles.desc}>{option.desc}</Text>
       </View>
-      <View style={[ocStyles.check, selected && ocStyles.checkSel]}>
-        {selected && <Ionicons name="checkmark" size={12} color={Colors.textPrimary} />}
-      </View>
+      {isLocked
+        ? <Ionicons name="lock-closed-outline" size={18} color={Colors.textDisabled} />
+        : (
+          <View style={[ocStyles.check, selected && ocStyles.checkSel]}>
+            {selected && <Ionicons name="checkmark" size={12} color={Colors.textPrimary} />}
+          </View>
+        )
+      }
     </TouchableOpacity>
   );
 }
@@ -187,7 +237,14 @@ const ocStyles = StyleSheet.create({
   desc:     { fontSize: FontSize.caption, color: Colors.textMuted, lineHeight: 17 },
   check:    { width: 22, height: 22, borderRadius: 11, borderWidth: 1.5, borderColor: Colors.border, alignItems: 'center', justifyContent: 'center' },
   checkSel: { backgroundColor: Colors.brand, borderColor: Colors.brand },
-  cardDim:  { opacity: 0.65 },
+  cardDim:  { opacity: 0.55 },
+  lockedBadge: {
+    flexDirection: 'row', alignItems: 'center', gap: 3,
+    backgroundColor: Colors.surfaceElevated,
+    borderRadius: BorderRadius.sm,
+    paddingHorizontal: 5, paddingVertical: 2,
+  },
+  lockedText: { fontSize: 8, fontWeight: FontWeight.bold, color: Colors.textMuted, letterSpacing: 0.5 },
   comingSoonBadge: {
     backgroundColor: `${Colors.gold}22`,
     borderRadius: BorderRadius.sm,
@@ -216,23 +273,32 @@ const SHOT_ITEMS = [
 function ShotGroupSelector({
   selectedGroups,
   onSelect,
+  allowedGroups,
 }: {
   selectedGroups: ShotGroup[];
   onSelect: (v: string) => void;
+  allowedGroups: ShotGroup[];
 }) {
   return (
     <View style={sgStyles.grid}>
       {SHOT_ITEMS.map((item) => {
-        const active = selectedGroups.includes(item.value as ShotGroup);
+        const isAllowed = allowedGroups.includes(item.value as ShotGroup);
+        const active    = isAllowed && selectedGroups.includes(item.value as ShotGroup);
         return (
           <TouchableOpacity
             key={item.value}
-            style={[sgStyles.chip, active && sgStyles.chipActive]}
-            onPress={() => onSelect(item.value)}
-            activeOpacity={0.75}
+            style={[sgStyles.chip, active && sgStyles.chipActive, !isAllowed && sgStyles.chipLocked]}
+            onPress={() => isAllowed && onSelect(item.value)}
+            activeOpacity={isAllowed ? 0.75 : 1}
           >
-            <Ionicons name={item.icon as any} size={14} color={active ? Colors.brand : Colors.textMuted} />
-            <Text style={[sgStyles.chipLabel, active && sgStyles.chipLabelActive]}>{item.label}</Text>
+            <Ionicons
+              name={item.icon as any}
+              size={14}
+              color={active ? Colors.brand : isAllowed ? Colors.textMuted : Colors.textDisabled}
+            />
+            <Text style={[sgStyles.chipLabel, active && sgStyles.chipLabelActive, !isAllowed && sgStyles.chipLabelLocked]}>
+              {item.label}
+            </Text>
           </TouchableOpacity>
         );
       })}
@@ -249,9 +315,11 @@ const sgStyles = StyleSheet.create({
     borderWidth: 1.5, borderColor: Colors.border,
     backgroundColor: Colors.surface,
   },
-  chipActive:       { borderColor: Colors.brand, backgroundColor: Colors.brandSoft },
-  chipLabel:        { fontSize: FontSize.caption, fontWeight: FontWeight.semiBold, color: Colors.textMuted },
-  chipLabelActive:  { color: Colors.brand },
+  chipActive:      { borderColor: Colors.brand, backgroundColor: Colors.brandSoft },
+  chipLocked:      { opacity: 0.35, borderColor: Colors.surfaceElevated },
+  chipLabel:       { fontSize: FontSize.caption, fontWeight: FontWeight.semiBold, color: Colors.textMuted },
+  chipLabelActive: { color: Colors.brand },
+  chipLabelLocked: { color: Colors.textDisabled },
 });
 
 // ─── Context info card ────────────────────────────────────────────────────────
@@ -331,6 +399,8 @@ export default function DrillConfigModal() {
   const [drillType,   setDrillType]   = useState<DrillType>(settings.defaultDrillType);
   const [courtSystem, setCourtSystem] = useState<CourtSystem>(settings.defaultCourtSystem);
   const [coverage,    setCoverage]    = useState<CoverageMode>('full');
+  // 'shot-based' patternType is no longer shown in the UI for shot-based drillType.
+  // Always start at 'random' — the engine applies shot filtering automatically.
   const [patternType, setPatternType] = useState<PatternType>('random');
   const [shotGroups,  setShotGroups]  = useState<ShotGroup[]>(['mixed']);
   const [duration,    setDuration]    = useState<number>(settings.defaultDuration);
@@ -340,30 +410,47 @@ export default function DrillConfigModal() {
   const [restSeconds, setRestSeconds] = useState<number>(15);
   const [voiceMode,   setVoiceMode]   = useState<VoiceMode>(settings.defaultVoiceMode);
 
+  // Reset step and voice mode on each open; keep other selections as defaults
+  // so backing out of step 1 and reopening doesn't lose drill/difficulty choices.
   useEffect(() => {
     if (drillConfigVisible) {
       setCurrentStep(1);
-      setDrillType(settings.defaultDrillType);
-      setCourtSystem(settings.defaultCourtSystem);
-      setDifficulty(settings.defaultDifficulty);
-      setTempo(settings.defaultTempo);
-      setDuration(settings.defaultDuration);
       setVoiceMode(settings.defaultVoiceMode);
-      setPatternType('random');
-      setCoverage('full');
-      setShotGroups(['mixed']);
-      setRestMode('auto');
-      setRestSeconds(15);
     }
   }, [drillConfigVisible]);
 
-  const steps      = drillType === 'match-sim' ? STEPS_MATCHSIM : STEPS_FULL;
+  const steps      = drillType === 'match-sim' ? STEPS_MATCHSIM : STEPS_BASE;
   const totalSteps = steps.length;
   const stepKey    = steps[currentStep - 1] as StepKey;
   const isLastStep = currentStep === totalSteps;
 
-  const showShots   = drillType === 'shot-based' || drillType === 'custom';
-  const patternOpts = showShots ? PATTERN_OPTS_ALL : PATTERN_OPTS_ALL.filter((p) => p.value !== 'shot-based');
+  // ── Constraint engine ────────────────────────────────────────────────────────
+  const allowedShotGroups  = COVERAGE_SHOT_GROUPS[coverage];
+  const drillTypeOpts      = buildDrillTypeOpts(coverage);
+  const showZoneBanner     = stepKey !== 'coverage' && coverage !== 'full';
+
+  // Shot Training shows the shot groups selector; Movement Only does not.
+  const showShots = drillType === 'shot-based';
+  // Shot-Based Training already implies position filtering by shot group — the
+  // "Shot-Based" pattern option would be circular. Movement Only has no shots at all.
+  // Neither needs the "Shot-Based" pattern in the list.
+  const patternOpts = PATTERN_OPTS_ALL.filter((p) =>
+    p.value !== 'shot-based' || (drillType !== 'shot-based' && drillType !== 'movement')
+  );
+
+  function handleCoverageChange(next: CoverageMode) {
+    setCoverage(next);
+    // Auto-reset match-sim to movement when switching to a non-full zone
+    // (match-sim is locked to full court — enforced by UI but defended here too)
+    if (next !== 'full' && drillType === 'match-sim') {
+      setDrillType('movement');
+      setPatternType('random');
+    }
+    // Strip shot groups that aren't valid for the new zone
+    const allowed = COVERAGE_SHOT_GROUPS[next];
+    const valid   = shotGroups.filter((g) => allowed.includes(g));
+    setShotGroups(valid.length > 0 ? valid : ['mixed']);
+  }
 
   function handleNext() {
     if (isLastStep) { handleStart(); return; }
@@ -446,22 +533,38 @@ export default function DrillConfigModal() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
+          {/* ── Active zone constraint banner ─────────────────── */}
+          {showZoneBanner && (
+            <View style={styles.zoneBanner}>
+              <Ionicons name="lock-closed-outline" size={12} color={Colors.brand} />
+              <Text style={styles.zoneBannerText}>
+                Zone: <Text style={styles.zoneBannerZone}>{COVERAGE_LABEL[coverage]}</Text>
+                {'  ·  '}options filtered to this area
+              </Text>
+            </View>
+          )}
+
           <Text style={styles.stepHeading}>{STEP_HEADING[stepKey]}</Text>
           {STEP_SUB[stepKey] ? (
             <Text style={styles.stepSub}>{STEP_SUB[stepKey]}</Text>
           ) : null}
 
-          {stepKey === 'drillType' && DRILL_TYPE_OPTS.map((opt) => (
+          {stepKey === 'drillType' && drillTypeOpts.map((opt) => (
             <OptionCard key={opt.value} option={opt}
               selected={drillType === opt.value}
               onPress={() => {
-                setDrillType(opt.value as DrillType);
-                // BUG-016: reset step to 1 whenever drill type changes to prevent
-                // landing on an out-of-range step when switching between 5/6-step flows.
-                setCurrentStep(1);
+                if (opt.lockedReason) return;
+                const newType = opt.value as DrillType;
+                setDrillType(newType);
                 // Pre-set the most meaningful patternType for each drill type.
-                if (opt.value === 'shot-based') setPatternType('shot-based');
-                else if (opt.value === 'movement' || opt.value === 'custom') setPatternType('random');
+                // 'shot-based' pattern is hidden for shot-based drillType (redundant),
+                // so default it to 'random' which applies shot-group filtering automatically.
+                if (newType === 'shot-based' || newType === 'movement') setPatternType('random');
+                // Clamp step to the valid range of the new drill type's step sequence.
+                // match-sim has 5 steps; all others have 6. Switching must not leave
+                // currentStep out of bounds, but it should NOT reset to step 1.
+                const newSteps = newType === 'match-sim' ? STEPS_MATCHSIM : STEPS_BASE;
+                setCurrentStep((s) => Math.min(s, newSteps.length));
               }}
             />
           ))}
@@ -490,46 +593,63 @@ export default function DrillConfigModal() {
             </View>
           )}
 
-          {/* Coverage */}
+          {/* Coverage — Step 1: primary zone constraint */}
           {stepKey === 'coverage' && (
             <>
               {COVERAGE_OPTS.map((opt) => (
                 <OptionCard key={opt.value} option={opt}
                   selected={coverage === opt.value}
-                  onPress={() => setCoverage(opt.value as CoverageMode)}
+                  onPress={() => handleCoverageChange(opt.value as CoverageMode)}
                 />
               ))}
-              {/* BUG-009: warn when match-sim + non-full coverage */}
-              {drillType === 'match-sim' && coverage !== 'full' && (
-                <View style={styles.warnCard}>
-                  <Ionicons name="warning-outline" size={16} color={Colors.gold} />
-                  <Text style={styles.warnText}>
-                    Match Simulation rally templates require Full Court. This selection will fall back to random movement with no shot calls.
-                  </Text>
-                </View>
-              )}
             </>
           )}
 
           {/* Court System */}
-          {stepKey === 'courtSystem' && (
-            <>
-              {COURT_SYSTEM_OPTS.map((opt) => (
-                <OptionCard key={opt.value} option={opt}
-                  selected={courtSystem === opt.value}
-                  onPress={() => setCourtSystem(opt.value as CourtSystem)}
+          {stepKey === 'courtSystem' && (() => {
+            const zoneFilter = (COVERAGE_FILTER[coverage] ?? POSITIONS_10PT) as string[];
+            const pos6  = POSITIONS_6PT.filter(p => zoneFilter.includes(p) && p !== 'T');
+            const pos10 = POSITIONS_10PT.filter(p => zoneFilter.includes(p) && p !== 'T');
+            const count6  = pos6.length;
+            const count10 = pos10.length;
+            const tooFew6 = coverage !== 'full' && count6 <= 2;
+            return (
+              <>
+                {COURT_SYSTEM_OPTS.map((opt) => {
+                  const count = opt.value === '6pt' ? count6 : count10;
+                  const tooFew = opt.value === '6pt' && tooFew6;
+                  const badgeLabel = coverage !== 'full' ? `${count} position${count !== 1 ? 's' : ''} in zone` : undefined;
+                  return (
+                    <View key={opt.value}>
+                      <OptionCard
+                        option={tooFew ? { ...opt, lockedReason: 'Only 2 positions — use 10-Point' } : opt}
+                        selected={courtSystem === opt.value}
+                        onPress={() => setCourtSystem(opt.value as CourtSystem)}
+                      />
+                      {badgeLabel && !tooFew && (
+                        <Text style={styles.posCountBadge}>{badgeLabel}</Text>
+                      )}
+                    </View>
+                  );
+                })}
+                <TipCard
+                  icon={courtSystem === '10pt' ? 'grid-outline' : 'apps-outline'}
+                  title={courtSystem === '10pt' ? '10-Point: Advanced coverage' : '6-Point: The classic layout'}
+                  body={courtSystem === '10pt'
+                    ? 'Adds 4 mid-diagonal positions to the 6 corners + T. Trains more realistic angles and court movement — recommended for Advanced level and above.'
+                    : '6 positions: 4 corners, the T, and the front centre. The standard ghosting layout used at all levels. Simple to learn, hard to master.'
+                  }
                 />
-              ))}
-              <TipCard
-                icon={courtSystem === '10pt' ? 'grid-outline' : 'apps-outline'}
-                title={courtSystem === '10pt' ? '10-Point: Advanced coverage' : '6-Point: The classic layout'}
-                body={courtSystem === '10pt'
-                  ? 'Adds 4 mid-diagonal positions to the 6 corners + T. Trains more realistic angles and court movement — recommended for Advanced level and above.'
-                  : '6 positions: 4 corners, the T, and the front centre. The standard ghosting layout used at all levels. Simple to learn, hard to master.'
-                }
-              />
-            </>
-          )}
+                {tooFew6 && courtSystem === '6pt' && (
+                  <TipCard
+                    icon="warning-outline"
+                    title="6-Point gives only 2 positions in this zone"
+                    body={`${COVERAGE_LABEL[coverage]} with 6-Point = ${pos6.map(p => p).join(' + ')} only. Switch to 10-Point for a meaningful zone drill (${count10} positions).`}
+                  />
+                )}
+              </>
+            );
+          })()}
 
           {/* Pattern + Shots */}
           {stepKey === 'pattern' && (
@@ -541,8 +661,12 @@ export default function DrillConfigModal() {
                 />
               ))}
               {showShots && (
-                <CompactSection title="SHOT GROUPS  (multi-select)">
-                  <ShotGroupSelector selectedGroups={shotGroups} onSelect={handleShotGroupSelect} />
+                <CompactSection title={`SHOT GROUPS  (multi-select)${coverage !== 'full' ? '  ·  filtered to zone' : ''}`}>
+                  <ShotGroupSelector
+                    selectedGroups={shotGroups}
+                    onSelect={handleShotGroupSelect}
+                    allowedGroups={allowedShotGroups}
+                  />
                 </CompactSection>
               )}
               {!showShots && PATTERN_TIP[patternType] && (
@@ -649,6 +773,25 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
     lineHeight: 20,
     marginBottom: Spacing.xl,
+  },
+
+  // Active zone constraint banner (shows on steps 2–6 when coverage ≠ full)
+  zoneBanner: {
+    flexDirection: 'row', alignItems: 'center', gap: Spacing.xs,
+    backgroundColor: Colors.brandSoft,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1, borderColor: Colors.borderBrand,
+    paddingHorizontal: Spacing.md, paddingVertical: 6,
+    alignSelf: 'flex-start',
+    marginBottom: Spacing.md,
+  },
+  zoneBannerText: { fontSize: FontSize.caption, color: Colors.textSecondary },
+  zoneBannerZone: { color: Colors.brand, fontWeight: FontWeight.bold },
+
+  posCountBadge: {
+    fontSize: FontSize.micro, color: Colors.brand, fontWeight: FontWeight.semiBold,
+    marginTop: -Spacing.xs, marginBottom: Spacing.sm, marginLeft: Spacing.sm,
+    letterSpacing: 0.3,
   },
 
   hint: {

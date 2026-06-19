@@ -7,6 +7,7 @@ import {
 } from '../constants/positions';
 import {
   getIntervalMs, getShotCallMs, getRecoveryMs, MOVES_PER_SET, estimateTotalMoves,
+  POSITION_PHASE_OFFSET_MS,
 } from '../constants/timing';
 import { getShotsForPosition, pickShot } from './positionShotMatrix';
 
@@ -20,6 +21,7 @@ export interface SessionMove {
   recoveryMs: number;
   setIndex: number;
   moveIndex: number;
+  phaseOffsetMs: number;       // extra time at position for front corners (FR/FL +250ms, FMCR/FMCL +100ms)
 }
 
 export interface GhostingEngine {
@@ -42,20 +44,50 @@ export interface GhostingEngine {
   seekToSet(targetSetIndex: number): void;
 }
 
+// ─── Zone constraint chain ────────────────────────────────────────────────────
+//
+// Coverage is the primary zone constraint. It flows through every sequence type:
+//
+//  1. buildPool()      intersects court-system positions with COVERAGE_FILTER,
+//                      removes T for movement drills, mirrors for left-handed.
+//                      Result: POOL — the authoritative zone scope.
+//
+//  2. All sequence types receive POOL and cannot generate out-of-zone positions:
+//
+//     Fixed            fixedSet() filters FIXED_ORDER to pool positions only.
+//
+//     Random           shuffleNoRepeat() seeded with pool; every pick is in-zone.
+//
+//     Shot-Based       buildShotBasedPool() intersects SHOT_GROUP_POSITIONS with pool.
+//                      Fallback when intersection < 2 returns pool (NOT base) —
+//                      zone scope preserved even when no shot-group match exists.
+//
+//     Match-Sim        matchSimSet() filters templates to pool-compatible ones.
+//                      Falls back to shuffleNoRepeat(pool) on no match.
+//
 // ─── Shot-group → preferred court positions ───────────────────────────────────
-// Each group maps to positions where those shots have primary or secondary weight.
-// Used to constrain shot-based drills so positions are always tactically realistic.
+// Derived from positionShotMatrix: only positions with primary or secondary shots
+// for each group are listed. Advanced-only positions excluded intentionally —
+// drills visit tactically representative zones, not exotic outliers.
+//
+// Key decisions:
+//  drives:  T + FMCR/FMCL included — Volley Drive is PRIMARY at all three.
+//           Drives drills must train volley interception, not just deep-court.
+//  drops:   BR/BL excluded — Back-Court Drop is an advanced outlier. Drop drills
+//           train the front/mid short game; back corners don't belong here.
+//  boasts:  FR/FL excluded — Trickle Boast (the only front-corner boast) is
+//           advanced/niche. Boast drills train back and mid-court boast decisions.
+//  'mixed': omitted — means all pool positions are valid (no restriction).
 
 const SHOT_GROUP_POSITIONS: Partial<Record<ShotGroup, Position[]>> = {
-  drives:     ['BR', 'BL', 'BMCR', 'BMCL', 'MR', 'ML', 'FR', 'FL'],
-  lengths:    ['BR', 'BL', 'BMCR', 'BMCL', 'MR', 'ML'],
-  drops:      ['FR', 'FL', 'FMCR', 'FMCL', 'MR', 'ML', 'BR', 'BL'],
-  kills:      ['FR', 'FL', 'FMCR', 'FMCL', 'T'],
-  lobs:       ['BR', 'BL', 'BMCR', 'BMCL', 'MR', 'ML', 'FR', 'FL', 'FMCR', 'FMCL'],
-  boasts:     ['BR', 'BL', 'BMCR', 'BMCL', 'MR', 'ML', 'FR', 'FL'],
-  volleys:    ['T', 'FMCR', 'FMCL', 'MR', 'ML'],
-  deception:  ['T', 'FMCR', 'FMCL', 'MR', 'ML', 'BR', 'BL'],
-  // 'mixed' omitted — means all positions are valid
+  drives:    ['T', 'FR', 'FL', 'FMCR', 'FMCL', 'MR', 'ML', 'BMCR', 'BMCL', 'BR', 'BL'],
+  lengths:   ['BR', 'BL', 'BMCR', 'BMCL', 'MR', 'ML'],
+  drops:     ['FR', 'FL', 'FMCR', 'FMCL', 'MR', 'ML'],
+  kills:     ['FR', 'FL', 'FMCR', 'FMCL', 'T'],
+  lobs:      ['BR', 'BL', 'BMCR', 'BMCL', 'MR', 'ML', 'FR', 'FL', 'FMCR', 'FMCL'],
+  boasts:    ['BR', 'BL', 'BMCR', 'BMCL', 'MR', 'ML'],
+  volleys:   ['T', 'FMCR', 'FMCL', 'MR', 'ML'],
+  deception: ['T', 'FMCR', 'FMCL', 'MR', 'ML', 'BR', 'BL'],
 };
 
 // ─── Match simulation rally templates ─────────────────────────────────────────
@@ -83,21 +115,23 @@ const MATCH_SIM_PATTERNS_6PT: MatchSimEntry[][] = [
     { position: 'BR', shot: 'defensive boast'    },
     { position: 'FL', shot: 'straight drive'     },
   ],
-  // Boast-Drop (3-shot repeat): sustained attacking pattern
+  // Length-Drop-Volley rally: drive deep, attack with drop, intercept at T
   [
-    { position: 'BR', shot: 'defensive boast'    },
+    { position: 'BR', shot: 'straight drive'     },
+    { position: 'FR', shot: 'straight drop'      },
+    { position: 'T',  shot: 'volley drive'       },
+    { position: 'BL', shot: 'straight drive'     },
     { position: 'FL', shot: 'straight drop'      },
-    { position: 'BR', shot: 'defensive boast'    },
-    { position: 'FL', shot: 'straight drop'      },
-    { position: 'BR', shot: 'defensive boast'    },
-    { position: 'FL', shot: 'straight drop'      },
+    { position: 'T',  shot: 'volley drop'        },
   ],
-  // Crosscourt Exchange: sustained crosscourt drives
+  // Figure-of-eight pressure: diagonal runs that mirror real rally geometry
   [
     { position: 'BR', shot: 'crosscourt drive'   },
-    { position: 'FL', shot: 'crosscourt drive'   },
-    { position: 'BR', shot: 'crosscourt drive'   },
-    { position: 'FL', shot: 'crosscourt drive'   },
+    { position: 'FL', shot: 'straight drop'      },
+    { position: 'MR', shot: 'straight drive'     },
+    { position: 'BL', shot: 'crosscourt drive'   },
+    { position: 'FR', shot: 'straight drop'      },
+    { position: 'ML', shot: 'straight drive'     },
   ],
   // Drive-Boast-Drop: drive long, recover to T, boast from back, attack with drop
   [
@@ -112,6 +146,35 @@ const MATCH_SIM_PATTERNS_6PT: MatchSimEntry[][] = [
     { position: 'BR', shot: 'hard length'        },
     { position: 'T',  shot: 'volley drop'        },
     { position: 'FL', shot: 'straight drive'     },
+  ],
+  // Crosscourt Pressure: alternating diagonal lob-drop rally
+  [
+    { position: 'BR', shot: 'crosscourt lob'     },
+    { position: 'FL', shot: 'straight drop'      },
+    { position: 'BL', shot: 'crosscourt lob'     },
+    { position: 'FR', shot: 'straight drop'      },
+  ],
+  // Mid-court Width Game: crosscourt drives from service-line box
+  [
+    { position: 'MR', shot: 'crosscourt drive'   },
+    { position: 'BL', shot: 'hard length'        },
+    { position: 'ML', shot: 'crosscourt drive'   },
+    { position: 'BR', shot: 'hard length'        },
+  ],
+  // Hold-and-Attack: deception at T, opponent punished front and back
+  [
+    { position: 'T',  shot: 'volley crosscourt'  },
+    { position: 'FR', shot: 'straight drive'     },
+    { position: 'BL', shot: 'defensive boast'    },
+    { position: 'T',  shot: 'volley drop'        },
+    { position: 'FL', shot: 'crosscourt drive'   },
+    { position: 'BR', shot: 'hard length'        },
+  ],
+  // Length-and-Boast-Rotation: classic 3-touch drill pattern
+  [
+    { position: 'BR', shot: 'straight drive'     },
+    { position: 'BL', shot: 'defensive boast'    },
+    { position: 'FR', shot: 'crosscourt drive'   },
   ],
 ];
 
@@ -135,6 +198,16 @@ const MATCH_SIM_PATTERNS_10PT: MatchSimEntry[][] = [
 
 // ─── Private helpers ──────────────────────────────────────────────────────────
 
+// Crosscourt-diagonal pairs — the most common transition in match squash.
+// Used to weight shuffleNoRepeat toward match-realistic movement patterns.
+const CROSSCOURT_DIAGONAL: Partial<Record<Position, Position>> = {
+  BR: 'FL',   FL: 'BR',
+  BL: 'FR',   FR: 'BL',
+  BMCR: 'FMCL', FMCL: 'BMCR',
+  BMCL: 'FMCR', FMCR: 'BMCL',
+  MR: 'ML',   ML: 'MR',
+};
+
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -149,7 +222,8 @@ function shuffle<T>(arr: T[]): T[] {
  * Rules:
  *  1. No position repeats back-to-back.
  *  2. No position repeats two slots ago (avoids A-B-A ping-pong).
- *  3. After two positions in the same zone, the next pick prefers a different zone.
+ *  3. After THREE consecutive positions in the same zone, force a zone change.
+ *     (Front/back zones are physically demanding — 3+ same-zone runs are brutal at fast pace.)
  *  4. Re-shuffles the pool at every full cycle so identical patterns never repeat.
  */
 function shuffleNoRepeat(pool: Position[], count: number): Position[] {
@@ -160,24 +234,39 @@ function shuffleNoRepeat(pool: Position[], count: number): Position[] {
   let p = shuffle([...pool]);
   let prev1: Position | null = null;
   let prev2: Position | null = null;
+  let prev3: Position | null = null;
 
   for (let i = 0; i < count; i++) {
-    // Re-shuffle at every new cycle so patterns don't repeat identically
     if (i > 0 && i % pool.length === 0) p = shuffle([...pool]);
 
-    // Build candidates excluding the last two positions
     let candidates = p.filter(pos => pos !== prev1 && pos !== prev2);
     if (candidates.length === 0) candidates = p.filter(pos => pos !== prev1);
     if (candidates.length === 0) candidates = [...p];
 
-    // Zone balancing: if last two were in same zone, prefer a different zone
-    if (prev1 && prev2 && POSITION_ZONE[prev1] === POSITION_ZONE[prev2]) {
+    // Force zone change after 3 consecutive same-zone positions
+    const sameZoneStreak =
+      prev1 && prev2 && prev3 &&
+      POSITION_ZONE[prev1] === POSITION_ZONE[prev2] &&
+      POSITION_ZONE[prev2] === POSITION_ZONE[prev3];
+
+    if (sameZoneStreak) {
+      const diffZone = candidates.filter(pos => POSITION_ZONE[pos] !== POSITION_ZONE[prev1!]);
+      if (diffZone.length > 0) candidates = diffZone;
+    } else if (prev1 && prev2 && POSITION_ZONE[prev1] === POSITION_ZONE[prev2]) {
+      // After 2 same-zone, prefer different but don't force
       const diffZone = candidates.filter(pos => POSITION_ZONE[pos] !== POSITION_ZONE[prev1!]);
       if (diffZone.length > 0) candidates = diffZone;
     }
 
-    const next = candidates[Math.floor(Math.random() * candidates.length)];
+    // Weight the crosscourt diagonal 2× — ~70% pull toward match-realistic transitions
+    // when the diagonal candidate is available, without forcing it every time.
+    const diagonal: Position | undefined = prev1 ? CROSSCOURT_DIAGONAL[prev1] : undefined;
+    const weighted: Position[] = diagonal
+      ? candidates.flatMap((pos) => pos === diagonal ? [pos, pos] : [pos])
+      : candidates;
+    const next: Position = weighted[Math.floor(Math.random() * weighted.length)];
     result.push(next);
+    prev3 = prev2;
     prev2 = prev1;
     prev1 = next;
   }
@@ -185,25 +274,45 @@ function shuffleNoRepeat(pool: Position[], count: number): Position[] {
 }
 
 function buildPool(config: SessionConfig): Position[] {
-  const base = getPositionsForSystem(config.courtSystem);
+  const base   = getPositionsForSystem(config.courtSystem);
   const filter = (COVERAGE_FILTER[config.coverage] ?? base) as Position[];
 
+  // Step 1: intersect base positions with the coverage zone filter
   let pool = base.filter((p) => filter.includes(p));
 
-  // Mirror left↔right for left-handed players
+  // Step 2: T is the recovery base, not a movement target — exclude from movement-only drills.
+  // It remains available for shot-based and match-sim where T volleys are tactically valid.
+  if (config.drillType === 'movement') {
+    pool = pool.filter((p) => p !== 'T');
+  }
+
+  // Step 3: mirror L↔R for left-handed players (done after zone filter so COVERAGE_FILTER
+  // uses right-handed codes as the canonical definition, then mirroring translates to physical)
   if (config.dominantHand === 'left') {
     pool = pool.map((p) => HAND_MIRROR[p]);
   }
 
-  return pool.length >= 2 ? pool : base.slice(0, 2);
+  // Fallback: if filtering reduced pool below 2 positions (edge case — e.g. 6pt with a
+  // zone that only touches 1 position), widen within the zone before giving up on scope.
+  // Never fall back to coverage-unaware base positions.
+  if (pool.length < 2) {
+    const zoneWithT = base.filter((p) => filter.includes(p));
+    if (zoneWithT.length >= 2) return zoneWithT;
+    // Absolute last resort: use any 2 non-T positions from the court system
+    return base.filter((p) => p !== 'T').slice(0, 2);
+  }
+
+  return pool;
 }
 
-/**
- * Filters the base position pool to positions where the selected shot groups
- * have primary or secondary shots. This ensures shot-based drills only visit
- * positions where calling those shots is tactically realistic.
- * Falls back to the full pool when the filter produces fewer than 2 positions.
- */
+// Narrows the zone pool to positions where the selected shot groups have
+// primary or secondary shots. Ensures shot-based drills only visit tactically
+// realistic positions for the chosen shots.
+//
+// Fallback contract: when the shot-group intersection yields < 2 positions,
+// returns basePool — NOT the raw court-system base — so zone scope is ALWAYS
+// preserved. The engine may call fewer of the selected shot types at some
+// positions, but it will never send the player outside their chosen zone.
 function buildShotBasedPool(basePool: Position[], shotGroups: ShotGroup[]): Position[] {
   if (shotGroups.includes('mixed')) return basePool;
   const preferred = new Set<Position>();
@@ -340,11 +449,12 @@ export function createGhostingEngine(config: SessionConfig): GhostingEngine {
       const move: SessionMove = {
         position,
         shot,
-        intervalMs:  interval,
-        shotCallMs:  shot ? getShotCallMs(interval) : null,
-        recoveryMs:  getRecoveryMs(interval),
+        intervalMs:    interval,
+        shotCallMs:    shot ? getShotCallMs(interval) : null,
+        recoveryMs:    getRecoveryMs(interval),
         setIndex,
         moveIndex,
+        phaseOffsetMs: POSITION_PHASE_OFFSET_MS[position] ?? 0,
       };
 
       moveIndex++;

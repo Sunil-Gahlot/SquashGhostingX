@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import {
   Modal, View, Text, StyleSheet, TouchableOpacity,
-  Animated, ScrollView, Alert, AppState, AppStateStatus,
+  Animated, ScrollView, AppState, AppStateStatus,
 } from 'react-native';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
@@ -82,6 +82,10 @@ const cdStyles = StyleSheet.create({
 
 const PACE_STEP_COUNT = PACE_STEPS_MS.length; // 7
 
+function fmtLabel(s: string): string {
+  return s.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 function ActiveTrainingView({
   session, onPause, onEnd, courtMode, gender,
 }: {
@@ -100,9 +104,6 @@ function ActiveTrainingView({
   const rmm = String(Math.floor(remaining / 60)).padStart(2, '0');
   const rss = String(remaining % 60).padStart(2, '0');
 
-  const posLabel  = session.currentPosition
-    ? POSITION_INFO[session.currentPosition]?.label ?? ''
-    : '';
   const diffLabel = session.config.difficulty.charAt(0).toUpperCase() + session.config.difficulty.slice(1);
 
   return (
@@ -123,22 +124,11 @@ function ActiveTrainingView({
         </View>
       </View>
 
-      {/* ── Position callout banner ───────────────────────────────── */}
-      <View style={atStyles.callCard}>
-        {session.currentPosition ? (
-          <>
-            <Text style={atStyles.callText} numberOfLines={1} adjustsFontSizeToFit>
-              {posLabel}
-            </Text>
-            {session.currentShot ? (
-              <Text style={atStyles.callShot} numberOfLines={1}>
-                {session.currentShot}
-              </Text>
-            ) : null}
-          </>
-        ) : (
-          <Text style={atStyles.callPlaceholder}>Get ready…</Text>
-        )}
+      {/* ── Drill metadata bar (static) ───────────────────────────── */}
+      <View style={atStyles.metaBar}>
+        <Text style={atStyles.metaText}>
+          {fmtLabel(session.config.drillType)}  ·  {session.config.courtSystem.toUpperCase()}  ·  {fmtLabel(session.config.patternType)}
+        </Text>
       </View>
 
       {/* ── Court (fills remaining space) ─────────────────────────── */}
@@ -236,36 +226,20 @@ const atStyles = StyleSheet.create({
   },
   diffBadgeText: { fontSize: FontSize.caption, fontWeight: FontWeight.bold, color: Colors.textPrimary },
 
-  // Position call card
-  callCard: {
+  // Drill metadata bar (static — replaces dynamic callCard)
+  metaBar: {
     marginHorizontal: Spacing.base,
     marginBottom: Spacing.sm,
-    backgroundColor: '#160800',
-    borderWidth: 1,
-    borderColor: `${Colors.brand}33`,
-    borderRadius: BorderRadius.lg,
-    paddingHorizontal: Spacing.base,
-    paddingVertical: Spacing.md,
-    minHeight: 60,
-    justifyContent: 'center',
+    paddingVertical: Spacing.xs + 2,
     alignItems: 'center',
   },
-  callText: {
-    fontSize: FontSize.title + 2,
-    fontWeight: FontWeight.black,
-    color: Colors.textPrimary,
-    textAlign: 'center',
-    letterSpacing: 0.3,
-  },
-  callShot: {
-    fontSize: FontSize.body,
+  metaText: {
+    fontSize: FontSize.caption,
     fontWeight: FontWeight.medium,
-    color: Colors.brand,
-    textAlign: 'center',
-    marginTop: 2,
-    textTransform: 'capitalize',
+    color: Colors.textMuted,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
   },
-  callPlaceholder: { fontSize: FontSize.body, color: Colors.textMuted },
 
   // Court
   court: { flex: 1, marginHorizontal: Spacing.base, borderRadius: BorderRadius.lg, overflow: 'hidden' },
@@ -282,6 +256,16 @@ const atStyles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
   },
+  paceTip: {
+    flexDirection: 'row', alignItems: 'center', gap: Spacing.xs,
+    alignSelf: 'stretch',
+    backgroundColor: `${Colors.brand}14`,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1, borderColor: `${Colors.brand}35`,
+    paddingHorizontal: Spacing.md, paddingVertical: 5,
+    marginBottom: 2,
+  },
+  paceTipText: { flex: 1, fontSize: FontSize.caption, color: Colors.textPrimary, fontWeight: FontWeight.medium },
   paceHeader: {
     fontSize: FontSize.caption,
     fontWeight: FontWeight.bold,
@@ -531,10 +515,12 @@ function SessionSummaryView({
       {/* Badge unlocks */}
       {justEarned.length > 0 && (
         <View style={ssStyles.badgeUnlockWrap}>
-          <Text style={ssStyles.badgeUnlockLabel}>
+          <View style={ssStyles.badgeUnlockLabelRow}>
             <Ionicons name="medal" size={12} color={Colors.gold} />
-            {' '}BADGE{justEarned.length > 1 ? 'S' : ''} UNLOCKED
-          </Text>
+            <Text style={ssStyles.badgeUnlockLabel}>
+              BADGE{justEarned.length > 1 ? 'S' : ''} UNLOCKED
+            </Text>
+          </View>
           {justEarned.map((id) => {
             const def = BADGE_DEFS.find((b) => b.id === id);
             if (!def) return null;
@@ -685,6 +671,9 @@ const ssStyles = StyleSheet.create({
     padding: Spacing.md,
     gap: Spacing.sm,
   },
+  badgeUnlockLabelRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+  },
   badgeUnlockLabel: {
     fontSize: FontSize.micro, fontWeight: FontWeight.bold,
     color: Colors.gold, letterSpacing: 1.2,
@@ -723,10 +712,6 @@ export default function SessionModal() {
   const { session, pendingConfig, clearPendingConfig } = useSessionStore();
   const settings = useSettingsStore((s) => s.settings);
   const gender   = useProfileStore((s) => s.profile.gender);
-  const {
-    hasSeenCourtTutorial, hasSeenPaceTutorial,
-    markCourtTutorialSeen, markPaceTutorialSeen,
-  } = useProfileStore();
   const db = useSQLiteContext() as any;
   const engine = useSessionEngine(db);
   const savedBrightnessRef = useRef<number | null>(null);
@@ -820,80 +805,28 @@ export default function SessionModal() {
               dominantHand={session.config.dominantHand}
               gender={gender}
               courtMode={settings.courtMode ?? 'wooden'}
-      
+
               style={idleStyles.court}
             />
           </View>
         )}
         {session?.state === 'countdown' && (
-          <>
-            <CountdownView session={session} />
-            {!hasSeenCourtTutorial && (
-              <View style={tutStyles.overlay} pointerEvents="box-none">
-                <View style={tutStyles.card}>
-                  <Text style={tutStyles.title}>Court Positions</Text>
-                  <Text style={tutStyles.body}>
-                    {'T = centre T-junction — your home base.\nFront/Back = near & far ends.\nNumbers = corner & mid positions.\nAlways recover to T between calls.'}
-                  </Text>
-                  <TouchableOpacity
-                    style={tutStyles.btn}
-                    onPress={markCourtTutorialSeen}
-                    activeOpacity={0.85}
-                  >
-                    <Text style={tutStyles.btnText}>Got it — Let's Go!</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            )}
-          </>
+          <CountdownView session={session} />
         )}
         {session?.state === 'active' && (
-          <>
-          {!hasSeenPaceTutorial && (
-            <View style={tutStyles.paceTooltip} pointerEvents="box-none">
-              <Ionicons name="information-circle" size={14} color={Colors.brand} />
-              <Text style={tutStyles.paceTooltipText}>
-                Use − and + to adjust pace live
-              </Text>
-              <TouchableOpacity onPress={markPaceTutorialSeen} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                <Ionicons name="close-circle" size={16} color={Colors.textMuted} />
-              </TouchableOpacity>
-            </View>
-          )}
           <ActiveTrainingView
             session={session}
             onPause={engine.pauseSession}
-            onEnd={() => {
-              // BUG-017: confirm before ending so data isn't lost accidentally.
-              engine.pauseSession();
-              Alert.alert(
-                'End Session?',
-                `${session.repCount} movements done. Your session progress will be saved.`,
-                [
-                  { text: 'Keep Going', style: 'cancel', onPress: engine.resumeSession },
-                  { text: 'End & Save', style: 'destructive', onPress: engine.endSession },
-                ]
-              );
-            }}
+            onEnd={engine.endSession}
             courtMode={settings.courtMode ?? 'wooden'}
             gender={gender}
           />
-          </>
         )}
         {session?.state === 'paused' && (
           <PausedView
             session={session}
             onResume={engine.resumeSession}
-            onEnd={() => {
-              Alert.alert(
-                'End Session?',
-                `${session.repCount} movements done. Your session progress will be saved.`,
-                [
-                  { text: 'Cancel', style: 'cancel' },
-                  { text: 'End & Save', style: 'destructive', onPress: engine.endSession },
-                ]
-              );
-            }}
+            onEnd={engine.endSession}
             courtMode={settings.courtMode ?? 'wooden'}
             gender={gender}
           />
@@ -924,55 +857,6 @@ export default function SessionModal() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
-});
-
-const tutStyles = StyleSheet.create({
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: 'flex-end',
-    paddingHorizontal: Spacing.base,
-    paddingBottom: Spacing.xxl,
-  },
-  card: {
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.xl,
-    borderWidth: 1, borderColor: Colors.border,
-    padding: Spacing.base,
-    gap: Spacing.sm,
-    shadowColor: '#000', shadowOpacity: 0.4, shadowRadius: 20, shadowOffset: { width: 0, height: 8 },
-    elevation: 12,
-  },
-  title: { fontSize: FontSize.body, fontWeight: FontWeight.bold, color: Colors.textPrimary },
-  body:  { fontSize: FontSize.label, color: Colors.textSecondary, lineHeight: 22 },
-  btn: {
-    height: 48, backgroundColor: Colors.brand,
-    borderRadius: BorderRadius.full,
-    alignItems: 'center', justifyContent: 'center',
-    marginTop: Spacing.xs,
-  },
-  btnText: { fontSize: FontSize.body, fontWeight: FontWeight.bold, color: Colors.textPrimary },
-
-  paceTooltip: {
-    position: 'absolute',
-    bottom: 115,
-    left: Spacing.base,
-    right: Spacing.base,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.sm,
-    backgroundColor: `${Colors.brand}18`,
-    borderRadius: BorderRadius.full,
-    borderWidth: 1, borderColor: `${Colors.brand}40`,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
-    zIndex: 10,
-  },
-  paceTooltipText: {
-    flex: 1,
-    fontSize: FontSize.caption,
-    color: Colors.textPrimary,
-    fontWeight: FontWeight.medium,
-  },
 });
 
 const idleStyles = StyleSheet.create({

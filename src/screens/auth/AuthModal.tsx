@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/colors';
 import { FontSize, FontWeight, Spacing, BorderRadius } from '../../constants/layout';
 import { useProfileStore } from '../../stores/profileStore';
+import { LANGUAGE_OPTIONS } from '../../constants/languages';
 
 // ─── Welcome slides ───────────────────────────────────────────────────────────
 
@@ -1038,8 +1039,8 @@ export default function AuthModal() {
     setPage('guest-prefs');
   }
 
-  function handleGuestPrefsContinue(skill: string, hand: string, voiceGender: string) {
-    setProfile({ skillLevel: skill as any, dominantHand: hand as any, voiceGender: voiceGender as any });
+  function handleGuestPrefsContinue(skill: string, hand: string, voiceGender: string, language: string) {
+    setProfile({ skillLevel: skill as any, dominantHand: hand as any, voiceGender: voiceGender as any, language: language as any });
     completeAuth(undefined);
     completeOnboarding();
   }
@@ -1176,12 +1177,13 @@ function GuestPrefsPage({
   onContinue,
   onBack,
 }: {
-  onContinue: (skill: string, hand: string, voiceGender: string) => void;
+  onContinue: (skill: string, hand: string, voiceGender: string, language: string) => void;
   onBack: () => void;
 }) {
-  const [skill, setSkill]       = useState('intermediate');
-  const [hand,  setHand]        = useState('right');
-  const [voice, setVoice]       = useState('female');
+  const [skill,    setSkill]    = useState('intermediate');
+  const [hand,     setHand]     = useState('right');
+  const [voice,    setVoice]    = useState('female');
+  const [language, setLanguage] = useState('en-US');
 
   const SKILLS = [
     { value: 'beginner',     label: 'Beginner' },
@@ -1245,9 +1247,25 @@ function GuestPrefsPage({
         ))}
       </View>
 
+      <Text style={gpStyles.sectionLabel}>COACHING LANGUAGE</Text>
+      <View style={gpStyles.langGrid}>
+        {LANGUAGE_OPTIONS.map((opt) => (
+          <TouchableOpacity
+            key={opt.value}
+            style={[gpStyles.langChip, language === opt.value && gpStyles.langChipSel]}
+            onPress={() => setLanguage(opt.value)}
+            activeOpacity={0.75}
+          >
+            <Text style={[gpStyles.langChipText, language === opt.value && gpStyles.langChipTextSel]}>
+              {opt.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
       <TouchableOpacity
         style={aStyles.submitBtn}
-        onPress={() => onContinue(skill, hand, voice)}
+        onPress={() => onContinue(skill, hand, voice, language)}
         activeOpacity={0.88}
       >
         <Text style={aStyles.submitText}>Start Training</Text>
@@ -1275,6 +1293,17 @@ const gpStyles = StyleSheet.create({
   },
   pillHalf: { flex: 1 },
   pillSel:  { borderColor: Colors.brand, backgroundColor: Colors.brandSoft },
-  pillText: { fontSize: FontSize.label, color: Colors.textSecondary, fontWeight: FontWeight.medium, textAlign: 'center' },
+  pillText:    { fontSize: FontSize.label, color: Colors.textSecondary, fontWeight: FontWeight.medium, textAlign: 'center' },
   pillTextSel: { color: Colors.brand, fontWeight: FontWeight.bold },
+
+  langGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.xs, marginBottom: Spacing.base },
+  langChip: {
+    paddingHorizontal: Spacing.sm, paddingVertical: 5,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1, borderColor: Colors.border,
+    backgroundColor: Colors.surface,
+  },
+  langChipSel:     { borderColor: Colors.brand, backgroundColor: Colors.brandSoft },
+  langChipText:    { fontSize: FontSize.caption, color: Colors.textMuted, fontWeight: FontWeight.medium },
+  langChipTextSel: { color: Colors.brand, fontWeight: FontWeight.semiBold },
 });

@@ -23,12 +23,12 @@ export const POSITION_INFO: Record<Position, PositionInfo> = {
   },
   ML: {
     code: 'ML', label: 'Mid Left', shortLabel: 'ML',
-    zone: 'mid', x: -2.00, z: 4.60,
+    zone: 'mid', x: -2.00, z: 5.60,
     courtSystems: ['6pt', '10pt'],
   },
   MR: {
     code: 'MR', label: 'Mid Right', shortLabel: 'MR',
-    zone: 'mid', x: 2.00, z: 4.60,
+    zone: 'mid', x: 2.00, z: 5.60,
     courtSystems: ['6pt', '10pt'],
   },
   BL: {
@@ -70,9 +70,12 @@ export const POSITION_INFO: Record<Position, PositionInfo> = {
 export const POSITIONS_6PT: Position[] = ['FL', 'FR', 'ML', 'MR', 'BL', 'BR', 'T'];
 export const POSITIONS_10PT: Position[] = ['FL', 'FR', 'ML', 'MR', 'BL', 'BR', 'T', 'FMCL', 'FMCR', 'BMCL', 'BMCR'];
 
-// Fixed cyclic order — T placed at the natural recovery break in each sequence
-export const FIXED_ORDER_6PT: Position[] = ['FL', 'FR', 'BL', 'BR', 'T', 'ML', 'MR'];
-export const FIXED_ORDER_10PT: Position[] = ['FL', 'FR', 'FMCL', 'FMCR', 'T', 'ML', 'MR', 'BMCL', 'BMCR', 'BL', 'BR'];
+// Fixed cyclic order — T is the recovery base, not a target; excluded from fixed sequences.
+// Pattern follows PSA figure-of-eight: front↔back diagonal alternation for match realism.
+// 6pt: FL→BR (diagonal) → FR→BL (diagonal) → MR→ML (width)
+// 10pt: extends with FMCL/BMCR and FMCR/BMCL diagonal pairs integrated
+export const FIXED_ORDER_6PT: Position[] = ['FL', 'BR', 'FR', 'BL', 'MR', 'ML'];
+export const FIXED_ORDER_10PT: Position[] = ['FL', 'BR', 'FMCL', 'BMCR', 'FR', 'BL', 'FMCR', 'BMCL', 'MR', 'ML'];
 
 // Handedness mirror: left-handed players swap all L↔R labels
 export const HAND_MIRROR: Record<Position, Position> = {
@@ -85,13 +88,15 @@ export const HAND_MIRROR: Record<Position, Position> = {
 };
 
 // Coverage filter sets — right-handed defaults; engine mirrors for left-handed.
-// T is only in 'full' — it's center court so it doesn't belong in side-only filters.
+// T is always included in every filter: it is the universal recovery node and
+// a valid volley-intercept target in shot-based drills for all coverage modes.
+// (Movement-only drills still exclude T via buildPool filtering in ghostingEngine.)
 export const COVERAGE_FILTER: Record<string, Position[]> = {
-  full:      POSITIONS_10PT,                                     // includes T via POSITIONS_10PT
-  front:     ['FL', 'FR', 'FMCL', 'FMCR'],
-  back:      ['BL', 'BR', 'BMCL', 'BMCR'],
-  forehand:  ['FR', 'MR', 'BR', 'FMCR', 'BMCR'],
-  backhand:  ['FL', 'ML', 'BL', 'FMCL', 'BMCL'],
+  full:      POSITIONS_10PT,                                              // all positions including T
+  front:     ['T', 'FL', 'FR', 'FMCL', 'FMCR'],
+  back:      ['T', 'BL', 'BR', 'BMCL', 'BMCR'],
+  forehand:  ['T', 'FR', 'MR', 'BR', 'FMCR', 'BMCR'],
+  backhand:  ['T', 'FL', 'ML', 'BL', 'FMCL', 'BMCL'],
 };
 
 // Zone mapping for analytics (3-zone: front / mid / back)

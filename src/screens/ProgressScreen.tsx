@@ -13,6 +13,7 @@ import { useProgressStore } from '../stores/progressStore';
 import { useProgressLoader } from '../hooks/useProgressLoader';
 import { useSessionStore } from '../stores/sessionStore';
 import { useProfileStore } from '../stores/profileStore';
+import { useSettingsStore } from '../stores/settingsStore';
 import { getProgramById } from '../data/builtinPrograms';
 import { useBadgesStore, BADGE_DEFS } from '../stores/badgesStore';
 
@@ -149,6 +150,13 @@ const courtStyles = StyleSheet.create({
 
 // ─── Drill constants ───────────────────────────────────────────────────────────
 
+const COURT_SYSTEM_LABELS: Record<string, string> = {
+  '6pt':  '6-Point',
+  '10pt': '10-Point',
+  '11pt': '11-Point English',
+  'psa':  'PSA International',
+};
+
 const DRILL_COLOR = {
   'movement':   Colors.brand,
   'shot-based': Colors.accentRoutines,
@@ -169,6 +177,7 @@ export default function ProgressScreen() {
   const { stats, recentSessions, lastSessionCompletedAt } = useProgressStore();
   const { openDrillConfig, setPendingConfig } = useSessionStore();
   const { profile } = useProfileStore();
+  const settings = useSettingsStore((s) => s.settings);
   const { loadData }  = useProgressLoader();
   const earnedBadges = useBadgesStore((s) => s.earned);
   const [selectedSession, setSelectedSession] = useState<typeof recentSessions[number] | null>(null);
@@ -395,6 +404,7 @@ export default function ProgressScreen() {
               dominantHand: profile.dominantHand,
               voiceGender:  profile.voiceGender,
               language:     profile.language,
+              voiceMode:    settings.defaultVoiceMode,
             })}
           >
             <View style={styles.insightIconWrap}>
@@ -567,7 +577,7 @@ export default function ProgressScreen() {
                     { label: 'Rep Speed',   value: `${avgRep}s` },
                     { label: 'Score',       value: `${Math.round(s.intensityScore)}` },
                     { label: 'Difficulty',  value: s.difficulty ?? '—' },
-                    { label: 'Court',       value: s.courtSystem.toUpperCase() },
+                    { label: 'Court',       value: COURT_SYSTEM_LABELS[s.courtSystem] ?? s.courtSystem.toUpperCase() },
                   ].map(({ label, value }) => (
                     <View key={label} style={sdStyles.gridCell}>
                       <Text style={sdStyles.cellValue}>{value}</Text>

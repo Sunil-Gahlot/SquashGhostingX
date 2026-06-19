@@ -10,6 +10,7 @@ import { BUILTIN_PROGRAMS, getSuggestedDrill } from '../data/builtinPrograms';
 import { useSessionStore } from '../stores/sessionStore';
 import { useProfileStore } from '../stores/profileStore';
 import { useProgressStore } from '../stores/progressStore';
+import { useSettingsStore } from '../stores/settingsStore';
 import { Program, SkillLevel } from '../types';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -135,6 +136,7 @@ export default function RoutinesScreen() {
   const { setPendingConfig, openDrillConfig } = useSessionStore();
   const { profile } = useProfileStore();
   const { stats, recentSessions } = useProgressStore();
+  const settings = useSettingsStore((s) => s.settings);
 
   const suggested = getSuggestedDrill(
     stats.zoneDistribution,
@@ -152,6 +154,7 @@ export default function RoutinesScreen() {
       dominantHand: profile.dominantHand,
       voiceGender:  profile.voiceGender,
       language:     profile.language,
+      voiceMode:    settings.defaultVoiceMode,
     });
   }
 

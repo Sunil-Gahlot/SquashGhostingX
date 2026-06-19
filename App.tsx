@@ -5,7 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
-import { SQLiteProvider, useSQLiteContext } from 'expo-sqlite';
+import { SQLiteProvider } from 'expo-sqlite';
 import { Ionicons } from '@expo/vector-icons';
 
 import HomeScreen       from './src/screens/HomeScreen';
@@ -17,16 +17,13 @@ import SessionModal     from './src/screens/session/SessionModal';
 import DrillConfigModal from './src/screens/drill/DrillConfigModal';
 import OnboardingModal  from './src/screens/onboarding/OnboardingModal';
 import AuthModal        from './src/screens/auth/AuthModal';
-import ResumePromptModal from './src/screens/session/ResumePromptModal';
+import TermsConsentModal from './src/screens/TermsConsentModal';
 
 import { Colors } from './src/constants/colors';
 import { FontSize, FontWeight } from './src/constants/layout';
 import { migrateDatabase } from './src/db/schema';
-import { getCheckpoint } from './src/db/queries';
-import { useSessionStore } from './src/stores/sessionStore';
 import { useProfileStore } from './src/stores/profileStore';
 import { RootTabParamList } from './src/types';
-import { RESUME_MAX_AGE_HOURS } from './src/constants/timing';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 type TabName = keyof RootTabParamList;
@@ -58,24 +55,6 @@ const TAB_ICONS: Record<TabName, { focused: keyof typeof Ionicons.glyphMap; outl
   Settings: { focused: 'settings',  outline: 'settings-outline'  },
 };
 
-function StartupCheckpointChecker() {
-  const db = useSQLiteContext() as any;
-  const { setPendingCheckpoint } = useSessionStore();
-
-  useEffect(() => {
-    async function check() {
-      try {
-        const cp = await getCheckpoint(db);
-        if (!cp) return;
-        const ageHours = (Date.now() - new Date(cp.savedAt).getTime()) / 3_600_000;
-        if (ageHours < RESUME_MAX_AGE_HOURS) setPendingCheckpoint(cp);
-      } catch {}
-    }
-    check();
-  }, []);
-
-  return null;
-}
 
 export default function App() {
   return (
@@ -83,12 +62,11 @@ export default function App() {
       <SafeAreaProvider>
         <SQLiteProvider databaseName="squashghostingx.db" onInit={migrateDatabase}>
 
+          <TermsConsentModal />
           <AuthModal />
           <OnboardingModal />
           <DrillConfigModal />
           <SessionModal />
-          <ResumePromptModal />
-          <StartupCheckpointChecker />
           <NavToTrainAfterAuth />
 
           <NavigationContainer ref={navigationRef}>

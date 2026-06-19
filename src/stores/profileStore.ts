@@ -28,6 +28,8 @@ interface ProfileStore {
   hasCompletedAuth: boolean;
   hasSeenCourtTutorial: boolean;
   hasSeenPaceTutorial: boolean;
+  hasStartedAnySession: boolean;
+  hasAcceptedTerms: boolean;
 
   setProfile: (updates: Partial<UserProfile>) => void;
   completeOnboarding: () => void;
@@ -36,6 +38,8 @@ interface ProfileStore {
   resetProfile: () => void;
   markCourtTutorialSeen: () => void;
   markPaceTutorialSeen: () => void;
+  markSessionStarted: () => void;
+  acceptTerms: () => void;
 }
 
 export const useProfileStore = create<ProfileStore>()(
@@ -46,6 +50,8 @@ export const useProfileStore = create<ProfileStore>()(
       hasCompletedAuth: false,
       hasSeenCourtTutorial: false,
       hasSeenPaceTutorial: false,
+      hasStartedAnySession: false,
+      hasAcceptedTerms: false,
 
       setProfile: (updates) =>
         set((s) => ({ profile: { ...s.profile, ...updates } })),
@@ -71,21 +77,22 @@ export const useProfileStore = create<ProfileStore>()(
         })),
 
       resetProfile: () =>
-        set({ profile: DEFAULT_PROFILE, isOnboardingComplete: false, hasCompletedAuth: false, hasSeenCourtTutorial: false, hasSeenPaceTutorial: false }),
+        set({ profile: DEFAULT_PROFILE, isOnboardingComplete: false, hasCompletedAuth: false, hasSeenCourtTutorial: false, hasSeenPaceTutorial: false, hasStartedAnySession: false, hasAcceptedTerms: false }),
 
       markCourtTutorialSeen: () => set({ hasSeenCourtTutorial: true }),
       markPaceTutorialSeen: () => set({ hasSeenPaceTutorial: true }),
+      markSessionStarted: () => set({ hasStartedAnySession: true }),
+      acceptTerms: () => set({ hasAcceptedTerms: true }),
     }),
     {
       name: 'profile-storage',
       storage: createJSONStorage(() => AsyncStorage),
-      version: 3,
+      version: 5,
       migrate: (persisted: any, version: number) => {
         if (version < 1) {
           persisted = { ...persisted, hasCompletedAuth: false };
         }
         if (version < 2) {
-          // Add DOB fields and normalise null gender
           if (persisted?.state?.profile) {
             const p = persisted.state.profile;
             if (!p.dobDay)   p.dobDay   = '';
@@ -98,6 +105,16 @@ export const useProfileStore = create<ProfileStore>()(
           if (persisted?.state) {
             if (persisted.state.hasSeenCourtTutorial === undefined) persisted.state.hasSeenCourtTutorial = false;
             if (persisted.state.hasSeenPaceTutorial === undefined)  persisted.state.hasSeenPaceTutorial  = false;
+          }
+        }
+        if (version < 4) {
+          if (persisted?.state) {
+            if (persisted.state.hasStartedAnySession === undefined) persisted.state.hasStartedAnySession = false;
+          }
+        }
+        if (version < 5) {
+          if (persisted?.state) {
+            if (persisted.state.hasAcceptedTerms === undefined) persisted.state.hasAcceptedTerms = false;
           }
         }
         return persisted;

@@ -136,11 +136,9 @@ function Step1({
   );
 }
 
-// BUG-034: added Non-Binary option
 const GENDER_OPTIONS = [
-  { label: 'Male',       value: 'male'      },
-  { label: 'Female',     value: 'female'    },
-  { label: 'Non-Binary', value: 'nonbinary' },
+  { label: 'Male',   value: 'male'   },
+  { label: 'Female', value: 'female' },
 ];
 
 // ─── Step 2: Hand + Voice + Name + Age + Gender ───────────────────────────────
@@ -212,6 +210,14 @@ function Step2({
         selected={voice}
         onSelect={(v) => onVoice(v as VoiceGender)}
       />
+      <TouchableOpacity
+        style={stepStyles.previewBtn}
+        onPress={() => Audio.speakText('Front Left. Recover to T.', 0.9, 'en-US', voice)}
+        activeOpacity={0.75}
+      >
+        <Ionicons name="volume-high-outline" size={15} color={Colors.brand} />
+        <Text style={stepStyles.previewBtnText}>Preview Voice</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -406,6 +412,15 @@ const stepStyles = StyleSheet.create({
   skillDesc:       { fontSize: FontSize.caption, color: Colors.textMuted, marginTop: 2 },
   skillDescActive: { color: Colors.primaryDim },
   hint:            { fontSize: FontSize.caption, color: Colors.textMuted, marginTop: Spacing.sm, lineHeight: 18 },
+  previewBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: Spacing.xs,
+    height: ButtonHeight.sm,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1.5, borderColor: Colors.brand,
+    backgroundColor: Colors.brandSoft,
+    marginTop: Spacing.sm,
+  },
+  previewBtnText: { fontSize: FontSize.caption, fontWeight: FontWeight.semiBold, color: Colors.brand },
   input: {
     backgroundColor: Colors.surface, borderRadius: BorderRadius.md,
     borderWidth: 1.5, borderColor: Colors.border,

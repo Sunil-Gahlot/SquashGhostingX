@@ -135,6 +135,11 @@ export function useSessionEngine(db: SQLiteDatabase) {
   const cpTimer         = useRef<IntervalId | null>(null);
   const isCompletingRef = useRef(false);
 
+  // Tracks when the current move cycle started — used to reschedule loopTimer on live pace change
+  const cycleStartRef     = useRef<number>(0);
+  // Always-current ref to fireMoveLoop so the pace subscription can call it without stale closure
+  const fireMoveLoopRef   = useRef<() => void>(() => {});
+
   // ── Helpers ────────────────────────────────────────────────────────────────
 
   function clearMoveTimers() {
@@ -328,6 +333,9 @@ export function useSessionEngine(db: SQLiteDatabase) {
     // Safety: only run in active state
     if (store.getState().session?.state !== 'active') return;
 
+    // Mark when this cycle started so the pace-change subscription can compute remaining time
+    cycleStartRef.current = Date.now();
+
     const move = engine.getNextMove();
     const s    = store.getState();
 
@@ -387,27 +395,35 @@ export function useSessionEngine(db: SQLiteDatabase) {
         speak(callText);
       }, AUDIO_OFFSETS.voiceCallMs));
 
-      // Recovery cue fires at end of movement phase for ALL drill types.
-      // Signals the player to run back to T before the next position call.
-      const recoveryCallMs = MOVEMENT_PHASE_MS[config.difficulty][config.tempo];
-      addTimer(setTimeout(() => {
-        if (store.getState().session?.state !== 'active') return;
-        const recoveryCue = Audio.getRecoveryCue(recoveryCueIdxRef.current++);
-        speak(recoveryCue);
-      }, recoveryCallMs));
+      // Recovery cue: skip when position IS the T, and when the effective interval is so
+      // tight (e.g. Turbo pace) that the cue would fire < 1500ms before the next call.
+      // phaseOffsetMs delays the cue for front corners so players have full time at position.
+      const recoveryCallMs = MOVEMENT_PHASE_MS[config.difficulty][config.tempo] + move.phaseOffsetMs;
+      const skipRecoveryCue = move.position === 'T' || (effectiveIntervalMs - recoveryCallMs) < 1500;
+      if (!skipRecoveryCue) {
+        addTimer(setTimeout(() => {
+          if (store.getState().session?.state !== 'active') return;
+          const recoveryCue = Audio.getRecoveryCue(recoveryCueIdxRef.current++);
+          speak(recoveryCue);
+        }, recoveryCallMs));
+      }
     }
 
     // T-pose clear fires in ALL voiceModes (voice+visual, voice-only, visual-only, beep).
     // BUG-006: clamp so clear always fires before the next cycle starts.
-    const tPoseClearMs = Math.min(movementPhase + T_POSE_CLEAR_DELAY_MS, effectiveIntervalMs - 100);
+    // phaseOffsetMs shifts the clear point for front corners in sync with the recovery cue.
+    const tPoseClearMs = Math.min(
+      movementPhase + move.phaseOffsetMs + T_POSE_CLEAR_DELAY_MS,
+      effectiveIntervalMs - 100,
+    );
     addTimer(setTimeout(() => {
       if (store.getState().session?.state === 'active') {
         store.getState().setCurrentPosition(null, null);
       }
     }, tPoseClearMs));
 
-    // Haptic "return to T" fires with recovery cue at end of movement phase
-    const recoveryMs = MOVEMENT_PHASE_MS[config.difficulty][config.tempo];
+    // Haptic "return to T" fires with recovery cue — shifted by phaseOffsetMs for front corners.
+    const recoveryMs = MOVEMENT_PHASE_MS[config.difficulty][config.tempo] + move.phaseOffsetMs;
     if (getSettings().hapticsEnabled) {
       addTimer(setTimeout(() => {
         Haptics.onReturnToT();
@@ -435,6 +451,41 @@ export function useSessionEngine(db: SQLiteDatabase) {
     }, effectiveIntervalMs);
 
   }, [settings, completeSession, startRest]);
+
+  // Keep ref current so the pace subscription below can always call the latest fireMoveLoop
+  fireMoveLoopRef.current = fireMoveLoop;
+
+  // ── Live pace change — immediate reschedule ────────────────────────────────
+  // When the user presses +/− mid-cycle, cancel the already-scheduled loopTimer and
+  // reschedule it with the remaining time adjusted for the new pace.  Without this,
+  // the change only takes effect after the current cycle's timer expires (up to 10 s
+  // at beginner/slow), which feels like the button is broken.
+  useEffect(() => {
+    let prevStep: number | undefined;
+    return useSessionStore.subscribe((newState) => {
+      const step = newState.session?.livePaceStep;
+      if (step === undefined || step === prevStep) return;
+      prevStep = step;
+
+      if (newState.session?.state !== 'active') return;
+      if (!loopTimer.current) return;
+
+      const config = configRef.current;
+      if (!config) return;
+
+      const paceOffset    = PACE_STEPS_MS[step] ?? 0;
+      const extraPaceMs   = getSettings().movementPaceExtraMs ?? 0;
+      const movementPhase = MOVEMENT_PHASE_MS[config.difficulty][config.tempo];
+      const baseInterval  = getIntervalMs(config.difficulty, config.tempo);
+      const newInterval   = Math.max(movementPhase + 800, baseInterval + paceOffset + extraPaceMs);
+
+      const elapsed   = Date.now() - cycleStartRef.current;
+      const remaining = Math.max(100, newInterval - elapsed);
+
+      clearTimeout(loopTimer.current!);
+      loopTimer.current = setTimeout(fireMoveLoopRef.current, remaining);
+    });
+  }, []);
 
   // ── Active state setup ─────────────────────────────────────────────────────
 
@@ -580,6 +631,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
       ssettings.movementPaceExtraMs ?? 0,
     );
     store.getState().initSession(fullConfig, totalMoves);
+    useProfileStore.getState().markSessionStarted();
 
     // Announce "Move to the T" before countdown numbers begin
     const sForStart = getSettings();

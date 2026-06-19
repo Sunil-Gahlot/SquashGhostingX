@@ -22,9 +22,10 @@ export const BUILTIN_PROGRAMS: Program[] = [
   {
     id: 'first-steps',
     name: 'First Steps',
-    description: 'Front corners (FL & FR) at a forgiving pace. Learn your first two positions.',
+    description: 'Front Left and Front Right at a forgiving pace. Your first two court positions.',
     level: 'beginner', estimatedMinutes: 8, isBuiltin: true,
     tags: ['beginner', 'footwork'],
+    // Intentionally 6pt + front = FL and FR only. Beginner drill to learn exactly these 2 positions.
     config: { ...base, drillType: 'movement', courtSystem: '6pt', coverage: 'front', patternType: 'fixed', tempo: 'slow', difficulty: 'beginner', duration: 8, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
   },
   {
@@ -43,6 +44,14 @@ export const BUILTIN_PROGRAMS: Program[] = [
     tags: ['beginner', 'cardio'],
     config: { ...base, drillType: 'movement', courtSystem: '6pt', coverage: 'full', patternType: 'random', tempo: 'natural', difficulty: 'beginner', duration: 12, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
   },
+  {
+    id: 'cool-down',
+    name: 'Cool Down',
+    description: 'Slow-paced movement to recover after hard training.',
+    level: 'beginner', estimatedMinutes: 5, isBuiltin: true,
+    tags: ['cool-down', 'recovery'],
+    config: { ...base, drillType: 'movement', courtSystem: '6pt', coverage: 'full', patternType: 'fixed', tempo: 'slow', difficulty: 'beginner', duration: 5, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
+  },
 
   // ─── Intermediate ─────────────────────────────────────────────────────────
   {
@@ -56,15 +65,16 @@ export const BUILTIN_PROGRAMS: Program[] = [
   {
     id: 'drop-and-drive',
     name: 'Drop & Drive',
-    description: 'Shot-based drill: drops from front, drives from back.',
+    description: 'Shot training: drops from front court, drives from back. Covers all 6 positions.',
     level: 'intermediate', estimatedMinutes: 12, isBuiltin: true,
     tags: ['intermediate', 'shot-based', 'tactics'],
-    config: { ...base, drillType: 'shot-based', courtSystem: '6pt', coverage: 'full', patternType: 'shot-based', tempo: 'natural', difficulty: 'intermediate', duration: 12, voiceMode: 'voice+visual', shotGroups: ['drops', 'drives'] },
+    // patternType: 'random' — engine applies shot-group position filtering automatically for shot-based drillType
+    config: { ...base, drillType: 'shot-based', courtSystem: '6pt', coverage: 'full', patternType: 'random', tempo: 'natural', difficulty: 'intermediate', duration: 12, voiceMode: 'voice+visual', shotGroups: ['drops', 'drives'] },
   },
   {
     id: 'cross-court-pattern',
     name: 'Cross Court Pattern',
-    description: 'Fixed sequence across all 6 positions. Build consistency and court range.',
+    description: 'Fixed PSA figure-of-eight sequence across all 6 positions. Build consistency and court range.',
     level: 'intermediate', estimatedMinutes: 12, isBuiltin: true,
     tags: ['intermediate', 'pattern', 'diagonal'],
     config: { ...base, drillType: 'movement', courtSystem: '6pt', coverage: 'full', patternType: 'fixed', tempo: 'natural', difficulty: 'intermediate', duration: 12, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
@@ -72,18 +82,20 @@ export const BUILTIN_PROGRAMS: Program[] = [
   {
     id: 'front-court-focus',
     name: 'Front Court Focus',
-    description: 'Front and mid positions only. Fast feet, low body.',
+    description: 'FL, FR and front volley positions. Fast feet, low body, short game pressure.',
     level: 'intermediate', estimatedMinutes: 10, isBuiltin: true,
     tags: ['intermediate', 'front-court'],
-    config: { ...base, drillType: 'movement', courtSystem: '6pt', coverage: 'front', patternType: 'random', tempo: 'natural', difficulty: 'intermediate', duration: 10, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
+    // 10pt required: front + 6pt = only FL/FR (2 positions). 10pt gives FL, FR, FMCL, FMCR.
+    config: { ...base, drillType: 'movement', courtSystem: '10pt', coverage: 'front', patternType: 'random', tempo: 'natural', difficulty: 'intermediate', duration: 10, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
   },
   {
     id: 'back-court-power',
     name: 'Back Court Power',
-    description: 'Back and mid positions. Build leg strength and drive length.',
+    description: 'BL, BR and back diagonal positions. Build leg strength and drive length.',
     level: 'intermediate', estimatedMinutes: 10, isBuiltin: true,
     tags: ['intermediate', 'back-court', 'strength'],
-    config: { ...base, drillType: 'movement', courtSystem: '6pt', coverage: 'back', patternType: 'random', tempo: 'natural', difficulty: 'intermediate', duration: 10, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
+    // 10pt required: back + 6pt = only BL/BR (2 positions). 10pt gives BL, BR, BMCL, BMCR.
+    config: { ...base, drillType: 'movement', courtSystem: '10pt', coverage: 'back', patternType: 'random', tempo: 'natural', difficulty: 'intermediate', duration: 10, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
   },
 
   // ─── Advanced ─────────────────────────────────────────────────────────────
@@ -98,18 +110,68 @@ export const BUILTIN_PROGRAMS: Program[] = [
   {
     id: 'full-court-shots',
     name: 'Full Court Shot Drill',
-    description: 'All positions, full shot library. Think and move.',
+    description: 'All 6 positions with full shot library. Move, think, and execute.',
     level: 'advanced', estimatedMinutes: 15, isBuiltin: true,
     tags: ['advanced', 'shot-based'],
-    config: { ...base, drillType: 'shot-based', courtSystem: '6pt', coverage: 'full', patternType: 'shot-based', tempo: 'natural', difficulty: 'advanced', duration: 15, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
+    config: { ...base, drillType: 'shot-based', courtSystem: '6pt', coverage: 'full', patternType: 'random', tempo: 'natural', difficulty: 'advanced', duration: 15, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
   },
   {
     id: 'psa-speed',
     name: 'PSA Speed',
-    description: '6-point at pro tempo. Race the clock.',
+    description: '6-point at explosive tempo. Race the clock.',
     level: 'advanced', estimatedMinutes: 15, isBuiltin: true,
     tags: ['advanced', 'speed', 'explosive'],
     config: { ...base, drillType: 'movement', courtSystem: '6pt', coverage: 'full', patternType: 'random', tempo: 'explosive', difficulty: 'advanced', duration: 15, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
+  },
+  {
+    id: 'boast-and-length',
+    name: 'Boast & Length',
+    description: 'Back court and mid positions. Trains the defensive boast and straight drive combination.',
+    level: 'advanced', estimatedMinutes: 12, isBuiltin: true,
+    tags: ['advanced', 'shot-based', 'back-court'],
+    config: { ...base, drillType: 'shot-based', courtSystem: '10pt', coverage: 'back', patternType: 'random', tempo: 'natural', difficulty: 'advanced', duration: 12, voiceMode: 'voice+visual', shotGroups: ['boasts', 'lengths'] },
+  },
+
+  // ─── Elite ────────────────────────────────────────────────────────────────
+  {
+    id: 'match-simulation',
+    name: 'Match Simulation',
+    description: 'Rally-like 10-point sequences. Pressure and unpredictability.',
+    level: 'elite', estimatedMinutes: 20, isBuiltin: true,
+    tags: ['elite', 'match-sim', '10pt'],
+    config: { ...base, drillType: 'match-sim', courtSystem: '10pt', coverage: 'full', patternType: 'match-sim', tempo: 'natural', difficulty: 'elite', duration: 20, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
+  },
+  {
+    id: 'no-rest',
+    name: 'No Rest',
+    description: '5 minutes continuous ghosting. No rest. Pure endurance.',
+    level: 'elite', estimatedMinutes: 5, isBuiltin: true,
+    tags: ['elite', 'endurance', 'no-rest'],
+    config: { ...base, drillType: 'movement', courtSystem: '6pt', coverage: 'full', patternType: 'random', tempo: 'natural', difficulty: 'elite', duration: 5, restMode: 'none', restSeconds: 0, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
+  },
+  {
+    id: 'tactical-shotmaking',
+    name: 'Tactical Shotmaking',
+    description: '10-point court with full shot library at explosive elite pace. Every position, every shot.',
+    level: 'elite', estimatedMinutes: 20, isBuiltin: true,
+    tags: ['elite', 'shot-based', '10pt', 'explosive'],
+    config: { ...base, drillType: 'shot-based', courtSystem: '10pt', coverage: 'full', patternType: 'random', tempo: 'explosive', difficulty: 'elite', duration: 20, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
+  },
+  {
+    id: 'forehand-domination',
+    name: 'Forehand Domination',
+    description: 'Dominant-hand side only. 10-point forehand positions at elite explosive pace.',
+    level: 'elite', estimatedMinutes: 15, isBuiltin: true,
+    tags: ['elite', 'forehand', '10pt', 'explosive'],
+    config: { ...base, drillType: 'movement', courtSystem: '10pt', coverage: 'forehand', patternType: 'random', tempo: 'explosive', difficulty: 'elite', duration: 15, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
+  },
+  {
+    id: 'backhand-precision',
+    name: 'Backhand Precision',
+    description: 'Off-hand side with shot calls. Drops, drives and lengths on the backhand court.',
+    level: 'elite', estimatedMinutes: 15, isBuiltin: true,
+    tags: ['elite', 'backhand', '10pt', 'shot-based'],
+    config: { ...base, drillType: 'shot-based', courtSystem: '10pt', coverage: 'backhand', patternType: 'random', tempo: 'natural', difficulty: 'elite', duration: 15, voiceMode: 'voice+visual', shotGroups: ['drops', 'drives', 'lengths'] },
   },
 
   // ─── Pro ──────────────────────────────────────────────────────────────────
@@ -132,10 +194,10 @@ export const BUILTIN_PROGRAMS: Program[] = [
   {
     id: 'precision-and-power',
     name: 'Precision & Power',
-    description: 'Explosive shot-based drill across all 10 positions. Think fast, move faster.',
+    description: 'Explosive shot training across all 10 positions. Think fast, move faster.',
     level: 'pro', estimatedMinutes: 20, isBuiltin: true,
     tags: ['pro', 'shot-based', '10pt', 'explosive'],
-    config: { ...base, drillType: 'shot-based', courtSystem: '10pt', coverage: 'full', patternType: 'shot-based', tempo: 'explosive', difficulty: 'pro', duration: 20, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
+    config: { ...base, drillType: 'shot-based', courtSystem: '10pt', coverage: 'full', patternType: 'random', tempo: 'explosive', difficulty: 'pro', duration: 20, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
   },
   {
     id: 'maximum-intensity',
@@ -151,33 +213,7 @@ export const BUILTIN_PROGRAMS: Program[] = [
     description: 'Full 10-point court with complete shot library at explosive tempo. The ultimate test.',
     level: 'pro', estimatedMinutes: 30, isBuiltin: true,
     tags: ['pro', 'shot-based', '10pt', 'explosive', 'mastery'],
-    config: { ...base, drillType: 'shot-based', courtSystem: '10pt', coverage: 'full', patternType: 'shot-based', tempo: 'explosive', difficulty: 'pro', duration: 30, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
-  },
-
-  // ─── Elite ────────────────────────────────────────────────────────────────
-  {
-    id: 'match-simulation',
-    name: 'Match Simulation',
-    description: 'Rally-like 10-point sequences. Pressure and unpredictability.',
-    level: 'elite', estimatedMinutes: 20, isBuiltin: true,
-    tags: ['elite', 'match-sim', '10pt'],
-    config: { ...base, drillType: 'match-sim', courtSystem: '10pt', coverage: 'full', patternType: 'match-sim', tempo: 'natural', difficulty: 'elite', duration: 20, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
-  },
-  {
-    id: 'no-rest',
-    name: 'No Rest',
-    description: '5 minutes continuous. No rest. Pure endurance.',
-    level: 'elite', estimatedMinutes: 5, isBuiltin: true,
-    tags: ['elite', 'endurance', 'no-rest'],
-    config: { ...base, drillType: 'movement', courtSystem: '6pt', coverage: 'full', patternType: 'random', tempo: 'natural', difficulty: 'elite', duration: 5, restMode: 'none', restSeconds: 0, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
-  },
-  {
-    id: 'cool-down',
-    name: 'Cool Down',
-    description: 'Slow-paced movement to recover after hard training.',
-    level: 'beginner', estimatedMinutes: 5, isBuiltin: true,
-    tags: ['cool-down', 'recovery'],
-    config: { ...base, drillType: 'movement', courtSystem: '6pt', coverage: 'full', patternType: 'fixed', tempo: 'slow', difficulty: 'beginner', duration: 5, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
+    config: { ...base, drillType: 'shot-based', courtSystem: '10pt', coverage: 'full', patternType: 'random', tempo: 'explosive', difficulty: 'pro', duration: 30, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
   },
 ];
 
