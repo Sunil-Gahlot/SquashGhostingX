@@ -11,14 +11,14 @@
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#FF6B35">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23FF6B35'/%3E%3Ctext x='16' y='23' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='900' font-size='14'%3ESX%3C/text%3E%3C/svg%3E">
-<link rel="apple-touch-icon" href="App_Home_Screen.jpeg">
-<meta property="og:image" content="https://squashghostingx.com/App_Home_Screen.jpeg">
+<link rel="apple-touch-icon" href="screen-home.jpeg">
+<meta property="og:image" content="https://squashghostingx.com/screen-home.jpeg">
 <meta property="og:url" content="https://squashghostingx.com">
 <meta property="og:site_name" content="SquashGhostingX">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="SquashGhostingX — AI-Powered Squash Ghosting Training">
 <meta name="twitter:description" content="The only squash app with AI voice coaching, 6-point & 10-point ghosting systems and real-time analytics. Free on iOS and Android.">
-<meta name="twitter:image" content="https://squashghostingx.com/App_Home_Screen.jpeg">
+<meta name="twitter:image" content="https://squashghostingx.com/screen-home.jpeg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -543,7 +543,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
 .prog-tab[data-level="elite"].active{background:var(--accent);border-color:var(--accent)}
 .prog-tab[data-level="pro"].active{background:#a855f7;border-color:#a855f7}
 .prog-tab[data-level="custom"].active{background:#06b6d4;border-color:#06b6d4}
-.programs-panel{display:none}.programs-panel.active{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.programs-panel{display:none}.programs-panel.active{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
 .prog-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:1.25rem;transition:all .3s;cursor:pointer}
 .prog-card:hover{border-color:var(--borderacc);transform:translateY(-3px)}
 .prog-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.6rem}
@@ -554,7 +554,8 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
 .prog-tag{font-size:.65rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:.2rem .5rem;border-radius:4px;background:var(--glow);color:var(--accent)}
 
 /* FOUNDERS RESPONSIVE OVERRIDE */
-@media(max-width:900px){.founders-grid{grid-template-columns:1fr}.founders-mission{grid-template-columns:1fr 1fr}}
+.prog-phone-col{position:sticky;top:6rem}
+@media(max-width:900px){.founders-grid{grid-template-columns:1fr}.founders-mission{grid-template-columns:1fr 1fr}.programs-layout,.custom-builder-layout{grid-template-columns:1fr!important}.prog-phone-col{position:static;display:flex;justify-content:center;order:-1;margin-bottom:1.5rem}.prog-phone-col>div{max-width:240px;width:100%}}
 
 /* VIDEOS 4-up */
 .videos-4grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
@@ -718,7 +719,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
         <div class="float-val">14 🔥</div>
       </div>
       <div class="hero-phone">
-        <img src="App_Home_Screen.jpeg" alt="SquashGhostingX home screen — Good morning, START SESSION, Ghosting, Last Session, Routines, Progress"
+        <img src="screen-home.jpeg" alt="SquashGhostingX home screen — Push Your Limits Today, Quick Start, New Session, weekly stats and Programs"
              style="width:100%;display:block" onerror="this.style.opacity='.12'">
         <div class="hero-phone-glow"></div>
       </div>
@@ -999,7 +1000,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       <div class="showcase-phone reveal">
         <div style="font-family:var(--font-display);font-size:2.8rem;font-weight:900;color:var(--gray3);line-height:1;margin-bottom:.5rem;letter-spacing:-.03em">01</div>
         <div class="showcase-screen">
-          <img src="App_Program_Screen.jpeg" alt="SquashGhostingX routines — training programs by skill level"
+          <img src="screen-programs.jpeg" alt="SquashGhostingX routines — training programs by skill level"
                loading="lazy" onerror="this.style.opacity='.12'">
         </div>
         <div class="showcase-caption">Choose Your Program</div>
@@ -1008,7 +1009,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       <div class="showcase-phone center reveal d1">
         <div style="font-family:var(--font-display);font-size:2.8rem;font-weight:900;color:var(--accent);line-height:1;margin-bottom:.5rem;letter-spacing:-.03em">02</div>
         <div class="showcase-screen" style="border-color:var(--borderacc);box-shadow:0 30px 60px rgba(0,0,0,.6),0 0 0 1px rgba(255,107,53,.2)">
-          <img src="App_Home_Screen.jpeg" alt="SquashGhostingX home screen — START SESSION with AI ghosting"
+          <img src="screen-active-training.jpeg" alt="SquashGhostingX active training — court view with player at the T position"
                loading="lazy" onerror="this.style.opacity='.12'">
         </div>
         <div class="showcase-caption" style="color:var(--accent)">Train With AI</div>
@@ -1017,7 +1018,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       <div class="showcase-phone reveal d2">
         <div style="font-family:var(--font-display);font-size:2.8rem;font-weight:900;color:var(--gray3);line-height:1;margin-bottom:.5rem;letter-spacing:-.03em">03</div>
         <div class="showcase-screen">
-          <img src="App_Session_Stats_Screen.jpeg" alt="SquashGhostingX session stats — reps, zones, duration and performance score"
+          <img src="screen-progress-overview.jpeg" alt="SquashGhostingX progress — Your Journey, day streak, weekly load chart and achievements"
                loading="lazy" onerror="this.style.opacity='.12'">
         </div>
         <div class="showcase-caption">Review &amp; Improve</div>
@@ -1157,39 +1158,9 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
           </div>
         </div>
       </div>
-      <!-- Live call sequence visual -->
-      <div class="reveal d2" style="display:flex;justify-content:center">
-        <div style="background:var(--bg3);border:1px solid var(--borderacc);border-radius:var(--r16);padding:1.75rem;max-width:320px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.45),0 0 0 1px rgba(255,107,53,.1)">
-          <div style="font-family:var(--font-display);font-size:.72rem;font-weight:700;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between">
-            <span>Live Call Sequence</span>
-            <span style="background:var(--accent);color:#fff;padding:.18rem .55rem;border-radius:4px;font-size:.65rem">ACTIVE</span>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:.65rem">
-            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:var(--r8);padding:.8rem 1rem;display:flex;align-items:center;gap:.75rem;opacity:.5">
-              <div style="width:34px;height:34px;background:rgba(255,107,53,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.7rem;font-weight:900;color:var(--accent);flex-shrink:0">FL</div>
-              <div style="flex:1"><div style="font-size:.78rem;font-weight:700;color:var(--gray1)">Front Left</div><div style="font-size:.68rem;color:var(--gray2)">Drop Shot — done</div></div>
-              <div style="font-size:.65rem;color:var(--gray2)">✓ T</div>
-            </div>
-            <div style="background:rgba(255,107,53,.1);border:1.5px solid var(--accent);border-radius:var(--r8);padding:.8rem 1rem;display:flex;align-items:center;gap:.75rem">
-              <div style="width:34px;height:34px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.7rem;font-weight:900;color:#fff;flex-shrink:0">BR</div>
-              <div style="flex:1"><div style="font-size:.78rem;font-weight:700;color:var(--accent)">Back Right ← NOW</div><div style="font-size:.68rem;color:var(--accent-l)">Drive</div></div>
-              <div style="width:8px;height:8px;background:var(--accent);border-radius:50%;animation:pulse 1.5s infinite"></div>
-            </div>
-            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:var(--r8);padding:.8rem 1rem;display:flex;align-items:center;gap:.75rem;opacity:.35">
-              <div style="width:34px;height:34px;background:var(--bg4);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.7rem;font-weight:900;color:var(--gray2);flex-shrink:0">ML</div>
-              <div style="flex:1"><div style="font-size:.78rem;font-weight:700;color:var(--gray2)">Mid Left</div><div style="font-size:.68rem;color:var(--gray2)">Cross Court</div></div>
-              <div style="font-size:.65rem;color:var(--gray3)">next</div>
-            </div>
-            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:var(--r8);padding:.8rem 1rem;display:flex;align-items:center;gap:.75rem;opacity:.2">
-              <div style="width:34px;height:34px;background:var(--bg4);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:.7rem;font-weight:900;color:var(--gray2);flex-shrink:0">BL</div>
-              <div style="flex:1"><div style="font-size:.78rem;font-weight:700;color:var(--gray2)">Back Left</div><div style="font-size:.68rem;color:var(--gray2)">Boast</div></div>
-              <div style="font-size:.65rem;color:var(--gray3)">—</div>
-            </div>
-          </div>
-          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:.7rem;color:var(--gray2)">Shot-Based · 6pt · Natural Tempo</span>
-            <span style="font-size:.68rem;color:var(--gray2)">→ T every rep</span>
-          </div>
+      <div class="reveal d2" style="display:flex;justify-content:center;align-items:flex-start">
+        <div style="width:min(280px,88%);background:var(--bg3);border-radius:32px;border:1px solid var(--borderacc);overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.5),0 0 0 1px rgba(255,107,53,.15)">
+          <img src="screen-setup-drill-type.jpeg" alt="Training type selection — Movement Only, Shot Training or Match Simulation" style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'">
         </div>
       </div>
     </div>
@@ -1230,7 +1201,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       </div>
       <div class="reveal d2" style="display:flex;justify-content:center;align-items:flex-start">
         <div style="width:min(280px,88%);background:var(--bg3);border-radius:32px;border:1px solid var(--borderacc);overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.5),0 0 0 1px rgba(255,107,53,.15)">
-          <img src="App_Progress_Screen.jpeg" alt="SquashGhostingX progress screen — zone balance, session history, streaks and personal bests" style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'">
+          <img src="screen-progress-sessions.jpeg" alt="SquashGhostingX progress — court balance, achievements and recent sessions" style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'">
         </div>
       </div>
     </div>
@@ -1306,61 +1277,92 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
 </section>
 
 <!-- PROGRAMS -->
-<section id="programs">
+<section id="programs" style="background:var(--bg2)">
   <div class="container">
     <div class="section-head text-center">
       <div class="section-label reveal">Built-In Programs</div>
       <h2 class="section-title reveal d1">20 Programs. <em>Every Level.</em></h2>
       <p class="section-sub reveal d2">Expertly designed sessions from beginner warm-ups to professional match simulations. All included. All free.</p>
     </div>
-    <div class="reveal d2" style="background:var(--glow2);border:1px solid var(--borderacc);border-radius:var(--r12);padding:.85rem 1.25rem;margin-bottom:2rem;font-size:.85rem;color:var(--gray1);display:flex;align-items:center;gap:.75rem">
-      <span style="font-size:1.1rem;flex-shrink:0">📱</span>
-      <span>In the app, tap <strong style="color:var(--accent)">Train → Ghosting</strong> to launch any of these programs. Your custom saved sessions live under the <strong style="color:var(--accent)">Routines</strong> tab.</span>
+    <div class="programs-layout" style="display:grid;grid-template-columns:1fr 260px;gap:3rem;align-items:start">
+      <div>
+        <div class="programs-level-tabs reveal">
+          <button class="prog-tab active" data-level="beginner" onclick="switchPrograms('beginner',this)">Beginner</button>
+          <button class="prog-tab" data-level="intermediate" onclick="switchPrograms('intermediate',this)">Intermediate</button>
+          <button class="prog-tab" data-level="advanced" onclick="switchPrograms('advanced',this)">Advanced</button>
+          <button class="prog-tab" data-level="elite" onclick="switchPrograms('elite',this)">Elite</button>
+          <button class="prog-tab" data-level="pro" onclick="switchPrograms('pro',this)">Pro</button>
+        </div>
+        <div id="prog-beginner" class="programs-panel active">
+          <div class="prog-card reveal"><div class="prog-card-top"><div class="prog-card-name">Warm Up</div><div class="prog-card-time">5 min</div></div><div class="prog-card-desc">Easy movement to wake up your body and mind before training begins.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Slow</span><span class="prog-tag">Movement</span></div></div>
+          <div class="prog-card reveal d1"><div class="prog-card-top"><div class="prog-card-name">First Steps</div><div class="prog-card-time">8 min</div></div><div class="prog-card-desc">Front Left and Front Right at a forgiving pace — your first two court positions.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Slow</span><span class="prog-tag">Front Focus</span></div></div>
+          <div class="prog-card reveal d2"><div class="prog-card-top"><div class="prog-card-name">Finding the T</div><div class="prog-card-time">10 min</div></div><div class="prog-card-desc">All 6 positions with emphasis on T recovery. Build the most important habit in squash.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Slow</span><span class="prog-tag">T Recovery</span></div></div>
+          <div class="prog-card reveal d3"><div class="prog-card-top"><div class="prog-card-name">Steady Pace</div><div class="prog-card-time">12 min</div></div><div class="prog-card-desc">6-point random ghosting at a comfortable natural tempo. Build a rhythm.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Natural</span><span class="prog-tag">Full Court</span></div></div>
+          <div class="prog-card reveal d4"><div class="prog-card-top"><div class="prog-card-name">Cool Down</div><div class="prog-card-time">5 min</div></div><div class="prog-card-desc">Slow-paced movement to wind down and recover after a training session.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Slow</span><span class="prog-tag">Recovery</span></div></div>
+        </div>
+        <div id="prog-intermediate" class="programs-panel">
+          <div class="prog-card reveal"><div class="prog-card-top"><div class="prog-card-name">Court Coverage</div><div class="prog-card-time">15 min</div></div><div class="prog-card-desc">Continuous 6-point ghosting at natural match pace. Maximum floor coverage.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Natural</span><span class="prog-tag">Full Court</span></div></div>
+          <div class="prog-card reveal d1"><div class="prog-card-top"><div class="prog-card-name">Drop &amp; Drive</div><div class="prog-card-time">12 min</div></div><div class="prog-card-desc">Shot training: drops from front court, drives from back. Covers all 6 positions.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Natural</span><span class="prog-tag">Shots</span></div></div>
+          <div class="prog-card reveal d2"><div class="prog-card-top"><div class="prog-card-name">Cross Court Pattern</div><div class="prog-card-time">12 min</div></div><div class="prog-card-desc">PSA figure-of-eight sequence across all 6 positions. Build width and consistency.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Natural</span><span class="prog-tag">Pattern</span></div></div>
+          <div class="prog-card reveal d3"><div class="prog-card-top"><div class="prog-card-name">Front Court Focus</div><div class="prog-card-time">10 min</div></div><div class="prog-card-desc">FL, FR and front volley positions. Fast feet, low body, short game pressure.</div><div class="prog-card-tags"><span class="prog-tag">10pt</span><span class="prog-tag">Natural</span><span class="prog-tag">Front Zone</span></div></div>
+          <div class="prog-card reveal d4"><div class="prog-card-top"><div class="prog-card-name">Back Court Power</div><div class="prog-card-time">10 min</div></div><div class="prog-card-desc">BL, BR and back diagonal positions. Build leg drive and straight-drive length.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Natural</span><span class="prog-tag">Back Zone</span></div></div>
+        </div>
+        <div id="prog-advanced" class="programs-panel">
+          <div class="prog-card reveal"><div class="prog-card-top"><div class="prog-card-name">Ghost Master</div><div class="prog-card-time">20 min</div></div><div class="prog-card-desc">10-point court at explosive tempo. Maximum court coverage and conditioning.</div><div class="prog-card-tags"><span class="prog-tag">10pt</span><span class="prog-tag">Explosive</span><span class="prog-tag">Movement</span></div></div>
+          <div class="prog-card reveal d1"><div class="prog-card-top"><div class="prog-card-name">Full Court Shot Drill</div><div class="prog-card-time">15 min</div></div><div class="prog-card-desc">All 6 positions with full shot library. Move, read the call, and execute simultaneously.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Natural</span><span class="prog-tag">Shots</span></div></div>
+          <div class="prog-card reveal d2"><div class="prog-card-top"><div class="prog-card-name">PSA Speed</div><div class="prog-card-time">15 min</div></div><div class="prog-card-desc">6-point at professional explosive tempo. Race the clock. Train at match speed.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Explosive</span><span class="prog-tag">Movement</span></div></div>
+          <div class="prog-card reveal d3"><div class="prog-card-top"><div class="prog-card-name">Boast &amp; Length</div><div class="prog-card-time">12 min</div></div><div class="prog-card-desc">Back court and mid positions. Trains the defensive boast and straight drive combination.</div><div class="prog-card-tags"><span class="prog-tag">10pt</span><span class="prog-tag">Natural</span><span class="prog-tag">Shots</span></div></div>
+        </div>
+        <div id="prog-elite" class="programs-panel">
+          <div class="prog-card reveal"><div class="prog-card-top"><div class="prog-card-name">Match Simulation</div><div class="prog-card-time">20 min</div></div><div class="prog-card-desc">Rally-like 10-point sequences. Real match pressure and unpredictability.</div><div class="prog-card-tags"><span class="prog-tag">10pt</span><span class="prog-tag">Natural</span><span class="prog-tag">Match Sim</span></div></div>
+          <div class="prog-card reveal d1"><div class="prog-card-top"><div class="prog-card-name">No Rest</div><div class="prog-card-time">5 min</div></div><div class="prog-card-desc">5 minutes continuous ghosting with zero rest intervals. Pure sustained endurance.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Natural</span><span class="prog-tag">Endurance</span></div></div>
+          <div class="prog-card reveal d2"><div class="prog-card-top"><div class="prog-card-name">Tactical Shotmaking</div><div class="prog-card-time">20 min</div></div><div class="prog-card-desc">10-point court with full shot library at elite explosive pace. Every position, every shot.</div><div class="prog-card-tags"><span class="prog-tag">10pt</span><span class="prog-tag">Explosive</span><span class="prog-tag">Shots</span></div></div>
+          <div class="prog-card reveal d3"><div class="prog-card-top"><div class="prog-card-name">Forehand Domination</div><div class="prog-card-time">15 min</div></div><div class="prog-card-desc">Dominant-hand side positions only at elite explosive pace. Turn your strength into a weapon.</div><div class="prog-card-tags"><span class="prog-tag">10pt</span><span class="prog-tag">Explosive</span><span class="prog-tag">Movement</span></div></div>
+          <div class="prog-card reveal d4"><div class="prog-card-top"><div class="prog-card-name">Backhand Precision</div><div class="prog-card-time">15 min</div></div><div class="prog-card-desc">Off-hand side positions only. Systematically eliminate the weakness every opponent attacks.</div><div class="prog-card-tags"><span class="prog-tag">10pt</span><span class="prog-tag">Explosive</span><span class="prog-tag">Movement</span></div></div>
+        </div>
+        <div id="prog-pro" class="programs-panel">
+          <div class="prog-card reveal"><div class="prog-card-top"><div class="prog-card-name">Full Court Blitz</div><div class="prog-card-time">25 min</div></div><div class="prog-card-desc">10-point court at maximum explosive pace. Every corner, zero rest between reps.</div><div class="prog-card-tags"><span class="prog-tag">10pt</span><span class="prog-tag">Explosive</span><span class="prog-tag">Movement</span></div></div>
+          <div class="prog-card reveal d1"><div class="prog-card-top"><div class="prog-card-name">PSA Match Sim</div><div class="prog-card-time">25 min</div></div><div class="prog-card-desc">Rally-length sequences on a 10-point court simulating elite match conditions.</div><div class="prog-card-tags"><span class="prog-tag">10pt</span><span class="prog-tag">Natural</span><span class="prog-tag">Match Sim</span></div></div>
+          <div class="prog-card reveal d2"><div class="prog-card-top"><div class="prog-card-name">Precision &amp; Power</div><div class="prog-card-time">20 min</div></div><div class="prog-card-desc">Explosive shot training across all 10 positions. Think fast, move faster.</div><div class="prog-card-tags"><span class="prog-tag">10pt</span><span class="prog-tag">Explosive</span><span class="prog-tag">Shots</span></div></div>
+          <div class="prog-card reveal d3"><div class="prog-card-top"><div class="prog-card-name">Maximum Intensity</div><div class="prog-card-time">30 min</div></div><div class="prog-card-desc">30 minutes continuous at explosive pace. No mercy — pure sustained output.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Explosive</span><span class="prog-tag">Movement</span></div></div>
+          <div class="prog-card reveal d4"><div class="prog-card-top"><div class="prog-card-name">Total Court Mastery</div><div class="prog-card-time">30 min</div></div><div class="prog-card-desc">Full 10-point court with complete shot library. The ultimate test of movement and execution.</div><div class="prog-card-tags"><span class="prog-tag">10pt</span><span class="prog-tag">Explosive</span><span class="prog-tag">Shots</span></div></div>
+        </div>
+      </div>
+      <div class="prog-phone-col">
+        <div style="background:var(--bg3);border-radius:32px;border:1px solid var(--borderacc);overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.5),0 0 0 1px rgba(255,107,53,.15)">
+          <img id="prog-phone-img" src="program-beginner.jpeg" alt="Training programs in the app" style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'">
+        </div>
+        <p style="text-align:center;margin-top:.75rem;font-size:.72rem;color:var(--gray2);letter-spacing:.03em">Real screenshot from the app</p>
+      </div>
     </div>
-    <div class="programs-level-tabs reveal">
-      <button class="prog-tab active" data-level="beginner" onclick="switchPrograms('beginner',this)">Beginner</button>
-      <button class="prog-tab" data-level="intermediate" onclick="switchPrograms('intermediate',this)">Intermediate</button>
-      <button class="prog-tab" data-level="advanced" onclick="switchPrograms('advanced',this)">Advanced</button>
-      <button class="prog-tab" data-level="elite" onclick="switchPrograms('elite',this)">Elite</button>
-      <button class="prog-tab" data-level="pro" onclick="switchPrograms('pro',this)">Pro</button>
-      <button class="prog-tab" data-level="custom" onclick="switchPrograms('custom',this)">Custom</button>
-    </div>
-    <div id="prog-beginner" class="programs-panel active">
-      <div class="prog-card reveal"><div class="prog-card-top"><div class="prog-card-name">Warm Up</div><div class="prog-card-time">5 min</div></div><div class="prog-card-desc">Easy 5-min movement to prepare your body and mind.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Slow</span><span class="prog-tag">Movement</span></div></div>
-      <div class="prog-card reveal d1"><div class="prog-card-top"><div class="prog-card-name">First Steps</div><div class="prog-card-time">8 min</div></div><div class="prog-card-desc">4-corner drill at a forgiving pace. Learn the court.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Slow</span><span class="prog-tag">Front Focus</span></div></div>
-      <div class="prog-card reveal d2"><div class="prog-card-top"><div class="prog-card-name">Finding the T</div><div class="prog-card-time">10 min</div></div><div class="prog-card-desc">All 6 positions. Focus on T recovery every rep.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Random</span><span class="prog-tag">T Recovery</span></div></div>
-      <div class="prog-card reveal d3"><div class="prog-card-top"><div class="prog-card-name">Steady Pace</div><div class="prog-card-time">12 min</div></div><div class="prog-card-desc">6-point random ghosting at a comfortable natural tempo.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Natural</span><span class="prog-tag">Full Court</span></div></div>
-      <div class="prog-card reveal d4"><div class="prog-card-top"><div class="prog-card-name">Cool Down</div><div class="prog-card-time">5 min</div></div><div class="prog-card-desc">Slow-paced movement to recover after hard training.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Slow</span><span class="prog-tag">Recovery</span></div></div>
-    </div>
-    <div id="prog-intermediate" class="programs-panel">
-      <div class="prog-card reveal"><div class="prog-card-top"><div class="prog-card-name">Court Coverage</div><div class="prog-card-time">15 min</div></div><div class="prog-card-desc">Continuous 6-point ghosting at match pace.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Natural</span><span class="prog-tag">Full Court</span></div></div>
-      <div class="prog-card reveal d1"><div class="prog-card-top"><div class="prog-card-name">Drop &amp; Drive</div><div class="prog-card-time">12 min</div></div><div class="prog-card-desc">Shot-based: drops from front, drives from back.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Shot-Based</span><span class="prog-tag">Tactics</span></div></div>
-      <div class="prog-card reveal d2"><div class="prog-card-top"><div class="prog-card-name">Cross Court Pattern</div><div class="prog-card-time">12 min</div></div><div class="prog-card-desc">FL→BR→FR→BL diagonal pattern to build width.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Fixed</span><span class="prog-tag">Diagonal</span></div></div>
-      <div class="prog-card reveal d3"><div class="prog-card-top"><div class="prog-card-name">Front Court Focus</div><div class="prog-card-time">10 min</div></div><div class="prog-card-desc">Front and mid positions only. Fast feet, low body.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Front Zone</span><span class="prog-tag">Random</span></div></div>
-      <div class="prog-card reveal d4"><div class="prog-card-top"><div class="prog-card-name">Back Court Power</div><div class="prog-card-time">10 min</div></div><div class="prog-card-desc">Back and mid positions. Build leg strength and drive length.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Back Zone</span><span class="prog-tag">Strength</span></div></div>
-    </div>
-    <div id="prog-advanced" class="programs-panel">
-      <div class="prog-card reveal"><div class="prog-card-top"><div class="prog-card-name">Ghost Master</div><div class="prog-card-time">20 min</div></div><div class="prog-card-desc">10-point court, explosive tempo. Maximum court coverage.</div><div class="prog-card-tags"><span class="prog-tag">10pt</span><span class="prog-tag">Explosive</span><span class="prog-tag">Full Court</span></div></div>
-      <div class="prog-card reveal d1"><div class="prog-card-top"><div class="prog-card-name">Full Court Shot Drill</div><div class="prog-card-time">15 min</div></div><div class="prog-card-desc">All positions, full shot library. Think and move.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Shot-Based</span><span class="prog-tag">Natural</span></div></div>
-      <div class="prog-card reveal d2"><div class="prog-card-top"><div class="prog-card-name">PSA Speed</div><div class="prog-card-time">15 min</div></div><div class="prog-card-desc">6-point at pro tempo. Race the clock.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Explosive</span><span class="prog-tag">Elite Pace</span></div></div>
-    </div>
-    <div id="prog-elite" class="programs-panel">
-      <div class="prog-card reveal"><div class="prog-card-top"><div class="prog-card-name">Match Simulation</div><div class="prog-card-time">20 min</div></div><div class="prog-card-desc">Rally-like 10-point sequences. Pressure and unpredictability.</div><div class="prog-card-tags"><span class="prog-tag">10pt</span><span class="prog-tag">Match Sim</span><span class="prog-tag">Natural</span></div></div>
-      <div class="prog-card reveal d1"><div class="prog-card-top"><div class="prog-card-name">No Rest</div><div class="prog-card-time">5 min</div></div><div class="prog-card-desc">5 minutes continuous. No rest. Pure endurance.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">No Rest</span><span class="prog-tag">Endurance</span></div></div>
-    </div>
-    <div id="prog-pro" class="programs-panel">
-      <div class="prog-card reveal"><div class="prog-card-top"><div class="prog-card-name">Full Court Blitz</div><div class="prog-card-time">25 min</div></div><div class="prog-card-desc">10-point court at maximum explosive pace. Every corner, zero rest.</div><div class="prog-card-tags"><span class="prog-tag">10pt</span><span class="prog-tag">Explosive</span><span class="prog-tag">Endurance</span></div></div>
-      <div class="prog-card reveal d1"><div class="prog-card-top"><div class="prog-card-name">PSA Match Sim</div><div class="prog-card-time">25 min</div></div><div class="prog-card-desc">Rally-length sequences simulating pro match conditions.</div><div class="prog-card-tags"><span class="prog-tag">10pt</span><span class="prog-tag">Match Sim</span><span class="prog-tag">Tactical</span></div></div>
-      <div class="prog-card reveal d2"><div class="prog-card-top"><div class="prog-card-name">Precision &amp; Power</div><div class="prog-card-time">20 min</div></div><div class="prog-card-desc">Explosive shot-based drill across all 10 positions.</div><div class="prog-card-tags"><span class="prog-tag">10pt</span><span class="prog-tag">Shot-Based</span><span class="prog-tag">Explosive</span></div></div>
-      <div class="prog-card reveal d3"><div class="prog-card-top"><div class="prog-card-name">Maximum Intensity</div><div class="prog-card-time">30 min</div></div><div class="prog-card-desc">30 minutes continuous at explosive pace. No mercy.</div><div class="prog-card-tags"><span class="prog-tag">6pt</span><span class="prog-tag">Explosive</span><span class="prog-tag">No Rest</span></div></div>
-      <div class="prog-card reveal d4"><div class="prog-card-top"><div class="prog-card-name">Total Court Mastery</div><div class="prog-card-time">30 min</div></div><div class="prog-card-desc">Full 10-point court with complete shot library. The ultimate test.</div><div class="prog-card-tags"><span class="prog-tag">10pt</span><span class="prog-tag">Shot-Based</span><span class="prog-tag">Explosive</span></div></div>
-    </div>
-    <div id="prog-custom" class="programs-panel">
-      <div class="prog-card reveal" style="grid-column:1/-1;text-align:center;padding:2.5rem">
-        <div style="font-size:3rem;margin-bottom:1rem">🔧</div>
-        <div class="prog-card-name" style="font-size:1.4rem;margin-bottom:.75rem">Custom Session Builder</div>
-        <p style="color:var(--gray1);font-size:.9rem;line-height:1.7;max-width:500px;margin:0 auto 1.5rem">Build your own session from scratch. Choose court system, drill type, coverage mode, pattern type, tempo, duration, rest intervals, shot groups, and voice settings — everything configurable.</p>
-        <a href="#cta" class="btn-primary" style="display:inline-flex">⬇ Download to Build</a>
+  </div>
+</section>
+
+<!-- CUSTOM SESSION BUILDER -->
+<section id="custom-builder">
+  <div class="container">
+    <div class="custom-builder-layout" style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center">
+      <div>
+        <div class="section-label reveal">Custom Session Builder</div>
+        <h2 class="section-title reveal d1">Every Rep,<br><em>Exactly How You Want It.</em></h2>
+        <p class="section-sub reveal d2" style="text-align:left">Build your own session from scratch. Configure every parameter — court system, training type, coverage zone, difficulty, tempo, duration, rest intervals, shot groups, and voice settings.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.85rem;margin-top:2rem">
+          <div class="reveal d2" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:1rem;display:flex;gap:.75rem;align-items:flex-start"><span style="font-size:1.1rem">🎯</span><div><div style="font-size:.82rem;font-weight:700;color:var(--white);margin-bottom:.2rem">Training Type</div><div style="font-size:.73rem;color:var(--gray1)">Movement Only, Shot Training, or Match Simulation</div></div></div>
+          <div class="reveal d2" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:1rem;display:flex;gap:.75rem;align-items:flex-start"><span style="font-size:1.1rem">📐</span><div><div style="font-size:.82rem;font-weight:700;color:var(--white);margin-bottom:.2rem">Court System</div><div style="font-size:.73rem;color:var(--gray1)">6-Point classic or 10-Point advanced layout</div></div></div>
+          <div class="reveal d3" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:1rem;display:flex;gap:.75rem;align-items:flex-start"><span style="font-size:1.1rem">⚡</span><div><div style="font-size:.82rem;font-weight:700;color:var(--white);margin-bottom:.2rem">Difficulty &amp; Tempo</div><div style="font-size:.73rem;color:var(--gray1)">Beginner through Pro — Slow, Natural or Explosive</div></div></div>
+          <div class="reveal d3" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:1rem;display:flex;gap:.75rem;align-items:flex-start"><span style="font-size:1.1rem">🗺️</span><div><div style="font-size:.82rem;font-weight:700;color:var(--white);margin-bottom:.2rem">Court Coverage</div><div style="font-size:.73rem;color:var(--gray1)">Full Court, Front, Back, Forehand or Backhand</div></div></div>
+          <div class="reveal d4" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:1rem;display:flex;gap:.75rem;align-items:flex-start"><span style="font-size:1.1rem">⏱️</span><div><div style="font-size:.82rem;font-weight:700;color:var(--white);margin-bottom:.2rem">Duration &amp; Rest</div><div style="font-size:.73rem;color:var(--gray1)">5–45 min sessions · Auto, Manual or No Rest</div></div></div>
+          <div class="reveal d4" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:1rem;display:flex;gap:.75rem;align-items:flex-start"><span style="font-size:1.1rem">🎙️</span><div><div style="font-size:.82rem;font-weight:700;color:var(--white);margin-bottom:.2rem">Voice &amp; Shot Groups</div><div style="font-size:.73rem;color:var(--gray1)">Voice+Visual, Voice Only, Visual Only, or Silent</div></div></div>
+        </div>
+      </div>
+      <div class="reveal d2">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+          <div style="background:var(--bg3);border-radius:24px;border:1px solid var(--border);overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.4)"><img src="screen-setup-coverage.jpeg" alt="Court coverage selection" style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'"></div>
+          <div style="background:var(--bg3);border-radius:24px;border:1px solid var(--border);overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.4)"><img src="screen-setup-drill-type.jpeg" alt="Training type selection" style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'"></div>
+          <div style="background:var(--bg3);border-radius:24px;border:1px solid var(--border);overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.4)"><img src="screen-setup-difficulty.jpeg" alt="Difficulty selection" style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'"></div>
+          <div style="background:var(--bg3);border-radius:24px;border:1px solid var(--border);overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.4)"><img src="screen-setup-session.jpeg" alt="Session duration and tempo" style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'"></div>
+        </div>
+        <p style="text-align:center;margin-top:.85rem;font-size:.72rem;color:var(--gray2);letter-spacing:.03em">Real setup screens — 6-step flow in the app</p>
       </div>
     </div>
   </div>
@@ -1379,7 +1381,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       <!-- Step 1: Training Type -->
       <div class="reveal">
         <div class="config-phone">
-          <img src="App_Drill_Type_Screen.jpeg" alt="Training type selection — Shot-Based, Match Simulation, Movement Only, Custom Drill"
+          <img src="screen-setup-drill-type.jpeg" alt="Training type selection — Movement Only, Shot Training or Match Simulation"
                style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'">
         </div>
         <div class="config-phone-label">Step 1 — Training Type</div>
@@ -1389,7 +1391,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       <!-- Step 2: Court Coverage -->
       <div class="reveal d1">
         <div class="config-phone">
-          <img src="App_Court_Zone_Screen.jpeg" alt="Court coverage selection — Full Court, Front Court, Back Court, Forehand, Backhand"
+          <img src="screen-setup-coverage.jpeg" alt="Court coverage selection — Full Court, Front Court, Back Court, Forehand, Backhand"
                style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'">
         </div>
         <div class="config-phone-label">Step 2 — Court Coverage</div>
@@ -1399,11 +1401,11 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       <!-- Step 3: Position Sequence -->
       <div class="reveal d2">
         <div class="config-phone">
-          <img src="App_Squence_Screen.jpeg" alt="Position sequence — Random or Fixed"
+          <img src="screen-setup-court-layout.jpeg" alt="Court layout — 6-Point or 10-Point system selection"
                style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'">
         </div>
-        <div class="config-phone-label">Step 3 — Position Sequence</div>
-        <div class="config-phone-sub">Random unpredictability or Fixed pattern grooves</div>
+        <div class="config-phone-label">Step 3 — Court Layout</div>
+        <div class="config-phone-sub">6-Point classic or 10-Point advanced system</div>
       </div>
 
     </div>
@@ -1421,7 +1423,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
     <div class="config-grid">
       <div class="reveal">
         <div class="config-phone">
-          <img src="App_Setup_Session_Screen.jpeg" alt="Session setup step 6 — duration, tempo, rest interval, voice mode, START SESSION"
+          <img src="screen-setup-session.jpeg" alt="Session setup step 6 — duration, tempo, rest interval, voice mode, START SESSION"
                style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'">
         </div>
         <div class="config-phone-label">Session Setup</div>
@@ -1429,7 +1431,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       </div>
       <div class="reveal d1">
         <div class="config-phone">
-          <img src="App_Audio_Screen.jpeg" alt="Audio settings — voice instructions, speech rate, coaching cues, haptic feedback, test voice"
+          <img src="screen-settings-audio.jpeg" alt="Audio settings — voice instructions, speech rate, coaching cues, haptic feedback, test voice"
                style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'">
         </div>
         <div class="config-phone-label">Audio Control</div>
@@ -1437,7 +1439,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       </div>
       <div class="reveal d2">
         <div class="config-phone">
-          <img src="App_Session_Settings_Screen.jpeg" alt="Default session settings — court system, court style, difficulty, tempo, movement pace"
+          <img src="screen-setup-difficulty.jpeg" alt="Difficulty selection — Beginner, Intermediate, Advanced, Elite or Pro"
                style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'">
         </div>
         <div class="config-phone-label">Default Settings</div>
@@ -1458,7 +1460,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
     <div class="config-grid">
       <div class="reveal">
         <div class="config-phone">
-          <img src="App_Welcome_Screen.jpeg" alt="Welcome screen — Train Hard. Play Fearless. Create Account or Sign In"
+          <img src="screen-welcome.jpeg" alt="Welcome screen — Train Hard. Play Fearless. Create Account or Sign In"
                style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'">
         </div>
         <div class="config-phone-label">Get Started Free</div>
@@ -1466,7 +1468,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       </div>
       <div class="reveal d1">
         <div class="config-phone">
-          <img src="App_Session_Stats_Screen.jpeg" alt="Session ended — duration, movements, reaction time, consistency, calories, streak"
+          <img src="screen-session-ended.jpeg" alt="Session ended — duration, movements, reaction time, consistency, calories, streak"
                style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'">
         </div>
         <div class="config-phone-label">Session Complete</div>
@@ -1474,7 +1476,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       </div>
       <div class="reveal d2">
         <div class="config-phone">
-          <img src="App_Session_Stats_Screen%20%282%29.jpeg" alt="Personal bests and recent sessions — completion, intensity, reps by court system"
+          <img src="screen-progress-sessions.jpeg" alt="SquashGhostingX progress — court balance, achievements and recent sessions"
                style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'">
         </div>
         <div class="config-phone-label">Personal Bests</div>
@@ -1613,51 +1615,6 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
           <div>
             <div class="coach-name">Richard C.</div>
             <div class="coach-role">Head Coach · County Squash Academy</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- TESTIMONIALS -->
-<section id="testimonials">
-  <div class="container">
-    <div class="section-head text-center">
-      <div class="section-label reveal">Players Love It</div>
-      <h2 class="section-title reveal d1">Real Results from <em>Real Players</em></h2>
-    </div>
-    <div class="testi-grid">
-      <div class="testi-card reveal">
-        <div class="testi-stars">★★★★★</div>
-        <div class="testi-quote">"The AI voice coaching is a game-changer. I can do a full ghosting session without looking at my phone once. My court coverage has improved dramatically in just two months."</div>
-        <div class="testi-author">
-          <div class="testi-avatar">MK</div>
-          <div>
-            <div class="testi-name">Marcus K.</div>
-            <div class="testi-handle">County player · UK</div>
-          </div>
-        </div>
-      </div>
-      <div class="testi-card reveal d1">
-        <div class="testi-stars">★★★★★</div>
-        <div class="testi-quote">"I use this with all my junior squad. They actually do the ghosting homework I set because the app makes it structured and trackable. The progress data at our next lesson is always revealing."</div>
-        <div class="testi-author">
-          <div class="testi-avatar">AT</div>
-          <div>
-            <div class="testi-name">Ahmed T.</div>
-            <div class="testi-handle">Head Coach · Dubai Squash Club</div>
-          </div>
-        </div>
-      </div>
-      <div class="testi-card reveal d2">
-        <div class="testi-stars">★★★★★</div>
-        <div class="testi-quote">"The 10-point system is brutal in the best possible way. My back corner movement was terrible — the zone balance data showed it immediately and now I focus every other session on it."</div>
-        <div class="testi-author">
-          <div class="testi-avatar">PW</div>
-          <div>
-            <div class="testi-name">Priya W.</div>
-            <div class="testi-handle">Club champion · Singapore</div>
           </div>
         </div>
       </div>
@@ -2215,7 +2172,9 @@ function switchPrograms(level, btn) {
   document.querySelectorAll('.prog-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('prog-' + level).classList.add('active');
   btn.classList.add('active');
-  // Re-trigger reveal animations for new panel
+  var imgs = {beginner:'program-beginner.jpeg',intermediate:'program-intermediate.jpeg',advanced:'screen-programs.jpeg',elite:'program-elite.jpeg',pro:'program-pro.jpeg'};
+  var ph = document.getElementById('prog-phone-img');
+  if (ph && imgs[level]) ph.src = imgs[level];
   document.querySelectorAll('#prog-' + level + ' .reveal').forEach(el => {
     el.classList.remove('visible');
     setTimeout(() => el.classList.add('visible'), 50);
