@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   Modal, View, Text, StyleSheet, TouchableOpacity, TextInput,
   ScrollView, KeyboardAvoidingView, Platform, Animated, Alert,
-  ActivityIndicator, Linking, FlatList, useWindowDimensions,
+  ActivityIndicator, Linking, FlatList, useWindowDimensions, Keyboard,
 } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import * as SecureStore from 'expo-secure-store';
@@ -13,6 +13,7 @@ import { Colors } from '../../constants/colors';
 import { FontSize, FontWeight, Spacing, BorderRadius } from '../../constants/layout';
 import { useProfileStore } from '../../stores/profileStore';
 import { LANGUAGE_OPTIONS } from '../../constants/languages';
+import TermsConsentModal from '../TermsConsentModal';
 
 // ─── Welcome slides ───────────────────────────────────────────────────────────
 
@@ -205,7 +206,10 @@ function WelcomePage({
         <View style={wStyles.brandIcon}>
           <Ionicons name="body" size={20} color={Colors.brand} />
         </View>
-        <Text style={wStyles.brandName}>SquashGhostingX</Text>
+        <Text style={wStyles.brandName}>
+          {'Squash '}
+          <Text style={wStyles.brandNameAccent}>GhostingX</Text>
+        </Text>
       </View>
 
       {/* Tagline */}
@@ -311,19 +315,23 @@ const wStyles = StyleSheet.create({
     flex: 1,
     flexShrink: 1,
   },
+  brandNameAccent: {
+    color: Colors.brand,
+  },
 
   // Tagline
   tagline: {
-    fontSize: FontSize.caption,
+    fontSize: 16,
     fontWeight: FontWeight.semiBold,
-    color: Colors.textMuted,
-    letterSpacing: 0.3,
+    color: 'rgba(255,255,255,0.80)',
+    letterSpacing: 0.4,
     textAlign: 'center',
+    lineHeight: 24,
     marginBottom: Spacing.md,
   },
   taglineGreen:  { color: '#34C759', fontWeight: FontWeight.bold },
   taglineOrange: { color: Colors.brand, fontWeight: FontWeight.bold },
-  taglineSep:    { color: 'rgba(255,255,255,0.35)', fontWeight: FontWeight.regular },
+  taglineSep:    { color: 'rgba(255,255,255,0.40)', fontWeight: FontWeight.regular },
 
   // FlatList — fills remaining vertical space; escape container's horizontal padding via negative margin
   flatList: {
@@ -1014,22 +1022,41 @@ const aStyles = StyleSheet.create({
 export default function AuthModal() {
   const { profile, hasCompletedAuth, hasAcceptedTerms, isOnboardingComplete, completeAuth, completeOnboarding, setProfile } = useProfileStore();
 
-  const [page, setPage] = useState<'welcome' | 'register' | 'login' | 'guest-name' | 'guest-prefs'>('welcome');
+  const [page, setPage] = useState<'welcome' | 'register' | 'login' | 'guest-name' | 'guest-prefs' | 'terms'>('welcome');
+  // Stores the email for the email-auth path so the terms page can complete auth after acceptance.
+  const pendingEmailRef = useRef<string | undefined>(undefined);
 
-  // Reset to welcome whenever auth is cleared (sign-out, delete account) so the
-  // user never lands on a stale mid-flow page (e.g. 'guest-prefs') after signing out.
+  // Reset to welcome whenever auth is cleared (sign-out or delete account).
   useEffect(() => {
     if (!hasCompletedAuth) setPage('welcome');
   }, [hasCompletedAuth]);
 
-  // Terms must be accepted before auth screen can show.
-  if (!hasAcceptedTerms) return null;
+  // Once T&C is accepted on the terms page, complete auth automatically.
+  useEffect(() => {
+    if (page === 'terms' && hasAcceptedTerms && !hasCompletedAuth) {
+      const email = pendingEmailRef.current;
+      pendingEmailRef.current = undefined;
+      completeAuth(email);
+      if (!email) completeOnboarding(); // guest path only
+    }
+  }, [page, hasAcceptedTerms, hasCompletedAuth]);
+
+  // Already logged in — nothing to show.
   if (hasCompletedAuth) return null;
+  // Terms page: show T&C as the final step before entering the app.
+  // Returned outside the main Modal so it renders as its own full-screen overlay.
+  if (page === 'terms') return <TermsConsentModal />;
+
+  function goToTerms(email?: string) {
+    pendingEmailRef.current = email;
+    setPage('terms');
+  }
 
   function handleAuthComplete(email?: string) {
     if (!email) {
-      // Returning guest — already has a name from a previous session, skip name entry
+      // Returning guest (has name + completed onboarding) — show T&C if not accepted, else complete.
       if (profile.name.trim() && isOnboardingComplete) {
+        if (!hasAcceptedTerms) { goToTerms(); return; }
         completeAuth(undefined);
         return;
       }
@@ -1039,6 +1066,8 @@ export default function AuthModal() {
     if (!profile.name) {
       setProfile({ name: email.split('@')[0] });
     }
+    // Email auth: show T&C if not yet accepted (first account or after deletion).
+    if (!hasAcceptedTerms) { goToTerms(email); return; }
     completeAuth(email);
   }
 
@@ -1059,6 +1088,8 @@ export default function AuthModal() {
       voiceGender: voiceGender as any,
       language: language as any,
     });
+    // Show T&C as the final step before completing guest setup.
+    if (!hasAcceptedTerms) { goToTerms(); return; }
     completeAuth(undefined);
     completeOnboarding();
   }
@@ -1127,9 +1158,9 @@ const DOB_YEARS = Array.from({ length: _cy - 1919 }, (_, i) => {
   return { label: y, value: y };
 });
 
-// ─── Combined DOB picker — single modal with three scrollable columns ────────
+// ─── DOB picker: three inline chips → single shared bottom sheet ─────────────
 
-const DOB_ITEM_H = 46;
+const DOB_SHEET_ITEM_H = 50;
 
 function DobPickerCombined({
   dobMonth, dobDay, dobYear, onConfirm,
@@ -1137,110 +1168,114 @@ function DobPickerCombined({
   dobMonth: string; dobDay: string; dobYear: string;
   onConfirm: (month: string, day: string, year: string) => void;
 }) {
-  const [open,     setOpen]     = useState(false);
-  const [selMonth, setSelMonth] = useState(dobMonth);
-  const [selDay,   setSelDay]   = useState(dobDay);
-  const [selYear,  setSelYear]  = useState(dobYear);
+  const [openField, setOpenField] = useState<'month' | 'day' | 'year' | null>(null);
+  const listRef = useRef<FlatList>(null);
 
-  const monthListRef = useRef<FlatList>(null);
-  const dayListRef   = useRef<FlatList>(null);
-  const yearListRef  = useRef<FlatList>(null);
+  function openSheet(field: 'month' | 'day' | 'year') {
+    Keyboard.dismiss();
+    setOpenField(field);
+  }
+
+  function select(value: string) {
+    if (!openField) return;
+    const m = openField === 'month' ? value : dobMonth;
+    const d = openField === 'day'   ? value : dobDay;
+    const y = openField === 'year'  ? value : dobYear;
+    onConfirm(m, d, y);
+    setOpenField(null);
+  }
+
+  const sheetData  = openField === 'month' ? DOB_MONTHS : openField === 'day' ? DOB_DAYS : openField === 'year' ? DOB_YEARS : [];
+  const sheetValue = openField === 'month' ? dobMonth   : openField === 'day' ? dobDay   : dobYear;
+  const sheetTitle = openField === 'month' ? 'Month'    : openField === 'day' ? 'Day'    : 'Year';
+
+  const selIdx = sheetData.findIndex(i => i.value === sheetValue);
 
   useEffect(() => {
-    if (!open) return;
+    if (openField === null) return;
     const t = setTimeout(() => {
-      const mIdx = DOB_MONTHS.findIndex(m => m.value === selMonth);
-      const dIdx = DOB_DAYS.findIndex(d => d.value === selDay);
-      const yIdx = DOB_YEARS.findIndex(y => y.value === selYear);
-      if (mIdx > 0) monthListRef.current?.scrollToIndex({ index: mIdx, animated: false });
-      if (dIdx > 0) dayListRef.current?.scrollToIndex({ index: dIdx, animated: false });
-      if (yIdx > 0) yearListRef.current?.scrollToIndex({ index: yIdx, animated: false });
-    }, 80);
+      if (selIdx > 2) listRef.current?.scrollToIndex({ index: selIdx, animated: false, viewPosition: 0.4 });
+    }, 60);
     return () => clearTimeout(t);
-  }, [open]);
+  }, [openField]);
 
-  function openPicker() {
-    setSelMonth(dobMonth);
-    setSelDay(dobDay);
-    setSelYear(dobYear);
-    setOpen(true);
-  }
-
-  const displayDate = dobMonth && dobDay && dobYear
-    ? `${DOB_MONTHS.find(m => m.value === dobMonth)?.label} ${parseInt(dobDay, 10)}, ${dobYear}`
-    : null;
-
-  function renderCol(
-    data: { label: string; value: string }[],
-    selected: string,
-    onSelect: (v: string) => void,
-    listRef: React.RefObject<FlatList>,
-    flex: number,
-  ) {
-    return (
-      <FlatList
-        ref={listRef}
-        data={data}
-        keyExtractor={item => item.value}
-        style={{ flex }}
-        showsVerticalScrollIndicator={false}
-        getItemLayout={(_, index) => ({ length: DOB_ITEM_H, offset: DOB_ITEM_H * index, index })}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={[dobStyles.colItem, item.value === selected && dobStyles.colItemSel]}
-            onPress={() => onSelect(item.value)}
-            activeOpacity={0.6}
-          >
-            <Text style={[dobStyles.colItemText, item.value === selected && dobStyles.colItemTextSel]} numberOfLines={1}>
-              {item.label}
-            </Text>
-          </TouchableOpacity>
-        )}
-      />
-    );
-  }
+  const monthLabel = dobMonth ? (DOB_MONTHS.find(m => m.value === dobMonth)?.label ?? '') : '';
+  const dayLabel   = dobDay   ? String(parseInt(dobDay, 10))                              : '';
+  const yearLabel  = dobYear  ?? '';
 
   return (
     <>
-      <TouchableOpacity style={gnStyles.dobTrigger} onPress={openPicker} activeOpacity={0.8}>
-        <Ionicons name="calendar-outline" size={16} color={Colors.textMuted} />
-        <Text style={displayDate ? gnStyles.dobTriggerValue : gnStyles.dobTriggerPlaceholder} numberOfLines={1}>
-          {displayDate ?? 'Select date of birth'}
-        </Text>
-        <Ionicons name="chevron-down" size={13} color={Colors.textMuted} />
-      </TouchableOpacity>
+      {/* Three chips in one row */}
+      <View style={dobStyles.row}>
+        <TouchableOpacity
+          style={[dobStyles.chip, dobStyles.chipWide, dobMonth && dobStyles.chipFilled]}
+          onPress={() => openSheet('month')}
+          activeOpacity={0.75}
+        >
+          <Text style={dobMonth ? dobStyles.chipValue : dobStyles.chipPlaceholder} numberOfLines={1}>
+            {monthLabel || 'Month'}
+          </Text>
+          <Ionicons name="chevron-down" size={13} color={Colors.textMuted} />
+        </TouchableOpacity>
 
-      <Modal visible={open} transparent animationType="fade" statusBarTranslucent>
-        <TouchableOpacity style={gnStyles.pickerOverlay} onPress={() => setOpen(false)} activeOpacity={1}>
-          <View style={gnStyles.pickerSheet} onStartShouldSetResponder={() => true}>
-            <View style={gnStyles.pickerHeader}>
-              <Text style={gnStyles.pickerHeaderText}>Date of Birth</Text>
-              <TouchableOpacity onPress={() => setOpen(false)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                <Ionicons name="close" size={20} color={Colors.textSecondary} />
-              </TouchableOpacity>
-            </View>
+        <TouchableOpacity
+          style={[dobStyles.chip, dobStyles.chipNarrow, dobDay && dobStyles.chipFilled]}
+          onPress={() => openSheet('day')}
+          activeOpacity={0.75}
+        >
+          <Text style={dobDay ? dobStyles.chipValue : dobStyles.chipPlaceholder}>
+            {dayLabel || 'Day'}
+          </Text>
+          <Ionicons name="chevron-down" size={13} color={Colors.textMuted} />
+        </TouchableOpacity>
 
-            <View style={dobStyles.colHeaders}>
-              <Text style={[dobStyles.colHeaderText, { flex: 1.6 }]}>MONTH</Text>
-              <Text style={[dobStyles.colHeaderText, { flex: 0.8 }]}>DAY</Text>
-              <Text style={[dobStyles.colHeaderText, { flex: 1 }]}>YEAR</Text>
-            </View>
+        <TouchableOpacity
+          style={[dobStyles.chip, dobYear && dobStyles.chipFilled]}
+          onPress={() => openSheet('year')}
+          activeOpacity={0.75}
+        >
+          <Text style={dobYear ? dobStyles.chipValue : dobStyles.chipPlaceholder}>
+            {yearLabel || 'Year'}
+          </Text>
+          <Ionicons name="chevron-down" size={13} color={Colors.textMuted} />
+        </TouchableOpacity>
+      </View>
 
-            <View style={dobStyles.colsRow}>
-              {renderCol(DOB_MONTHS, selMonth, setSelMonth, monthListRef, 1.6)}
-              <View style={dobStyles.colDivider} />
-              {renderCol(DOB_DAYS,   selDay,   setSelDay,   dayListRef,   0.8)}
-              <View style={dobStyles.colDivider} />
-              {renderCol(DOB_YEARS,  selYear,  setSelYear,  yearListRef,  1)}
-            </View>
-
-            <TouchableOpacity
-              style={dobStyles.doneBtn}
-              onPress={() => { onConfirm(selMonth, selDay, selYear); setOpen(false); }}
-              activeOpacity={0.85}
-            >
-              <Text style={dobStyles.doneBtnText}>Done</Text>
-            </TouchableOpacity>
+      {/* Bottom sheet — shared for whichever chip was tapped */}
+      <Modal
+        visible={openField !== null}
+        transparent
+        animationType="slide"
+        statusBarTranslucent
+        onRequestClose={() => setOpenField(null)}
+      >
+        <TouchableOpacity style={dobStyles.overlay} onPress={() => setOpenField(null)} activeOpacity={1}>
+          <View style={dobStyles.sheet} onStartShouldSetResponder={() => true}>
+            <View style={dobStyles.handle} />
+            <Text style={dobStyles.sheetTitle}>{sheetTitle}</Text>
+            <FlatList
+              ref={listRef}
+              data={sheetData}
+              keyExtractor={item => item.value}
+              style={dobStyles.sheetList}
+              showsVerticalScrollIndicator={false}
+              getItemLayout={(_, index) => ({ length: DOB_SHEET_ITEM_H, offset: DOB_SHEET_ITEM_H * index, index })}
+              renderItem={({ item }) => {
+                const active = item.value === sheetValue;
+                return (
+                  <TouchableOpacity
+                    style={[dobStyles.sheetItem, active && dobStyles.sheetItemActive]}
+                    onPress={() => select(item.value)}
+                    activeOpacity={0.65}
+                  >
+                    <Text style={[dobStyles.sheetItemText, active && dobStyles.sheetItemTextActive]}>
+                      {item.label}
+                    </Text>
+                    {active && <Ionicons name="checkmark" size={17} color={Colors.brand} />}
+                  </TouchableOpacity>
+                );
+              }}
+            />
           </View>
         </TouchableOpacity>
       </Modal>
@@ -1249,60 +1284,80 @@ function DobPickerCombined({
 }
 
 const dobStyles = StyleSheet.create({
-  colHeaders: {
+  row: {
     flexDirection: 'row',
-    paddingHorizontal: Spacing.base,
-    paddingVertical: 6,
+    gap: Spacing.sm,
+    marginBottom: Spacing.lg,
+  },
+  chip: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    height: 50,
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    paddingHorizontal: Spacing.sm,
+    gap: 4,
+  },
+  chipWide:   { flex: 1.6 },
+  chipNarrow: { flex: 0.8 },
+  chipFilled: {
+    borderColor: `${Colors.brand}50`,
+    backgroundColor: Colors.surfaceElevated,
+  },
+  chipValue:       { flex: 1, fontSize: FontSize.label, color: Colors.textPrimary, fontWeight: FontWeight.medium },
+  chipPlaceholder: { flex: 1, fontSize: FontSize.label, color: Colors.textMuted },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    justifyContent: 'flex-end',
+  },
+  sheet: {
+    backgroundColor: Colors.surfaceElevated,
+    borderTopLeftRadius: BorderRadius.xl,
+    borderTopRightRadius: BorderRadius.xl,
+    maxHeight: '55%',
+    paddingBottom: Spacing.xl,
+  },
+  handle: {
+    width: 38, height: 4, borderRadius: 2,
+    backgroundColor: Colors.border,
+    alignSelf: 'center',
+    marginTop: Spacing.sm,
+    marginBottom: 4,
+  },
+  sheetTitle: {
+    fontSize: FontSize.body,
+    fontWeight: FontWeight.semiBold,
+    color: Colors.textPrimary,
+    textAlign: 'center',
+    paddingVertical: Spacing.sm,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: Colors.border,
+    marginHorizontal: Spacing.base,
+    marginBottom: 4,
   },
-  colHeaderText: {
-    fontSize: FontSize.micro,
-    fontWeight: FontWeight.bold,
-    color: Colors.textDisabled,
-    letterSpacing: 0.8,
-    textAlign: 'center',
-  },
-  colsRow: {
+  sheetList: { maxHeight: 320 },
+  sheetItem: {
+    height: DOB_SHEET_ITEM_H,
     flexDirection: 'row',
-    maxHeight: 230,
-  },
-  colDivider: {
-    width: StyleSheet.hairlineWidth,
-    backgroundColor: Colors.border,
-  },
-  colItem: {
-    height: DOB_ITEM_H,
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingHorizontal: Spacing.base,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: Colors.borderLight,
   },
-  colItemSel: {
-    backgroundColor: Colors.brandMuted,
-  },
-  colItemText: {
+  sheetItemActive: { backgroundColor: Colors.brandMuted },
+  sheetItemText: {
+    flex: 1,
     fontSize: FontSize.body,
     color: Colors.textSecondary,
-    textAlign: 'center',
-    paddingHorizontal: 2,
   },
-  colItemTextSel: {
+  sheetItemTextActive: {
     color: Colors.brand,
     fontWeight: FontWeight.semiBold,
-  },
-  doneBtn: {
-    margin: Spacing.md,
-    height: 48,
-    backgroundColor: Colors.brand,
-    borderRadius: BorderRadius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  doneBtnText: {
-    fontSize: FontSize.body,
-    fontWeight: FontWeight.bold,
-    color: Colors.textInverse,
   },
 });
 
@@ -1315,15 +1370,38 @@ function GuestNamePage({
   onContinue: (name: string, gender: string, dobMonth: string, dobDay: string, dobYear: string) => void;
   onBack: () => void;
 }) {
-  const [name,     setName]     = useState('');
-  const [gender,   setGender]   = useState('male');
-  const [dobMonth, setDobMonth] = useState('');
-  const [dobDay,   setDobDay]   = useState('');
-  const [dobYear,  setDobYear]  = useState('');
+  const [name,        setName]        = useState('');
+  const [gender,      setGender]      = useState('');
+  const [dobMonth,    setDobMonth]    = useState('');
+  const [dobDay,      setDobDay]      = useState('');
+  const [dobYear,     setDobYear]     = useState('');
+  const [nameError,   setNameError]   = useState('');
+  const [genderError, setGenderError] = useState('');
+  const scrollRef = useRef<ScrollView>(null);
 
   // Letters, spaces, hyphens, apostrophes only (covers accented names like O'Brien, María)
   function handleNameChange(text: string) {
     setName(text.replace(/[^a-zA-ZÀ-ɏ'\- ]/g, ''));
+    if (nameError) setNameError('');
+  }
+
+  function handleGenderSelect(value: string) {
+    setGender(value);
+    if (genderError) setGenderError('');
+  }
+
+  function handleContinue() {
+    if (!name.trim()) {
+      setNameError('Please enter your name to continue.');
+      scrollRef.current?.scrollTo({ y: 0, animated: true });
+      return;
+    }
+    if (!gender) {
+      setGenderError('Please select your gender to continue.');
+      scrollRef.current?.scrollTo({ y: 0, animated: true });
+      return;
+    }
+    onContinue(name, gender, dobMonth, dobDay, dobYear);
   }
 
   const GENDERS = [
@@ -1334,6 +1412,7 @@ function GuestNamePage({
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
       <ScrollView
+        ref={scrollRef}
         style={gnStyles.scroll}
         contentContainerStyle={gnStyles.content}
         keyboardShouldPersistTaps="handled"
@@ -1348,17 +1427,17 @@ function GuestNamePage({
         </View>
 
         <Text style={gnStyles.heading}>{"Tell us about\nyourself"}</Text>
-        <Text style={gnStyles.sub}>Optional — you can update these anytime in Profile.</Text>
+        <Text style={gnStyles.sub}>Name and gender are required. Date of birth is optional.</Text>
 
-        {/* Name */}
-        <Text style={gnStyles.fieldLabel}>YOUR NAME</Text>
-        <View style={[aStyles.inputWrap, { marginBottom: Spacing.lg }]}>
-          <Ionicons name="person-outline" size={18} color={Colors.textMuted} style={aStyles.inputIcon} />
+        {/* Name — required */}
+        <Text style={gnStyles.fieldLabel}>YOUR NAME <Text style={{ color: Colors.danger }}>*</Text></Text>
+        <View style={[aStyles.inputWrap, nameError ? { borderColor: Colors.danger } : {}, { marginBottom: nameError ? Spacing.xs : Spacing.lg }]}>
+          <Ionicons name="person-outline" size={18} color={nameError ? Colors.danger : Colors.textMuted} style={aStyles.inputIcon} />
           <TextInput
             style={aStyles.input}
             value={name}
             onChangeText={handleNameChange}
-            placeholder="Your name"
+            placeholder="Your name (required)"
             placeholderTextColor={Colors.textMuted}
             autoCapitalize="words"
             returnKeyType="done"
@@ -1366,31 +1445,43 @@ function GuestNamePage({
             autoFocus
           />
         </View>
+        {nameError ? (
+          <View style={[aStyles.errorWrap, { marginBottom: Spacing.lg }]}>
+            <Ionicons name="alert-circle-outline" size={15} color={Colors.danger} />
+            <Text style={aStyles.errorText}>{nameError}</Text>
+          </View>
+        ) : null}
 
-        {/* Gender */}
-        <Text style={gnStyles.fieldLabel}>GENDER</Text>
-        <View style={gnStyles.pillRow}>
+        {/* Gender — required */}
+        <Text style={gnStyles.fieldLabel}>GENDER <Text style={{ color: Colors.danger }}>*</Text></Text>
+        <View style={[gnStyles.pillRow, genderError ? { marginBottom: Spacing.xs } : {}]}>
           {GENDERS.map(g => (
             <TouchableOpacity
               key={g.value}
-              style={[gnStyles.pill, gender === g.value && gnStyles.pillActive]}
-              onPress={() => setGender(g.value)}
+              style={[gnStyles.pill, gender === g.value && gnStyles.pillActive, genderError && !gender ? { borderColor: Colors.danger } : {}]}
+              onPress={() => handleGenderSelect(g.value)}
               activeOpacity={0.75}
             >
               <Ionicons
                 name={gender === g.value ? g.icon : (`${g.icon}-outline` as any)}
                 size={16}
-                color={gender === g.value ? Colors.brand : Colors.textMuted}
+                color={gender === g.value ? Colors.brand : (genderError && !gender ? Colors.danger : Colors.textMuted)}
               />
-              <Text style={[gnStyles.pillText, gender === g.value && gnStyles.pillTextActive]}>
+              <Text style={[gnStyles.pillText, gender === g.value && gnStyles.pillTextActive, genderError && !gender ? { color: Colors.danger } : {}]}>
                 {g.label}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
+        {genderError ? (
+          <View style={[aStyles.errorWrap, { marginBottom: Spacing.lg }]}>
+            <Ionicons name="alert-circle-outline" size={15} color={Colors.danger} />
+            <Text style={aStyles.errorText}>{genderError}</Text>
+          </View>
+        ) : null}
 
-        {/* Date of birth — single tap opens combined month/day/year picker */}
-        <Text style={[gnStyles.fieldLabel, { marginTop: Spacing.md }]}>DATE OF BIRTH</Text>
+        {/* Date of birth — three inline chips (Month / Day / Year) */}
+        <Text style={[gnStyles.fieldLabel, { marginTop: Spacing.md }]}>DATE OF BIRTH <Text style={gnStyles.fieldLabelOptional}>(optional)</Text></Text>
         <DobPickerCombined
           dobMonth={dobMonth} dobDay={dobDay} dobYear={dobYear}
           onConfirm={(m, d, y) => { setDobMonth(m); setDobDay(d); setDobYear(y); }}
@@ -1398,10 +1489,10 @@ function GuestNamePage({
 
         <TouchableOpacity
           style={[aStyles.submitBtn, { marginTop: Spacing.xl }]}
-          onPress={() => onContinue(name, gender, dobMonth, dobDay, dobYear)}
+          onPress={handleContinue}
           activeOpacity={0.88}
         >
-          <Text style={aStyles.submitText}>{name.trim() ? 'Continue' : 'Skip'}</Text>
+          <Text style={aStyles.submitText}>Continue</Text>
           <Ionicons name="arrow-forward" size={18} color={Colors.textInverse} />
         </TouchableOpacity>
       </ScrollView>
@@ -1430,6 +1521,10 @@ const gnStyles = StyleSheet.create({
     fontSize: FontSize.caption, fontWeight: FontWeight.semiBold,
     color: Colors.textMuted, letterSpacing: 0.8, marginBottom: Spacing.sm,
   },
+  fieldLabelOptional: {
+    fontSize: FontSize.caption, fontWeight: FontWeight.regular,
+    color: Colors.textDisabled, letterSpacing: 0.4,
+  },
 
   // Gender pills
   pillRow: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.lg },
@@ -1447,36 +1542,6 @@ const gnStyles = StyleSheet.create({
   pillText:       { fontSize: FontSize.label, fontWeight: FontWeight.medium, color: Colors.textMuted },
   pillTextActive: { color: Colors.brand, fontWeight: FontWeight.semiBold },
 
-  // DOB single trigger button
-  dobTrigger: {
-    flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.md,
-    borderWidth: 1, borderColor: Colors.border,
-    paddingHorizontal: Spacing.md, paddingVertical: 14,
-    marginBottom: Spacing.lg,
-  },
-  dobTriggerValue:       { flex: 1, fontSize: FontSize.label, color: Colors.textPrimary },
-  dobTriggerPlaceholder: { flex: 1, fontSize: FontSize.label, color: Colors.textMuted },
-
-  // Picker modal (overlay + sheet + header — shared with DobPickerCombined)
-  pickerOverlay: {
-    flex: 1, backgroundColor: 'rgba(0,0,0,0.6)',
-    justifyContent: 'flex-end',
-  },
-  pickerSheet: {
-    backgroundColor: Colors.surfaceElevated,
-    borderTopLeftRadius: BorderRadius.xl,
-    borderTopRightRadius: BorderRadius.xl,
-    paddingBottom: Spacing.xl,
-    borderWidth: 1, borderColor: Colors.border,
-  },
-  pickerHeader: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: Spacing.base, paddingVertical: Spacing.md,
-    borderBottomWidth: 1, borderBottomColor: Colors.border,
-  },
-  pickerHeaderText: { fontSize: FontSize.body, fontWeight: FontWeight.semiBold, color: Colors.textPrimary },
 });
 
 // ─── GuestPrefsPage ───────────────────────────────────────────────────────────

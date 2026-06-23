@@ -569,27 +569,31 @@ export default function DrillConfigModal() {
             />
           ))}
 
-          {/* Difficulty — 2-col grid */}
+          {/* Difficulty — compact single-column rows */}
           {stepKey === 'difficulty' && (
-            <View style={styles.diffGrid}>
-              {DIFFICULTY_OPTS.map((opt) => (
-                <TouchableOpacity
-                  key={opt.value}
-                  style={[styles.diffCard, difficulty === opt.value && styles.diffCardSel]}
-                  onPress={() => setDifficulty(opt.value as Difficulty)}
-                  activeOpacity={0.75}
-                >
-                  <Ionicons
-                    name={opt.icon as any}
-                    size={24}
-                    color={difficulty === opt.value ? Colors.brand : opt.iconColor}
-                  />
-                  <Text style={[styles.diffTitle, difficulty === opt.value && styles.diffTitleSel]}>
-                    {opt.title}
-                  </Text>
-                  <Text style={styles.diffDesc}>{opt.desc}</Text>
-                </TouchableOpacity>
-              ))}
+            <View style={styles.diffList}>
+              {DIFFICULTY_OPTS.map((opt) => {
+                const active = difficulty === opt.value;
+                return (
+                  <TouchableOpacity
+                    key={opt.value}
+                    style={[styles.diffRow, active && styles.diffRowSel]}
+                    onPress={() => setDifficulty(opt.value as Difficulty)}
+                    activeOpacity={0.75}
+                  >
+                    <View style={[styles.diffIcon, { backgroundColor: active ? `${Colors.brand}22` : opt.iconBg }]}>
+                      <Ionicons name={opt.icon as any} size={20} color={active ? Colors.brand : opt.iconColor} />
+                    </View>
+                    <View style={styles.diffText}>
+                      <Text style={[styles.diffRowTitle, active && styles.diffRowTitleSel]}>{opt.title}</Text>
+                      <Text style={styles.diffRowDesc} numberOfLines={1}>{opt.desc}</Text>
+                    </View>
+                    <View style={[styles.diffCheck, active && styles.diffCheckSel]}>
+                      {active && <Ionicons name="checkmark" size={12} color={Colors.textPrimary} />}
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
           )}
 
@@ -799,21 +803,23 @@ const styles = StyleSheet.create({
     marginTop: Spacing.xs, paddingHorizontal: Spacing.xs, lineHeight: 18,
   },
 
-  // Difficulty 2-col grid
-  diffGrid:    { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm, marginBottom: Spacing.sm },
-  diffCard: {
-    width: '47.5%',
+  // Difficulty compact rows
+  diffList:       { gap: Spacing.xs },
+  diffRow: {
+    flexDirection: 'row', alignItems: 'center', gap: Spacing.md,
     backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.lg,
-    borderWidth: 1.5,
-    borderColor: Colors.border,
-    padding: Spacing.md,
-    gap: Spacing.sm,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1.5, borderColor: Colors.border,
+    paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm,
   },
-  diffCardSel: { borderColor: Colors.brand, backgroundColor: Colors.brandSoft },
-  diffTitle:   { fontSize: FontSize.label, fontWeight: FontWeight.bold, color: Colors.textPrimary },
-  diffTitleSel:{ color: Colors.brand },
-  diffDesc:    { fontSize: FontSize.micro, color: Colors.textMuted, lineHeight: 16 },
+  diffRowSel:     { borderColor: Colors.brand, backgroundColor: Colors.brandSoft },
+  diffIcon:       { width: 36, height: 36, borderRadius: BorderRadius.sm, alignItems: 'center', justifyContent: 'center' },
+  diffText:       { flex: 1, gap: 2 },
+  diffRowTitle:   { fontSize: FontSize.label, fontWeight: FontWeight.semiBold, color: Colors.textPrimary },
+  diffRowTitleSel:{ color: Colors.brand, fontWeight: FontWeight.bold },
+  diffRowDesc:    { fontSize: FontSize.caption, color: Colors.textMuted },
+  diffCheck:      { width: 22, height: 22, borderRadius: 11, borderWidth: 1.5, borderColor: Colors.border, alignItems: 'center', justifyContent: 'center' },
+  diffCheckSel:   { backgroundColor: Colors.brand, borderColor: Colors.brand },
 
   restRow:   { flexDirection: 'row', alignItems: 'center', marginTop: Spacing.sm, gap: Spacing.sm },
   restLabel: { fontSize: FontSize.label, color: Colors.textSecondary, width: 72 },

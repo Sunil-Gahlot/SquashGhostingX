@@ -144,10 +144,10 @@ const GENDER_OPTIONS = [
 // ─── Step 2: Hand + Voice + Name + Age + Gender ───────────────────────────────
 
 function Step2({
-  hand, voice, name, age, gender,
+  hand, voice, name, age, gender, language,
   onHand, onVoice, onName, onAge, onGender,
 }: {
-  hand: DominantHand; voice: VoiceGender; name: string; age: string; gender: string;
+  hand: DominantHand; voice: VoiceGender; name: string; age: string; gender: string; language: Language;
   onHand: (v: DominantHand) => void;
   onVoice: (v: VoiceGender) => void;
   onName: (v: string) => void;
@@ -212,7 +212,7 @@ function Step2({
       />
       <TouchableOpacity
         style={stepStyles.previewBtn}
-        onPress={() => Audio.speakText('Front Left. Recover to T.', 0.9, 'en-US', voice)}
+        onPress={async () => { await Audio.initAudioSession(); Audio.speakText('Front Left. Recover to T.', 0.9, language, voice); }}
         activeOpacity={0.75}
       >
         <Ionicons name="volume-high-outline" size={15} color={Colors.brand} />
@@ -258,7 +258,7 @@ function Step3({
 
       <TouchableOpacity
         style={langStyles.previewBtn}
-        onPress={() => Audio.speakText('Front Left. Recover to T.', 0.9, language, voice)}
+        onPress={async () => { await Audio.initAudioSession(); Audio.speakText('Front Left. Recover to T.', 0.9, language, voice); }}
         activeOpacity={0.75}
       >
         <Ionicons name="volume-high-outline" size={16} color={Colors.brand} />
@@ -350,7 +350,7 @@ export default function OnboardingModal() {
             )}
             {step === 1 && (
               <Step2
-                hand={hand} voice={voice} name={name} age={age} gender={gender}
+                hand={hand} voice={voice} name={name} age={age} gender={gender} language={language}
                 onHand={setHand} onVoice={setVoice} onName={setName}
                 onAge={setAge} onGender={handleGender}
               />

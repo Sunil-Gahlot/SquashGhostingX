@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
   Modal, View, Text, ScrollView, TouchableOpacity,
   StyleSheet, NativeScrollEvent, NativeSyntheticEvent,
@@ -91,16 +91,28 @@ export default function TermsConsentModal({ viewOnly, onClose }: { viewOnly?: bo
   const [scrolledToBottom, setScrolledToBottom] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
 
+  // Reset scroll state each time the modal becomes visible (e.g. after account deletion).
+  useEffect(() => {
+    if (!hasAcceptedTerms && !viewOnly) {
+      setScrolledToBottom(false);
+    }
+  }, [hasAcceptedTerms, viewOnly]);
+
   function handleScroll(e: NativeSyntheticEvent<NativeScrollEvent>) {
     const { layoutMeasurement, contentOffset, contentSize } = e.nativeEvent;
+    // Only unlock if content is tall enough to actually require scrolling (>120px overflow).
+    const requiresScroll = contentSize.height > layoutMeasurement.height + 120;
     const isBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height - 40;
-    if (isBottom) setScrolledToBottom(true);
+    if (!requiresScroll || isBottom) setScrolledToBottom(true);
   }
 
-  if (!viewOnly && hasAcceptedTerms) return null;
+  // Always keep this component mounted — control visibility via the `visible` prop only.
+  // Returning null here would unmount the Modal, causing it to silently fail to re-appear
+  // after hasAcceptedTerms goes false→true→false (e.g. account deletion flow).
+  const isVisible = viewOnly ? true : !hasAcceptedTerms;
 
   return (
-    <Modal visible={viewOnly ? true : !hasAcceptedTerms} animationType="slide" presentationStyle="fullScreen">
+    <Modal visible={isVisible} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => {}}>
       <SafeAreaView style={s.safe}>
 
         <View style={s.header}>

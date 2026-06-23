@@ -91,7 +91,7 @@ export const useProfileStore = create<ProfileStore>()(
     {
       name: 'profile-storage',
       storage: createJSONStorage(() => AsyncStorage),
-      version: 7,
+      version: 8,
       migrate: (persisted: any, version: number) => {
         if (version < 1) {
           persisted = { ...persisted, hasCompletedAuth: false };
@@ -127,10 +127,14 @@ export const useProfileStore = create<ProfileStore>()(
           }
         }
         if (version < 7) {
-          // Force re-acceptance of the updated Terms & Conditions (v1.1, June 2026).
-          // All users must view and explicitly accept the revised injury/liability terms.
-          if (persisted?.state) {
-            persisted.state.hasAcceptedTerms = false;
+          // Originally forced re-acceptance for all users. Reverted in v8 below.
+        }
+        if (version < 8) {
+          // Restore hasAcceptedTerms for users affected by the v7 forced reset.
+          // T&C acceptance is now embedded in the auth flow and only shown to users
+          // who have not yet completed account setup — not to existing logged-in users.
+          if (persisted?.state && persisted.state.hasCompletedAuth) {
+            persisted.state.hasAcceptedTerms = true;
           }
         }
         return persisted;

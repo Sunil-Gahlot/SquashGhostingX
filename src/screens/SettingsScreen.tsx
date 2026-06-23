@@ -220,7 +220,14 @@ export default function SettingsScreen() {
     Alert.alert('Reset All Settings', 'This resets your profile and all app settings to defaults. Cannot be undone.', [
       { text: 'Cancel', style: 'cancel' },
       {
-        text: 'Reset', style: 'destructive', onPress: () => {
+        text: 'Reset', style: 'destructive', onPress: async () => {
+          try {
+            await db.execAsync(
+              'DELETE FROM movements; DELETE FROM personal_bests; DELETE FROM checkpoints; DELETE FROM sessions;'
+            );
+          } catch (e) {
+            console.warn('[Settings] SQLite reset failed:', e);
+          }
           resetProfile();
           resetSettings();
           clearCache();
@@ -280,9 +287,12 @@ export default function SettingsScreen() {
         <View style={styles.hero}>
           <View style={styles.heroAppRow}>
             <View style={styles.heroAppIcon}>
-              <Ionicons name="body" size={15} color={Colors.brand} />
+              <Ionicons name="body" size={18} color={Colors.brand} />
             </View>
-            <Text style={styles.heroAppName}>SquashGhostingX</Text>
+            <Text style={styles.heroAppName}>
+              {'Squash '}
+              <Text style={styles.heroAppNameAccent}>GhostingX</Text>
+            </Text>
           </View>
           <View style={styles.heroTitleRow}>
             <Text style={styles.heroTitle}>Settings</Text>
@@ -483,7 +493,7 @@ export default function SettingsScreen() {
                 selected={String(settings.defaultPaceStep ?? 3)}
                 onSelect={(v) => updateSettings({ defaultPaceStep: Number(v) })}
                 size="sm"
-                scrollable
+                wrap
               />
             }
           />
@@ -502,7 +512,7 @@ export default function SettingsScreen() {
                 selected={settings.defaultVoiceMode}
                 onSelect={(v) => updateSettings({ defaultVoiceMode: v as any })}
                 size="sm"
-                scrollable
+                wrap
               />
             }
           />
@@ -704,9 +714,10 @@ const styles = StyleSheet.create({
   skillChipText:    { fontSize: FontSize.micro, fontWeight: FontWeight.bold, letterSpacing: 0.5 },
   accountTypeLabel: { fontSize: FontSize.caption, color: Colors.textMuted },
   editProfileLabel: { fontSize: FontSize.caption, color: Colors.brand, fontWeight: FontWeight.semiBold },
-  heroAppRow:  { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, marginBottom: Spacing.xs },
-  heroAppIcon: { width: 26, height: 26, borderRadius: 7, backgroundColor: Colors.brandMuted, alignItems: 'center', justifyContent: 'center' },
-  heroAppName: { fontSize: FontSize.caption, fontWeight: FontWeight.semiBold, color: Colors.brand, letterSpacing: 0.6 },
+  heroAppRow:       { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, marginBottom: Spacing.xs },
+  heroAppIcon:      { width: 32, height: 32, borderRadius: 9, backgroundColor: Colors.brandMuted, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: `${Colors.brand}30` },
+  heroAppName:      { fontSize: 18, fontWeight: FontWeight.bold, color: Colors.textPrimary, letterSpacing: 0.1 },
+  heroAppNameAccent:{ color: Colors.brand },
   heroTitleRow:    { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   heroTitle:       { fontSize: 34, fontWeight: FontWeight.black, color: Colors.textPrimary, letterSpacing: -0.5 },
   signOutBtn:      { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: `${Colors.danger}18`, borderWidth: 1, borderColor: `${Colors.danger}35`, borderRadius: BorderRadius.full, paddingHorizontal: Spacing.md, paddingVertical: 7 },

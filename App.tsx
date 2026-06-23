@@ -18,7 +18,6 @@ import SessionModal     from './src/screens/session/SessionModal';
 import DrillConfigModal from './src/screens/drill/DrillConfigModal';
 import OnboardingModal  from './src/screens/onboarding/OnboardingModal';
 import AuthModal        from './src/screens/auth/AuthModal';
-import TermsConsentModal from './src/screens/TermsConsentModal';
 
 import { Colors } from './src/constants/colors';
 import { FontSize, FontWeight } from './src/constants/layout';
@@ -97,7 +96,6 @@ export default function App() {
       <SafeAreaProvider>
         <SQLiteProvider databaseName="squashghostingx.db" onInit={migrateDatabase}>
 
-          <TermsConsentModal />
           <AuthModal />
           <OnboardingModal />
           <DrillConfigModal />

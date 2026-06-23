@@ -25,6 +25,8 @@ function calcAge(day: string, month: string, year: string): number | null {
   if (d < 1 || d > 31 || m < 1 || m > 12) return null;
   const birth = new Date(y, m - 1, d);
   if (isNaN(birth.getTime())) return null;
+  // Reject overflow dates (e.g. Feb 31 silently rolls to March 3)
+  if (birth.getFullYear() !== y || birth.getMonth() + 1 !== m || birth.getDate() !== d) return null;
   const today = new Date();
   let age = today.getFullYear() - birth.getFullYear();
   if (today.getMonth() < birth.getMonth() || (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())) age--;
@@ -83,6 +85,13 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
   const [dobMonth,    setDobMonth]    = useState(profile.dobMonth ?? '');
   const [dobYear,     setDobYear]     = useState(profile.dobYear  ?? '');
 
+  // Keep local name draft in sync if profile is updated elsewhere (e.g. auth flow).
+  React.useEffect(() => { setLocalName(profile.name); }, [profile.name]);
+  // Keep DOB drafts in sync with store for the same reason.
+  React.useEffect(() => { setDobDay(profile.dobDay ?? ''); },   [profile.dobDay]);
+  React.useEffect(() => { setDobMonth(profile.dobMonth ?? ''); }, [profile.dobMonth]);
+  React.useEffect(() => { setDobYear(profile.dobYear ?? ''); },  [profile.dobYear]);
+
   const displayName = profile.name.trim() || 'Player';
   const skillColor  = SKILL_COLORS[profile.skillLevel] ?? Colors.primary;
   const langLabel   = getLanguageLabel(profile.language);
@@ -94,7 +103,7 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaType.Images,
+      mediaTypes: ['images'],
       allowsEditing: true, aspect: [1, 1], quality: 0.85,
     });
     if (!result.canceled && result.assets?.[0]) {
@@ -256,7 +265,12 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
                 <TextInput
                   style={sStyles.dobSegment}
                   value={dobDay}
-                  onChangeText={(t) => { setDobDay(t); setProfile({ dobDay: t }); const a = calcAge(t, dobMonth, dobYear); if (a !== null) setProfile({ age: a }); }}
+                  onChangeText={setDobDay}
+                  onBlur={() => {
+                    setProfile({ dobDay });
+                    const a = calcAge(dobDay, dobMonth, dobYear);
+                    setProfile({ age: a ?? undefined });
+                  }}
                   placeholder="DD"
                   placeholderTextColor={Colors.textMuted}
                   keyboardType="number-pad"
@@ -266,7 +280,12 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
                 <TextInput
                   style={sStyles.dobSegment}
                   value={dobMonth}
-                  onChangeText={(t) => { setDobMonth(t); setProfile({ dobMonth: t }); const a = calcAge(dobDay, t, dobYear); if (a !== null) setProfile({ age: a }); }}
+                  onChangeText={setDobMonth}
+                  onBlur={() => {
+                    setProfile({ dobMonth });
+                    const a = calcAge(dobDay, dobMonth, dobYear);
+                    setProfile({ age: a ?? undefined });
+                  }}
                   placeholder="MM"
                   placeholderTextColor={Colors.textMuted}
                   keyboardType="number-pad"
@@ -276,13 +295,17 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
                 <TextInput
                   style={[sStyles.dobSegment, sStyles.dobSegmentYear]}
                   value={dobYear}
-                  onChangeText={(t) => { setDobYear(t); setProfile({ dobYear: t }); const a = calcAge(dobDay, dobMonth, t); if (a !== null) setProfile({ age: a }); }}
+                  onChangeText={setDobYear}
+                  onBlur={() => {
+                    setProfile({ dobYear });
+                    const a = calcAge(dobDay, dobMonth, dobYear);
+                    setProfile({ age: a ?? undefined });
+                  }}
                   placeholder="YYYY"
                   placeholderTextColor={Colors.textMuted}
                   keyboardType="number-pad"
                   maxLength={4}
                 />
-                {/* BUG-032: compute calcAge once to avoid calling it twice */}
                 {(() => { const a = calcAge(dobDay, dobMonth, dobYear); return a !== null ? <Text style={sStyles.ageCalc}>{a} yrs</Text> : null; })()}
               </View>
             </View>
