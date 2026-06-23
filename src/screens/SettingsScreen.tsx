@@ -15,7 +15,7 @@ import { useSettingsStore } from '../stores/settingsStore';
 import { useProgressStore } from '../stores/progressStore';
 import { useBadgesStore } from '../stores/badgesStore';
 import { getLanguageLabel } from '../constants/languages';
-import { getIntervalMs, MOVES_PER_SET, MOVEMENT_PHASE_MS } from '../constants/timing';
+import { getIntervalMs, MOVES_PER_SET, MOVEMENT_PHASE_MS, PACE_STEPS_MS } from '../constants/timing';
 import { Language } from '../types';
 import * as Audio from '../engine/audioEngine';
 import ProfileScreen from './ProfileScreen';
@@ -27,6 +27,36 @@ import TermsConsentModal from './TermsConsentModal';
 function SettingsGroup({ children }: { children: React.ReactNode }) {
   return <View style={grpStyles.wrap}>{children}</View>;
 }
+
+function CollapsibleGroup({
+  icon, iconBg, iconColor, label, sub, children,
+}: {
+  icon: string; iconBg: string; iconColor: string;
+  label: string; sub?: string;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <View style={grpStyles.wrap}>
+      <TouchableOpacity
+        onPress={() => setOpen(o => !o)}
+        activeOpacity={0.7}
+        style={[rowStyles.row, !open && rowStyles.rowLast]}
+      >
+        <View style={[rowStyles.iconBox, { backgroundColor: iconBg }]}>
+          <Ionicons name={icon as any} size={18} color={iconColor} />
+        </View>
+        <View style={rowStyles.text}>
+          <Text style={rowStyles.label}>{label}</Text>
+          {sub && <Text style={rowStyles.sub}>{sub}</Text>}
+        </View>
+        <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={16} color={Colors.textMuted} />
+      </TouchableOpacity>
+      {open && children}
+    </View>
+  );
+}
+
 const grpStyles = StyleSheet.create({
   wrap: {
     marginHorizontal: Spacing.base,
@@ -139,10 +169,10 @@ export default function SettingsScreen() {
   const displayName = profile.name.trim() || 'Player';
   const skillColor  = SKILL_COLORS[profile.skillLevel] ?? Colors.levelIntermediate;
 
-  const extraMs     = settings.movementPaceExtraMs ?? 0;
-  const rawInterval = getIntervalMs(settings.defaultDifficulty, settings.defaultTempo) + extraMs;
+  const paceOffset  = PACE_STEPS_MS[settings.defaultPaceStep ?? 3] ?? 0;
+  const rawInterval = getIntervalMs(settings.defaultDifficulty, settings.defaultTempo) + paceOffset;
   const movPhase    = MOVEMENT_PHASE_MS[settings.defaultDifficulty][settings.defaultTempo];
-  const interval    = Math.max(movPhase + 800, rawInterval);
+  const interval    = Math.max(movPhase + 400, rawInterval);
   const movesPerSet = MOVES_PER_SET[settings.defaultDifficulty];
   const repsPerMin  = Math.round(60_000 / interval);
   const langLabel   = getLanguageLabel(profile.language);
@@ -159,8 +189,9 @@ export default function SettingsScreen() {
       {
         text: 'Reset', style: 'destructive', onPress: async () => {
           try {
+            // Children (movements, personal_bests) reference sessions via FK; delete them first.
             await db.execAsync(
-              'DELETE FROM sessions; DELETE FROM movements; DELETE FROM personal_bests; DELETE FROM checkpoints;'
+              'DELETE FROM movements; DELETE FROM personal_bests; DELETE FROM checkpoints; DELETE FROM sessions;'
             );
           } catch (e) {
             console.warn('[Settings] SQLite reset failed:', e);
@@ -210,8 +241,9 @@ export default function SettingsScreen() {
           style: 'destructive',
           onPress: async () => {
             try {
+              // Children (movements, personal_bests) reference sessions via FK; delete them first.
               await db.execAsync(
-                'DELETE FROM sessions; DELETE FROM movements; DELETE FROM personal_bests; DELETE FROM checkpoints;'
+                'DELETE FROM movements; DELETE FROM personal_bests; DELETE FROM checkpoints; DELETE FROM sessions;'
               );
             } catch {}
             await SecureStore.deleteItemAsync('sgx-user-credentials').catch(() => {});
@@ -309,7 +341,7 @@ export default function SettingsScreen() {
           <SettingsRow
             icon="speedometer" iconBg={`${Colors.accentRoutines}22`} iconColor={Colors.accentRoutines}
             label="Speech Rate"
-            sub="0.7–0.9× for Bluetooth · 1.1–1.3× for loud court speaker"
+            sub="0.7–0.9× for Bluetooth · 1.1–1.6× for court speaker or Elite/Pro pace"
             right={
               <View style={srStyles.stepper}>
                 <TouchableOpacity
@@ -435,19 +467,21 @@ export default function SettingsScreen() {
           />
           <SettingsRow
             icon="hourglass-outline" iconBg={`${Colors.rest}22`} iconColor={Colors.rest}
-            label="Movement Pace"
-            sub="Adjust the T-pause relative to the base difficulty"
+            label="Default Pace"
+            sub="Starting pace every session — adjust live with ± during training"
             bottom={
               <PillSelector
                 options={[
-                  { label: 'Fast',     value: '-1000' },
-                  { label: 'Default',  value: '0'     },
-                  { label: 'Steady',   value: '1000'  },
-                  { label: 'Measured', value: '2000'  },
-                  { label: 'Recovery', value: '3000'  },
+                  { label: 'Turbo',    value: '6' },
+                  { label: 'Fast+',    value: '5' },
+                  { label: 'Fast',     value: '4' },
+                  { label: 'Normal',   value: '3' },
+                  { label: 'Easy',     value: '2' },
+                  { label: 'Slow',     value: '1' },
+                  { label: 'Recovery', value: '0' },
                 ]}
-                selected={String(settings.movementPaceExtraMs ?? 0)}
-                onSelect={(v) => updateSettings({ movementPaceExtraMs: Number(v) })}
+                selected={String(settings.defaultPaceStep ?? 3)}
+                onSelect={(v) => updateSettings({ defaultPaceStep: Number(v) })}
                 size="sm"
                 scrollable
               />
@@ -564,8 +598,10 @@ export default function SettingsScreen() {
         </SettingsGroup>
 
         {/* ── LEGAL ─────────────────────────────────────────── */}
-        <Text style={styles.sectionLabel}>LEGAL</Text>
-        <SettingsGroup>
+        <CollapsibleGroup
+          icon="shield-outline" iconBg={`${Colors.accentProgress}22`} iconColor={Colors.accentProgress}
+          label="Legal" sub="Privacy, Terms & Conditions, Contact"
+        >
           <SettingsRow
             icon="shield-checkmark" iconBg={`${Colors.accentProgress}22`} iconColor={Colors.accentProgress}
             label="Privacy Policy"
@@ -587,11 +623,13 @@ export default function SettingsScreen() {
             onPress={() => Linking.openURL('mailto:squash.ghostingx@gmail.com')}
             isLast
           />
-        </SettingsGroup>
+        </CollapsibleGroup>
 
         {/* ── APP ───────────────────────────────────────────── */}
-        <Text style={styles.sectionLabel}>APP</Text>
-        <SettingsGroup>
+        <CollapsibleGroup
+          icon="settings-outline" iconBg={`${Colors.warning}22`} iconColor={Colors.warning}
+          label="App" sub="About, reset options"
+        >
           <SettingsRow
             icon="information-circle" iconBg={`${Colors.accentProgress}22`} iconColor={Colors.accentProgress}
             label="About" sub="Version 1.0.0 · All data stored locally on device"
@@ -615,7 +653,7 @@ export default function SettingsScreen() {
             onPress={handleResetAll}
             isLast
           />
-        </SettingsGroup>
+        </CollapsibleGroup>
 
         <Text style={styles.footerText}>SquashGhostingX · v1.0.0</Text>
       </ScrollView>

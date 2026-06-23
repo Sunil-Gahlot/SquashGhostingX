@@ -7,7 +7,7 @@ export interface AppSettings {
   // Audio
   voiceEnabled: boolean;
   hapticsEnabled: boolean;
-  speechRate: number;           // 0.6 – 1.2
+  speechRate: number;           // 0.7 – 1.6
   coachingCues: boolean;        // mid-session encouragement
   // Session defaults (pre-filled on S-12)
   defaultDrillType: DrillType;
@@ -22,14 +22,14 @@ export interface AppSettings {
   reducedMotion: boolean;
   courtMode: CourtMode;
   // Pace
-  movementPaceExtraMs: number;  // extra ms added to T-pause between calls (0 = default)
+  defaultPaceStep: number;  // 0–6, index into PACE_STEPS_MS; 3 = Normal
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
   voiceEnabled: true,
   hapticsEnabled: true,
-  speechRate: 1.1,
-  coachingCues: false,
+  speechRate: 0.95,
+  coachingCues: true,
   defaultDrillType: 'movement',
   defaultCourtSystem: '6pt',
   defaultTempo: 'natural',
@@ -40,7 +40,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   keepScreenAwake: true,
   reducedMotion: false,
   courtMode: 'wooden',
-  movementPaceExtraMs: 0,
+  defaultPaceStep: 3,
 };
 
 interface SettingsStore {
@@ -60,7 +60,7 @@ export const useSettingsStore = create<SettingsStore>()(
     {
       name: 'settings-storage',
       storage: createJSONStorage(() => AsyncStorage),
-      version: 3,
+      version: 4,
       migrate: (persisted: any, version: number) => {
         if (version < 1) {
           const cm = persisted?.state?.settings?.courtMode;
@@ -74,9 +74,18 @@ export const useSettingsStore = create<SettingsStore>()(
           }
         }
         if (version < 3) {
-          // Remove unused beepEnabled field from persisted state
           if (persisted?.state?.settings) {
             delete persisted.state.settings.beepEnabled;
+          }
+        }
+        if (version < 4) {
+          const s = persisted?.state?.settings;
+          if (s) {
+            const extraMs = s.movementPaceExtraMs ?? 0;
+            const msSteps = [3000, 2000, 1000, 0, -1000, -2000, -3000];
+            const idx = msSteps.indexOf(extraMs);
+            s.defaultPaceStep = idx >= 0 ? idx : 3;
+            delete s.movementPaceExtraMs;
           }
         }
         return persisted;

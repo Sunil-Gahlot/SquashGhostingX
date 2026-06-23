@@ -34,6 +34,20 @@
   "author":{"@type":"Person","name":"Varish Gahlot"}
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"FAQPage",
+  "mainEntity":[
+    {"@type":"Question","name":"Is SquashGhostingX really free?","acceptedAnswer":{"@type":"Answer","text":"Yes — the full app including both 6-point and 10-point ghosting systems, AI voice coaching, all analytics, all 20 built-in programs, and unlimited session history is completely free. No trial period, no credit card, no hidden fees. Free forever."}},
+    {"@type":"Question","name":"What is squash ghosting?","acceptedAnswer":{"@type":"Answer","text":"Ghosting is a solo squash training drill where you move to each position on the court and play a shadow stroke — as if the ball were there — then recover to the T. It builds court movement, aerobic fitness, and muscle memory for automatic footwork."}},
+    {"@type":"Question","name":"What devices does SquashGhostingX run on?","acceptedAnswer":{"@type":"Answer","text":"SquashGhostingX is available free on both iOS (App Store — iPhone and iPad) and Android (Google Play). No TestFlight or beta required."}},
+    {"@type":"Question","name":"Does SquashGhostingX work offline?","acceptedAnswer":{"@type":"Answer","text":"Yes, completely. SquashGhostingX works 100% offline. All session data is stored locally on your device using SQLite. No Wi-Fi connection needed on court."}},
+    {"@type":"Question","name":"What is the difference between 6-point and 10-point ghosting?","acceptedAnswer":{"@type":"Answer","text":"The 6-point system covers front corners, mid-court, and back corners — ideal for beginners through intermediate players. The 10-point system adds four bridging positions creating more complex patterns and longer movement arcs for advanced and elite players."}},
+    {"@type":"Question","name":"Does the AI voice work with earphones?","acceptedAnswer":{"@type":"Answer","text":"Yes — earphones are the recommended setup. The AI voice calls each court position through any Bluetooth or wired headphones. The app also bypasses iOS silent mode so it works even when your phone is on silent."}}
+  ]
+}
+</script>
 <style>
 :root{
   --bg:#080401;--bg2:#0F0700;--bg3:#170C02;--bg4:#1E1104;--bg5:#271607;
@@ -202,7 +216,7 @@ section{padding:5rem 1.5rem}
 /* CONFIGURE SESSION */
 #configure{background:var(--bg2)}
 .config-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
-.config-phone{background:#0d0d0f;border:1px solid var(--border);border-radius:22px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+.config-phone{background:#f8f8f8;border:1px solid rgba(0,0,0,.1);border-radius:44px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.35),0 0 0 10px rgba(0,0,0,.06)}
 .config-phone-bar{background:var(--accent);padding:11px 18px;display:flex;align-items:center;justify-content:space-between}
 .config-phone-title{font-size:.78rem;font-weight:700;color:#fff;letter-spacing:.02em}
 .config-phone-step{font-size:.7rem;color:rgba(255,255,255,.8)}
@@ -273,7 +287,7 @@ section{padding:5rem 1.5rem}
 
 /* SKILL LEVELS */
 #skills{background:var(--bg)}
-.skills-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
+.skills-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1.5rem}
 .skill-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:1.5rem;position:relative;transition:all .3s}
 .skill-card:hover{border-color:var(--borderacc);transform:translateY(-4px)}
 .skill-level-badge{display:inline-flex;align-items:center;gap:.4rem;padding:.3rem .7rem;border-radius:100px;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:1rem}
@@ -281,6 +295,7 @@ section{padding:5rem 1.5rem}
 .skill-card.intermediate .skill-level-badge{background:rgba(100,150,255,.15);color:#6496ff}
 .skill-card.advanced .skill-level-badge{background:rgba(255,165,50,.15);color:#FFA532}
 .skill-card.elite .skill-level-badge{background:rgba(255,107,53,.15);color:var(--accent)}
+.skill-card.pro .skill-level-badge{background:rgba(168,85,247,.15);color:#a855f7}
 .skill-card h3{font-family:var(--font-display);font-size:1.2rem;font-weight:800;color:var(--white);margin-bottom:.5rem}
 .skill-card p{font-size:.82rem;color:var(--gray1);line-height:1.6;margin-bottom:1rem}
 .skill-features{list-style:none;display:flex;flex-direction:column;gap:.4rem}
@@ -426,7 +441,7 @@ section{padding:5rem 1.5rem}
 /* BLOG */
 #blog{background:var(--bg2)}
 .blog-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
-.blog-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);overflow:hidden;cursor:pointer;transition:all .3s}
+.blog-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);overflow:hidden;cursor:pointer;transition:all .3s;display:block;width:100%;text-align:left;font-family:inherit}
 .blog-card:hover{border-color:var(--borderacc);transform:translateY(-4px)}
 .blog-card-img{height:120px;background:var(--bg4);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .blog-card-emoji{font-size:2.5rem}
@@ -444,9 +459,9 @@ section{padding:5rem 1.5rem}
 .blog-modal-tag{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem}
 .blog-modal-title{font-family:var(--font-display);font-size:2rem;font-weight:900;color:var(--white);margin-bottom:.75rem;line-height:1.1}
 .blog-modal-meta{font-size:.8rem;color:var(--gray2);margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
-.blog-modal-body{font-size:.9rem;color:var(--text);line-height:1.8}
-.blog-modal-body p{margin-bottom:1rem}
-.blog-modal-body h4{font-family:var(--font-display);font-size:1.1rem;font-weight:800;color:var(--white);margin:1.5rem 0 .5rem}
+.blog-modal-body{font-size:1.05rem;color:var(--text);line-height:1.9}
+.blog-modal-body p{margin-bottom:1.1rem}
+.blog-modal-body h4{font-family:var(--font-display);font-size:1.15rem;font-weight:800;color:var(--white);margin:1.75rem 0 .6rem}
 
 /* TESTIMONIALS */
 #testimonials{background:var(--bg)}
@@ -498,7 +513,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
 .footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:1.5rem;border-top:1px solid var(--border);flex-wrap:wrap;gap:1rem}
 .footer-copy{font-size:.8rem;color:var(--gray3)}
 .footer-theme-btns{display:flex;gap:.5rem}
-.theme-btn{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);cursor:pointer;transition:border-color .2s;position:relative}
+.theme-btn{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);cursor:pointer;transition:border-color .2s;position:relative;padding:8px;box-sizing:content-box;margin:-8px}
 .theme-btn:hover,.theme-btn.active{border-color:var(--accent)}
 .theme-btn[data-theme="dark"]{background:#1A0A02}
 .theme-btn[data-theme="light"]{background:#F5EDE6}
@@ -554,7 +569,8 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
 
 /* RESPONSIVE */
 @media(max-width:1024px){
-  .system-grid,.skills-grid,.blog-grid,.free-grid{grid-template-columns:repeat(2,1fr)}
+  .system-grid,.blog-grid,.free-grid{grid-template-columns:repeat(2,1fr)}
+  .skills-grid{grid-template-columns:repeat(3,1fr)}
   #movement .container>div[style*="grid-template-columns"]{grid-template-columns:repeat(2,1fr)}
   .bento-grid{grid-template-columns:1fr 1fr}.bento-card.wide{grid-column:span 2}
   .showcase-inner{grid-template-columns:1fr 1fr;}.showcase-phone:last-child{display:none}
@@ -685,7 +701,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       <h1 class="hero-title reveal d1">Dominate Every Corner.<br><em>Own the T.</em></h1>
       <p class="hero-sub reveal d2">The most advanced squash ghosting app on the planet. AI voice coaching calls every position, shot simulation sharpens your tactical mind, and real-time analytics reveal exactly where you need to push harder. Built for players who refuse to lose a rally at the back corners.</p>
       <div class="hero-actions reveal d3">
-        <a href="https://apps.apple.com/app/squashghostingx/id6744036820" class="btn-primary" target="_blank" rel="noopener"> iOS App Store</a>
+        <a href="https://apps.apple.com/app/squashghostingx/id6744036820" class="btn-primary" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="flex-shrink:0"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg> iOS App Store</a>
         <a href="https://play.google.com/store/apps/details?id=com.squashghostingx.app" class="btn-primary" style="background:var(--bg4);border:1px solid var(--borderacc)" target="_blank" rel="noopener">🤖 Google Play</a>
         <a href="#videos" class="btn-outline">▶ Watch Demo</a>
       </div>
@@ -984,7 +1000,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
         <div style="font-family:var(--font-display);font-size:2.8rem;font-weight:900;color:var(--gray3);line-height:1;margin-bottom:.5rem;letter-spacing:-.03em">01</div>
         <div class="showcase-screen">
           <img src="App_Program_Screen.jpeg" alt="SquashGhostingX routines — training programs by skill level"
-               onerror="this.style.opacity='.12'">
+               loading="lazy" onerror="this.style.opacity='.12'">
         </div>
         <div class="showcase-caption">Choose Your Program</div>
         <div class="showcase-caption-sub">20+ programs matched to your level</div>
@@ -993,7 +1009,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
         <div style="font-family:var(--font-display);font-size:2.8rem;font-weight:900;color:var(--accent);line-height:1;margin-bottom:.5rem;letter-spacing:-.03em">02</div>
         <div class="showcase-screen" style="border-color:var(--borderacc);box-shadow:0 30px 60px rgba(0,0,0,.6),0 0 0 1px rgba(255,107,53,.2)">
           <img src="App_Home_Screen.jpeg" alt="SquashGhostingX home screen — START SESSION with AI ghosting"
-               onerror="this.style.opacity='.12'">
+               loading="lazy" onerror="this.style.opacity='.12'">
         </div>
         <div class="showcase-caption" style="color:var(--accent)">Train With AI</div>
         <div class="showcase-caption-sub">Voice coaching calls every rep</div>
@@ -1002,7 +1018,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
         <div style="font-family:var(--font-display);font-size:2.8rem;font-weight:900;color:var(--gray3);line-height:1;margin-bottom:.5rem;letter-spacing:-.03em">03</div>
         <div class="showcase-screen">
           <img src="App_Session_Stats_Screen.jpeg" alt="SquashGhostingX session stats — reps, zones, duration and performance score"
-               onerror="this.style.opacity='.12'">
+               loading="lazy" onerror="this.style.opacity='.12'">
         </div>
         <div class="showcase-caption">Review &amp; Improve</div>
         <div class="showcase-caption-sub">Zone data shows where to focus next</div>
@@ -1020,8 +1036,8 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       <p class="section-sub reveal d2">Both systems include AI voice coaching, analytics, and T-position recovery. Choose based on your current skill level.</p>
     </div>
     <div class="courts-tabs reveal">
-      <button class="court-tab active" onclick="switchCourt('6pt')">6-Point System</button>
-      <button class="court-tab" onclick="switchCourt('10pt')">10-Point System</button>
+      <button class="court-tab active" onclick="switchCourt('6pt',this)">6-Point System</button>
+      <button class="court-tab" onclick="switchCourt('10pt',this)">10-Point System</button>
     </div>
     <div id="court-6pt" class="court-panel active">
       <div class="court-diagram-wrap reveal">
@@ -1214,7 +1230,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       </div>
       <div class="reveal d2" style="display:flex;justify-content:center;align-items:flex-start">
         <div style="width:min(280px,88%);background:var(--bg3);border-radius:32px;border:1px solid var(--borderacc);overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.5),0 0 0 1px rgba(255,107,53,.15)">
-          <img src="App_Progress_Screen.jpeg" alt="SquashGhostingX progress screen — zone balance, session history, streaks and personal bests" style="width:100%;display:block" onerror="this.style.opacity='.12'">
+          <img src="App_Progress_Screen.jpeg" alt="SquashGhostingX progress screen — zone balance, session history, streaks and personal bests" style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'">
         </div>
       </div>
     </div>
@@ -1274,6 +1290,17 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
           <li>Weekly load monitoring</li>
         </ul>
       </div>
+      <div class="skill-card pro reveal d4">
+        <div class="skill-level-badge">⬤ Pro</div>
+        <h3>Competing at the Top</h3>
+        <p>25–30 minute explosive sessions, PSA-level match simulation, and shot-based precision across all 10 positions.</p>
+        <ul class="skill-features">
+          <li>10-point court always</li>
+          <li>Explosive tempo standard</li>
+          <li>PSA match sim sequences</li>
+          <li>No-rest endurance blocks</li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>
@@ -1285,6 +1312,10 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       <div class="section-label reveal">Built-In Programs</div>
       <h2 class="section-title reveal d1">20 Programs. <em>Every Level.</em></h2>
       <p class="section-sub reveal d2">Expertly designed sessions from beginner warm-ups to professional match simulations. All included. All free.</p>
+    </div>
+    <div class="reveal d2" style="background:var(--glow2);border:1px solid var(--borderacc);border-radius:var(--r12);padding:.85rem 1.25rem;margin-bottom:2rem;font-size:.85rem;color:var(--gray1);display:flex;align-items:center;gap:.75rem">
+      <span style="font-size:1.1rem;flex-shrink:0">📱</span>
+      <span>In the app, tap <strong style="color:var(--accent)">Train → Ghosting</strong> to launch any of these programs. Your custom saved sessions live under the <strong style="color:var(--accent)">Routines</strong> tab.</span>
     </div>
     <div class="programs-level-tabs reveal">
       <button class="prog-tab active" data-level="beginner" onclick="switchPrograms('beginner',this)">Beginner</button>
@@ -1341,37 +1372,37 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
     <div class="section-head text-center">
       <div class="section-label reveal">Setup Training</div>
       <h2 class="section-title reveal d1">Configure Every <em>Detail</em></h2>
-      <p class="section-sub reveal d2">A 6-step setup wizard gives you complete control. Three key choices shape every session — training mode, court coverage zone, and position sequencing.</p>
+      <p class="section-sub reveal d2">A 6-step wizard gives you complete control. Step 1 picks training type and difficulty. Step 2 sets court coverage. Then pattern, tempo, duration, and voice — every detail locked in before you start.</p>
     </div>
     <div class="config-grid">
 
-      <!-- Step 2: Training Mode -->
+      <!-- Step 1: Training Type -->
       <div class="reveal">
         <div class="config-phone">
-          <img src="App_Drill_Type_Screen.jpeg" alt="Training mode selection — Shot-Based, Match Simulation, Movement Only, Custom Drill"
-               style="width:100%;display:block" onerror="this.style.opacity='.12'">
+          <img src="App_Drill_Type_Screen.jpeg" alt="Training type selection — Shot-Based, Match Simulation, Movement Only, Custom Drill"
+               style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'">
         </div>
-        <div class="config-phone-label">Training Mode</div>
-        <div class="config-phone-sub">4 modes — movement to match simulation</div>
+        <div class="config-phone-label">Step 1 — Training Type</div>
+        <div class="config-phone-sub">4 drill types + difficulty level</div>
       </div>
 
-      <!-- Step 4: Coverage Zone -->
+      <!-- Step 2: Court Coverage -->
       <div class="reveal d1">
         <div class="config-phone">
-          <img src="App_Court_Zone_Screen.jpeg" alt="Coverage zone selection — Full Court, Front Court, Back Court, Forehand, Backhand"
-               style="width:100%;display:block" onerror="this.style.opacity='.12'">
+          <img src="App_Court_Zone_Screen.jpeg" alt="Court coverage selection — Full Court, Front Court, Back Court, Forehand, Backhand"
+               style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'">
         </div>
-        <div class="config-phone-label">Court Coverage</div>
-        <div class="config-phone-sub">5 zone modes — full court to targeted side</div>
+        <div class="config-phone-label">Step 2 — Court Coverage</div>
+        <div class="config-phone-sub">5 zones — full court to one side only</div>
       </div>
 
-      <!-- Step 5: Position Sequence -->
+      <!-- Step 3: Position Sequence -->
       <div class="reveal d2">
         <div class="config-phone">
           <img src="App_Squence_Screen.jpeg" alt="Position sequence — Random or Fixed"
-               style="width:100%;display:block" onerror="this.style.opacity='.12'">
+               style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'">
         </div>
-        <div class="config-phone-label">Position Sequence</div>
+        <div class="config-phone-label">Step 3 — Position Sequence</div>
         <div class="config-phone-sub">Random unpredictability or Fixed pattern grooves</div>
       </div>
 
@@ -1391,7 +1422,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       <div class="reveal">
         <div class="config-phone">
           <img src="App_Setup_Session_Screen.jpeg" alt="Session setup step 6 — duration, tempo, rest interval, voice mode, START SESSION"
-               style="width:100%;display:block" onerror="this.style.opacity='.12'">
+               style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'">
         </div>
         <div class="config-phone-label">Session Setup</div>
         <div class="config-phone-sub">Duration · Tempo · Rest · Voice mode</div>
@@ -1399,7 +1430,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       <div class="reveal d1">
         <div class="config-phone">
           <img src="App_Audio_Screen.jpeg" alt="Audio settings — voice instructions, speech rate, coaching cues, haptic feedback, test voice"
-               style="width:100%;display:block" onerror="this.style.opacity='.12'">
+               style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'">
         </div>
         <div class="config-phone-label">Audio Control</div>
         <div class="config-phone-sub">Voice · Speech rate · Coaching cues · Haptics</div>
@@ -1407,7 +1438,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       <div class="reveal d2">
         <div class="config-phone">
           <img src="App_Session_Settings_Screen.jpeg" alt="Default session settings — court system, court style, difficulty, tempo, movement pace"
-               style="width:100%;display:block" onerror="this.style.opacity='.12'">
+               style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'">
         </div>
         <div class="config-phone-label">Default Settings</div>
         <div class="config-phone-sub">Court system · Difficulty · Tempo · Pace</div>
@@ -1428,7 +1459,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       <div class="reveal">
         <div class="config-phone">
           <img src="App_Welcome_Screen.jpeg" alt="Welcome screen — Train Hard. Play Fearless. Create Account or Sign In"
-               style="width:100%;display:block" onerror="this.style.opacity='.12'">
+               style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'">
         </div>
         <div class="config-phone-label">Get Started Free</div>
         <div class="config-phone-sub">Free account · Instant access · No payment</div>
@@ -1436,7 +1467,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       <div class="reveal d1">
         <div class="config-phone">
           <img src="App_Session_Stats_Screen.jpeg" alt="Session ended — duration, movements, reaction time, consistency, calories, streak"
-               style="width:100%;display:block" onerror="this.style.opacity='.12'">
+               style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'">
         </div>
         <div class="config-phone-label">Session Complete</div>
         <div class="config-phone-sub">Duration · Movements · Consistency · Calories</div>
@@ -1444,7 +1475,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       <div class="reveal d2">
         <div class="config-phone">
           <img src="App_Session_Stats_Screen%20%282%29.jpeg" alt="Personal bests and recent sessions — completion, intensity, reps by court system"
-               style="width:100%;display:block" onerror="this.style.opacity='.12'">
+               style="width:100%;display:block" loading="lazy" onerror="this.style.opacity='.12'">
         </div>
         <div class="config-phone-label">Personal Bests</div>
         <div class="config-phone-sub">Completion · Intensity · Most reps · By system</div>
@@ -1708,73 +1739,113 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
     <div class="section-head text-center">
       <div class="section-label reveal">Training Intelligence</div>
       <h2 class="section-title reveal d1">The <em>Squash Lab</em></h2>
-      <p class="section-sub reveal d2">Evidence-backed guides, training science, and tactical breakdowns for serious squash players.</p>
+      <p class="section-sub reveal d2">Real training advice from people who actually play. Movement science, tactics, app breakdowns, and what 12,000+ sessions teach you about getting better on court.</p>
     </div>
     <div class="blog-grid">
-      <div class="blog-card reveal" onclick="openBlog(0)">
+      <button type="button" class="blog-card reveal" onclick="openBlog(0)" aria-label="Read: The Neuroscience of Court Movement">
         <div class="blog-card-img"><div class="blog-card-emoji">🧠</div></div>
         <div class="blog-card-body">
           <div class="blog-card-tag">Training Science</div>
           <div class="blog-card-title">The Neuroscience of Court Movement</div>
-          <div class="blog-card-excerpt">How ghosting rewires your motor cortex for automatic court coverage.</div>
+          <div class="blog-card-excerpt">Your feet move before your brain decides. That's not talent — that's what ghosting actually builds at a neurological level.</div>
         </div>
-      </div>
-      <div class="blog-card reveal d1" onclick="openBlog(1)">
+      </button>
+      <button type="button" class="blog-card reveal d1" onclick="openBlog(1)" aria-label="Read: Reading Your Zone Balance Data">
         <div class="blog-card-img"><div class="blog-card-emoji">📈</div></div>
         <div class="blog-card-body">
           <div class="blog-card-tag">Analytics</div>
           <div class="blog-card-title">Reading Your Zone Balance Data</div>
-          <div class="blog-card-excerpt">What your heatmap tells you about your match game weaknesses.</div>
+          <div class="blog-card-excerpt">Most players are surprised by the gap between where they think they move and where the data says they actually go.</div>
         </div>
-      </div>
-      <div class="blog-card reveal d2" onclick="openBlog(2)">
+      </button>
+      <button type="button" class="blog-card reveal d2" onclick="openBlog(2)" aria-label="Read: 6-Point vs 10-Point: Which Is Right for You?">
         <div class="blog-card-img"><div class="blog-card-emoji">⚡</div></div>
         <div class="blog-card-body">
           <div class="blog-card-tag">Fitness</div>
           <div class="blog-card-title">6-Point vs 10-Point: Which Is Right for You?</div>
-          <div class="blog-card-excerpt">A complete breakdown of both systems and how to choose.</div>
+          <div class="blog-card-excerpt">Not sure which to use? Start with 6-point. Here's when — and why — to move up to 10.</div>
         </div>
-      </div>
-      <div class="blog-card reveal d3" onclick="openBlog(3)">
+      </button>
+      <button type="button" class="blog-card reveal d3" onclick="openBlog(3)" aria-label="Read: T-Position: The Most Important Habit in Squash">
         <div class="blog-card-img"><div class="blog-card-emoji">🎯</div></div>
         <div class="blog-card-body">
           <div class="blog-card-tag">Tactics</div>
           <div class="blog-card-title">T-Position: The Most Important Habit in Squash</div>
-          <div class="blog-card-excerpt">Why recovering to the T after every shot is non-negotiable.</div>
+          <div class="blog-card-excerpt">The T-recovery isn't just good practice. It's the difference between controlling a rally and reacting to it.</div>
         </div>
-      </div>
-      <div class="blog-card reveal" onclick="openBlog(4)">
+      </button>
+      <button type="button" class="blog-card reveal" onclick="openBlog(4)" aria-label="Read: Progressive Overload for Squash Athletes">
         <div class="blog-card-img"><div class="blog-card-emoji">💪</div></div>
         <div class="blog-card-body">
           <div class="blog-card-tag">Conditioning</div>
           <div class="blog-card-title">Progressive Overload for Squash Athletes</div>
-          <div class="blog-card-excerpt">How to structure training load to keep improving without burning out.</div>
+          <div class="blog-card-excerpt">If your ghosting sessions have looked the same for three months, your body stopped adapting weeks ago.</div>
         </div>
-      </div>
-      <div class="blog-card reveal d1" onclick="openBlog(5)">
+      </button>
+      <button type="button" class="blog-card reveal d1" onclick="openBlog(5)" aria-label="Read: The Perfect Ghosting Lunge Technique">
         <div class="blog-card-img"><div class="blog-card-emoji">🏃</div></div>
         <div class="blog-card-body">
           <div class="blog-card-tag">Movement</div>
           <div class="blog-card-title">The Perfect Ghosting Lunge Technique</div>
-          <div class="blog-card-excerpt">Biomechanics of efficient court movement that protects your knees.</div>
+          <div class="blog-card-excerpt">Done right, it's powerful and fast. Done wrong, it's months of knee problems waiting to happen.</div>
         </div>
-      </div>
-      <div class="blog-card reveal d2" onclick="openBlog(6)">
+      </button>
+      <button type="button" class="blog-card reveal d2" onclick="openBlog(6)" aria-label="Read: Building a 4-Week Ghosting Programme">
         <div class="blog-card-img"><div class="blog-card-emoji">🔄</div></div>
         <div class="blog-card-body">
           <div class="blog-card-tag">Routines</div>
           <div class="blog-card-title">Building a 4-Week Ghosting Programme</div>
-          <div class="blog-card-excerpt">A structured four-week plan for competitive players pre-tournament.</div>
+          <div class="blog-card-excerpt">Tournament in four weeks? Here's exactly what to do each week — and why the taper matters as much as the hard work.</div>
         </div>
-      </div>
-      <div class="blog-card reveal d3" onclick="openBlog(7)">
+      </button>
+      <button type="button" class="blog-card reveal d3" onclick="openBlog(7)" aria-label="Read: Why AI Voice Coaching Changes Everything">
         <div class="blog-card-img"><div class="blog-card-emoji">🎤</div></div>
         <div class="blog-card-body">
           <div class="blog-card-tag">Technology</div>
           <div class="blog-card-title">Why AI Voice Coaching Changes Everything</div>
-          <div class="blog-card-excerpt">How audio-first coaching keeps your eyes up and your focus on movement.</div>
+          <div class="blog-card-excerpt">Glancing at a screen for your next position drills the wrong habit. Your eyes should always be forward.</div>
         </div>
-      </div>
+      </button>
+      <button type="button" class="blog-card reveal" onclick="openBlog(8)" aria-label="Read: Your Phone Is the Best Squash Coach You've Never Had">
+        <div class="blog-card-img"><div class="blog-card-emoji">📱</div></div>
+        <div class="blog-card-body">
+          <div class="blog-card-tag">Mobile App</div>
+          <div class="blog-card-title">Your Phone Is the Best Squash Coach You've Never Had</div>
+          <div class="blog-card-excerpt">A phone can't replace a coach for technique. But for movement and conditioning solo? It's closer than you'd think.</div>
+        </div>
+      </button>
+      <button type="button" class="blog-card reveal d1" onclick="openBlog(9)" aria-label="Read: Why Your Back Corners Are Costing You Matches">
+        <div class="blog-card-img"><div class="blog-card-emoji">🔥</div></div>
+        <div class="blog-card-body">
+          <div class="blog-card-tag">Tactics</div>
+          <div class="blog-card-title">Why Your Back Corners Are Costing You Matches</div>
+          <div class="blog-card-excerpt">That scrambled back-corner reply isn't bad luck. It's a movement pattern you haven't fixed yet.</div>
+        </div>
+      </button>
+      <button type="button" class="blog-card reveal d2" onclick="openBlog(10)" aria-label="Read: How to Train Squash Solo When You Have No Partner">
+        <div class="blog-card-img"><div class="blog-card-emoji">🏅</div></div>
+        <div class="blog-card-body">
+          <div class="blog-card-tag">Training</div>
+          <div class="blog-card-title">How to Train Squash Solo When You Have No Partner</div>
+          <div class="blog-card-excerpt">Partner cancelled again? Solo court time works better than most people think — if you structure it properly.</div>
+        </div>
+      </button>
+      <button type="button" class="blog-card reveal d3" onclick="openBlog(11)" aria-label="Read: The 15-Minute Ghost Session That Actually Works">
+        <div class="blog-card-img"><div class="blog-card-emoji">⏱️</div></div>
+        <div class="blog-card-body">
+          <div class="blog-card-tag">Routines</div>
+          <div class="blog-card-title">The 15-Minute Ghost Session That Actually Works</div>
+          <div class="blog-card-excerpt">Sometimes 15 minutes is all you've got. Here's how to make every one of them count.</div>
+        </div>
+      </button>
+      <button type="button" class="blog-card reveal" onclick="openBlog(12)" aria-label="Read: What Your Session Stats Are Actually Telling You">
+        <div class="blog-card-img"><div class="blog-card-emoji">📊</div></div>
+        <div class="blog-card-body">
+          <div class="blog-card-tag">Analytics</div>
+          <div class="blog-card-title">What Your Session Stats Are Actually Telling You</div>
+          <div class="blog-card-excerpt">Looking at your numbers after training and actually reading them are two very different things.</div>
+        </div>
+      </button>
     </div>
   </div>
 </section>
@@ -1810,7 +1881,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
         <div class="founder-card-photo">
           <img src="Co-Founder%20%26%20CEO-Varish.jpg"
                alt="Varish Gahlot — Co-Founder &amp; CEO, SquashGhostingX"
-               class="founder-card-img"
+               class="founder-card-img" loading="lazy"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="founder-card-fallback" style="display:none">VG</div>
         </div>
@@ -1827,7 +1898,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
         <div class="founder-card-photo">
           <img src="Co-Founder%20%26%20President-Darshika.JPG"
                alt="Darshika Gahlot — Co-Founder &amp; President, SquashGhostingX"
-               class="founder-card-img"
+               class="founder-card-img" loading="lazy"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="founder-card-fallback" style="display:none">DG</div>
         </div>
@@ -1885,7 +1956,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       </div>
       <div class="faq-item reveal d2">
         <button class="faq-q" onclick="toggleFaq(this)">What devices does it run on?<span class="faq-arrow">▼</span></button>
-        <div class="faq-a"><div class="faq-a-inner">SquashGhostingX is currently available on iOS (iPhone and iPad). Android support is on the roadmap. You can download it free from the App Store — no TestFlight required, it's in the public App Store.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">SquashGhostingX is available free on both iOS (App Store — iPhone and iPad) and Android (Google Play). No TestFlight or beta required on either platform. Just search "SquashGhostingX" or use the download links on this page.</div></div>
       </div>
       <div class="faq-item reveal d3">
         <button class="faq-q" onclick="toggleFaq(this)">Does it work offline?<span class="faq-arrow">▼</span></button>
@@ -1911,11 +1982,11 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
       <p class="cta-sub">Join 2,500+ players across 40+ countries training with AI voice coaching, shot simulation, and pattern intelligence. Free forever. No subscription. No excuses.</p>
       <div class="cta-actions">
         <a href="https://apps.apple.com/app/squashghostingx/id6744036820" class="store-btn" target="_blank" rel="noopener">
-          <span class="store-btn-icon"></span>
+          <span class="store-btn-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg></span>
           <div><div style="font-size:.65rem;opacity:.8">Download on the</div><div style="font-size:.95rem;font-weight:800">App Store</div></div>
         </a>
         <a href="https://play.google.com/store/apps/details?id=com.squashghostingx.app" class="store-btn" target="_blank" rel="noopener">
-          <span class="store-btn-icon">🤖</span>
+          <span class="store-btn-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M3.18 23.77a2 2 0 0 0 2.76.74l10.07-5.8-2.84-2.84zm15.6-10.24L16.3 12l2.48-1.53 2.35 1.35a1.5 1.5 0 0 1 0 2.62zM2.01 1.23A2 2 0 0 0 2 1.8v20.4a2 2 0 0 0 .01.57l.07.07 11.43-11.43-.07-.07zm4.93 12.31L3.18.23A2 2 0 0 0 5.94.97l10.07 5.81z"/></svg></span>
           <div><div style="font-size:.65rem;opacity:.8">Get it on</div><div style="font-size:.95rem;font-weight:800">Google Play</div></div>
         </a>
       </div>
@@ -1995,6 +2066,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             Send Message
           </button>
+          <p style="font-size:.74rem;color:var(--gray2);margin-top:.6rem;line-height:1.5">Messages are delivered directly to our inbox. If you don't hear back within 24 hours, email us at <a href="mailto:squash.ghostingx@gmail.com" style="color:var(--accent)">squash.ghostingx@gmail.com</a>.</p>
         </form>
       </div>
 
@@ -2020,7 +2092,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 1.5
           <a href="#courts">Court Systems</a>
           <a href="#programs">Programs</a>
           <a href="#showcase">Features</a>
-          <a href="https://apps.apple.com/app/squashghostingx/id6744036820" target="_blank" rel="noopener"> iOS App Store</a>
+          <a href="https://apps.apple.com/app/squashghostingx/id6744036820" target="_blank" rel="noopener">iOS App Store</a>
           <a href="https://play.google.com/store/apps/details?id=com.squashghostingx.app" target="_blank" rel="noopener">🤖 Google Play</a>
         </div>
       </div>
@@ -2118,26 +2190,13 @@ const statObs = new IntersectionObserver((entries) => {
 const statsSection = document.getElementById('stats');
 if (statsSection) statObs.observe(statsSection);
 
-// ── PATTERN BARS ──
-const barObs = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.querySelectorAll('.pattern-bar-fill').forEach(bar => {
-        bar.style.width = bar.dataset.width + '%';
-      });
-      barObs.unobserve(e.target);
-    }
-  });
-}, { threshold: 0.3 });
-const patSection = document.getElementById('patterns');
-if (patSection) barObs.observe(patSection);
 
 // ── COURT TABS ──
-function switchCourt(id) {
+function switchCourt(id, btn) {
   document.querySelectorAll('.court-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.court-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('court-' + id).classList.add('active');
-  event.target.classList.add('active');
+  btn.classList.add('active');
 }
 
 // ── VIDEO SYSTEM (simple 4-up) ──
@@ -2168,99 +2227,162 @@ const blogs = [
   {
     tag: 'Training Science', title: 'The Neuroscience of Court Movement',
     meta: '8 min read · Training Science', body: `
-      <p>Ghosting is not just a fitness drill — it is a neurological programming exercise. Every repetition you complete on court is embedding a movement pattern deeper into your motor cortex, the brain region responsible for automatic physical responses.</p>
-      <h4>How Motor Memory Works</h4>
-      <p>When you first learn a movement, your prefrontal cortex (conscious thinking) is heavily engaged. You are deciding, then moving. With practice, the movement programme transfers to the basal ganglia and cerebellum — subcortical structures that operate below conscious awareness. The result: you move before you think.</p>
-      <h4>Why Ghosting Is Optimal for This Transfer</h4>
-      <p>Because there is no ball to distract you, ghosting allows maximum repetitions of the pure movement pattern. Elite squash players complete more than 500 ghost repetitions per session. That volume accelerates the shift from conscious to automatic movement at a rate that match play simply cannot match.</p>
-      <h4>The Role of AI Voice Coaching</h4>
-      <p>Audio cues are processed faster than visual cues. When the AI calls a position, your motor system begins preparing the movement before your visual system has even registered the information. This is why SquashGhostingX uses voice coaching — and why you should keep your eyes forward, not on the screen.</p>
+      <p>Ghosting gets sold as a fitness drill. It is, but that's almost missing the point. What it really does, when you do it properly, is rewire how your brain handles court movement. The gap between a beginner who thinks through every step and a seasoned player who just arrives at the ball isn't fitness. It's motor memory.</p>
+      <h4>How Your Brain Locks In Movement</h4>
+      <p>When you first try ghosting, your prefrontal cortex is doing all the heavy lifting. You hear the position, translate it, decide where to go, then move. It's slow and effortful, and you probably can't get back to the T before the next call fires. Do it a few hundred times and something shifts. The movement migrates from the conscious thinking part of your brain down to the basal ganglia and cerebellum, structures that run well below awareness. You stop deciding and start reacting.</p>
+      <h4>Why Repetitions Beat Everything Else</h4>
+      <p>There's no shortcut to this transfer. Motor learning research points to 300–500 high-quality repetitions before a movement pattern starts to stick. A 20-minute ghosting session at moderate pace gives you roughly 160 T-position returns. Three sessions a week and you're hitting that range within a month. Match play doesn't come close to that repetition density. There's too much time between contacts, too many other things happening.</p>
+      <h4>Why the Audio-First Approach Works</h4>
+      <p>Your auditory system processes information faster than your visual system. When the coach calls a position, your motor system starts preparing that movement before your eyes have fully processed what was said. That's why the app is audio-first. Keep your eyes forward. Let the voice come to you. The cue starts your movement. Your body takes it from there.</p>
     `
   },
   {
     tag: 'Analytics', title: 'Reading Your Zone Balance Data',
     meta: '6 min read · Analytics', body: `
-      <p>Your zone balance chart is the most honest feedback you will ever get about your movement patterns. Most players are shocked when they first see it — because what they think they do and what they actually do are very different things.</p>
-      <h4>What Zone Balance Measures</h4>
-      <p>Zone balance tracks the frequency with which you visit each court position across your sessions. A score of 100% across all zones means you are visiting every position with equal frequency — the ideal for an all-court player.</p>
-      <h4>Common Patterns and What They Mean</h4>
-      <p>Most players show strength in the mid-court and weakness in the deep back corners. This usually reflects their match game: they are comfortable at mid-court but struggle when pushed into the back. The analytics simply confirm what their coach already suspects.</p>
-      <h4>Using the Data to Improve</h4>
-      <p>Once you identify your weakest zones, you can configure sessions that heavily weight those positions. SquashGhostingX's pattern intelligence will also automatically flag these zones and suggest targeted sessions — removing the guesswork from your training planning.</p>
+      <p>The first time most players look at their zone balance chart, they're surprised. Not by what it shows, but by the gap between what they thought they were doing and what the numbers actually say.</p>
+      <h4>What the Numbers Actually Track</h4>
+      <p>It measures how evenly you're distributing movement across the court over time. Each position you visit gets logged. Balanced across all zones means roughly equal frequency everywhere, the goal for any all-court player. Imbalanced means there's somewhere you're avoiding, even if you never noticed it.</p>
+      <h4>What the Data Usually Reveals</h4>
+      <p>For most club players the pattern is consistent: strong mid-court, weak in the deep back corners. Especially back left for right-handed players. It's the furthest point from the T, the most physically demanding to reach, and the most common weakness in match play. Your chart probably confirms what your opponent already knows.</p>
+      <h4>What to Do With It</h4>
+      <p>Stop ghosting randomly and start targeting the weak zones. In SquashGhostingX you can weight sessions toward specific positions. If back right is sitting at 60% while everything else is over 85%, run a session that hammers it. Two or three targeted sessions will move that number. More importantly, you'll feel the difference in your matches before the data even catches up.</p>
     `
   },
   {
     tag: 'Fitness', title: '6-Point vs 10-Point: Which Is Right for You?',
     meta: '7 min read · Fitness', body: `
-      <p>Both systems are effective. The question is which one is right for your current level and training goals. Here is a complete breakdown.</p>
-      <h4>The 6-Point System</h4>
-      <p>Six positions: front left, front right, mid left, mid right, back left, back right. This covers the fundamental movement patterns every squash player needs. The distances between positions are shorter, making it more accessible for beginners and ideal for conditioning work at higher intensities.</p>
-      <h4>The 10-Point System</h4>
-      <p>Ten positions: all six from the standard system plus deep front corners, additional centre-mid, and deep back centre. The additional positions create longer movement arcs, more complex directional changes, and a significantly higher metabolic demand. It more accurately replicates the movement demands of elite match play.</p>
-      <h4>Our Recommendation</h4>
-      <p>Start with 6-point until you can complete a 20-minute session at medium pace with consistent T-position recovery. Then progress to 10-point. Many advanced players use both — 6-point for high-intensity conditioning and 10-point for pattern and movement quality work.</p>
+      <p>Not sure which to use? Start with 6-point. Here's the full breakdown, and when it actually makes sense to move up.</p>
+      <h4>What the 6-Point System Covers</h4>
+      <p>Six positions: front corners, mid-court sides, back corners. The fundamental movement vocabulary of squash. Distances are manageable, patterns are clear, and intensity scales well from beginner through intermediate. Most players can run a solid 20-minute 6-point session within a few weeks of starting.</p>
+      <h4>What the 10-Point System Adds</h4>
+      <p>Four extra positions: deep front corners, additional mid-court points, and a deep back centre. Movement arcs get longer, direction changes get sharper, and the physical demand jumps noticeably. It's a much closer match to what elite-level rally movement actually looks like. For advanced players, this is where the real work is.</p>
+      <h4>When to Make the Switch</h4>
+      <p>Here's a simple test: can you run 20 minutes at Pace 4 on the 6-point system, recovering cleanly to the T every rep, without technique breaking down in the last five minutes? Yes, try 10-point. Not yet, spend a few more weeks on the foundation first. A lot of experienced players use both: 6-point for conditioning, 10-point for movement quality. There's no rule that says you have to pick one.</p>
     `
   },
   {
     tag: 'Tactics', title: 'T-Position: The Most Important Habit in Squash',
     meta: '5 min read · Tactics', body: `
-      <p>Ask any squash coach what single habit separates recreational players from competitive players and the answer is almost universally the same: T-position recovery.</p>
-      <h4>What Is the T?</h4>
-      <p>The T is the junction of the half-court line and the short line — roughly the centre of the court. From the T, you are equidistant from all four corners. You have maximum time to read your opponent and minimal distance to cover regardless of where the ball goes.</p>
-      <h4>Why Most Players Do Not Return to the T</h4>
-      <p>After playing a shot, the natural tendency is to watch the ball or admire your shot. The discipline of immediately recovering to the T — before the ball even reaches the front wall — is a trained habit, not a natural one. Ghosting automates this because every drill ends with a return to the T before the next position is called.</p>
-      <h4>How Long It Takes to Automate</h4>
-      <p>Research on motor learning suggests 300-500 high-quality repetitions are needed to begin automating a movement pattern. At a moderate ghosting pace of 8 positions per minute over 20 minutes, you complete 160 T-position returns per session. After 3-4 sessions per week for 4 weeks, you will have made the T a habit.</p>
+      <p>Ask almost any squash coach what they notice first about a new player and the answer is usually the same: whether they naturally return to the T.</p>
+      <h4>What the T Actually Is</h4>
+      <p>The T is the junction of the short line and the half-court line, roughly the geographic centre of the court. Stand there and you're equidistant from all four corners. You have time, you have options. Step away from it and you've handed your opponent a positional advantage and extra time to set up their next shot, both at once.</p>
+      <h4>Why Players Don't Go Back</h4>
+      <p>After hitting a shot, the instinct is to watch where it goes. Did it die in the nick? Did they reach it? That pause is completely natural. It's also why you end up scrambling for the next ball from a bad position. The T-recovery has to happen before you even know if the shot was good. That takes repetition to build. It won't happen on its own.</p>
+      <h4>Why Ghosting Automates It</h4>
+      <p>Every drill in SquashGhostingX ends with a return to the T before the next call fires. Not sometimes. Every single rep. After a few hundred of those, your body starts doing it automatically. The motor pattern runs faster than the conscious thought. When you carry that into a match, recovering to the T stops being a decision and starts being just what you do.</p>
     `
   },
   {
     tag: 'Conditioning', title: 'Progressive Overload for Squash Athletes',
     meta: '9 min read · Conditioning', body: `
-      <p>The principle of progressive overload — systematically increasing the training stimulus over time — is the cornerstone of all athletic development. Applied to ghosting, it transforms a drill into a structured training programme.</p>
-      <h4>The Four Variables You Can Manipulate</h4>
-      <p>In SquashGhostingX, you have four levers: pace (1-7), session duration, rest interval, and court system (6 or 10 point). Progressive overload means increasing at least one of these variables each week while allowing adaptation.</p>
-      <h4>A Simple 4-Week Cycle</h4>
-      <p>Week 1: Pace 4, 15 minutes, 5-second rests. Week 2: Pace 5, 18 minutes, 4-second rests. Week 3: Pace 6, 20 minutes, 3-second rests. Week 4: Deload — Pace 3, 12 minutes, longer rests. Then repeat the cycle at a higher baseline.</p>
-      <h4>How the App Supports This</h4>
-      <p>Your session history shows exactly what you did last time. The AI suggestion engine tracks your recent load and flags when it detects plateau patterns — ensuring you are always progressing, not just maintaining.</p>
+      <p>If you've been doing the same ghosting session for three months and wondering why you're not improving, progressive overload is almost certainly the missing piece.</p>
+      <h4>The Basic Idea</h4>
+      <p>Your body adapts to what you ask of it. Push it a little further than last time and it adapts. Keep asking the same thing and it stops improving. It just maintains. Progressive overload means deliberately increasing the training demand over time so adaptation keeps happening instead of stalling.</p>
+      <h4>Four Variables You Can Adjust</h4>
+      <p>In SquashGhostingX you have four levers: pace (1–7), session duration, rest interval between positions, and court system (6 or 10 point). You don't need to push all of them at once. Increase one variable per week and you'll stay well clear of overtraining while still making real progress.</p>
+      <h4>A Simple 4-Week Structure</h4>
+      <p>Week 1: Pace 4, 15 minutes, normal rest. Week 2: Pace 5, 18 minutes, slightly shorter rest. Week 3: Pace 6, 20 minutes, minimal rest. Week 4: Deliberate deload, Pace 3, 12 minutes, longer rest. Then start the next cycle from a slightly higher baseline. Your session history is right there in the app. If it looks the same as two weeks ago, something needs to change.</p>
     `
   },
   {
     tag: 'Movement', title: 'The Perfect Ghosting Lunge Technique',
     meta: '6 min read · Movement', body: `
-      <p>The ghosting lunge is the most repeated movement in squash training. Done correctly, it is powerful and efficient. Done incorrectly, it is the fastest path to knee and ankle injuries. Here is how to do it right.</p>
-      <h4>The Front Corner Lunge</h4>
-      <p>Step 1: Cross-step with the dominant foot. Step 2: Plant the lead foot with toes turned out 30-45 degrees. Step 3: Drop your knee over (not beyond) your toe. Step 4: Push off explosively. The key error most players make: leading with the upper body instead of the hips, which loads the patella tendon incorrectly.</p>
-      <h4>The Back Corner Ghost</h4>
-      <p>For back corners, a split-step into an open stance is biomechanically safer than a closed stance lunge. Push off the outside foot, step through, and use the racket as a counterbalance. Your knee should track over your second toe throughout.</p>
-      <h4>Building the Habit at Slow Pace</h4>
-      <p>Use SquashGhostingX at Pace 1-2 specifically to drill technique. Slow ghosting at correct technique is vastly superior to fast ghosting with poor form. Film yourself from the side to check knee alignment — you will likely be surprised by what you see.</p>
+      <p>The ghosting lunge is the most repeated movement in squash training. Done right, it's powerful and fast. Done wrong, it's a direct route to knee problems that stick around for months. Worth getting it right from the start.</p>
+      <h4>Front Corner Lunges</h4>
+      <p>Cross-step with your dominant foot. Land with toes turned out roughly 30–40 degrees, not pointing straight forward. Drop your knee over your toe, not in front of it. Push off from heel-to-midfoot. The most common mistake: leading with your chest instead of your hips, which loads the patella tendon incorrectly. Drop the hip first, not the upper body.</p>
+      <h4>Back Corner Ghosts</h4>
+      <p>For back corners, an open stance is biomechanically safer than a closed lunge for most players. Step out with the outside foot, stay upright, and push back hard off that foot. Your knee should track over your second toe the whole way. Use your racket arm as a counterbalance. It's not just habit, it genuinely helps with rotation and landing mechanics.</p>
+      <h4>Drill Technique at Pace 1–2</h4>
+      <p>The fastest way to fix technique isn't slowing down your matches. It's ghosting at Pace 1 or 2 with deliberate focus on mechanics. Film yourself from the side. Most players find their knee collapses inward on front-corner lunges far more than they thought. Two slow-pace sessions focused purely on form is worth more than ten fast sessions with poor mechanics.</p>
     `
   },
   {
     tag: 'Routines', title: 'Building a 4-Week Ghosting Programme',
     meta: '10 min read · Routines', body: `
-      <p>For competitive players preparing for a tournament, a structured 4-week ghosting programme produces measurable fitness gains and movement confidence. Here is a template you can use directly in SquashGhostingX.</p>
-      <h4>Week 1 — Foundation</h4>
-      <p>3 sessions: 2x 6-point (20 min, Pace 4), 1x 10-point (15 min, Pace 3). Focus on T-position recovery quality over speed. Use the zone balance data to identify your weakest positions from day one.</p>
-      <h4>Week 2 — Load</h4>
-      <p>4 sessions: 2x 6-point (25 min, Pace 5), 2x 10-point (20 min, Pace 4). Increase both volume and intensity. Check your zone balance — target sessions for any positions below 70%.</p>
-      <h4>Week 3 — Peak</h4>
-      <p>4 sessions: 1x 6-point (20 min, Pace 6), 3x 10-point (25 min, Pace 5-6). Highest load week. Prioritise recovery between sessions. Avoid back-to-back high-intensity days.</p>
-      <h4>Week 4 — Taper</h4>
-      <p>2 sessions only: 1x 6-point (15 min, Pace 3), 1x 10-point (15 min, Pace 4). Reduce volume by 50%, keep intensity moderate. Arrive at your tournament with fresh legs and automatic movement patterns.</p>
+      <p>Got a tournament in four weeks and not sure how to structure your training? Here's a plan you can run directly in SquashGhostingX, no planning required.</p>
+      <h4>Week 1: Find Your Baseline</h4>
+      <p>Three sessions: two 6-point at Pace 4 for 20 minutes, one 10-point at Pace 3 for 15 minutes. Don't push for intensity yet. You're establishing your movement quality baseline and getting your zone balance data to show you where the holes are. Check which positions are under 70%; you'll be targeting those next week.</p>
+      <h4>Week 2: Start Loading</h4>
+      <p>Four sessions: two 6-point at Pace 5 for 25 minutes, two 10-point at Pace 4 for 20 minutes. Volume and intensity both go up. Run targeted sessions on your weakest zones. If back right is sitting at 65%, weight it heavily in at least one session this week.</p>
+      <h4>Week 3: Peak Week</h4>
+      <p>Four sessions: one 6-point at Pace 6 for 20 minutes, three 10-point at Pace 5–6 for 25 minutes. Highest load of the block. Don't train back-to-back if you can avoid it. Your legs should feel heavy mid-week. That's normal. That's the point.</p>
+      <h4>Week 4: Taper</h4>
+      <p>Two sessions only: 6-point at Pace 3 for 15 minutes, 10-point at Pace 4 for 15 minutes. Cut the volume roughly in half, keep intensity moderate, give your body real recovery time. Show up to your tournament with automatic movement patterns and legs that aren't beaten up. The hard work is already in the bank.</p>
     `
   },
   {
     tag: 'Technology', title: 'Why AI Voice Coaching Changes Everything',
     meta: '7 min read · Technology', body: `
-      <p>Before SquashGhostingX, ghosting required either a coach calling positions or a printed card. Both require your eyes to leave the court. The AI voice coaching engine changes this completely.</p>
-      <h4>Eyes Forward, Always</h4>
-      <p>In a real match, your eyes are always forward — reading your opponent and the ball. Training with a screen you need to glance at breaks this fundamental habit. Audio cues eliminate the problem entirely. Your phone stays in your pocket.</p>
-      <h4>Timing Precision</h4>
-      <p>The SquashGhostingX timing engine fires each voice cue at the precise moment you should be starting your movement — not when you arrive, but when you should leave. The recovery cue fires 400ms before the next position is called, giving your body time to set up at the T. No human coach can achieve this consistency.</p>
-      <h4>Personalisation at Scale</h4>
-      <p>The voice engine adapts to your settings — speech rate, coaching intensity, voice gender, language. This level of personalisation would require a dedicated personal coach in a traditional training setting. The AI delivers it to every player, every session, for free.</p>
+      <p>Before SquashGhostingX, your options for solo ghosting were: hire a coach to call positions, count out loud yourself, or stare at a screen. The first is expensive, the second breaks your rhythm, and the third drills exactly the wrong habit. Voice coaching fixes this.</p>
+      <h4>Keep Your Eyes Forward</h4>
+      <p>In a match, your eyes should always be forward, tracking your opponent, reading their body shape, watching the ball. If training involves looking down at a screen to find your next position, you're reinforcing the wrong behaviour every rep. Audio cues fix it completely. Your phone stays in your pocket. The position comes to you.</p>
+      <h4>More Consistent Than Any Human Coach</h4>
+      <p>The app fires each position cue at the exact moment you should be starting your movement. Not when you arrive, but when you should leave the T. The recovery cue comes just before the next position call, giving you the window to reset. A human coach can approximate this. No human maintains that consistency across a 25-minute session at pace, rep after rep.</p>
+      <h4>It Adapts to You</h4>
+      <p>Speed, coaching intensity, voice, language: it all adjusts to your settings. Coaching in 17 languages means playing in your first language, whether that's French, Hindi, Arabic, or Spanish. Dial the pace up for faster calls. Turn coaching cues on for feedback between positions. This level of personalisation used to mean a dedicated personal coach at every session. Now it's on your phone, for free.</p>
+    `
+  },
+  {
+    tag: 'Mobile App', title: "Your Phone Is the Best Squash Coach You've Never Had",
+    meta: '6 min read · Mobile App', body: `
+      <p>I know how that sounds. Bear with me.</p>
+      <p>Private squash coaching is expensive, anywhere from $60 to $150 an hour depending on where you live, if you can even find a good coach with availability. Club coaching is cheaper but usually means group sessions where you get ten minutes of focused attention if you're lucky. Training three times a week gets costly fast, and most club players simply can't sustain it.</p>
+      <h4>What a Mobile App Actually Does Well</h4>
+      <p>A phone can't watch your technique or tell you your swing is too open; that still needs a real coach in the room. But what it does consistently, for free, any time you have court access: calls your ghosting positions, times your intervals, adapts to your skill level, tracks your court coverage over weeks, and enforces T-recovery on every single rep. For the movement and conditioning side of the game, a well-built app covers most of it.</p>
+      <h4>The Offline Factor</h4>
+      <p>Courts don't usually have WiFi. The changing room definitely doesn't. SquashGhostingX works entirely offline, everything runs on your device with no connection needed. Open the app, set your session, earphones in, and go. It doesn't need to check in with a server before letting you train.</p>
+      <h4>17 Languages</h4>
+      <p>This matters more than it seems. If English isn't your first language, processing coaching cues in English costs you something in real time, a small lag as your brain translates. Getting coached in Hindi, Arabic, French, Spanish, or another of the 17 supported languages is just cleaner. Faster to process, more natural to respond to. None of this replaces a skilled coach for technique work. But for movement, fitness, and court patterns on your own? Your phone is genuinely useful.</p>
+    `
+  },
+  {
+    tag: 'Tactics', title: 'Why Your Back Corners Are Costing You Matches',
+    meta: '5 min read · Tactics', body: `
+      <p>Watch most club players and there's a pattern: comfortable at mid-court, decent up front, and suddenly very human when the ball goes deep to the back. Not just uncomfortable. Slow, off-balance, playing the ball from behind instead of beside it. That usually means a weak reply, and a sharp opponent puts it away.</p>
+      <h4>Why Back Corners Are So Difficult</h4>
+      <p>The back corners are the furthest points from the T. You have the least time to get there, the most ground to cover, and when you arrive you're often still moving away from where you want to hit the ball. You need to decelerate, set your stance, and generate power at the same moment. There's no magic solution. The geometry is just hard.</p>
+      <h4>What Actually Fixes It</h4>
+      <p>Repetition. Targeted, unglamorous repetition of exactly that movement. Match play won't cut it; match play doesn't give you enough back-corner contacts in an hour to actually move the needle. Ghosting does. If your zone balance shows back corners at 65% while mid-court is at 90%, that gap maps directly onto what your opponent is exploiting. Weight your sessions toward back-left and back-right for two weeks. The numbers will move, and you'll feel it in your matches before they do.</p>
+      <h4>One Cue That Helps Immediately</h4>
+      <p>Get your racket back early. Most back-corner errors come from players arriving at the ball without their racket prepared. If you can reach the backswing position before you arrive at the corner (not as you arrive), the rest of the movement becomes significantly easier. Ghost it at Pace 1–2, focused only on racket preparation timing. Small adjustment, real payoff.</p>
+    `
+  },
+  {
+    tag: 'Training', title: 'How to Train Squash Solo When You Have No Partner',
+    meta: '7 min read · Training', body: `
+      <p>Squash is a two-player sport, which makes it annoying when you can't find someone to hit with. Partner cancelled. Can't find anyone at your level. Court booked, nobody available. Solo training is your fallback, and it works better than most people think, if you do it properly.</p>
+      <h4>What Solo Training Is Good For</h4>
+      <p>Movement, footwork, aerobic fitness, and pattern repetition. The things that carry you through a five-game match. For shot-making under pressure or tactical adaptation against a real opponent, you need a ball and a partner. But for court coverage and conditioning? Solo isn't just acceptable. It's sometimes better, because there's nothing to distract you from the movement itself.</p>
+      <h4>Ghosting Is the Foundation</h4>
+      <p>Moving to each court position, playing a shadow stroke, then returning to the T. That's the most direct route to better court movement when you're alone. The discipline is the T-recovery. Every single rep, come back before the next call. No shortcuts. Set up a structured session in the app, put your earphones in, and twenty minutes goes by faster than you'd expect.</p>
+      <h4>Use Structure to Stay Honest</h4>
+      <p>Without structure, solo court time drifts. You move fast for a bit, slow down, lose focus. With a session running through your earphones, there's always something happening. The calls come whether you're ready or not. Two or three structured ghosting sessions per week alongside your match play, and within a month you'll notice your feet arriving earlier, fewer scrambled balls, better stamina late in games. These show up in real matches, usually before you consciously notice them.</p>
+    `
+  },
+  {
+    tag: 'Routines', title: 'The 15-Minute Ghost Session That Actually Works',
+    meta: '4 min read · Routines', body: `
+      <p>Most training advice assumes you have 45 minutes to an hour on court. That's not always realistic. Work, family, limited court time, sometimes 15 minutes is all you've got, and the question is whether it's worth doing at all. It is. Here's how.</p>
+      <h4>The Setup</h4>
+      <p>6-point system, Pace 5, minimum rest intervals. Quality movement over as many reps as possible. Earphones in, phone in pocket, session running before you step on court. Don't spend the first three minutes stretching on the T. Warm up off court and get straight into it.</p>
+      <h4>The Structure</h4>
+      <p>Minutes 1–3: moderate pace, getting moving, clean T-recovery on every rep. Minutes 4–10: full pace, don't back off when you're tired. That's the exact moment the session starts to count. Minutes 11–13: hold pace, keep technique together. Minutes 14–15: drop to Pace 2–3, slow deliberate movement, finish clean.</p>
+      <h4>Why This Works</h4>
+      <p>Fifteen minutes done like this three times a week genuinely outperforms 45 minutes of unfocused court time. Intensity matters more than duration, up to a point. Short, consistent sessions also keep movement patterns fresher than one long session followed by a week off. When you have more time, do more. When you don't, 15 minutes is enough to keep the adaptation going.</p>
+    `
+  },
+  {
+    tag: 'Analytics', title: 'What Your Session Stats Are Actually Telling You',
+    meta: '6 min read · Analytics', body: `
+      <p>Most players look at their session stats after training and either feel good or feel bad about the numbers. That's not really using the data. Here's what it's actually saying.</p>
+      <h4>Total Reps and Pace</h4>
+      <p>Rep count only means something alongside pace. A hundred reps at Pace 3 and a hundred reps at Pace 6 are completely different training stimuli. Track reps-at-pace over time. If your Pace 5 rep count keeps climbing week over week without technique falling apart, that's real fitness improvement. If it's been flat for three weeks, something in your programme needs to change.</p>
+      <h4>Zone Balance Over Time</h4>
+      <p>This is the most useful number for match players. Watch it across four to eight weeks. Your weakest zone almost always maps to a weakness in your actual match game: the position you avoid, the corner you dread. When that zone percentage starts climbing, your match play follows, usually within a couple of weeks.</p>
+      <h4>Session Streaks and Consistency</h4>
+      <p>Five moderate sessions per week, consistently, does more over a training season than one brutal session followed by ten days of nothing. The streak number is a proxy for consistency, so keep it going. When you break a streak, the question isn't how long it was. It's what actually disrupted it, and whether that changes how you schedule training going forward.</p>
+      <h4>Personal Bests</h4>
+      <p>When a PB falls, note which variable moved: pace, duration, or rep count. Knowing which lever changed tells you where your current adaptation is coming from, and that's the thing to keep pushing in your next session. The data doesn't do anything on its own, but two minutes looking at it after each session starts revealing patterns you'd never notice otherwise.</p>
     `
   }
 ];
@@ -2367,6 +2489,8 @@ function closeLightbox() { document.getElementById('lightbox').classList.remove(
       a: Math.random() * .5 + .1
     });
   }
+  let rafId = null;
+  let heroVisible = true;
   function draw() {
     ctx.clearRect(0, 0, W, H);
     particles.forEach(p => {
@@ -2392,9 +2516,13 @@ function closeLightbox() { document.getElementById('lightbox').classList.remove(
         }
       }
     });
-    requestAnimationFrame(draw);
+    if (heroVisible) rafId = requestAnimationFrame(draw);
   }
-  draw();
+  new IntersectionObserver((entries) => {
+    heroVisible = entries[0].isIntersecting;
+    if (heroVisible && !rafId) { rafId = requestAnimationFrame(draw); }
+  }, { threshold: 0 }).observe(canvas);
+  rafId = requestAnimationFrame(draw);
 })();
 </script>
 </body>

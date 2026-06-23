@@ -1012,10 +1012,18 @@ const aStyles = StyleSheet.create({
 // ─── Main modal ───────────────────────────────────────────────────────────────
 
 export default function AuthModal() {
-  const { profile, hasCompletedAuth, isOnboardingComplete, completeAuth, completeOnboarding, setProfile } = useProfileStore();
+  const { profile, hasCompletedAuth, hasAcceptedTerms, isOnboardingComplete, completeAuth, completeOnboarding, setProfile } = useProfileStore();
 
   const [page, setPage] = useState<'welcome' | 'register' | 'login' | 'guest-name' | 'guest-prefs'>('welcome');
 
+  // Reset to welcome whenever auth is cleared (sign-out, delete account) so the
+  // user never lands on a stale mid-flow page (e.g. 'guest-prefs') after signing out.
+  useEffect(() => {
+    if (!hasCompletedAuth) setPage('welcome');
+  }, [hasCompletedAuth]);
+
+  // Terms must be accepted before auth screen can show.
+  if (!hasAcceptedTerms) return null;
   if (hasCompletedAuth) return null;
 
   function handleAuthComplete(email?: string) {
@@ -1034,13 +1042,23 @@ export default function AuthModal() {
     completeAuth(email);
   }
 
-  function handleGuestNameContinue(name: string) {
-    if (name.trim()) setProfile({ name: name.trim() });
+  function handleGuestNameContinue(name: string, gender: string, dobMonth: string, dobDay: string, dobYear: string) {
+    setProfile({
+      ...(name.trim() ? { name: name.trim() } : {}),
+      gender: gender as any,
+      dobMonth, dobDay, dobYear,
+    });
     setPage('guest-prefs');
   }
 
   function handleGuestPrefsContinue(skill: string, hand: string, voiceGender: string, language: string) {
-    setProfile({ skillLevel: skill as any, dominantHand: hand as any, voiceGender: voiceGender as any, language: language as any });
+    // gender already set in GuestNamePage — do not override here.
+    setProfile({
+      skillLevel: skill as any,
+      dominantHand: hand as any,
+      voiceGender: voiceGender as any,
+      language: language as any,
+    });
     completeAuth(undefined);
     completeOnboarding();
   }
@@ -1089,16 +1107,230 @@ const modalStyles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
 });
 
+// ─── DOB picker data ──────────────────────────────────────────────────────────
+
+const DOB_MONTHS = [
+  { label: 'January',   value: '01' }, { label: 'February',  value: '02' },
+  { label: 'March',     value: '03' }, { label: 'April',     value: '04' },
+  { label: 'May',       value: '05' }, { label: 'June',      value: '06' },
+  { label: 'July',      value: '07' }, { label: 'August',    value: '08' },
+  { label: 'September', value: '09' }, { label: 'October',   value: '10' },
+  { label: 'November',  value: '11' }, { label: 'December',  value: '12' },
+];
+const DOB_DAYS = Array.from({ length: 31 }, (_, i) => {
+  const d = String(i + 1).padStart(2, '0');
+  return { label: d, value: d };
+});
+const _cy = new Date().getFullYear();
+const DOB_YEARS = Array.from({ length: _cy - 1919 }, (_, i) => {
+  const y = String(_cy - i);
+  return { label: y, value: y };
+});
+
+// ─── Combined DOB picker — single modal with three scrollable columns ────────
+
+const DOB_ITEM_H = 46;
+
+function DobPickerCombined({
+  dobMonth, dobDay, dobYear, onConfirm,
+}: {
+  dobMonth: string; dobDay: string; dobYear: string;
+  onConfirm: (month: string, day: string, year: string) => void;
+}) {
+  const [open,     setOpen]     = useState(false);
+  const [selMonth, setSelMonth] = useState(dobMonth);
+  const [selDay,   setSelDay]   = useState(dobDay);
+  const [selYear,  setSelYear]  = useState(dobYear);
+
+  const monthListRef = useRef<FlatList>(null);
+  const dayListRef   = useRef<FlatList>(null);
+  const yearListRef  = useRef<FlatList>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const t = setTimeout(() => {
+      const mIdx = DOB_MONTHS.findIndex(m => m.value === selMonth);
+      const dIdx = DOB_DAYS.findIndex(d => d.value === selDay);
+      const yIdx = DOB_YEARS.findIndex(y => y.value === selYear);
+      if (mIdx > 0) monthListRef.current?.scrollToIndex({ index: mIdx, animated: false });
+      if (dIdx > 0) dayListRef.current?.scrollToIndex({ index: dIdx, animated: false });
+      if (yIdx > 0) yearListRef.current?.scrollToIndex({ index: yIdx, animated: false });
+    }, 80);
+    return () => clearTimeout(t);
+  }, [open]);
+
+  function openPicker() {
+    setSelMonth(dobMonth);
+    setSelDay(dobDay);
+    setSelYear(dobYear);
+    setOpen(true);
+  }
+
+  const displayDate = dobMonth && dobDay && dobYear
+    ? `${DOB_MONTHS.find(m => m.value === dobMonth)?.label} ${parseInt(dobDay, 10)}, ${dobYear}`
+    : null;
+
+  function renderCol(
+    data: { label: string; value: string }[],
+    selected: string,
+    onSelect: (v: string) => void,
+    listRef: React.RefObject<FlatList>,
+    flex: number,
+  ) {
+    return (
+      <FlatList
+        ref={listRef}
+        data={data}
+        keyExtractor={item => item.value}
+        style={{ flex }}
+        showsVerticalScrollIndicator={false}
+        getItemLayout={(_, index) => ({ length: DOB_ITEM_H, offset: DOB_ITEM_H * index, index })}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={[dobStyles.colItem, item.value === selected && dobStyles.colItemSel]}
+            onPress={() => onSelect(item.value)}
+            activeOpacity={0.6}
+          >
+            <Text style={[dobStyles.colItemText, item.value === selected && dobStyles.colItemTextSel]} numberOfLines={1}>
+              {item.label}
+            </Text>
+          </TouchableOpacity>
+        )}
+      />
+    );
+  }
+
+  return (
+    <>
+      <TouchableOpacity style={gnStyles.dobTrigger} onPress={openPicker} activeOpacity={0.8}>
+        <Ionicons name="calendar-outline" size={16} color={Colors.textMuted} />
+        <Text style={displayDate ? gnStyles.dobTriggerValue : gnStyles.dobTriggerPlaceholder} numberOfLines={1}>
+          {displayDate ?? 'Select date of birth'}
+        </Text>
+        <Ionicons name="chevron-down" size={13} color={Colors.textMuted} />
+      </TouchableOpacity>
+
+      <Modal visible={open} transparent animationType="fade" statusBarTranslucent>
+        <TouchableOpacity style={gnStyles.pickerOverlay} onPress={() => setOpen(false)} activeOpacity={1}>
+          <View style={gnStyles.pickerSheet} onStartShouldSetResponder={() => true}>
+            <View style={gnStyles.pickerHeader}>
+              <Text style={gnStyles.pickerHeaderText}>Date of Birth</Text>
+              <TouchableOpacity onPress={() => setOpen(false)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                <Ionicons name="close" size={20} color={Colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={dobStyles.colHeaders}>
+              <Text style={[dobStyles.colHeaderText, { flex: 1.6 }]}>MONTH</Text>
+              <Text style={[dobStyles.colHeaderText, { flex: 0.8 }]}>DAY</Text>
+              <Text style={[dobStyles.colHeaderText, { flex: 1 }]}>YEAR</Text>
+            </View>
+
+            <View style={dobStyles.colsRow}>
+              {renderCol(DOB_MONTHS, selMonth, setSelMonth, monthListRef, 1.6)}
+              <View style={dobStyles.colDivider} />
+              {renderCol(DOB_DAYS,   selDay,   setSelDay,   dayListRef,   0.8)}
+              <View style={dobStyles.colDivider} />
+              {renderCol(DOB_YEARS,  selYear,  setSelYear,  yearListRef,  1)}
+            </View>
+
+            <TouchableOpacity
+              style={dobStyles.doneBtn}
+              onPress={() => { onConfirm(selMonth, selDay, selYear); setOpen(false); }}
+              activeOpacity={0.85}
+            >
+              <Text style={dobStyles.doneBtnText}>Done</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+    </>
+  );
+}
+
+const dobStyles = StyleSheet.create({
+  colHeaders: {
+    flexDirection: 'row',
+    paddingHorizontal: Spacing.base,
+    paddingVertical: 6,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: Colors.border,
+  },
+  colHeaderText: {
+    fontSize: FontSize.micro,
+    fontWeight: FontWeight.bold,
+    color: Colors.textDisabled,
+    letterSpacing: 0.8,
+    textAlign: 'center',
+  },
+  colsRow: {
+    flexDirection: 'row',
+    maxHeight: 230,
+  },
+  colDivider: {
+    width: StyleSheet.hairlineWidth,
+    backgroundColor: Colors.border,
+  },
+  colItem: {
+    height: DOB_ITEM_H,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: Colors.borderLight,
+  },
+  colItemSel: {
+    backgroundColor: Colors.brandMuted,
+  },
+  colItemText: {
+    fontSize: FontSize.body,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    paddingHorizontal: 2,
+  },
+  colItemTextSel: {
+    color: Colors.brand,
+    fontWeight: FontWeight.semiBold,
+  },
+  doneBtn: {
+    margin: Spacing.md,
+    height: 48,
+    backgroundColor: Colors.brand,
+    borderRadius: BorderRadius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  doneBtnText: {
+    fontSize: FontSize.body,
+    fontWeight: FontWeight.bold,
+    color: Colors.textInverse,
+  },
+});
+
 // ─── GuestNamePage ────────────────────────────────────────────────────────────
 
 function GuestNamePage({
   onContinue,
   onBack,
 }: {
-  onContinue: (name: string) => void;
+  onContinue: (name: string, gender: string, dobMonth: string, dobDay: string, dobYear: string) => void;
   onBack: () => void;
 }) {
-  const [name, setName] = useState('');
+  const [name,     setName]     = useState('');
+  const [gender,   setGender]   = useState('male');
+  const [dobMonth, setDobMonth] = useState('');
+  const [dobDay,   setDobDay]   = useState('');
+  const [dobYear,  setDobYear]  = useState('');
+
+  // Letters, spaces, hyphens, apostrophes only (covers accented names like O'Brien, María)
+  function handleNameChange(text: string) {
+    setName(text.replace(/[^a-zA-ZÀ-ɏ'\- ]/g, ''));
+  }
+
+  const GENDERS = [
+    { value: 'male',   label: 'Male',   icon: 'man'   as const },
+    { value: 'female', label: 'Female', icon: 'woman' as const },
+  ];
+
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
       <ScrollView
@@ -1107,11 +1339,7 @@ function GuestNamePage({
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <TouchableOpacity
-          onPress={onBack}
-          style={aStyles.backBtn}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
+        <TouchableOpacity onPress={onBack} style={aStyles.backBtn} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
           <Ionicons name="arrow-back" size={22} color={Colors.textSecondary} />
         </TouchableOpacity>
 
@@ -1119,28 +1347,58 @@ function GuestNamePage({
           <Ionicons name="person" size={40} color={Colors.brand} />
         </View>
 
-        <Text style={gnStyles.heading}>{"What should we\ncall you?"}</Text>
-        <Text style={gnStyles.sub}>Optional — you can change this anytime in Profile.</Text>
+        <Text style={gnStyles.heading}>{"Tell us about\nyourself"}</Text>
+        <Text style={gnStyles.sub}>Optional — you can update these anytime in Profile.</Text>
 
-        <View style={[aStyles.inputWrap, gnStyles.inputWrap]}>
+        {/* Name */}
+        <Text style={gnStyles.fieldLabel}>YOUR NAME</Text>
+        <View style={[aStyles.inputWrap, { marginBottom: Spacing.lg }]}>
           <Ionicons name="person-outline" size={18} color={Colors.textMuted} style={aStyles.inputIcon} />
           <TextInput
             style={aStyles.input}
             value={name}
-            onChangeText={setName}
+            onChangeText={handleNameChange}
             placeholder="Your name"
             placeholderTextColor={Colors.textMuted}
             autoCapitalize="words"
             returnKeyType="done"
-            onSubmitEditing={() => onContinue(name)}
             maxLength={32}
             autoFocus
           />
         </View>
 
+        {/* Gender */}
+        <Text style={gnStyles.fieldLabel}>GENDER</Text>
+        <View style={gnStyles.pillRow}>
+          {GENDERS.map(g => (
+            <TouchableOpacity
+              key={g.value}
+              style={[gnStyles.pill, gender === g.value && gnStyles.pillActive]}
+              onPress={() => setGender(g.value)}
+              activeOpacity={0.75}
+            >
+              <Ionicons
+                name={gender === g.value ? g.icon : (`${g.icon}-outline` as any)}
+                size={16}
+                color={gender === g.value ? Colors.brand : Colors.textMuted}
+              />
+              <Text style={[gnStyles.pillText, gender === g.value && gnStyles.pillTextActive]}>
+                {g.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Date of birth — single tap opens combined month/day/year picker */}
+        <Text style={[gnStyles.fieldLabel, { marginTop: Spacing.md }]}>DATE OF BIRTH</Text>
+        <DobPickerCombined
+          dobMonth={dobMonth} dobDay={dobDay} dobYear={dobYear}
+          onConfirm={(m, d, y) => { setDobMonth(m); setDobDay(d); setDobYear(y); }}
+        />
+
         <TouchableOpacity
-          style={aStyles.submitBtn}
-          onPress={() => onContinue(name)}
+          style={[aStyles.submitBtn, { marginTop: Spacing.xl }]}
+          onPress={() => onContinue(name, gender, dobMonth, dobDay, dobYear)}
           activeOpacity={0.88}
         >
           <Text style={aStyles.submitText}>{name.trim() ? 'Continue' : 'Skip'}</Text>
@@ -1168,7 +1426,57 @@ const gnStyles = StyleSheet.create({
     fontSize: FontSize.label, color: Colors.textMuted,
     lineHeight: 22, marginBottom: Spacing.xl,
   },
-  inputWrap: { marginBottom: Spacing.xl },
+  fieldLabel: {
+    fontSize: FontSize.caption, fontWeight: FontWeight.semiBold,
+    color: Colors.textMuted, letterSpacing: 0.8, marginBottom: Spacing.sm,
+  },
+
+  // Gender pills
+  pillRow: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.lg },
+  pill: {
+    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: 6, paddingVertical: 12,
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1, borderColor: Colors.border,
+  },
+  pillActive: {
+    backgroundColor: Colors.brandMuted,
+    borderColor: Colors.brand,
+  },
+  pillText:       { fontSize: FontSize.label, fontWeight: FontWeight.medium, color: Colors.textMuted },
+  pillTextActive: { color: Colors.brand, fontWeight: FontWeight.semiBold },
+
+  // DOB single trigger button
+  dobTrigger: {
+    flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1, borderColor: Colors.border,
+    paddingHorizontal: Spacing.md, paddingVertical: 14,
+    marginBottom: Spacing.lg,
+  },
+  dobTriggerValue:       { flex: 1, fontSize: FontSize.label, color: Colors.textPrimary },
+  dobTriggerPlaceholder: { flex: 1, fontSize: FontSize.label, color: Colors.textMuted },
+
+  // Picker modal (overlay + sheet + header — shared with DobPickerCombined)
+  pickerOverlay: {
+    flex: 1, backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'flex-end',
+  },
+  pickerSheet: {
+    backgroundColor: Colors.surfaceElevated,
+    borderTopLeftRadius: BorderRadius.xl,
+    borderTopRightRadius: BorderRadius.xl,
+    paddingBottom: Spacing.xl,
+    borderWidth: 1, borderColor: Colors.border,
+  },
+  pickerHeader: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: Spacing.base, paddingVertical: Spacing.md,
+    borderBottomWidth: 1, borderBottomColor: Colors.border,
+  },
+  pickerHeaderText: { fontSize: FontSize.body, fontWeight: FontWeight.semiBold, color: Colors.textPrimary },
 });
 
 // ─── GuestPrefsPage ───────────────────────────────────────────────────────────
@@ -1182,7 +1490,7 @@ function GuestPrefsPage({
 }) {
   const [skill,    setSkill]    = useState('intermediate');
   const [hand,     setHand]     = useState('right');
-  const [voice,    setVoice]    = useState('female');
+  const [voice,    setVoice]    = useState('male');
   const [language, setLanguage] = useState('en-US');
 
   const SKILLS = [

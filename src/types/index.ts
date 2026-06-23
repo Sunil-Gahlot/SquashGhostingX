@@ -67,7 +67,7 @@ export interface ActiveSession {
   totalMovementsPlanned: number;
   startedAt: number;          // Date.now() timestamp
   elapsedSeconds: number;
-  livePaceStep: number;       // 0–4: index into PACE_STEPS_MS; 2 = neutral
+  livePaceStep: number;       // 0–6: index into PACE_STEPS_MS; 3 = Normal
 }
 
 export interface SessionCheckpoint {
@@ -143,7 +143,7 @@ export interface Program {
   id: string;
   name: string;
   description: string;
-  level: SkillLevel | 'custom';
+  level: SkillLevel | 'custom' | 'all';
   config: SessionConfig;
   isBuiltin: boolean;
   estimatedMinutes: number;

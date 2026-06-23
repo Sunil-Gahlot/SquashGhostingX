@@ -202,6 +202,20 @@ export default function CourtCanvas({
   const pulseR       = pulse.interpolate({ inputRange: [0, 1], outputRange: [PULSE_R, PULSE_R + 20] });
   const pulseOpacity = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.70, 0.04] });
 
+  // Delay the pulse ring so the player image always appears before the circle,
+  // preventing the "circle at target before player arrives" visual mismatch.
+  const [showPulse, setShowPulse] = useState(false);
+  const pulseShowTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (pulseShowTimer.current) clearTimeout(pulseShowTimer.current);
+    if (activePosition && activePosition !== 'T') {
+      pulseShowTimer.current = setTimeout(() => setShowPulse(true), 150);
+    } else {
+      setShowPulse(false);
+    }
+    return () => { if (pulseShowTimer.current) clearTimeout(pulseShowTimer.current); };
+  }, [activePosition]);
+
   // SVG mirror transform for left-handed players
   const mirror = dominantHand === 'left' ? `scale(-1,1) translate(-${VB_W},0)` : undefined;
 
@@ -256,14 +270,13 @@ export default function CourtCanvas({
         );
       })()}
 
-      {/* Active position pose — instant key-swap ensures no morph animation */}
+      {/* Active position pose — source-only swap avoids remount flash */}
       {activePosition && activePosition !== 'T' && (() => {
         const src = getPoseSource(activePosition, gender, dominantHand);
         const { vx, vy } = visualCoords(activePosition, dominantHand);
         const { w, h } = poseDims(activePosition, true);
         return (
           <RNImage
-            key={String(activePosition)}
             source={src}
             style={poseStyle(vx, vy, w, h, 1)}
             resizeMode="contain"
@@ -273,8 +286,9 @@ export default function CourtCanvas({
     </>
   );
 
-  // Pulse ring stays in SVG (it's a vector circle, not an image)
-  const pulseRingSvg = activePosition && activePosition !== 'T' ? (() => {
+  // Pulse ring stays in SVG (it's a vector circle, not an image).
+  // Uses showPulse (delayed 150ms) so the player image renders first.
+  const pulseRingSvg = showPulse && activePosition && activePosition !== 'T' ? (() => {
     const { vx, vy } = visualCoords(activePosition, dominantHand);
     return (
       <AnimatedCircle

@@ -6,8 +6,8 @@ import {
   getPositionsForSystem,
 } from '../constants/positions';
 import {
-  getIntervalMs, getShotCallMs, getRecoveryMs, MOVES_PER_SET, estimateTotalMoves,
-  POSITION_PHASE_OFFSET_MS,
+  getIntervalMs, getRecoveryMs, MOVES_PER_SET, estimateTotalMoves,
+  POSITION_PHASE_OFFSET_MS, MATCH_SIM_STEP_RATE,
 } from '../constants/timing';
 import { getShotsForPosition, pickShot } from './positionShotMatrix';
 
@@ -17,7 +17,6 @@ export interface SessionMove {
   position: Position;
   shot: string | null;
   intervalMs: number;
-  shotCallMs: number | null;   // null = movement-only drill
   recoveryMs: number;
   setIndex: number;
   moveIndex: number;
@@ -371,8 +370,10 @@ export function createGhostingEngine(config: SessionConfig): GhostingEngine {
 
   function effectiveInterval(): number {
     if (config.patternType !== 'match-sim') return baseIntervalMs;
-    // Spec: +10% speed every 3 sets in match simulation (floored at 60% of base)
-    const reduction = Math.floor(setIndex / 3) * 0.10;
+    // Progressive speed increase per 3 sets — rate scales with difficulty so beginners
+    // train at stable pace while advanced/elite/pro face increasing pressure.
+    const stepRate  = MATCH_SIM_STEP_RATE[config.difficulty] ?? 0.10;
+    const reduction = Math.floor(setIndex / 3) * stepRate;
     return Math.max(baseIntervalMs * 0.60, baseIntervalMs * (1 - reduction));
   }
 
@@ -440,8 +441,8 @@ export function createGhostingEngine(config: SessionConfig): GhostingEngine {
           // For left-handed players the pool was mirrored; unmirror before shot lookup
           // so the shot matrix (keyed on right-handed layout) returns the correct hand.
           const shotLookupPos = config.dominantHand === 'left' ? HAND_MIRROR[position] : position;
-          const shots = getShotsForPosition(shotLookupPos, config.shotGroups);
-          const entry = pickShot(shots);
+          const shots = getShotsForPosition(shotLookupPos, config.shotGroups, config.difficulty);
+          const entry = pickShot(shots, config.difficulty);
           shot = entry?.voiceText ?? null;
         }
       }
@@ -450,7 +451,6 @@ export function createGhostingEngine(config: SessionConfig): GhostingEngine {
         position,
         shot,
         intervalMs:    interval,
-        shotCallMs:    shot ? getShotCallMs(interval) : null,
         recoveryMs:    getRecoveryMs(interval),
         setIndex,
         moveIndex,
@@ -463,21 +463,9 @@ export function createGhostingEngine(config: SessionConfig): GhostingEngine {
 
     peekNextPosition(): Position | null {
       if (moveIndex < sequence.length) return sequence[moveIndex];
-      // Peek into what the next set would start with — save/restore state
-      const savedMoveIndex = moveIndex;
-      const savedSetIndex  = setIndex;
-      const savedSeq       = sequence;
-      const savedShots     = sequenceShots;
-      setIndex++;
-      moveIndex = 0;
-      buildSet();
-      const next = sequence[0] ?? null;
-      // Restore
-      setIndex      = savedSetIndex;
-      moveIndex     = savedMoveIndex;
-      sequence      = savedSeq;
-      sequenceShots = savedShots;
-      return next;
+      // Next set not yet generated — don't corrupt RNG by building a dummy set.
+      // The "Coming Up" hint will be absent at set boundaries, which is honest.
+      return null;
     },
 
     isSetComplete():        boolean { return moveIndex >= sequence.length; },

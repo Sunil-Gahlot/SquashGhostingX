@@ -111,9 +111,20 @@ export function speakText(
   language = 'en-US',
   voiceGender: VoiceGender = 'female',
 ): void {
-  // Re-assert audio session before each utterance so iOS routes to loudspeaker
-  // and respects playsInSilentMode even if the session was deactivated between calls.
-  setIsAudioActiveAsync(true).catch(() => {});
+  // Re-assert audio session before each utterance.
+  // On failure the session was interrupted (phone call, Siri, notification) — re-init to recover.
+  setIsAudioActiveAsync(true).catch(() => {
+    initAudioSession().catch(() => {});
+  });
+  // Re-assert routing so an earphone disconnect mid-session doesn't silently reroute to earpiece.
+  // iOS can short-circuit this call when routing is already correct — overhead is negligible.
+  setAudioModeAsync({
+    playsInSilentMode: true,
+    allowsRecording: false,
+    interruptionMode: 'doNotMix',
+    shouldPlayInBackground: true,
+    shouldRouteThroughEarpiece: false,
+  }).catch(() => {});
   try {
     Speech.stop();
     const voiceId = pickVoice(language, voiceGender);

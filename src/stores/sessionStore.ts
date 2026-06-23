@@ -27,7 +27,7 @@ interface SessionStore {
   setSessionId: (id: string) => void;
 
   // Lifecycle
-  initSession: (config: SessionConfig, totalPlanned: number) => void;
+  initSession: (config: SessionConfig, totalPlanned: number, defaultPaceStep?: number) => void;
   endSession: () => void;
   setPendingConfig: (config: SessionConfig) => void;
   clearPendingConfig: () => void;
@@ -70,7 +70,7 @@ export const useSessionStore = create<SessionStore>((set) => ({
   setPendingConfig:  (config) => set({ pendingConfig: config }),
   clearPendingConfig: ()      => set({ pendingConfig: null }),
 
-  initSession: (config, totalPlanned) => set({
+  initSession: (config, totalPlanned, defaultPaceStep = 3) => set({
     session: {
       sessionId: generateId(),
       state: 'idle',
@@ -87,7 +87,7 @@ export const useSessionStore = create<SessionStore>((set) => ({
       totalMovementsPlanned: totalPlanned,
       startedAt: Date.now(),
       elapsedSeconds: 0,
-      livePaceStep: 3,
+      livePaceStep: defaultPaceStep,
     },
   }),
 

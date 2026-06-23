@@ -20,7 +20,7 @@ import { useBadgesStore, BADGE_DEFS } from '../../stores/badgesStore';
 import { useSessionEngine } from '../../hooks/useSessionEngine';
 import { ActiveSession, Difficulty } from '../../types';
 import { POSITION_INFO } from '../../constants/positions';
-import { PACE_STEPS_MS, PACE_STEP_LABELS, MOVES_PER_SET, getIntervalMs, AUTO_REST_FACTOR } from '../../constants/timing';
+import { PACE_STEPS_MS, PACE_STEP_LABELS, MOVES_PER_SET, getIntervalMs, AUTO_REST_FACTORS } from '../../constants/timing';
 
 // ─── CountdownView ────────────────────────────────────────────────────────────
 
@@ -108,7 +108,7 @@ function ActiveTrainingView({
 
   return (
     <View style={atStyles.container}>
-      {/* ── Top: Timer (left) + Difficulty badge (right) ──────────── */}
+      {/* ── Top: Timer (left) + Rep count (center) + Difficulty badge (right) */}
       <View style={atStyles.topBar}>
         <View style={atStyles.timerWrap}>
           <View style={atStyles.timerCircle}>
@@ -118,6 +118,10 @@ function ActiveTrainingView({
             <Text style={atStyles.timerVal}>{rmm}:{rss}</Text>
             <Text style={atStyles.timerSub}>remaining</Text>
           </View>
+        </View>
+        <View style={atStyles.repWrap}>
+          <Text style={atStyles.repVal}>{session.repCount}</Text>
+          <Text style={atStyles.repSub}>reps</Text>
         </View>
         <View style={atStyles.diffBadge}>
           <Text style={atStyles.diffBadgeText}>{diffLabel}</Text>
@@ -134,12 +138,10 @@ function ActiveTrainingView({
       {/* ── Court (fills remaining space) ─────────────────────────── */}
       <CourtCanvas
         activePosition={session.currentPosition}
-        nextPosition={session.nextPosition}
         courtSystem={session.config.courtSystem}
         dominantHand={session.config.dominantHand}
         gender={gender}
         courtMode={courtMode}
-
         style={atStyles.court}
       />
 
@@ -218,6 +220,9 @@ const atStyles = StyleSheet.create({
   },
   timerVal:  { fontSize: FontSize.title, fontWeight: FontWeight.bold, color: Colors.textPrimary, lineHeight: 26 },
   timerSub:  { fontSize: FontSize.micro, color: Colors.textMuted },
+  repWrap:   { alignItems: 'center' },
+  repVal:    { fontSize: FontSize.title, fontWeight: FontWeight.black, color: Colors.accentProgress, lineHeight: 26 },
+  repSub:    { fontSize: FontSize.micro, color: Colors.textMuted, textAlign: 'center' },
   diffBadge: {
     backgroundColor: Colors.accentProgress,
     borderRadius: BorderRadius.full,
@@ -382,13 +387,12 @@ function RestView({ session, onSkip, courtMode, gender }: { session: ActiveSessi
       <Text style={rvStyles.label}>REST</Text>
       <Text style={rvStyles.countdown}>{session.restSecsRemaining}</Text>
       <CourtCanvas
-        activePosition={session.nextPosition ?? null}
+        activePosition={null}
         courtSystem={session.config.courtSystem}
         dominantHand={session.config.dominantHand}
         gender={gender}
         courtMode={courtMode}
         style={rvStyles.court}
-
       />
       <Text style={rvStyles.nextLabel}>
         {session.nextPosition
@@ -456,7 +460,7 @@ function SessionSummaryView({
   const cfg = session.config;
   const restPerSetSecs = cfg.restMode === 'none' ? 0 :
     cfg.restMode === 'manual' ? cfg.restSeconds :
-    Math.round(MOVES_PER_SET[cfg.difficulty] * getIntervalMs(cfg.difficulty, cfg.tempo) * AUTO_REST_FACTOR / 1000);
+    Math.round(MOVES_PER_SET[cfg.difficulty] * getIntervalMs(cfg.difficulty, cfg.tempo) * AUTO_REST_FACTORS[cfg.difficulty] / 1000);
   const totalRestSecs   = session.setIndex * restPerSetSecs;
   const activeTimeSecs  = Math.max(1, durationSecs - totalRestSecs);
   const avgReact = session.repCount > 0 ? (activeTimeSecs / session.repCount).toFixed(1) : '—';
@@ -774,17 +778,9 @@ export default function SessionModal() {
     return () => { try { deactivateKeepAwake('squash-session'); } catch {} };
   }, [visible, settings.keepScreenAwake]);
 
-  // Auto-pause when app goes to background (screen lock, home button, incoming call).
-  // Covers active, countdown, and rest states so timers never drift while backgrounded.
-  useEffect(() => {
-    const sub = AppState.addEventListener('change', (nextState: AppStateStatus) => {
-      const state = useSessionStore.getState().session?.state;
-      if (nextState === 'background' && (state === 'active' || state === 'countdown' || state === 'rest')) {
-        engine.pauseSession();
-      }
-    });
-    return () => sub.remove();
-  }, []); // pauseSession reads store directly — no stale-closure risk
+  // Background behaviour: session continues running when screen is locked or app is backgrounded.
+  // Player may use Bluetooth / speaker / headphones on court with phone in pocket.
+  // Audio re-assertion is handled in useSessionEngine's AppState listener.
 
   return (
     <Modal

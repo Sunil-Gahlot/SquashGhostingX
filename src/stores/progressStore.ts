@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SessionRecord, ProgressStats, PersonalBest } from '../types';
+import { SessionRecord, ProgressStats, PersonalBest, SessionConfig } from '../types';
 
 const EMPTY_STATS: ProgressStats = {
   totalSessions: 0,
@@ -23,6 +23,8 @@ interface ProgressStore {
   lastSessionCompletedAt: number;
   /** Set to sessionId when the just-completed session set a new movements PB; cleared on dismiss */
   newPBSessionId: string | null;
+  /** Full config of the last completed session — used by Quick Start to replay it exactly */
+  lastSessionConfig: SessionConfig | null;
 
   setRecentSessions: (sessions: SessionRecord[]) => void;
   setStats:          (stats: ProgressStats) => void;
@@ -33,7 +35,8 @@ interface ProgressStore {
   /** Triggers reactive reload in HomeScreen / ProgressScreen */
   markSessionCompleted:    () => void;
 
-  setNewPBFlag: (sessionId: string | null) => void;
+  setNewPBFlag:          (sessionId: string | null) => void;
+  setLastSessionConfig:  (config: SessionConfig) => void;
   clearCache: () => void;
 }
 
@@ -45,6 +48,7 @@ export const useProgressStore = create<ProgressStore>()(
       isLoading: false,
       lastSessionCompletedAt: 0,
       newPBSessionId: null,
+      lastSessionConfig: null,
 
       setRecentSessions: (sessions) => set({ recentSessions: sessions }),
       setStats:  (stats)   => set({ stats }),
@@ -83,9 +87,10 @@ export const useProgressStore = create<ProgressStore>()(
       markSessionCompleted: () =>
         set(() => ({ lastSessionCompletedAt: Date.now() })),
 
-      setNewPBFlag: (sessionId) => set({ newPBSessionId: sessionId }),
+      setNewPBFlag:         (sessionId) => set({ newPBSessionId: sessionId }),
+      setLastSessionConfig: (config)    => set({ lastSessionConfig: config }),
 
-      clearCache: () => set({ recentSessions: [], stats: EMPTY_STATS, newPBSessionId: null }),
+      clearCache: () => set({ recentSessions: [], stats: EMPTY_STATS, newPBSessionId: null, lastSessionConfig: null }),
     }),
     {
       name: 'progress-storage',
@@ -94,6 +99,7 @@ export const useProgressStore = create<ProgressStore>()(
       partialize: (state) => ({
         stats: state.stats,
         recentSessions: state.recentSessions,
+        lastSessionConfig: state.lastSessionConfig,
       }),
     }
   )

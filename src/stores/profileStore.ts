@@ -30,6 +30,7 @@ interface ProfileStore {
   hasSeenPaceTutorial: boolean;
   hasStartedAnySession: boolean;
   hasAcceptedTerms: boolean;
+  hasShownAndroidVolumeHint: boolean;
 
   setProfile: (updates: Partial<UserProfile>) => void;
   completeOnboarding: () => void;
@@ -40,6 +41,7 @@ interface ProfileStore {
   markPaceTutorialSeen: () => void;
   markSessionStarted: () => void;
   acceptTerms: () => void;
+  markAndroidVolumeHintShown: () => void;
 }
 
 export const useProfileStore = create<ProfileStore>()(
@@ -52,6 +54,7 @@ export const useProfileStore = create<ProfileStore>()(
       hasSeenPaceTutorial: false,
       hasStartedAnySession: false,
       hasAcceptedTerms: false,
+      hasShownAndroidVolumeHint: false,
 
       setProfile: (updates) =>
         set((s) => ({ profile: { ...s.profile, ...updates } })),
@@ -77,17 +80,18 @@ export const useProfileStore = create<ProfileStore>()(
         })),
 
       resetProfile: () =>
-        set({ profile: DEFAULT_PROFILE, isOnboardingComplete: false, hasCompletedAuth: false, hasSeenCourtTutorial: false, hasSeenPaceTutorial: false, hasStartedAnySession: false, hasAcceptedTerms: false }),
+        set({ profile: DEFAULT_PROFILE, isOnboardingComplete: false, hasCompletedAuth: false, hasSeenCourtTutorial: false, hasSeenPaceTutorial: false, hasStartedAnySession: false, hasAcceptedTerms: false, hasShownAndroidVolumeHint: false }),
 
       markCourtTutorialSeen: () => set({ hasSeenCourtTutorial: true }),
       markPaceTutorialSeen: () => set({ hasSeenPaceTutorial: true }),
       markSessionStarted: () => set({ hasStartedAnySession: true }),
       acceptTerms: () => set({ hasAcceptedTerms: true }),
+      markAndroidVolumeHintShown: () => set({ hasShownAndroidVolumeHint: true }),
     }),
     {
       name: 'profile-storage',
       storage: createJSONStorage(() => AsyncStorage),
-      version: 5,
+      version: 7,
       migrate: (persisted: any, version: number) => {
         if (version < 1) {
           persisted = { ...persisted, hasCompletedAuth: false };
@@ -115,6 +119,18 @@ export const useProfileStore = create<ProfileStore>()(
         if (version < 5) {
           if (persisted?.state) {
             if (persisted.state.hasAcceptedTerms === undefined) persisted.state.hasAcceptedTerms = false;
+          }
+        }
+        if (version < 6) {
+          if (persisted?.state) {
+            if (persisted.state.hasShownAndroidVolumeHint === undefined) persisted.state.hasShownAndroidVolumeHint = false;
+          }
+        }
+        if (version < 7) {
+          // Force re-acceptance of the updated Terms & Conditions (v1.1, June 2026).
+          // All users must view and explicitly accept the revised injury/liability terms.
+          if (persisted?.state) {
+            persisted.state.hasAcceptedTerms = false;
           }
         }
         return persisted;

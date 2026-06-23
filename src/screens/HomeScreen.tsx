@@ -116,7 +116,7 @@ function greeting(): string {
 
 export default function HomeScreen({ navigation }: any) {
   const { profile, signOut, hasCompletedAuth, hasStartedAnySession } = useProfileStore();
-  const { stats, lastSessionCompletedAt, recentSessions } = useProgressStore();
+  const { stats, lastSessionCompletedAt, recentSessions, lastSessionConfig } = useProgressStore();
   const settings = useSettingsStore((s) => s.settings);
   const { setPendingConfig, openDrillConfig } = useSessionStore();
   const { loadData } = useProgressLoader();
@@ -229,19 +229,10 @@ export default function HomeScreen({ navigation }: any) {
   }
 
   function handleQuickStart() {
-    if (!lastSession) { handleStartGhosting(); return; }
+    if (!lastSessionConfig) { handleStartGhosting(); return; }
+    // Replay the exact last config, but refresh user-specific fields from current profile.
     setPendingConfig({
-      drillType:    lastSession.drillType,
-      courtSystem:  lastSession.courtSystem,
-      difficulty:   lastSession.difficulty,
-      tempo:        settings.defaultTempo,
-      coverage:     'full',
-      patternType:  'random',
-      shotGroups:   ['mixed'],
-      duration:     settings.defaultDuration,
-      restMode:     'auto',
-      restSeconds:  15,
-      voiceMode:    settings.defaultVoiceMode,
+      ...lastSessionConfig,
       dominantHand: profile.dominantHand,
       voiceGender:  profile.voiceGender,
       language:     profile.language,
@@ -252,13 +243,30 @@ export default function HomeScreen({ navigation }: any) {
     if (card.type === 'ghosting') {
       handleStartGhosting();
     } else if (card.base) {
-      setPendingConfig({
-        ...card.base,
+      const DIFF_LEVELS = ['beginner', 'intermediate', 'advanced', 'elite', 'pro'];
+      const cardIdx = DIFF_LEVELS.indexOf(card.base.difficulty);
+      const userIdx = DIFF_LEVELS.indexOf(profile.skillLevel);
+      const launch = () => setPendingConfig({
+        ...card.base!,
         dominantHand: profile.dominantHand,
         voiceGender:  profile.voiceGender,
         language:     profile.language,
         voiceMode:    settings.defaultVoiceMode,
       });
+      if (cardIdx > userIdx + 1) {
+        const cardDiff = card.base.difficulty.charAt(0).toUpperCase() + card.base.difficulty.slice(1);
+        const userDiff = profile.skillLevel.charAt(0).toUpperCase() + profile.skillLevel.slice(1);
+        Alert.alert(
+          'Program Above Your Level',
+          `This program is designed for ${cardDiff} players. Your profile is set to ${userDiff}. Continue anyway?`,
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Continue', onPress: launch },
+          ],
+        );
+      } else {
+        launch();
+      }
     }
   }
 
@@ -353,30 +361,22 @@ export default function HomeScreen({ navigation }: any) {
             </View>
           </View>
 
-          {/* ── FIRST-RUN GUIDANCE (PQA-11) ───────────────────────── */}
+          {/* ── FIRST-RUN CARD ────────────────────────────────────── */}
           {!hasStartedAnySession && (
             <View style={styles.firstRunCard}>
-              <View style={styles.firstRunIconRow}>
+              <View style={styles.firstRunAccentBar} />
+              <View style={styles.firstRunContent}>
                 <View style={styles.firstRunIconCircle}>
-                  <Ionicons name="rocket-outline" size={28} color={Colors.brand} />
+                  <Ionicons name="body" size={36} color={Colors.brand} />
                 </View>
-              </View>
-              <Text style={styles.firstRunTitle}>Your first session awaits</Text>
-              <Text style={styles.firstRunBody}>
-                Tap <Text style={styles.firstRunEmphasis}>Quick Start</Text> above for an instant session, or{' '}
-                <Text style={styles.firstRunEmphasis}>New Session</Text> to pick your drill type, difficulty, and duration.
-              </Text>
-              <View style={styles.firstRunSteps}>
-                {[
-                  { icon: 'footsteps-outline' as const, text: 'Start on the T in the middle of the court' },
-                  { icon: 'volume-high-outline' as const, text: 'Listen for position calls and move to each spot' },
-                  { icon: 'refresh-outline' as const, text: 'Always recover back to T between calls' },
-                ].map(({ icon, text }) => (
-                  <View key={text} style={styles.firstRunStep}>
-                    <Ionicons name={icon} size={16} color={Colors.brand} />
-                    <Text style={styles.firstRunStepText}>{text}</Text>
-                  </View>
-                ))}
+                <Text style={styles.firstRunTitle}>Get on court</Text>
+                <Text style={styles.firstRunSub}>
+                  Move to each position when called.{'\n'}Return to T between every rep. That's ghosting.
+                </Text>
+                <TouchableOpacity style={styles.firstRunBtn} onPress={handleQuickStart} activeOpacity={0.85}>
+                  <Ionicons name="flash" size={18} color="#000" />
+                  <Text style={styles.firstRunBtnTxt}>Begin First Session</Text>
+                </TouchableOpacity>
               </View>
             </View>
           )}
@@ -661,29 +661,32 @@ const styles = StyleSheet.create({
   scroll:  { flex: 1 },
   content: { paddingBottom: Spacing.xxxl },
 
-  // ── First-run guidance card
+  // ── First-run card
   firstRunCard: {
     marginHorizontal: Spacing.base,
     marginTop: Spacing.base,
     backgroundColor: Colors.surface,
     borderRadius: BorderRadius.xl,
     borderWidth: 1,
-    borderColor: `${Colors.brand}40`,
-    padding: Spacing.base,
-    gap: Spacing.sm,
+    borderColor: Colors.borderBrand,
+    overflow: 'hidden',
   },
-  firstRunIconRow:    { alignItems: 'center' },
+  firstRunAccentBar: { height: 3, backgroundColor: Colors.brand },
+  firstRunContent:   { alignItems: 'center', padding: Spacing.xl, gap: Spacing.md },
   firstRunIconCircle: {
-    width: 56, height: 56, borderRadius: 28,
+    width: 72, height: 72, borderRadius: 36,
     backgroundColor: Colors.brandMuted,
     alignItems: 'center', justifyContent: 'center',
   },
-  firstRunTitle:    { fontSize: FontSize.body, fontWeight: FontWeight.bold, color: Colors.textPrimary, textAlign: 'center' },
-  firstRunBody:     { fontSize: FontSize.label, color: Colors.textMuted, lineHeight: 20, textAlign: 'center' },
-  firstRunEmphasis: { color: Colors.brand, fontWeight: FontWeight.semiBold },
-  firstRunSteps:    { gap: Spacing.sm, marginTop: Spacing.xs },
-  firstRunStep:     { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
-  firstRunStepText: { flex: 1, fontSize: FontSize.caption, color: Colors.textSecondary, lineHeight: 18 },
+  firstRunTitle: { fontSize: FontSize.title, fontWeight: FontWeight.black, color: Colors.textPrimary, textAlign: 'center' },
+  firstRunSub:   { fontSize: FontSize.label, color: Colors.textMuted, lineHeight: 22, textAlign: 'center' },
+  firstRunBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
+    backgroundColor: Colors.brand,
+    height: 52, borderRadius: BorderRadius.full,
+    width: '100%', marginTop: Spacing.xs,
+  },
+  firstRunBtnTxt: { fontSize: FontSize.body, fontWeight: FontWeight.bold, color: '#000' },
 
   // ── Hero
   hero: {
@@ -749,10 +752,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row', gap: 5, marginBottom: Spacing.sm,
   },
   heroTagline: {
-    fontSize: FontSize.caption,
+    fontSize: 15,
     fontWeight: FontWeight.semiBold,
-    color: 'rgba(255,255,255,0.45)',
-    letterSpacing: 0.3,
+    color: 'rgba(255,255,255,0.72)',
+    letterSpacing: 0.2,
     textAlign: 'center',
     marginBottom: Spacing.lg,
   },

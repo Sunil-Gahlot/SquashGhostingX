@@ -15,7 +15,7 @@ import {
   SessionConfig, DrillType, CourtSystem, CoverageMode,
   PatternType, ShotGroup, Tempo, Difficulty, RestMode, VoiceMode,
 } from '../../types';
-import { getIntervalMs } from '../../constants/timing';
+import { getIntervalMs, PACE_STEPS_MS } from '../../constants/timing';
 import { COVERAGE_FILTER, POSITIONS_6PT, POSITIONS_10PT } from '../../constants/positions';
 
 // ─── Step option type ─────────────────────────────────────────────────────────
@@ -690,7 +690,7 @@ export default function DrillConfigModal() {
                 <PillSelector options={TEMPO_OPTIONS} selected={tempo}
                   onSelect={(v) => setTempo(v as Tempo)} />
               </CompactSection>
-              <IntervalPreview difficulty={difficulty} tempo={tempo} extraMs={settings.movementPaceExtraMs ?? 0} />
+              <IntervalPreview difficulty={difficulty} tempo={tempo} extraMs={PACE_STEPS_MS[settings.defaultPaceStep ?? 3] ?? 0} />
               <CompactSection title="REST INTERVAL">
                 <PillSelector options={REST_MODE_OPTIONS} selected={restMode}
                   onSelect={(v) => setRestMode(v as RestMode)} />

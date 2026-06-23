@@ -1,5 +1,5 @@
 import { useRef, useCallback, useEffect } from 'react';
-import { AppState } from 'react-native';
+import { AppState, Alert, Platform } from 'react-native';
 import { type SQLiteDatabase } from 'expo-sqlite';
 
 import { useSessionStore } from '../stores/sessionStore';
@@ -85,6 +85,9 @@ const TEMPO_WEIGHT: Record<string, number> = { slow: 0.7, natural: 1.0, explosiv
 const DIFF_WEIGHT:  Record<string, number> = {
   beginner: 0.5, intermediate: 0.7, advanced: 1.0, elite: 1.3, pro: 1.5,
 };
+// Ceiling for intensity normalization: pro + explosive = 1.5 × 1.4 = 2.1
+// Dividing by this makes the full 0-100 scale usable instead of clamping at ~48% completion for pro.
+const INTENSITY_MAX = 1.5 * 1.4;
 
 // Coaching cues fire every N seconds of active training
 const COACHING_INTERVAL_SECS = 90;
@@ -176,6 +179,9 @@ export function useSessionEngine(db: SQLiteDatabase) {
 
     clearAllTimers();
     Audio.stopAudio();
+    // Return to T pose — clearAllTimers() may cancel a pending T-pose clear timer,
+    // and secondTimer can fire completeSession while currentPosition is still active.
+    store.getState().setCurrentPosition(null, null);
 
     const s = store.getState().session;
     if (!s) { isCompletingRef.current = false; return; }
@@ -184,7 +190,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
 
     const ssettings = getSettings();
     if (!abandoned && ssettings.voiceEnabled) {
-      speak(`Session complete. ${s.repCount} movements. Well done.`);
+      speak(`Back to T. Session complete. ${s.repCount} movements. Well done.`);
     }
     if (ssettings.hapticsEnabled) {
       abandoned ? Haptics.onSessionAbandoned() : Haptics.onSessionComplete();
@@ -205,7 +211,8 @@ export function useSessionEngine(db: SQLiteDatabase) {
     const intensity = Math.min(100,
       (TEMPO_WEIGHT[s.config.tempo] ?? 1) *
       (DIFF_WEIGHT[s.config.difficulty] ?? 1) *
-      (completion / 100) * 100
+      (completion / 100) *
+      (100 / INTENSITY_MAX)
     );
 
     const durationSeconds = Math.round((Date.now() - sessionStartRef.current) / 1000);
@@ -258,6 +265,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
 
     progressStore.addSession(record);
     progressStore.markSessionCompleted();   // triggers reactive reload in Home + Progress
+    progressStore.setLastSessionConfig(s.config); // Quick Start replays exact config next time
 
     // ── Badge checks ────────────────────────────────────────────────────────
     if (!abandoned && freshStats) {
@@ -283,6 +291,9 @@ export function useSessionEngine(db: SQLiteDatabase) {
     if (!config) return;
 
     clearMoveTimers();
+    // Reset to T pose immediately — clearMoveTimers() may cancel the T-pose clear
+    // timeout before it fires, leaving currentPosition stuck on the last position.
+    store.getState().setCurrentPosition(null, null);
 
     // BUG-005: restMode 'none' means skip rest entirely — go straight to next set.
     if (config.restMode === 'none') {
@@ -298,7 +309,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
     const intervalMs  = getIntervalMs(config.difficulty, config.tempo);
     const restMs = config.restMode === 'manual' && config.restSeconds > 0
       ? config.restSeconds * 1000
-      : getAutoRestMs(movesPerSet, intervalMs);
+      : getAutoRestMs(config.difficulty, movesPerSet, intervalMs);
     const restSecs = Math.max(1, Math.round(restMs / 1000));
 
     store.getState().setRestSecsRemaining(restSecs);
@@ -356,11 +367,11 @@ export function useSessionEngine(db: SQLiteDatabase) {
     // Pre-compute effective interval here so T-pose clear can clamp against it (BUG-006)
     const livePaceStep    = store.getState().session?.livePaceStep ?? PACE_DEFAULT_STEP;
     const paceOffset      = PACE_STEPS_MS[livePaceStep] ?? 0;
-    const extraPaceMs     = getSettings().movementPaceExtraMs ?? 0;
     const movementPhase   = MOVEMENT_PHASE_MS[config.difficulty][config.tempo];
-    // Floor = movementPhase + 800 ms so T_POSE_CLEAR (600ms) + 100ms buffer always
-    // fires before the next call. Was +1500; reduced so Fast/Fast+/Turbo have real effect.
-    const effectiveIntervalMs = Math.max(movementPhase + 800, move.intervalMs + paceOffset + extraPaceMs);
+    // Floor includes phaseOffsetMs so the gap between the recovery cue and the next
+    // position call is consistent across all positions (front corners no longer feel rushed
+    // vs mid/back positions at fast pace).
+    const effectiveIntervalMs = Math.max(movementPhase + move.phaseOffsetMs + 400, move.intervalMs + paceOffset);
 
     // T+positionCallMs: court and voice update simultaneously.
     // BUG-007: skip visual update in voice-only mode (voice-only = no court highlight).
@@ -395,11 +406,13 @@ export function useSessionEngine(db: SQLiteDatabase) {
         speak(callText);
       }, AUDIO_OFFSETS.voiceCallMs));
 
-      // Recovery cue: skip when position IS the T, and when the effective interval is so
-      // tight (e.g. Turbo pace) that the cue would fire < 1500ms before the next call.
-      // phaseOffsetMs delays the cue for front corners so players have full time at position.
-      const recoveryCallMs = MOVEMENT_PHASE_MS[config.difficulty][config.tempo] + move.phaseOffsetMs;
-      const skipRecoveryCue = move.position === 'T' || (effectiveIntervalMs - recoveryCallMs) < 1500;
+      // Recovery cue: skip when position IS the T, or when the gap between the cue and the
+      // next call is too tight to complete the utterance. Threshold scales with interval so
+      // faster pace doesn't skip the cue disproportionately vs slower settings.
+      const recoveryCallMs  = MOVEMENT_PHASE_MS[config.difficulty][config.tempo] + move.phaseOffsetMs;
+      const gapAfterCue     = effectiveIntervalMs - recoveryCallMs;
+      const skipThresholdMs = Math.max(600, effectiveIntervalMs * 0.22);
+      const skipRecoveryCue = move.position === 'T' || gapAfterCue < skipThresholdMs;
       if (!skipRecoveryCue) {
         addTimer(setTimeout(() => {
           if (store.getState().session?.state !== 'active') return;
@@ -474,10 +487,9 @@ export function useSessionEngine(db: SQLiteDatabase) {
       if (!config) return;
 
       const paceOffset    = PACE_STEPS_MS[step] ?? 0;
-      const extraPaceMs   = getSettings().movementPaceExtraMs ?? 0;
       const movementPhase = MOVEMENT_PHASE_MS[config.difficulty][config.tempo];
       const baseInterval  = getIntervalMs(config.difficulty, config.tempo);
-      const newInterval   = Math.max(movementPhase + 800, baseInterval + paceOffset + extraPaceMs);
+      const newInterval   = Math.max(movementPhase + 400, baseInterval + paceOffset);
 
       const elapsed   = Date.now() - cycleStartRef.current;
       const remaining = Math.max(100, newInterval - elapsed);
@@ -623,14 +635,28 @@ export function useSessionEngine(db: SQLiteDatabase) {
 
     await Audio.initAudioSession();
 
+    // One-time Android hint: TTS uses the media volume stream.
+    if (Platform.OS === 'android') {
+      const profState = useProfileStore.getState();
+      if (!profState.hasShownAndroidVolumeHint && getSettings().voiceEnabled) {
+        profState.markAndroidVolumeHintShown();
+        Alert.alert(
+          'Volume tip',
+          "Voice calls use your media volume. If calls are too quiet, press the volume-up button on your device while training.",
+          [{ text: 'Got it' }],
+        );
+      }
+    }
+
     const ssettings = getSettings();
+    const defaultPaceStep = ssettings.defaultPaceStep ?? 3;
     const totalMoves = estimateTotalMoves(
       fullConfig.duration,
       fullConfig.difficulty,
       fullConfig.tempo,
-      ssettings.movementPaceExtraMs ?? 0,
+      PACE_STEPS_MS[defaultPaceStep] ?? 0,
     );
-    store.getState().initSession(fullConfig, totalMoves);
+    store.getState().initSession(fullConfig, totalMoves, defaultPaceStep);
     useProfileStore.getState().markSessionStarted();
 
     // Announce "Move to the T" before countdown numbers begin
@@ -689,14 +715,23 @@ export function useSessionEngine(db: SQLiteDatabase) {
     };
   }, []);
 
-  // Re-initialise the audio session when the app returns to the foreground.
-  // Handles cases where the audio session was interrupted by a phone call,
-  // system sound, or OS audio-focus change while the app was backgrounded.
+  // Audio session management across foreground/background transitions.
+  // The app is designed to keep running in the background — player may lock the screen
+  // and use Bluetooth, speaker, or headphones on court.
+  // iOS: UIBackgroundModes:audio + shouldPlayInBackground:true allows continued execution
+  //      as long as the audio session remains active (each TTS call re-asserts it).
+  // Android: FOREGROUND_SERVICE_MEDIA_PLAYBACK permission keeps TTS audio running.
   useEffect(() => {
     const sub = AppState.addEventListener('change', (nextState) => {
       if (nextState === 'active') {
+        // Re-init audio in case it was interrupted (phone call, Siri, system sound)
+        Audio.initAudioSession().catch(() => {});
+      } else if (nextState === 'background') {
+        // Re-assert audio session so the OS keeps the process alive via the audio background mode.
+        // Do NOT pause — the session must continue with screen locked / phone in pocket.
         Audio.initAudioSession().catch(() => {});
       }
+      // 'inactive' (iOS only — Control Centre, notification shade): transient, no action needed.
     });
     return () => sub.remove();
   }, []);

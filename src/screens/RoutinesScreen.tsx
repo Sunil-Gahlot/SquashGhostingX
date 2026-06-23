@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/colors';
 import { FontSize, FontWeight, Spacing, BorderRadius, Shadow } from '../constants/layout';
-import { BUILTIN_PROGRAMS, getSuggestedDrill } from '../data/builtinPrograms';
+import { BUILTIN_PROGRAMS, getSuggestedDrill, getProgramsByLevel } from '../data/builtinPrograms';
 import { useSessionStore } from '../stores/sessionStore';
 import { useProfileStore } from '../stores/profileStore';
 import { useProgressStore } from '../stores/progressStore';
@@ -60,7 +60,7 @@ const DRILL_LABEL: Record<string, string>  = {
 function CategoryCard({ gridKey, onPress }: { gridKey: GridKey; onPress: () => void }) {
   const meta     = LEVEL_META[gridKey];
   const isCustom = gridKey === 'custom';
-  const count    = isCustom ? null : BUILTIN_PROGRAMS.filter((p) => p.level === gridKey).length;
+  const count    = isCustom ? null : getProgramsByLevel(gridKey).length;
 
   return (
     <TouchableOpacity
@@ -166,7 +166,7 @@ export default function RoutinesScreen() {
   // ── Detail view ──────────────────────────────────────────────────────────────
   if (detailLevel !== null) {
     const meta     = LEVEL_META[detailLevel];
-    const programs = BUILTIN_PROGRAMS.filter((p) => p.level === detailLevel);
+    const programs = getProgramsByLevel(detailLevel);
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.detailHeader}>

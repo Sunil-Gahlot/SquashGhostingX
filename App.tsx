@@ -1,5 +1,6 @@
 import 'react-native-gesture-handler';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, Component, ReactNode } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -27,6 +28,39 @@ import { RootTabParamList } from './src/types';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 type TabName = keyof RootTabParamList;
+
+// ─── Error Boundary ───────────────────────────────────────────────────────────
+
+class AppErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; message: string }> {
+  state = { hasError: false, message: '' };
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, message: error.message ?? 'Unknown error' };
+  }
+
+  render() {
+    if (!this.state.hasError) return this.props.children;
+    return (
+      <View style={eb.container}>
+        <Text style={eb.icon}>⚠️</Text>
+        <Text style={eb.title}>Something went wrong</Text>
+        <Text style={eb.body}>{this.state.message}</Text>
+        <TouchableOpacity style={eb.btn} onPress={() => this.setState({ hasError: false, message: '' })}>
+          <Text style={eb.btnTxt}>Try Again</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+}
+
+const eb = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#0A0A0A', alignItems: 'center', justifyContent: 'center', padding: 32 },
+  icon:      { fontSize: 48, marginBottom: 16 },
+  title:     { fontSize: 20, fontWeight: '700', color: '#FFFFFF', marginBottom: 8, textAlign: 'center' },
+  body:      { fontSize: 13, color: '#9A9A9A', textAlign: 'center', lineHeight: 20, marginBottom: 24 },
+  btn:       { backgroundColor: '#FF6B35', paddingHorizontal: 32, paddingVertical: 14, borderRadius: 9999 },
+  btnTxt:    { fontSize: 15, fontWeight: '700', color: '#000' },
+});
 
 const navigationRef = createNavigationContainerRef<RootTabParamList>();
 
@@ -58,6 +92,7 @@ const TAB_ICONS: Record<TabName, { focused: keyof typeof Ionicons.glyphMap; outl
 
 export default function App() {
   return (
+    <AppErrorBoundary>
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <SQLiteProvider databaseName="squashghostingx.db" onInit={migrateDatabase}>
@@ -120,5 +155,6 @@ export default function App() {
         </SQLiteProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
+    </AppErrorBoundary>
   );
 }

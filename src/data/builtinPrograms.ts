@@ -15,8 +15,8 @@ export const BUILTIN_PROGRAMS: Program[] = [
     id: 'warm-up',
     name: 'Warm Up',
     description: 'Easy 5-min movement to prepare your body and mind.',
-    level: 'beginner', estimatedMinutes: 5, isBuiltin: true,
-    tags: ['warm-up', 'beginner'],
+    level: 'all', estimatedMinutes: 5, isBuiltin: true,
+    tags: ['warm-up'],
     config: { ...base, drillType: 'movement', courtSystem: '6pt', coverage: 'full', patternType: 'fixed', tempo: 'slow', difficulty: 'beginner', duration: 5, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
   },
   {
@@ -48,7 +48,7 @@ export const BUILTIN_PROGRAMS: Program[] = [
     id: 'cool-down',
     name: 'Cool Down',
     description: 'Slow-paced movement to recover after hard training.',
-    level: 'beginner', estimatedMinutes: 5, isBuiltin: true,
+    level: 'all', estimatedMinutes: 5, isBuiltin: true,
     tags: ['cool-down', 'recovery'],
     config: { ...base, drillType: 'movement', courtSystem: '6pt', coverage: 'full', patternType: 'fixed', tempo: 'slow', difficulty: 'beginner', duration: 5, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
   },
@@ -218,7 +218,7 @@ export const BUILTIN_PROGRAMS: Program[] = [
 ];
 
 export function getProgramsByLevel(level: string): Program[] {
-  return BUILTIN_PROGRAMS.filter((p) => p.level === level);
+  return BUILTIN_PROGRAMS.filter((p) => p.level === level || p.level === 'all');
 }
 
 export function getProgramById(id: string): Program | undefined {
