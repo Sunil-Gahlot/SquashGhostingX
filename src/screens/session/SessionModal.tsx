@@ -48,7 +48,7 @@ function CountdownView({ session }: { session: ActiveSession }) {
       </Animated.View>
       <Text style={cdStyles.instruction}>Move to the T</Text>
       <Text style={cdStyles.drillInfo}>
-        {session.config.drillType.replace('-', ' ')} · {session.config.courtSystem.toUpperCase()} · {session.config.difficulty}
+        {fmtCoverage(session.config.coverage)}  ·  {fmtLabel(session.config.drillType)}  ·  {session.config.difficulty}
       </Text>
     </View>
   );
@@ -84,6 +84,18 @@ const PACE_STEP_COUNT = PACE_STEPS_MS.length; // 7
 
 function fmtLabel(s: string): string {
   return s.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+const COVERAGE_LABEL: Record<string, string> = {
+  full:     'Full Court',
+  front:    'Front Court',
+  back:     'Back Court',
+  forehand: 'Forehand',
+  backhand: 'Backhand',
+};
+
+function fmtCoverage(coverage: string): string {
+  return COVERAGE_LABEL[coverage] ?? fmtLabel(coverage);
 }
 
 function ActiveTrainingView({
@@ -131,7 +143,7 @@ function ActiveTrainingView({
       {/* ── Drill metadata bar (static) ───────────────────────────── */}
       <View style={atStyles.metaBar}>
         <Text style={atStyles.metaText}>
-          {fmtLabel(session.config.drillType)}  ·  {session.config.courtSystem.toUpperCase()}  ·  {fmtLabel(session.config.patternType)}
+          {fmtCoverage(session.config.coverage)}  ·  {fmtLabel(session.config.drillType)}  ·  {session.config.courtSystem.toUpperCase()}
         </Text>
       </View>
 

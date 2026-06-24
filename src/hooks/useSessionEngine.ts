@@ -38,7 +38,7 @@ type IntervalId = ReturnType<typeof setInterval>;
 const MOVEMENT_MODIFIERS = {
   front: ['lunge', 'quick lunge', 'reach low'],
   mid:   ['shuffle across', 'step and split', 'side step'],
-  back:  ['sprint back', 'full stretch', 'drive back'],
+  back:  ['sprint back', 'full stretch', 'push back'],
 } as const;
 
 function getMovementModifier(zone: string, callIndex: number): string {

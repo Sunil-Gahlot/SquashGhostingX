@@ -2,7 +2,7 @@ import { SessionConfig, Position, ShotGroup } from '../types';
 import {
   FIXED_ORDER_6PT, FIXED_ORDER_10PT,
   COVERAGE_FILTER, HAND_MIRROR,
-  POSITION_ZONE,
+  POSITION_ZONE, POSITIONS_10PT,
   getPositionsForSystem,
 } from '../constants/positions';
 import {
@@ -207,6 +207,15 @@ const CROSSCOURT_DIAGONAL: Partial<Record<Position, Position>> = {
   MR: 'ML',   ML: 'MR',
 };
 
+// Straight-side sprint partner — the primary movement axis for forehand/backhand
+// zone drills where all crosscourt diagonals fall outside the pool.
+const SAME_SIDE_PARTNER: Partial<Record<Position, Position>> = {
+  FR: 'BR',   BR: 'FR',
+  FL: 'BL',   BL: 'FL',
+  FMCR: 'BMCR', BMCR: 'FMCR',
+  FMCL: 'BMCL', BMCL: 'FMCL',
+};
+
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -217,20 +226,28 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 /**
- * Zone-aware shuffle with anti-streak logic.
- * Rules:
- *  1. No position repeats back-to-back.
- *  2. No position repeats two slots ago (avoids A-B-A ping-pong).
- *  3. After THREE consecutive positions in the same zone, force a zone change.
- *     (Front/back zones are physically demanding — 3+ same-zone runs are brutal at fast pace.)
- *  4. Re-shuffles the pool at every full cycle so identical patterns never repeat.
+ * Zone-aware shuffle with zone-balanced anti-streak logic.
+ *
+ * 1. No back-to-back same position (prev1 exclusion only). Removing the prev2
+ *    (A-B-A) exclusion unlocks genuine randomness for 3-position pools — e.g.
+ *    forehand+6pt → [FR, MR, BR] — that would otherwise lock into a predictable
+ *    round-robin cycle. A-B-A patterns are valid in squash (same corner twice
+ *    with T recovery in between).
+ * 2. After two consecutive same-zone positions, prefer a different zone.
+ *    After three, force it. Zone-balanced selection gives each available zone
+ *    equal probability so a lone mid position is not outcompeted by two
+ *    front/back positions (avoids systematic under-calling of MR/ML).
+ * 3. Cross-court diagonal weighted 2× for match-realistic transitions.
+ *    Falls back to same-side sprint partner (FR↔BR, FL↔BL) when the diagonal
+ *    is outside the active pool — e.g. all forehand/backhand zone drills.
+ * 4. Pool reshuffled at every full cycle for additional pattern variety.
  */
 function shuffleNoRepeat(pool: Position[], count: number): Position[] {
   if (pool.length === 0) return [];
   if (pool.length === 1) return Array(count).fill(pool[0]);
 
   const result: Position[] = [];
-  let p = shuffle([...pool]);
+  let p     = shuffle([...pool]);
   let prev1: Position | null = null;
   let prev2: Position | null = null;
   let prev3: Position | null = null;
@@ -238,32 +255,41 @@ function shuffleNoRepeat(pool: Position[], count: number): Position[] {
   for (let i = 0; i < count; i++) {
     if (i > 0 && i % pool.length === 0) p = shuffle([...pool]);
 
-    let candidates = p.filter(pos => pos !== prev1 && pos !== prev2);
-    if (candidates.length === 0) candidates = p.filter(pos => pos !== prev1);
+    // Exclude only the immediately previous position.
+    let candidates = p.filter(pos => pos !== prev1);
     if (candidates.length === 0) candidates = [...p];
 
-    // Force zone change after 3 consecutive same-zone positions
-    const sameZoneStreak =
-      prev1 && prev2 && prev3 &&
-      POSITION_ZONE[prev1] === POSITION_ZONE[prev2] &&
-      POSITION_ZONE[prev2] === POSITION_ZONE[prev3];
+    // Zone-streak detection (prev2 / prev3 track zones only, not used for identity exclusion)
+    const streak2 = prev1 !== null && prev2 !== null &&
+      POSITION_ZONE[prev1] === POSITION_ZONE[prev2];
+    const streak3 = streak2 && prev3 !== null &&
+      POSITION_ZONE[prev2!] === POSITION_ZONE[prev3];
 
-    if (sameZoneStreak) {
+    let next: Position;
+
+    if ((streak3 || streak2) && prev1 !== null) {
+      // Force (streak3) or prefer (streak2) a different zone.
       const diffZone = candidates.filter(pos => POSITION_ZONE[pos] !== POSITION_ZONE[prev1!]);
-      if (diffZone.length > 0) candidates = diffZone;
-    } else if (prev1 && prev2 && POSITION_ZONE[prev1] === POSITION_ZONE[prev2]) {
-      // After 2 same-zone, prefer different but don't force
-      const diffZone = candidates.filter(pos => POSITION_ZONE[pos] !== POSITION_ZONE[prev1!]);
-      if (diffZone.length > 0) candidates = diffZone;
+      const src = diffZone.length > 0 ? diffZone : candidates;
+      // Zone-balanced pick: select a zone uniformly first, then a position within it.
+      const zones = [...new Set(src.map(pos => POSITION_ZONE[pos]))];
+      const zone  = zones[Math.floor(Math.random() * zones.length)];
+      const inZone = src.filter(pos => POSITION_ZONE[pos] === zone);
+      next = inZone[Math.floor(Math.random() * inZone.length)];
+    } else {
+      // Weight cross-court diagonal 2× for match-realistic transitions.
+      // Fall back to same-side sprint partner when the diagonal is out of pool.
+      const diagonal = prev1 ? CROSSCOURT_DIAGONAL[prev1] : undefined;
+      const partner  = prev1 ? SAME_SIDE_PARTNER[prev1] : undefined;
+      const weighted: Position[] =
+        diagonal && candidates.some(c => c === diagonal)
+          ? candidates.flatMap(pos => pos === diagonal ? [pos, pos] : [pos])
+          : partner && candidates.some(c => c === partner)
+          ? candidates.flatMap(pos => pos === partner ? [pos, pos] : [pos])
+          : candidates;
+      next = weighted[Math.floor(Math.random() * weighted.length)];
     }
 
-    // Weight the crosscourt diagonal 2× — ~70% pull toward match-realistic transitions
-    // when the diagonal candidate is available, without forcing it every time.
-    const diagonal: Position | undefined = prev1 ? CROSSCOURT_DIAGONAL[prev1] : undefined;
-    const weighted: Position[] = diagonal
-      ? candidates.flatMap((pos) => pos === diagonal ? [pos, pos] : [pos])
-      : candidates;
-    const next: Position = weighted[Math.floor(Math.random() * weighted.length)];
     result.push(next);
     prev3 = prev2;
     prev2 = prev1;
@@ -273,7 +299,14 @@ function shuffleNoRepeat(pool: Position[], count: number): Position[] {
 }
 
 function buildPool(config: SessionConfig): Position[] {
-  const base   = getPositionsForSystem(config.courtSystem);
+  // Zone drills (front/back/forehand/backhand) have their own fixed 10pt position sets —
+  // FMCL/FMCR are front zone positions, BMCL/BMCR are back zone positions.
+  // The courtSystem UI selector is hidden for zone drills (STEPS_ZONE); the engine
+  // always uses the full 10pt base so every zone position is reachable via COVERAGE_FILTER.
+  // Full-court drills respect the user's courtSystem choice (6pt vs 10pt).
+  const base   = config.coverage === 'full'
+    ? getPositionsForSystem(config.courtSystem)
+    : POSITIONS_10PT;
   const filter = (COVERAGE_FILTER[config.coverage] ?? base) as Position[];
 
   // Step 1: intersect base positions with the coverage zone filter
@@ -297,9 +330,15 @@ function buildPool(config: SessionConfig): Position[] {
   if (pool.length < 2) {
     const zoneWithT = base.filter((p) => filter.includes(p));
     if (zoneWithT.length >= 2) return zoneWithT;
-    // Absolute last resort: use any 2 non-T positions from the court system
     return base.filter((p) => p !== 'T').slice(0, 2);
   }
+
+  // ── DIAGNOSTIC LOG — remove once pool bugs are resolved ──────────────────
+  console.log(
+    `\n[GhostEngine] coverage=${config.coverage}  drill=${config.drillType}  hand=${config.dominantHand}\n` +
+    `  pool (${pool.length}): [${pool.join(', ')}]\n`
+  );
+  // ─────────────────────────────────────────────────────────────────────────
 
   return pool;
 }
@@ -323,7 +362,10 @@ function buildShotBasedPool(basePool: Position[], shotGroups: ShotGroup[]): Posi
 }
 
 function fixedSet(config: SessionConfig, pool: Position[], count: number): Position[] {
-  const order = config.courtSystem === '6pt' ? FIXED_ORDER_6PT : FIXED_ORDER_10PT;
+  // Zone drills always use the 10pt order so FMCL/FMCR/BMCL/BMCR appear in fixed sequences.
+  const order = (config.coverage !== 'full' || config.courtSystem === '10pt')
+    ? FIXED_ORDER_10PT
+    : FIXED_ORDER_6PT;
   const filtered = order.filter((p) => pool.includes(p));
   if (filtered.length === 0) return shuffleNoRepeat(pool, count);
   return Array.from({ length: count }, (_, i) => filtered[i % filtered.length]);

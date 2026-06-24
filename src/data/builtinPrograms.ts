@@ -82,20 +82,18 @@ export const BUILTIN_PROGRAMS: Program[] = [
   {
     id: 'front-court-focus',
     name: 'Front Court Focus',
-    description: 'FL, FR and front volley positions. Fast feet, low body, short game pressure.',
+    description: 'FL, FR and mid positions. Fast feet, low body, short game pressure.',
     level: 'intermediate', estimatedMinutes: 10, isBuiltin: true,
     tags: ['intermediate', 'front-court'],
-    // 10pt required: front + 6pt = only FL/FR (2 positions). 10pt gives FL, FR, FMCL, FMCR.
-    config: { ...base, drillType: 'movement', courtSystem: '10pt', coverage: 'front', patternType: 'random', tempo: 'natural', difficulty: 'intermediate', duration: 10, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
+    config: { ...base, drillType: 'movement', courtSystem: '6pt', coverage: 'front', patternType: 'random', tempo: 'natural', difficulty: 'intermediate', duration: 10, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
   },
   {
     id: 'back-court-power',
     name: 'Back Court Power',
-    description: 'BL, BR and back diagonal positions. Build leg strength and drive length.',
+    description: 'BL, BR and mid positions. Build leg strength and drive length.',
     level: 'intermediate', estimatedMinutes: 10, isBuiltin: true,
     tags: ['intermediate', 'back-court', 'strength'],
-    // 10pt required: back + 6pt = only BL/BR (2 positions). 10pt gives BL, BR, BMCL, BMCR.
-    config: { ...base, drillType: 'movement', courtSystem: '10pt', coverage: 'back', patternType: 'random', tempo: 'natural', difficulty: 'intermediate', duration: 10, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
+    config: { ...base, drillType: 'movement', courtSystem: '6pt', coverage: 'back', patternType: 'random', tempo: 'natural', difficulty: 'intermediate', duration: 10, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
   },
 
   // ─── Advanced ─────────────────────────────────────────────────────────────
@@ -129,7 +127,7 @@ export const BUILTIN_PROGRAMS: Program[] = [
     description: 'Back court and mid positions. Trains the defensive boast and straight drive combination.',
     level: 'advanced', estimatedMinutes: 12, isBuiltin: true,
     tags: ['advanced', 'shot-based', 'back-court'],
-    config: { ...base, drillType: 'shot-based', courtSystem: '10pt', coverage: 'back', patternType: 'random', tempo: 'natural', difficulty: 'advanced', duration: 12, voiceMode: 'voice+visual', shotGroups: ['boasts', 'lengths'] },
+    config: { ...base, drillType: 'shot-based', courtSystem: '6pt', coverage: 'back', patternType: 'random', tempo: 'natural', difficulty: 'advanced', duration: 12, voiceMode: 'voice+visual', shotGroups: ['boasts', 'lengths'] },
   },
 
   // ─── Elite ────────────────────────────────────────────────────────────────
@@ -160,18 +158,18 @@ export const BUILTIN_PROGRAMS: Program[] = [
   {
     id: 'forehand-domination',
     name: 'Forehand Domination',
-    description: 'Dominant-hand side only. 10-point forehand positions at elite explosive pace.',
+    description: 'Dominant-hand side only. FR, MR and BR at elite explosive pace.',
     level: 'elite', estimatedMinutes: 15, isBuiltin: true,
-    tags: ['elite', 'forehand', '10pt', 'explosive'],
-    config: { ...base, drillType: 'movement', courtSystem: '10pt', coverage: 'forehand', patternType: 'random', tempo: 'explosive', difficulty: 'elite', duration: 15, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
+    tags: ['elite', 'forehand', 'explosive'],
+    config: { ...base, drillType: 'movement', courtSystem: '6pt', coverage: 'forehand', patternType: 'random', tempo: 'explosive', difficulty: 'elite', duration: 15, voiceMode: 'voice+visual', shotGroups: ['mixed'] },
   },
   {
     id: 'backhand-precision',
     name: 'Backhand Precision',
     description: 'Off-hand side with shot calls. Drops, drives and lengths on the backhand court.',
     level: 'elite', estimatedMinutes: 15, isBuiltin: true,
-    tags: ['elite', 'backhand', '10pt', 'shot-based'],
-    config: { ...base, drillType: 'shot-based', courtSystem: '10pt', coverage: 'backhand', patternType: 'random', tempo: 'natural', difficulty: 'elite', duration: 15, voiceMode: 'voice+visual', shotGroups: ['drops', 'drives', 'lengths'] },
+    tags: ['elite', 'backhand', 'shot-based'],
+    config: { ...base, drillType: 'shot-based', courtSystem: '6pt', coverage: 'backhand', patternType: 'random', tempo: 'natural', difficulty: 'elite', duration: 15, voiceMode: 'voice+visual', shotGroups: ['drops', 'drives', 'lengths'] },
   },
 
   // ─── Pro ──────────────────────────────────────────────────────────────────

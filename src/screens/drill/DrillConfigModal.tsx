@@ -111,7 +111,9 @@ const VOICE_MODE_OPTIONS = [
 // Irrelevant groups are dimmed and blocked in the shot group selector.
 const COVERAGE_SHOT_GROUPS: Record<CoverageMode, ShotGroup[]> = {
   full:     ['mixed', 'drives', 'lengths', 'drops', 'kills', 'lobs', 'boasts', 'volleys', 'deception'],
-  front:    ['mixed', 'drops', 'kills', 'lobs', 'volleys', 'deception'],
+  // Front now includes ML/MR — drives are their primary shot, so 'drives' is added.
+  front:    ['mixed', 'drives', 'drops', 'kills', 'lobs', 'volleys', 'deception'],
+  // Back includes ML/MR — drives/lengths are primary from mid positions.
   back:     ['mixed', 'drives', 'lengths', 'lobs', 'boasts', 'deception'],
   forehand: ['mixed', 'drives', 'lengths', 'drops', 'kills', 'lobs', 'boasts', 'volleys', 'deception'],
   backhand: ['mixed', 'drives', 'lengths', 'drops', 'kills', 'lobs', 'boasts', 'volleys', 'deception'],
@@ -133,6 +135,8 @@ function buildDrillTypeOpts(coverage: CoverageMode): StepOption[] {
 
 const STEPS_BASE     = ['coverage', 'drillType', 'difficulty', 'courtSystem', 'pattern', 'session'] as const;
 const STEPS_MATCHSIM = ['coverage', 'drillType', 'difficulty', 'courtSystem',            'session'] as const;
+// Zone-specific drills (front/back/forehand/backhand) are always 6pt — court system step is skipped.
+const STEPS_ZONE     = ['coverage', 'drillType', 'difficulty',               'pattern', 'session'] as const;
 type StepKey = typeof STEPS_BASE[number];
 
 const STEP_HEADING: Record<StepKey, string> = {
@@ -419,7 +423,9 @@ export default function DrillConfigModal() {
     }
   }, [drillConfigVisible]);
 
-  const steps      = drillType === 'match-sim' ? STEPS_MATCHSIM : STEPS_BASE;
+  const steps      = coverage !== 'full'
+    ? STEPS_ZONE
+    : drillType === 'match-sim' ? STEPS_MATCHSIM : STEPS_BASE;
   const totalSteps = steps.length;
   const stepKey    = steps[currentStep - 1] as StepKey;
   const isLastStep = currentStep === totalSteps;
@@ -440,13 +446,17 @@ export default function DrillConfigModal() {
 
   function handleCoverageChange(next: CoverageMode) {
     setCoverage(next);
-    // Auto-reset match-sim to movement when switching to a non-full zone
-    // (match-sim is locked to full court — enforced by UI but defended here too)
-    if (next !== 'full' && drillType === 'match-sim') {
-      setDrillType('movement');
-      setPatternType('random');
+    if (next !== 'full') {
+      // Zone drills skip the courtSystem step (STEPS_ZONE) — the zone defines the
+      // position set (which includes both 6pt and 10pt positions). courtSystem is not locked.
+      setCurrentStep((s) => Math.min(s, STEPS_ZONE.length));
+      // Match-sim is locked to full court — reset to movement.
+      if (drillType === 'match-sim') {
+        setDrillType('movement');
+        setPatternType('random');
+      }
     }
-    // Strip shot groups that aren't valid for the new zone
+    // Strip shot groups that aren't valid for the new zone.
     const allowed = COVERAGE_SHOT_GROUPS[next];
     const valid   = shotGroups.filter((g) => allowed.includes(g));
     setShotGroups(valid.length > 0 ? valid : ['mixed']);
@@ -621,16 +631,15 @@ export default function DrillConfigModal() {
               <>
                 {COURT_SYSTEM_OPTS.map((opt) => {
                   const count = opt.value === '6pt' ? count6 : count10;
-                  const tooFew = opt.value === '6pt' && tooFew6;
                   const badgeLabel = coverage !== 'full' ? `${count} position${count !== 1 ? 's' : ''} in zone` : undefined;
                   return (
                     <View key={opt.value}>
                       <OptionCard
-                        option={tooFew ? { ...opt, lockedReason: 'Only 2 positions — use 10-Point' } : opt}
+                        option={opt}
                         selected={courtSystem === opt.value}
                         onPress={() => setCourtSystem(opt.value as CourtSystem)}
                       />
-                      {badgeLabel && !tooFew && (
+                      {badgeLabel && (
                         <Text style={styles.posCountBadge}>{badgeLabel}</Text>
                       )}
                     </View>
@@ -646,9 +655,9 @@ export default function DrillConfigModal() {
                 />
                 {tooFew6 && courtSystem === '6pt' && (
                   <TipCard
-                    icon="warning-outline"
-                    title="6-Point gives only 2 positions in this zone"
-                    body={`${COVERAGE_LABEL[coverage]} with 6-Point = ${pos6.map(p => p).join(' + ')} only. Switch to 10-Point for a meaningful zone drill (${count10} positions).`}
+                    icon="information-circle-outline"
+                    title="2 positions in this zone with 6-Point"
+                    body={`${COVERAGE_LABEL[coverage]} + 6-Point = ${pos6.join(' + ')}. Valid for focused technique work. Switch to 10-Point for ${count10} positions and more variety.`}
                   />
                 )}
               </>

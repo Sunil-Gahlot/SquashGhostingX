@@ -238,15 +238,26 @@ export default function CourtCanvas({
   // Keys change with position so React replaces instantly (no cross-fade/morph).
 
   // Converts SVG viewport coordinates → absolute pixel style for RN Image.
-  // Uses cw/ch from onLayout so positions are always pixel-accurate.
+  //
+  // The SVG uses preserveAspectRatio="xMidYMid meet" (react-native-svg default),
+  // so on screens where the container aspect ratio != VB_W:VB_H (e.g. iPad landscape
+  // or large portrait tablets), the SVG content is letterboxed with equal margins on
+  // the shorter axis.  Player images must be positioned relative to the rendered SVG
+  // content area — not the raw container — otherwise they drift off-court on iPad.
+  //
+  // scale    = uniform scale factor the SVG applies to fit viewBox inside the container
+  // offsetX/Y = letterbox margin on each axis (0 when that axis is the limiting one)
   function poseStyle(vx: number, vy: number, w: number, h: number, opacity: number) {
     if (!cw || !ch) return { display: 'none' as const };
-    const pw = (w / VB_W) * cw;
-    const ph = (h / VB_H) * ch;
+    const scale   = Math.min(cw / VB_W, ch / VB_H);
+    const offsetX = (cw - VB_W * scale) / 2;
+    const offsetY = (ch - VB_H * scale) / 2;
+    const pw = w * scale;
+    const ph = h * scale;
     return {
       position: 'absolute' as const,
-      left:    (vx / VB_W) * cw - pw / 2,
-      top:     (vy / VB_H) * ch - ph / 2,
+      left:    offsetX + vx * scale - pw / 2,
+      top:     offsetY + vy * scale - ph / 2,
       width:   pw,
       height:  ph,
       opacity,

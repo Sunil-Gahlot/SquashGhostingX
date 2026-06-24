@@ -23,12 +23,12 @@ export const POSITION_INFO: Record<Position, PositionInfo> = {
   },
   ML: {
     code: 'ML', label: 'Mid Left', shortLabel: 'ML',
-    zone: 'mid', x: -2.00, z: 5.60,
+    zone: 'mid', x: -2.00, z: 4.60,
     courtSystems: ['6pt', '10pt'],
   },
   MR: {
     code: 'MR', label: 'Mid Right', shortLabel: 'MR',
-    zone: 'mid', x: 2.00, z: 5.60,
+    zone: 'mid', x: 2.00, z: 4.60,
     courtSystems: ['6pt', '10pt'],
   },
   BL: {
@@ -44,12 +44,12 @@ export const POSITION_INFO: Record<Position, PositionInfo> = {
   // 10-point extra positions:
   // FMCL/FMCR = Front Volley zones — early interception before the ball reaches the front corner
   FMCL: {
-    code: 'FMCL', label: 'Front Volley Left', shortLabel: 'FVL',
+    code: 'FMCL', label: 'Front Mid Left', shortLabel: 'FML',
     zone: 'front', x: -2.00, z: 2.80,
     courtSystems: ['10pt'],
   },
   FMCR: {
-    code: 'FMCR', label: 'Front Volley Right', shortLabel: 'FVR',
+    code: 'FMCR', label: 'Front Mid Right', shortLabel: 'FMR',
     zone: 'front', x: 2.00, z: 2.80,
     courtSystems: ['10pt'],
   },
@@ -92,9 +92,12 @@ export const HAND_MIRROR: Record<Position, Position> = {
 // a valid volley-intercept target in shot-based drills for all coverage modes.
 // (Movement-only drills still exclude T via buildPool filtering in ghostingEngine.)
 export const COVERAGE_FILTER: Record<string, Position[]> = {
-  full:      POSITIONS_10PT,                                              // all positions including T
-  front:     ['T', 'FL', 'FR', 'FMCL', 'FMCR'],
-  back:      ['T', 'BL', 'BR', 'BMCL', 'BMCR'],
+  full:      POSITIONS_10PT,
+  // Zone drills have fixed position sets that include both 6pt and 10pt positions.
+  // The zone IS the restriction — no additional 6pt/10pt lock is applied.
+  // The engine always uses POSITIONS_10PT as base for zones so FMCL/FMCR/BMCL/BMCR are reachable.
+  front:     ['T', 'FL', 'FR', 'MR', 'ML', 'FMCL', 'FMCR'],
+  back:      ['T', 'BL', 'BR', 'MR', 'ML', 'BMCL', 'BMCR'],
   forehand:  ['T', 'FR', 'MR', 'BR', 'FMCR', 'BMCR'],
   backhand:  ['T', 'FL', 'ML', 'BL', 'FMCL', 'BMCL'],
 };
