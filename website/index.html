@@ -14,247 +14,264 @@
 <meta property="og:site_name" content="SquashGhostingX">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="SquashGhostingX — AI-Powered Squash Ghosting Training">
-<meta name="twitter:description" content="The only squash app with AI voice coaching, 6-point & 10-point ghosting systems and real-time analytics. Free on iOS and Android.">
+<meta name="twitter:description" content="AI voice coaching, 6 & 10-point ghosting systems, real-time analytics. Free on iOS and Android.">
 <meta name="twitter:image" content="https://squashghostingx.com/screen-home.jpeg">
 <meta name="theme-color" content="#FF6B35">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23FF6B35'/%3E%3Ctext x='16' y='23' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='900' font-size='14'%3ESX%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="screen-home.jpeg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,700;1,900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"MobileApplication","name":"SquashGhostingX","operatingSystem":"iOS, Android","applicationCategory":"SportsApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"description":"AI-powered squash ghosting training with voice coaching, 6 & 10 point court systems and analytics. Free on iOS and Android.","author":{"@type":"Person","name":"Varish Gahlot"}}
 </script>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is SquashGhostingX really free?","acceptedAnswer":{"@type":"Answer","text":"Yes — the full app including both 6-point and 10-point ghosting systems, AI voice coaching, all analytics, all 20 built-in programs, and unlimited session history is completely free. No trial period, no credit card, no hidden fees."}},{"@type":"Question","name":"What is squash ghosting?","acceptedAnswer":{"@type":"Answer","text":"Ghosting is a solo squash training drill where you move to each position on the court and play a shadow stroke — as if the ball were there — then recover to the T. It builds court movement, aerobic fitness, and muscle memory."}},{"@type":"Question","name":"What devices does SquashGhostingX run on?","acceptedAnswer":{"@type":"Answer","text":"SquashGhostingX is available free on both iOS (App Store) and Android (Google Play). No TestFlight or beta required."}},{"@type":"Question","name":"Does SquashGhostingX work offline?","acceptedAnswer":{"@type":"Answer","text":"Yes, completely. SquashGhostingX works 100% offline. All session data is stored locally on your device. No Wi-Fi needed on court."}},{"@type":"Question","name":"What is the difference between 6-point and 10-point ghosting?","acceptedAnswer":{"@type":"Answer","text":"The 6-point system covers front corners, mid-court, and back corners — ideal for beginners through intermediate players. The 10-point system adds four bridging positions for advanced players."}},{"@type":"Question","name":"Does the AI voice work with earphones?","acceptedAnswer":{"@type":"Answer","text":"Yes — earphones are the recommended setup. The AI voice calls each court position through any Bluetooth or wired headphones. The app also bypasses iOS silent mode."}}]}
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is SquashGhostingX really free?","acceptedAnswer":{"@type":"Answer","text":"Yes — completely free. No subscription, no credit card, no trial period. The full app forever."}},{"@type":"Question","name":"What is squash ghosting?","acceptedAnswer":{"@type":"Answer","text":"Ghosting is a solo drill where you sprint to each court position, play a shadow stroke, then recover to the T. It builds movement, fitness and muscle memory."}},{"@type":"Question","name":"What devices does it run on?","acceptedAnswer":{"@type":"Answer","text":"iOS (App Store) and Android (Google Play). No TestFlight required."}},{"@type":"Question","name":"Does it work offline?","acceptedAnswer":{"@type":"Answer","text":"Yes. 100% offline. No Wi-Fi needed on court."}},{"@type":"Question","name":"6-point vs 10-point — which should I use?","acceptedAnswer":{"@type":"Answer","text":"Start with 6-point. It covers all key zones and suits beginners through intermediate players. Move to 10-point when you want more complex patterns and longer arcs."}},{"@type":"Question","name":"Does AI voice work with earphones?","acceptedAnswer":{"@type":"Answer","text":"Yes — earphones recommended. Works with Bluetooth or wired. Bypasses iOS silent mode."}}]}
 </script>
 <style>
-/* ── TOKENS ── */
-:root{
-  --bg:#0A0806;--bg2:#110D09;--bg3:#19120C;--bg4:#221810;--bg5:#2C1E14;
-  --accent:#FF6B35;--accent-b:#CC4A18;--accent-l:#FF9268;
-  --glow:rgba(255,107,53,.07);--glow2:rgba(255,107,53,.14);--glow3:rgba(255,107,53,.28);
-  --border:rgba(255,255,255,.07);--borderacc:rgba(255,107,53,.28);
-  --gray1:#C4A896;--gray2:#806050;--gray3:#3D2820;
-  --white:#fff;--text:#E8D5C4;
-  --fh:'Barlow Condensed',sans-serif;--fb:'DM Sans',sans-serif;
-  --r8:8px;--r12:12px;--r16:16px;--r24:24px;
+/* ─── DESIGN TOKENS ─────────────────────────────────────────── */
+:root {
+  --ink:#07050A;
+  --ink2:#0D0A10;
+  --ink3:#141118;
+  --ink4:#1C1723;
+  --ink5:#251F2E;
+  --orange:#FF6B35;
+  --orange-b:#D94F1A;
+  --orange-l:#FF9268;
+  --glow:rgba(255,107,53,.06);
+  --glow2:rgba(255,107,53,.12);
+  --glow3:rgba(255,107,53,.25);
+  --line:rgba(255,255,255,.07);
+  --line2:rgba(255,255,255,.12);
+  --line-o:rgba(255,107,53,.22);
+  --muted:#7A6E7E;
+  --dim:#B8ADBC;
+  --white:#FFFFFF;
+  --text:#E2D8E8;
+  --fh:'Barlow Condensed',sans-serif;
+  --fb:'DM Sans',sans-serif;
+  --r:12px;--r2:20px;--r3:28px;
   --max:1160px;
 }
 
-/* ── RESET ── */
+/* ─── RESET ─────────────────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;overflow-x:hidden;-webkit-text-size-adjust:100%}
-body{background:var(--bg);color:var(--text);font-family:var(--fb);line-height:1.6;overflow-x:hidden;min-height:100vh}
+body{background:var(--ink);color:var(--text);font-family:var(--fb);line-height:1.6;overflow-x:hidden;min-height:100vh}
 a{color:inherit;text-decoration:none}
 img{max-width:100%;display:block}
 button{cursor:pointer;border:none;background:none;font-family:inherit;-webkit-tap-highlight-color:transparent}
 a,button{-webkit-tap-highlight-color:transparent}
 
-/* ── SKIP LINK ── */
-.skip{position:fixed;top:-100%;left:1rem;background:var(--accent);color:#fff;padding:.5rem 1rem;border-radius:var(--r8);font-weight:600;z-index:9999;transition:top .2s}
+/* ─── SKIP / PROGRESS ───────────────────────────────────────── */
+.skip{position:fixed;top:-100%;left:1rem;background:var(--orange);color:#fff;padding:.5rem 1rem;border-radius:var(--r);font-weight:600;z-index:9999;transition:top .2s}
 .skip:focus{top:1rem}
+#prog{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--orange),var(--orange-l));width:0%;z-index:10001;transition:width .1s linear}
 
-/* ── SCROLL BAR ── */
-#prog{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0%;z-index:10001;transition:width .08s linear}
-
-/* ── NAV ── */
-#nav{position:fixed;inset:0 0 auto 0;z-index:1000;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;background:rgba(10,8,6,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);transition:height .3s,background .3s}
-#nav.scrolled{height:56px;background:rgba(10,8,6,.97)}
-.nav-logo{display:flex;align-items:center;gap:.6rem;font-family:var(--fh);font-size:1.5rem;font-weight:900;letter-spacing:-.02em;color:var(--white)}
-.nav-logo-icon{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#FF6B35,#c0392b);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:900;color:#fff;box-shadow:0 0 16px rgba(255,107,53,.45);flex-shrink:0}
-.nav-logo-g{background:linear-gradient(135deg,#FF6B35,#ff9f6b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+/* ─── NAV ───────────────────────────────────────────────────── */
+#nav{position:fixed;inset:0 0 auto;z-index:1000;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;background:rgba(7,5,10,.7);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--line);transition:background .3s}
+#nav.scrolled{background:rgba(7,5,10,.92)}
+.nav-logo{display:flex;align-items:center;gap:.6rem;font-family:var(--fh);font-size:1.45rem;font-weight:900;letter-spacing:-.02em;color:var(--white)}
+.logo-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(140deg,#FF6B35 0%,#B03010 100%);display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:900;color:#fff;box-shadow:0 0 20px rgba(255,107,53,.4),inset 0 1px 0 rgba(255,255,255,.2);flex-shrink:0}
+.logo-g{background:linear-gradient(135deg,#FF6B35,#FF9268);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .nav-links{display:flex;align-items:center;gap:1.75rem}
-.nav-links a{font-size:.85rem;font-weight:500;color:var(--gray1);transition:color .2s}
-.nav-links a:hover{color:var(--accent)}
-.nav-dl{background:var(--accent);color:#fff;padding:.45rem 1.1rem;border-radius:var(--r8);font-size:.85rem;font-weight:600;transition:background .2s,transform .15s}
-.nav-dl:hover{background:var(--accent-b);transform:translateY(-1px)}
-.burger{display:none;flex-direction:column;gap:5px;width:28px;cursor:pointer;padding:2px}
-.burger b{display:block;height:2px;background:var(--white);border-radius:2px;transition:all .3s}
-.burger.open b:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-links a{font-size:.84rem;font-weight:500;color:var(--muted);transition:color .2s;letter-spacing:.01em}
+.nav-links a:hover{color:var(--white)}
+.nav-cta{background:var(--orange);color:#fff;padding:.42rem 1.1rem;border-radius:8px;font-size:.84rem;font-weight:600;transition:background .2s,transform .15s,box-shadow .2s}
+.nav-cta:hover{background:var(--orange-b);transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,107,53,.35)}
+.burger{display:none;flex-direction:column;gap:5px;width:26px;padding:2px;cursor:pointer}
+.burger b{display:block;height:1.5px;background:var(--white);border-radius:2px;transition:all .3s}
+.burger.open b:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
 .burger.open b:nth-child(2){opacity:0;transform:scaleX(0)}
-.burger.open b:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
-#mob-nav{display:none;position:fixed;inset:64px 0 auto 0;background:rgba(10,8,6,.98);backdrop-filter:blur(20px);padding:1.25rem 1.5rem 1.75rem;flex-direction:column;gap:.25rem;z-index:999;border-bottom:1px solid var(--border)}
+.burger.open b:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+#mob-nav{display:none;position:fixed;inset:60px 0 auto;background:rgba(7,5,10,.97);backdrop-filter:blur(20px);flex-direction:column;gap:.15rem;padding:1rem 1.5rem 1.5rem;z-index:999;border-bottom:1px solid var(--line)}
 #mob-nav.open{display:flex}
-#mob-nav a{font-size:1rem;font-weight:500;color:var(--text);padding:.7rem 0;border-bottom:1px solid var(--border)}
-#mob-nav a:last-child{border-bottom:none;margin-top:.5rem;background:var(--accent);color:#fff;text-align:center;border-radius:var(--r8);padding:.75rem}
+#mob-nav a{font-size:1rem;font-weight:500;color:var(--text);padding:.65rem 0;border-bottom:1px solid var(--line)}
+#mob-nav a:last-child{margin-top:.5rem;background:var(--orange);color:#fff;text-align:center;border-radius:var(--r);padding:.75rem;border-bottom:none}
 
-/* ── LAYOUT ── */
-.wrap{max-width:var(--max);margin:0 auto;padding:0 1.5rem}
-section{padding:5rem 0}
-.section-label{font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:.6rem;display:block}
-.section-title{font-family:var(--fh);font-size:clamp(2rem,4vw,3rem);font-weight:900;line-height:1.05;color:var(--white);margin-bottom:.9rem}
-.section-title em{color:var(--accent);font-style:italic}
-.section-sub{font-size:1rem;color:var(--gray1);line-height:1.75;max-width:540px}
-.section-head{margin-bottom:3rem}
-.tc{text-align:center}.tc .section-sub{margin:0 auto}
+/* ─── LAYOUT HELPERS ────────────────────────────────────────── */
+.wrap{max-width:var(--max);margin:0 auto;padding:0 2rem}
+section{padding:5.5rem 0}
+.hl{font-family:var(--fh);font-weight:900;line-height:1;letter-spacing:-.01em;color:var(--white)}
+.hl-g{background:linear-gradient(135deg,#FF6B35,#FF9268);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.eyebrow{font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);margin-bottom:.65rem;display:block}
+.sec-title{font-family:var(--fh);font-size:clamp(2.2rem,4vw,3rem);font-weight:900;line-height:1.02;color:var(--white);margin-bottom:.85rem}
+.sec-title em{background:linear-gradient(135deg,#FF6B35,#FF9268);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-style:normal}
+.sec-sub{font-size:.97rem;color:var(--dim);line-height:1.75;max-width:520px}
+.sec-head{margin-bottom:3rem}
+.tc{text-align:center}.tc .sec-sub{margin:0 auto}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+.d1{transition-delay:.07s}.d2{transition-delay:.14s}.d3{transition-delay:.21s}.d4{transition-delay:.28s}
 
-/* ── BUTTONS ── */
-.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.85rem 1.75rem;border-radius:var(--r12);font-size:.95rem;font-weight:700;letter-spacing:.01em;transition:all .22s;cursor:pointer;text-decoration:none}
-.btn-orange{background:var(--accent);color:#fff}
-.btn-orange:hover{background:var(--accent-b);transform:translateY(-2px);box-shadow:0 8px 28px var(--glow3)}
-.btn-ghost{background:transparent;color:var(--white);border:1px solid var(--borderacc)}
-.btn-ghost:hover{background:var(--glow2);transform:translateY(-2px)}
+/* ─── STORE BUTTONS ─────────────────────────────────────────── */
+.stores{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center}
+.store{display:inline-flex;align-items:center;gap:.8rem;background:var(--ink3);border:1px solid var(--line2);border-radius:var(--r2);padding:.8rem 1.35rem;transition:all .22s;min-width:150px}
+.store:hover{background:var(--ink4);border-color:var(--line-o);transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,.4)}
+.store-text{line-height:1.2}
+.store-sub{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.store-name{font-size:.96rem;font-weight:700;color:var(--white)}
 
-/* ── STORE BUTTONS ── */
-.store-row{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center}
-.store-btn{display:inline-flex;align-items:center;gap:.75rem;background:var(--bg4);border:1px solid var(--border);border-radius:var(--r12);padding:.75rem 1.25rem;transition:all .22s}
-.store-btn:hover{border-color:var(--borderacc);background:var(--bg5);transform:translateY(-2px)}
-.store-btn svg{flex-shrink:0}
-.store-btn-label{line-height:1.2}
-.store-btn-sub{font-size:.62rem;color:var(--gray2);text-transform:uppercase;letter-spacing:.05em}
-.store-btn-name{font-size:.95rem;font-weight:700;color:var(--white)}
+/* ─── HERO ──────────────────────────────────────────────────── */
+#hero{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0;overflow:hidden}
+.hero-bg{position:absolute;inset:0;pointer-events:none}
+.hero-bg::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 20%,rgba(255,107,53,.11) 0%,transparent 65%)}
+.hero-bg::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 50% 40% at 20% 80%,rgba(180,60,10,.07) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 80% 80%,rgba(180,60,10,.07) 0%,transparent 60%)}
+.hero-noise{position:absolute;inset:0;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");pointer-events:none}
+.hero-content{position:relative;z-index:2;padding:8rem 2rem 3rem;max-width:860px;margin:0 auto;width:100%}
+.hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.25);border-radius:100px;padding:.32rem .9rem;font-size:.75rem;font-weight:600;color:var(--orange);margin-bottom:1.75rem;letter-spacing:.05em;text-transform:uppercase}
+.badge-dot{width:6px;height:6px;background:var(--orange);border-radius:50%;animation:pulse 2.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
+.hero-h1{font-family:var(--fh);font-size:clamp(3.8rem,10vw,8.5rem);font-weight:900;line-height:.95;letter-spacing:-.02em;color:var(--white);margin-bottom:1.5rem}
+.hero-h1 .line2{background:linear-gradient(135deg,#FF6B35 0%,#FF9268 50%,#FFBA94 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:1.1rem;color:var(--dim);line-height:1.75;max-width:520px;margin:0 auto 2.5rem}
+.hero-stores{justify-content:center;margin-bottom:2.5rem}
+.hero-proof{display:flex;align-items:center;justify-content:center;gap:2rem;flex-wrap:wrap}
+.hp-item{display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--muted)}
+.hp-icon{color:var(--orange);font-size:.85rem}
+/* phone */
+.hero-phone-section{position:relative;z-index:2;display:flex;justify-content:center;padding-bottom:6rem}
+.phone-cluster{position:relative;display:inline-flex;align-items:flex-end;gap:-12px}
+.phone{border-radius:36px;overflow:hidden;border:1px solid rgba(255,255,255,.12);background:#000;box-shadow:0 50px 100px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.04)}
+.phone.main{width:240px;z-index:3;position:relative}
+.phone.side{width:190px;opacity:.6;position:relative}
+.phone.side.l{transform:rotate(-5deg) translate(18px,24px);z-index:2}
+.phone.side.r{transform:rotate(5deg) translate(-18px,24px);z-index:2}
+.phone img{width:100%;display:block}
+.phone-notch{position:absolute;top:13px;left:50%;transform:translateX(-50%);width:86px;height:24px;background:#000;border-radius:12px;z-index:5}
+.phone-glow{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);width:260px;height:100px;background:radial-gradient(ellipse,rgba(255,107,53,.55) 0%,transparent 70%);filter:blur(20px);pointer-events:none;z-index:1}
+.phone-ring{position:absolute;inset:-2px;border-radius:38px;border:1px solid rgba(255,107,53,.18);pointer-events:none;z-index:6}
 
-/* ── HERO ── */
-#hero{padding-top:0;min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden}
-.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 65% 40%,rgba(255,107,53,.09) 0%,transparent 70%);pointer-events:none}
-.hero-inner{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;padding:7rem 0 5rem;width:100%}
-.hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:var(--glow2);border:1px solid var(--borderacc);border-radius:100px;padding:.3rem .85rem;font-size:.75rem;font-weight:600;color:var(--accent);margin-bottom:1.25rem;letter-spacing:.06em;text-transform:uppercase}
-.badge-dot{width:7px;height:7px;background:var(--accent);border-radius:50%;animation:blink 2s ease-in-out infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
-.hero-title{font-family:var(--fh);font-size:clamp(3rem,6vw,5rem);font-weight:900;line-height:.98;letter-spacing:-.01em;color:var(--white);margin-bottom:1.1rem}
-.hero-title em{color:var(--accent);font-style:italic}
-.hero-sub{font-size:1.05rem;color:var(--gray1);line-height:1.75;margin-bottom:2rem;max-width:460px}
-.hero-proof{margin-top:1.75rem;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
-.proof-pill{display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--gray1)}
-.proof-pill svg{color:var(--accent);flex-shrink:0}
-.hero-imgs{position:relative;display:flex;justify-content:center;align-items:flex-end;gap:-1rem}
-.phone-frame{width:200px;border-radius:32px;overflow:hidden;border:1px solid var(--border);box-shadow:0 30px 70px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.05);flex-shrink:0}
-.phone-frame img{width:100%;display:block;aspect-ratio:9/19.5;object-fit:cover;object-position:top}
-.phone-frame.main{width:220px;z-index:2;transform:translateY(0)}
-.phone-frame.side{width:180px;opacity:.75;transform:translateY(20px)}
-.phone-frame.side.l{transform:translateY(20px) rotate(-4deg) translateX(10px)}
-.phone-frame.side.r{transform:translateY(20px) rotate(4deg) translateX(-10px)}
-.hero-float{position:absolute;background:var(--bg3);border:1px solid var(--borderacc);border-radius:var(--r12);padding:.65rem .9rem;backdrop-filter:blur(10px)}
-.hero-float.tl{top:12%;left:-10px}
-.hero-float.br{bottom:18%;right:-10px}
-.hf-label{font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;color:var(--gray2);margin-bottom:.15rem}
-.hf-val{font-family:var(--fh);font-size:1.05rem;font-weight:900;color:var(--accent)}
-
-/* ── STATS STRIP ── */
-#strip{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:2.5rem 0}
-.strip-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
+/* ─── NUMBERS STRIP ─────────────────────────────────────────── */
+#strip{background:var(--ink2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:3rem 0}
+.strip-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2rem}
 .strip-item{text-align:center;position:relative}
-.strip-item+.strip-item::before{content:'';position:absolute;left:0;top:15%;height:70%;width:1px;background:var(--border)}
-.strip-num{font-family:var(--fh);font-size:clamp(2rem,3.5vw,2.8rem);font-weight:900;color:var(--accent);line-height:1;letter-spacing:-.02em}
-.strip-label{font-size:.82rem;color:var(--gray1);margin-top:.3rem}
-.strip-sub{font-size:.7rem;color:var(--gray2);margin-top:.1rem}
+.strip-item+.strip-item::before{content:'';position:absolute;left:0;top:20%;height:60%;width:1px;background:var(--line)}
+.strip-n{font-family:var(--fh);font-size:clamp(2.5rem,4vw,3.5rem);font-weight:900;line-height:1;background:linear-gradient(135deg,#FF6B35,#FF9268);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.3rem}
+.strip-label{font-size:.85rem;color:var(--white);font-weight:600}
+.strip-sub{font-size:.72rem;color:var(--muted);margin-top:.15rem}
 
-/* ── FEATURES ── */
-#features{background:var(--bg)}
-.feat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
-.feat-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:1.75rem;transition:border-color .25s,transform .25s}
-.feat-card:hover{border-color:var(--borderacc);transform:translateY(-4px)}
-.feat-icon{width:52px;height:52px;background:var(--glow2);border:1px solid var(--borderacc);border-radius:var(--r12);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1.25rem;flex-shrink:0}
-.feat-card h3{font-family:var(--fh);font-size:1.15rem;font-weight:800;color:var(--white);margin-bottom:.5rem;letter-spacing:.01em}
-.feat-card p{font-size:.88rem;color:var(--gray1);line-height:1.65}
-.feat-tag{display:inline-block;margin-top:.9rem;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:var(--glow);padding:.2rem .55rem;border-radius:4px}
+/* ─── BENTO FEATURES ────────────────────────────────────────── */
+#features{background:var(--ink)}
+.bento{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.bc{background:var(--ink2);border:1px solid var(--line);border-radius:var(--r2);padding:1.75rem;position:relative;overflow:hidden;transition:background .25s,border-color .25s,transform .25s}
+.bc:hover{background:var(--ink3);border-color:var(--line-o);transform:translateY(-4px)}
+.bc::after{content:'';position:absolute;inset:0;border-radius:inherit;background:radial-gradient(ellipse 60% 60% at 100% 0%,rgba(255,107,53,.06) 0%,transparent 70%);opacity:0;transition:opacity .3s;pointer-events:none}
+.bc:hover::after{opacity:1}
+.bc-wide{grid-column:span 2}
+.bc-icon{width:48px;height:48px;border-radius:14px;background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.18);display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:1.25rem;flex-shrink:0}
+.bc-tag{font-size:.67rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);margin-bottom:.4rem}
+.bc h3{font-family:var(--fh);font-size:1.2rem;font-weight:900;color:var(--white);margin-bottom:.5rem;letter-spacing:.01em}
+.bc p{font-size:.87rem;color:var(--dim);line-height:1.65}
+.bc-stat{margin-top:1.25rem;display:flex;align-items:baseline;gap:.35rem}
+.bc-stat-n{font-family:var(--fh);font-size:2.4rem;font-weight:900;line-height:1;background:linear-gradient(135deg,#FF6B35,#FF9268);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.bc-stat-l{font-size:.78rem;color:var(--muted);font-weight:500}
+.bc-court{position:absolute;bottom:-10px;right:-10px;opacity:.07;pointer-events:none}
 
-/* ── HOW IT WORKS ── */
-#how{background:var(--bg2)}
-.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;counter-reset:steps}
-.how-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:1.75rem;position:relative;overflow:hidden;counter-increment:steps}
-.how-card::before{content:counter(steps);position:absolute;top:.5rem;right:1rem;font-family:var(--fh);font-size:4rem;font-weight:900;color:var(--border);line-height:1;letter-spacing:-.03em}
-.how-step{font-family:var(--fh);font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem}
-.how-card h3{font-family:var(--fh);font-size:1.15rem;font-weight:800;color:var(--white);margin-bottom:.6rem}
-.how-card p{font-size:.88rem;color:var(--gray1);line-height:1.65}
+/* ─── HOW IT WORKS ──────────────────────────────────────────── */
+#how{background:var(--ink2)}
+.how-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;position:relative}
+.how-steps::before{content:'';position:absolute;top:28px;left:calc(16.6% + 24px);right:calc(16.6% + 24px);height:1px;background:linear-gradient(90deg,var(--line-o),var(--line),var(--line-o));pointer-events:none}
+.hs{background:var(--ink3);border:1px solid var(--line);border-radius:var(--r2);padding:2rem 1.5rem;text-align:center;position:relative}
+.hs-num{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#FF6B35,#D94F1A);display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:1.5rem;font-weight:900;color:#fff;margin:0 auto 1.25rem;box-shadow:0 0 24px rgba(255,107,53,.4)}
+.hs h3{font-family:var(--fh);font-size:1.15rem;font-weight:900;color:var(--white);margin-bottom:.5rem}
+.hs p{font-size:.87rem;color:var(--dim);line-height:1.65}
 
-/* ── SCREENSHOTS ── */
-#screens{background:var(--bg);overflow:hidden}
-.screens-scroll{display:flex;gap:1rem;overflow-x:auto;padding:.5rem 0 1.25rem;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent}
-.screens-scroll::-webkit-scrollbar{height:4px}
-.screens-scroll::-webkit-scrollbar-track{background:transparent}
-.screens-scroll::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
-.screen-item{flex-shrink:0;width:160px;border-radius:20px;overflow:hidden;border:1px solid var(--border);box-shadow:0 12px 32px rgba(0,0,0,.4)}
-.screen-item img{width:100%;aspect-ratio:9/19.5;object-fit:cover;object-position:top;display:block}
-.screen-label{font-size:.7rem;text-align:center;color:var(--gray2);padding:.5rem .25rem 0;font-weight:500}
+/* ─── SCREENSHOTS ───────────────────────────────────────────── */
+#screens{background:var(--ink);overflow:hidden}
+.screens-track{display:flex;gap:1rem;overflow-x:auto;padding:.5rem 2rem 1.5rem;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--ink4) transparent;cursor:grab}
+.screens-track:active{cursor:grabbing}
+.screens-track::-webkit-scrollbar{height:3px}
+.screens-track::-webkit-scrollbar-track{background:transparent}
+.screens-track::-webkit-scrollbar-thumb{background:var(--ink4);border-radius:2px}
+.sc-item{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:.6rem}
+.sc-frame{width:148px;border-radius:24px;overflow:hidden;border:1px solid var(--line);background:#000;box-shadow:0 16px 40px rgba(0,0,0,.5)}
+.sc-frame img{width:100%;display:block;aspect-ratio:9/19.5;object-fit:cover;object-position:top}
+.sc-label{font-size:.7rem;color:var(--muted);font-weight:500;white-space:nowrap}
 
-/* ── BLOG PREVIEW ── */
-#blog-preview{background:var(--bg2)}
-.blog-header-row{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2rem;gap:1rem;flex-wrap:wrap}
-.blog-see-all{font-size:.85rem;font-weight:600;color:var(--accent);display:flex;align-items:center;gap:.3rem;white-space:nowrap}
-.blog-see-all:hover{text-decoration:underline}
-.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
-.blog-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:1.5rem;display:flex;flex-direction:column;transition:border-color .22s,transform .22s}
-.blog-card:hover{border-color:var(--borderacc);transform:translateY(-3px)}
-.bc-emoji{font-size:1.75rem;margin-bottom:.85rem}
-.bc-tag{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
-.bc-title{font-family:var(--fh);font-size:1.1rem;font-weight:900;color:var(--white);line-height:1.2;margin-bottom:.6rem;flex:1}
-.bc-excerpt{font-size:.84rem;color:var(--gray1);line-height:1.6;margin-bottom:1rem}
-.bc-footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto}
-.bc-time{font-size:.75rem;color:var(--gray2)}
-.bc-read{font-size:.78rem;font-weight:600;color:var(--accent)}
+/* ─── BLOG PREVIEW ──────────────────────────────────────────── */
+#lab{background:var(--ink2)}
+.lab-row{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2.25rem;gap:1rem;flex-wrap:wrap}
+.lab-all{font-size:.84rem;font-weight:600;color:var(--orange);display:flex;align-items:center;gap:.35rem}
+.lab-all:hover{text-decoration:underline}
+.lab-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.lab-card{background:var(--ink3);border:1px solid var(--line);border-radius:var(--r2);padding:1.5rem;display:flex;flex-direction:column;transition:border-color .22s,transform .22s,background .22s}
+.lab-card:hover{border-color:var(--line-o);transform:translateY(-3px);background:var(--ink4)}
+.lc-emoji{font-size:1.6rem;margin-bottom:.85rem}
+.lc-tag{font-size:.63rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);margin-bottom:.35rem}
+.lc-title{font-family:var(--fh);font-size:1.05rem;font-weight:900;color:var(--white);line-height:1.2;margin-bottom:.5rem;flex:1}
+.lc-excerpt{font-size:.83rem;color:var(--dim);line-height:1.6;margin-bottom:.85rem}
+.lc-footer{display:flex;align-items:center;justify-content:space-between;padding-top:.75rem;border-top:1px solid var(--line)}
+.lc-time{font-size:.73rem;color:var(--muted)}
+.lc-read{font-size:.76rem;font-weight:600;color:var(--orange)}
 
-/* ── FAQ ── */
-#faq{background:var(--bg)}
-.faq-list{display:flex;flex-direction:column;gap:.75rem;max-width:760px;margin:0 auto}
-.faq-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);overflow:hidden;transition:border-color .2s}
-.faq-item.open{border-color:var(--borderacc)}
-.faq-q{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.1rem 1.25rem;cursor:pointer;font-weight:600;color:var(--white);font-size:.95rem;transition:color .2s;-webkit-tap-highlight-color:transparent}
-.faq-q:hover{color:var(--accent)}
-.faq-chevron{width:18px;height:18px;color:var(--gray2);flex-shrink:0;transition:transform .3s}
-.faq-item.open .faq-chevron{transform:rotate(180deg);color:var(--accent)}
-.faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease}
-.faq-a-inner{padding:0 1.25rem 1.1rem;font-size:.9rem;color:var(--gray1);line-height:1.75}
+/* ─── FAQ ───────────────────────────────────────────────────── */
+#faq{background:var(--ink)}
+.faq-wrap{max-width:740px;margin:0 auto;display:flex;flex-direction:column;gap:.65rem}
+.fq{background:var(--ink2);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:border-color .2s}
+.fq.open{border-color:var(--line-o)}
+.fq-q{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.1rem 1.25rem;cursor:pointer;font-weight:600;font-size:.93rem;color:var(--white);transition:color .2s;-webkit-tap-highlight-color:transparent}
+.fq-q:hover{color:var(--orange)}
+.fq-ico{width:18px;height:18px;color:var(--muted);flex-shrink:0;transition:transform .3s,color .2s}
+.fq.open .fq-ico{transform:rotate(180deg);color:var(--orange)}
+.fq-a{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.fq-a-in{padding:0 1.25rem 1.1rem;font-size:.89rem;color:var(--dim);line-height:1.75}
 
-/* ── DOWNLOAD CTA ── */
-#download{background:var(--bg2);border-top:1px solid var(--border)}
-.dl-inner{text-align:center;max-width:580px;margin:0 auto}
-.dl-inner .section-label{justify-content:center;display:flex}
-.dl-inner .section-title{font-size:clamp(2.2rem,5vw,3.5rem)}
-.dl-inner .section-sub{margin:0 auto 2rem}
-.dl-inner .store-row{justify-content:center}
+/* ─── DOWNLOAD CTA ──────────────────────────────────────────── */
+#download{position:relative;overflow:hidden;background:var(--ink2);padding:7rem 0}
+#download::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 100% at 50% 50%,rgba(255,107,53,.1) 0%,transparent 70%)}
+#download::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 40% 60% at 20% 50%,rgba(180,40,0,.07) 0%,transparent 60%),radial-gradient(ellipse 40% 60% at 80% 50%,rgba(180,40,0,.07) 0%,transparent 60%)}
+.dl-inner{position:relative;z-index:1;text-align:center;max-width:600px;margin:0 auto;padding:0 2rem}
+.dl-h{font-family:var(--fh);font-size:clamp(2.8rem,6vw,5rem);font-weight:900;line-height:1;letter-spacing:-.015em;color:var(--white);margin-bottom:1.1rem}
+.dl-h em{background:linear-gradient(135deg,#FF6B35,#FF9268);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-style:normal}
+.dl-sub{font-size:1rem;color:var(--dim);margin-bottom:2.25rem;line-height:1.7}
+.dl-stores{justify-content:center}
 
-/* ── FOOTER ── */
-footer{background:var(--bg);border-top:1px solid var(--border);padding:2.5rem 0}
-.footer-inner{display:flex;flex-direction:column;align-items:center;gap:1.25rem;text-align:center}
-.footer-logo{display:flex;align-items:center;gap:.6rem;font-family:var(--fh);font-size:1.3rem;font-weight:900;color:var(--white)}
+/* ─── FOOTER ────────────────────────────────────────────────── */
+footer{background:var(--ink);border-top:1px solid var(--line);padding:3rem 0 2rem}
+.footer-inner{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:2rem}
+.footer-logo{display:flex;align-items:center;gap:.55rem;font-family:var(--fh);font-size:1.2rem;font-weight:900;color:var(--white)}
 .footer-links{display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center}
-.footer-links a{font-size:.82rem;color:var(--gray2);transition:color .2s}
-.footer-links a:hover{color:var(--accent)}
-.footer-copy{font-size:.78rem;color:var(--gray2)}
+.footer-links a{font-size:.8rem;color:var(--muted);transition:color .2s}
+.footer-links a:hover{color:var(--white)}
+.footer-right{text-align:right}
+.footer-copy{font-size:.75rem;color:var(--muted)}
+.footer-made{font-size:.75rem;color:var(--muted);margin-top:.25rem}
+.footer-made span{color:var(--orange)}
 
-/* ── REVEAL ANIMATION ── */
-.rv{opacity:0;transform:translateY(24px);transition:opacity .55s ease,transform .55s ease}
-.rv.vis{opacity:1;transform:translateY(0)}
-.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}.d4{transition-delay:.32s}
-
-/* ── RESPONSIVE ── */
+/* ─── RESPONSIVE ─────────────────────────────────────────────── */
 @media(max-width:1024px){
-  .hero-inner{gap:2.5rem}
-  .phone-frame.main{width:195px}
-  .phone-frame.side{width:160px}
-  .feat-grid{gap:1rem}
+  .bento{grid-template-columns:repeat(2,1fr)}
+  .bc-wide{grid-column:span 1}
+  .strip-grid{grid-template-columns:repeat(2,1fr);row-gap:2rem}
+  .strip-item+.strip-item::before{display:none}
+  .footer-inner{grid-template-columns:1fr;text-align:center}
+  .footer-right{text-align:center}
+  .how-steps::before{display:none}
 }
 @media(max-width:860px){
-  .nav-links,.nav-dl{display:none}
+  .nav-links,.nav-cta{display:none}
   .burger{display:flex}
-  .hero-inner{grid-template-columns:1fr;text-align:center;padding:6rem 0 3.5rem}
-  .hero-sub{margin:0 auto 2rem}
-  .hero-proof{justify-content:center}
-  .hero-imgs{margin-top:2.5rem}
-  .hero-float.tl{left:0}
-  .hero-float.br{right:0}
-  .strip-grid{grid-template-columns:repeat(2,1fr);gap:1.25rem}
-  .strip-item+.strip-item::before{display:none}
-  .how-grid{grid-template-columns:1fr}
-  .blog-grid{grid-template-columns:1fr}
+  .bento{grid-template-columns:1fr}
+  .bc-wide{grid-column:span 1}
+  .lab-grid{grid-template-columns:1fr}
+  .phone.side{display:none}
+  .how-steps{grid-template-columns:1fr}
 }
 @media(max-width:640px){
-  section{padding:3.5rem 0}
-  .feat-grid{grid-template-columns:1fr}
-  .hero-imgs{gap:.5rem}
-  .phone-frame.side{display:none}
-  .phone-frame.main{width:200px}
-  .store-row{flex-direction:column;align-items:stretch}
-  .store-btn{justify-content:center}
-  .hero-float{display:none}
-  .strip-grid{grid-template-columns:1fr 1fr}
-  .blog-grid{grid-template-columns:1fr}
+  section{padding:4rem 0}
+  .wrap{padding:0 1.25rem}
+  .hero-content{padding:7rem 1.25rem 2.5rem}
+  .hero-phone-section{padding-bottom:4rem}
+  .phone.main{width:210px}
+  .stores{flex-direction:column;align-items:center}
+  .store{justify-content:center;width:100%;max-width:240px}
+  .strip-grid{grid-template-columns:1fr 1fr;gap:1.5rem}
 }
-@media(max-width:400px){
+@media(max-width:380px){
+  .hero-h1{font-size:3.4rem}
   .strip-grid{grid-template-columns:1fr}
-  .strip-item+.strip-item::before{display:none}
 }
 </style>
 </head>
@@ -263,32 +280,30 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:2.5rem 0}
 <div id="prog" aria-hidden="true"></div>
 
 <!-- ── NAV ── -->
-<nav id="nav" role="navigation" aria-label="Main navigation">
+<nav id="nav">
   <a href="index.html" class="nav-logo" aria-label="SquashGhostingX home">
-    <div class="nav-logo-icon" aria-hidden="true">SX</div>
-    <span>Squash<span class="nav-logo-g">GhostingX</span></span>
+    <div class="logo-mark" aria-hidden="true">SX</div>
+    <span>Squash<span class="logo-g">GhostingX</span></span>
   </a>
   <div class="nav-links">
     <a href="#features">Features</a>
-    <a href="#how">How It Works</a>
+    <a href="#screens">App</a>
     <a href="blog/index.html">Training Blog</a>
-    <a href="guide.html">App Guide</a>
+    <a href="guide.html">Guide</a>
     <a href="support.html">Support</a>
   </div>
-  <a href="https://apps.apple.com/app/squashghostingx/id6744036820" class="nav-dl nav-links" target="_blank" rel="noopener noreferrer">Download Free</a>
-  <button class="burger" id="burger" aria-label="Toggle menu" aria-expanded="false" aria-controls="mob-nav">
+  <a href="https://apps.apple.com/app/squashghostingx/id6744036820" class="nav-cta nav-links" target="_blank" rel="noopener noreferrer">Download Free</a>
+  <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false">
     <b></b><b></b><b></b>
   </button>
 </nav>
-
-<!-- ── MOBILE NAV ── -->
-<div id="mob-nav" role="dialog" aria-label="Mobile navigation">
+<div id="mob-nav">
   <a href="#features" onclick="closeMob()">Features</a>
-  <a href="#how" onclick="closeMob()">How It Works</a>
+  <a href="#screens" onclick="closeMob()">App Screens</a>
   <a href="blog/index.html">Training Blog</a>
   <a href="guide.html">App Guide</a>
   <a href="support.html">Support</a>
-  <a href="https://apps.apple.com/app/squashghostingx/id6744036820" target="_blank" rel="noopener noreferrer">Download Free →</a>
+  <a href="https://apps.apple.com/app/squashghostingx/id6744036820" target="_blank" rel="noopener noreferrer">Download Free &#8594;</a>
 </div>
 
 <main id="main">
@@ -296,128 +311,125 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:2.5rem 0}
 <!-- ── HERO ── -->
 <section id="hero" aria-label="Hero">
   <div class="hero-bg" aria-hidden="true"></div>
-  <div class="wrap">
-    <div class="hero-inner">
-      <div class="hero-text">
-        <div class="hero-badge rv">
-          <span class="badge-dot" aria-hidden="true"></span>
-          Free on iOS &amp; Android
-        </div>
-        <h1 class="hero-title rv d1">
-          Train Like<br>a Pro.<br><em>Ghost Like<br>a Champion.</em>
-        </h1>
-        <p class="hero-sub rv d2">AI voice coaching calls every court position hands-free. Real-time analytics track every move. 20+ training programs built for every level. All completely free.</p>
-        <div class="store-row rv d3">
-          <a href="https://apps.apple.com/app/squashghostingx/id6744036820" class="store-btn" target="_blank" rel="noopener noreferrer" aria-label="Download on the App Store">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="color:#fff"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-            <div class="store-btn-label">
-              <div class="store-btn-sub">Download on the</div>
-              <div class="store-btn-name">App Store</div>
-            </div>
-          </a>
-          <a href="https://play.google.com/store/apps/details?id=com.squashghostingx.app" class="store-btn" target="_blank" rel="noopener noreferrer" aria-label="Get it on Google Play">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="color:#3DDC84"><path d="M3.18 23.76c.37.2.8.2 1.18 0l11-6.35-2.37-2.37zm15.1-8.74L16.09 13l-2.45 2.45 2.45 2.45 2.21-1.28c.63-.36.63-1.24-.02-1.6zM3.18.24L13.64 10.7 11.27 8.35zm0 0L1.73 1.07A1.03 1.03 0 001 2v20c0 .38.2.73.52.93L13.64 10.7z"/></svg>
-            <div class="store-btn-label">
-              <div class="store-btn-sub">Get it on</div>
-              <div class="store-btn-name">Google Play</div>
-            </div>
-          </a>
-        </div>
-        <div class="hero-proof rv d4">
-          <span class="proof-pill">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.8 3.6L14 5.3l-3 2.9.7 4.1L8 10.4l-3.7 1.9.7-4.1-3-2.9 4.2-.7z"/></svg>
-            Free forever — no subscription
-          </span>
-          <span class="proof-pill">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.5 7.5h-3v-3a.5.5 0 00-1 0v3.5a.5.5 0 00.5.5H11.5a.5.5 0 000-1z"/></svg>
-            Works 100% offline
-          </span>
-        </div>
+  <div class="hero-noise" aria-hidden="true"></div>
+
+  <div class="hero-content reveal">
+    <div class="hero-badge">
+      <span class="badge-dot" aria-hidden="true"></span>
+      Free &middot; iOS &amp; Android &middot; No Subscription
+    </div>
+    <h1 class="hero-h1">
+      Ghost Every<br>
+      <span class="line2">Corner.</span>
+    </h1>
+    <p class="hero-sub">AI voice coaching calls every position &mdash; eyes forward, not on a screen. Real-time analytics. 20+ training programs. Completely free.</p>
+    <div class="stores hero-stores">
+      <a href="https://apps.apple.com/app/squashghostingx/id6744036820" class="store" target="_blank" rel="noopener noreferrer" aria-label="Download on the App Store">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="color:#fff;flex-shrink:0"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        <div class="store-text"><div class="store-sub">Download on the</div><div class="store-name">App Store</div></div>
+      </a>
+      <a href="https://play.google.com/store/apps/details?id=com.squashghostingx.app" class="store" target="_blank" rel="noopener noreferrer" aria-label="Get it on Google Play">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="color:#3DDC84;flex-shrink:0"><path d="M3.18 23.76c.37.2.8.2 1.18 0l11-6.35-2.37-2.37zm15.1-8.74L16.09 13l-2.45 2.45 2.45 2.45 2.21-1.28c.63-.36.63-1.24-.02-1.6zM3.18.24L13.64 10.7 11.27 8.35zm0 0L1.73 1.07A1.03 1.03 0 001 2v20c0 .38.2.73.52.93L13.64 10.7z"/></svg>
+        <div class="store-text"><div class="store-sub">Get it on</div><div class="store-name">Google Play</div></div>
+      </a>
+    </div>
+    <div class="hero-proof">
+      <span class="hp-item"><span class="hp-icon">&#10003;</span> Free forever &mdash; no hidden cost</span>
+      <span class="hp-item"><span class="hp-icon">&#10003;</span> Works 100% offline</span>
+      <span class="hp-item"><span class="hp-icon">&#10003;</span> No account required</span>
+    </div>
+  </div>
+
+  <div class="hero-phone-section">
+    <div class="phone-cluster reveal d2">
+      <div class="phone side l" aria-hidden="true">
+        <div class="phone-notch"></div>
+        <img src="screen-setup-session.jpeg" alt="" loading="lazy">
       </div>
-      <div class="hero-imgs rv d2" aria-hidden="true">
-        <div class="phone-frame side l" aria-hidden="true">
-          <img src="screen-setup-session.jpeg" alt="" loading="lazy">
-        </div>
-        <div class="phone-frame main">
-          <img src="screen-home.jpeg" alt="SquashGhostingX home screen" loading="eager">
-        </div>
-        <div class="phone-frame side r" aria-hidden="true">
-          <img src="screen-progress-overview.jpeg" alt="" loading="lazy">
-        </div>
-        <div class="hero-float tl">
-          <div class="hf-label">Sessions today</div>
-          <div class="hf-val">3 completed</div>
-        </div>
-        <div class="hero-float br">
-          <div class="hf-label">Zone balance</div>
-          <div class="hf-val">94% coverage</div>
-        </div>
+      <div class="phone main">
+        <div class="phone-notch"></div>
+        <div class="phone-ring" aria-hidden="true"></div>
+        <img src="screen-home.jpeg" alt="SquashGhostingX home screen" loading="eager">
       </div>
+      <div class="phone side r" aria-hidden="true">
+        <div class="phone-notch"></div>
+        <img src="screen-progress-overview.jpeg" alt="" loading="lazy">
+      </div>
+      <div class="phone-glow" aria-hidden="true"></div>
     </div>
   </div>
 </section>
 
-<!-- ── STATS STRIP ── -->
-<div id="strip" aria-label="Key stats">
+<!-- ── NUMBERS STRIP ── -->
+<div id="strip" aria-label="Key numbers">
   <div class="wrap">
     <div class="strip-grid">
-      <div class="strip-item rv">
-        <div class="strip-num">100%</div>
-        <div class="strip-label">Free Forever</div>
-        <div class="strip-sub">No subscription, no trial</div>
-      </div>
-      <div class="strip-item rv d1">
-        <div class="strip-num">100%</div>
-        <div class="strip-label">Works Offline</div>
-        <div class="strip-sub">No Wi-Fi needed on court</div>
-      </div>
-      <div class="strip-item rv d2">
-        <div class="strip-num">20+</div>
-        <div class="strip-label">Training Programs</div>
-        <div class="strip-sub">Beginner to elite</div>
-      </div>
-      <div class="strip-item rv d3">
-        <div class="strip-num">2</div>
-        <div class="strip-label">Court Systems</div>
-        <div class="strip-sub">6-point &amp; 10-point</div>
-      </div>
+      <div class="strip-item reveal"><div class="strip-n">100%</div><div class="strip-label">Free Forever</div><div class="strip-sub">No subscription, ever</div></div>
+      <div class="strip-item reveal d1"><div class="strip-n">100%</div><div class="strip-label">Works Offline</div><div class="strip-sub">No Wi-Fi needed on court</div></div>
+      <div class="strip-item reveal d2"><div class="strip-n">20+</div><div class="strip-label">Training Programs</div><div class="strip-sub">Beginner to elite</div></div>
+      <div class="strip-item reveal d3"><div class="strip-n">2</div><div class="strip-label">Court Systems</div><div class="strip-sub">6-point &amp; 10-point</div></div>
     </div>
   </div>
 </div>
 
-<!-- ── FEATURES ── -->
+<!-- ── FEATURES BENTO ── -->
 <section id="features" aria-label="Features">
   <div class="wrap">
-    <div class="section-head tc rv">
-      <span class="section-label">What you get</span>
-      <h2 class="section-title">Everything you need to<br><em>train smarter</em></h2>
-      <p class="section-sub">Four game-changing features that make SquashGhostingX the most complete solo training tool in squash.</p>
+    <div class="sec-head tc reveal">
+      <span class="eyebrow">What you get</span>
+      <h2 class="sec-title">Every tool serious players need.<br><em>Nothing they don&rsquo;t.</em></h2>
     </div>
-    <div class="feat-grid">
-      <div class="feat-card rv">
-        <div class="feat-icon" aria-hidden="true">🎤</div>
+    <div class="bento">
+
+      <div class="bc bc-wide reveal">
+        <div class="bc-icon" aria-hidden="true">&#127908;</div>
+        <div class="bc-tag">Signature Feature</div>
         <h3>AI Voice Coaching</h3>
-        <p>The app calls every court position out loud — so your eyes stay forward, not glued to a screen. Works with any Bluetooth earphones, even bypasses iOS silent mode.</p>
-        <span class="feat-tag">Hands-free training</span>
+        <p>The app calls every court position out loud so your eyes never leave the front wall. Works through any Bluetooth or wired earphones. Bypasses iOS silent mode &mdash; it plays even when your phone is on silent.</p>
+        <div class="bc-stat"><span class="bc-stat-n">15+</span><span class="bc-stat-l">languages supported</span></div>
+        <svg class="bc-court" width="140" height="200" viewBox="0 0 140 200" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true"><rect x="5" y="5" width="130" height="190" rx="2"/><line x1="5" y1="100" x2="135" y2="100"/><line x1="70" y1="100" x2="70" y2="5"/><circle cx="70" cy="105" r="4" fill="currentColor" opacity=".5"/></svg>
       </div>
-      <div class="feat-card rv d1">
-        <div class="feat-icon" aria-hidden="true">⚡</div>
-        <h3>6-Point &amp; 10-Point Systems</h3>
-        <p>The 6-point system covers all key court zones — perfect for beginners through intermediate players. 10-point adds bridging positions for advanced patterns and longer arcs.</p>
-        <span class="feat-tag">Every level covered</span>
+
+      <div class="bc reveal d1">
+        <div class="bc-icon" aria-hidden="true">&#9889;</div>
+        <div class="bc-tag">Court Systems</div>
+        <h3>6-Point &amp; 10-Point</h3>
+        <p>6-point covers all key zones &mdash; perfect for building the foundation. 10-point adds bridging positions for advanced patterns and longer movement arcs.</p>
+        <div class="bc-stat"><span class="bc-stat-n">2</span><span class="bc-stat-l">court configurations</span></div>
       </div>
-      <div class="feat-card rv d2">
-        <div class="feat-icon" aria-hidden="true">📊</div>
+
+      <div class="bc reveal d1">
+        <div class="bc-icon" aria-hidden="true">&#128202;</div>
+        <div class="bc-tag">Analytics</div>
         <h3>Real-Time Analytics</h3>
-        <p>Zone balance, completion rate, session history, forehand vs backhand split. Know exactly where your movement is weak and track progress session by session.</p>
-        <span class="feat-tag">Data-driven improvement</span>
+        <p>Zone balance, completion rate, forehand vs backhand split, session history. Know exactly where your movement is weak &mdash; and watch it improve.</p>
+        <div class="bc-stat"><span class="bc-stat-n">&#8734;</span><span class="bc-stat-l">session history stored</span></div>
       </div>
-      <div class="feat-card rv d3">
-        <div class="feat-icon" aria-hidden="true">🏋️</div>
-        <h3>20+ Training Programs</h3>
-        <p>Built-in structured programs from 15-minute beginner routines to elite conditioning blocks. Every program is progressive — it adapts as you improve.</p>
-        <span class="feat-tag">Structured progression</span>
+
+      <div class="bc reveal d2">
+        <div class="bc-icon" aria-hidden="true">&#127947;</div>
+        <div class="bc-tag">Programs</div>
+        <h3>Structured Programs</h3>
+        <p>20+ built-in programs from 15-minute beginner sessions to elite conditioning blocks &mdash; all progressive, all designed to get results.</p>
+        <div class="bc-stat"><span class="bc-stat-n">20+</span><span class="bc-stat-l">training programs</span></div>
       </div>
+
+      <div class="bc reveal d2">
+        <div class="bc-icon" aria-hidden="true">&#128246;</div>
+        <div class="bc-tag">Offline First</div>
+        <h3>100% Offline</h3>
+        <p>All data stored locally. No account, no cloud, no Wi-Fi on court. SquashGhostingX is built for players, not for tracking you.</p>
+        <div class="bc-stat"><span class="bc-stat-n">0</span><span class="bc-stat-l">data sent to any server</span></div>
+      </div>
+
+      <div class="bc reveal d3">
+        <div class="bc-icon" aria-hidden="true">&#127873;</div>
+        <div class="bc-tag">Pricing</div>
+        <h3>Free. Forever.</h3>
+        <p>Not a trial. Not a freemium tier. The full app &mdash; every feature, every program, every future update &mdash; at no cost. No ads either.</p>
+        <div class="bc-stat"><span class="bc-stat-n">&pound;0</span><span class="bc-stat-l">always</span></div>
+      </div>
+
     </div>
   </div>
 </section>
@@ -425,25 +437,25 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:2.5rem 0}
 <!-- ── HOW IT WORKS ── -->
 <section id="how" aria-label="How it works">
   <div class="wrap">
-    <div class="section-head tc rv">
-      <span class="section-label">Getting started</span>
-      <h2 class="section-title">On court in <em>under a minute</em></h2>
+    <div class="sec-head tc reveal">
+      <span class="eyebrow">How it works</span>
+      <h2 class="sec-title">On court in <em>three steps</em></h2>
     </div>
-    <div class="how-grid">
-      <div class="how-card rv">
-        <div class="how-step">Step 1</div>
-        <h3>Download Free</h3>
-        <p>Install SquashGhostingX from the App Store or Google Play. No account required, no trial period — just open and train.</p>
+    <div class="how-steps">
+      <div class="hs reveal">
+        <div class="hs-num">1</div>
+        <h3>Choose Your Session</h3>
+        <p>Pick 6-point or 10-point, set duration and difficulty, choose coverage and drill type. Takes under 30 seconds.</p>
       </div>
-      <div class="how-card rv d1">
-        <div class="how-step">Step 2</div>
-        <h3>Configure Your Session</h3>
-        <p>Choose your court system (6 or 10 point), intensity, drill type, and duration. Takes about 30 seconds. Everything is customisable.</p>
+      <div class="hs reveal d1">
+        <div class="hs-num">2</div>
+        <h3>Put Your Earphones In</h3>
+        <p>The AI calls each position &mdash; front left, back right, T. Your eyes stay forward. Your body reacts. Pure movement training.</p>
       </div>
-      <div class="how-card rv d2">
-        <div class="how-step">Step 3</div>
-        <h3>Train and Track</h3>
-        <p>Ghost to each position as the AI calls them. Review your zone balance, completion rate, and session history after every workout.</p>
+      <div class="hs reveal d2">
+        <div class="hs-num">3</div>
+        <h3>Review Your Data</h3>
+        <p>After every session, see zone balance, completion rate, and how your fitness is trending across weeks and months.</p>
       </div>
     </div>
   </div>
@@ -452,190 +464,98 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:2.5rem 0}
 <!-- ── SCREENSHOTS ── -->
 <section id="screens" aria-label="App screenshots">
   <div class="wrap">
-    <div class="section-head rv">
-      <span class="section-label">Inside the app</span>
-      <h2 class="section-title">Built for the <em>court, not the desk</em></h2>
-      <p class="section-sub">Every screen is designed to be readable at a distance and operable with one hand, even mid-session.</p>
+    <div class="sec-head reveal">
+      <span class="eyebrow">Inside the app</span>
+      <h2 class="sec-title">Designed for the court,<br><em>not the boardroom.</em></h2>
+      <p class="sec-sub">Every screen readable at a distance, every control reachable with one hand, even mid-session.</p>
     </div>
   </div>
-  <div class="wrap" style="overflow:hidden">
-    <div class="screens-scroll" role="list" aria-label="App screen gallery">
-      <div class="screen-item rv" role="listitem">
-        <img src="screen-welcome.jpeg" alt="Welcome screen" loading="lazy">
-        <div class="screen-label">Welcome</div>
-      </div>
-      <div class="screen-item rv d1" role="listitem">
-        <img src="screen-setup-session.jpeg" alt="Session setup" loading="lazy">
-        <div class="screen-label">Session Setup</div>
-      </div>
-      <div class="screen-item rv d1" role="listitem">
-        <img src="screen-setup-drill-type.jpeg" alt="Drill type selection" loading="lazy">
-        <div class="screen-label">Drill Type</div>
-      </div>
-      <div class="screen-item rv d2" role="listitem">
-        <img src="screen-setup-difficulty.jpeg" alt="Difficulty setting" loading="lazy">
-        <div class="screen-label">Difficulty</div>
-      </div>
-      <div class="screen-item rv d2" role="listitem">
-        <img src="screen-active-training.jpeg" alt="Active training session" loading="lazy">
-        <div class="screen-label">Active Session</div>
-      </div>
-      <div class="screen-item rv d3" role="listitem">
-        <img src="screen-session-ended.jpeg" alt="Session summary" loading="lazy">
-        <div class="screen-label">Session Summary</div>
-      </div>
-      <div class="screen-item rv d3" role="listitem">
-        <img src="screen-progress-overview.jpeg" alt="Progress overview" loading="lazy">
-        <div class="screen-label">Progress</div>
-      </div>
-      <div class="screen-item rv d4" role="listitem">
-        <img src="screen-progress-sessions.jpeg" alt="Session history" loading="lazy">
-        <div class="screen-label">Session History</div>
-      </div>
-      <div class="screen-item rv d4" role="listitem">
-        <img src="screen-programs.jpeg" alt="Training programs" loading="lazy">
-        <div class="screen-label">Programs</div>
-      </div>
-      <div class="screen-item rv d4" role="listitem">
-        <img src="screen-settings-audio.jpeg" alt="Audio settings" loading="lazy">
-        <div class="screen-label">Audio Settings</div>
-      </div>
-    </div>
+  <div class="screens-track" role="list" aria-label="App screen gallery">
+    <div style="flex-shrink:0;width:calc((100vw - min(1160px,100vw))/2 + 2rem)"></div>
+    <div class="sc-item reveal" role="listitem"><div class="sc-frame"><img src="screen-welcome.jpeg" alt="Welcome screen" loading="lazy"></div><span class="sc-label">Welcome</span></div>
+    <div class="sc-item reveal d1" role="listitem"><div class="sc-frame"><img src="screen-setup-session.jpeg" alt="Session setup" loading="lazy"></div><span class="sc-label">Session Setup</span></div>
+    <div class="sc-item reveal d1" role="listitem"><div class="sc-frame"><img src="screen-setup-drill-type.jpeg" alt="Drill type" loading="lazy"></div><span class="sc-label">Drill Type</span></div>
+    <div class="sc-item reveal d2" role="listitem"><div class="sc-frame"><img src="screen-setup-difficulty.jpeg" alt="Difficulty" loading="lazy"></div><span class="sc-label">Difficulty</span></div>
+    <div class="sc-item reveal d2" role="listitem"><div class="sc-frame"><img src="screen-setup-coverage.jpeg" alt="Coverage" loading="lazy"></div><span class="sc-label">Coverage</span></div>
+    <div class="sc-item reveal d2" role="listitem"><div class="sc-frame"><img src="screen-active-training.jpeg" alt="Active training" loading="lazy"></div><span class="sc-label">Active Session</span></div>
+    <div class="sc-item reveal d3" role="listitem"><div class="sc-frame"><img src="screen-session-ended.jpeg" alt="Session summary" loading="lazy"></div><span class="sc-label">Summary</span></div>
+    <div class="sc-item reveal d3" role="listitem"><div class="sc-frame"><img src="screen-progress-overview.jpeg" alt="Progress" loading="lazy"></div><span class="sc-label">Progress</span></div>
+    <div class="sc-item reveal d3" role="listitem"><div class="sc-frame"><img src="screen-progress-sessions.jpeg" alt="Session history" loading="lazy"></div><span class="sc-label">History</span></div>
+    <div class="sc-item reveal d4" role="listitem"><div class="sc-frame"><img src="screen-programs.jpeg" alt="Programs" loading="lazy"></div><span class="sc-label">Programs</span></div>
+    <div class="sc-item reveal d4" role="listitem"><div class="sc-frame"><img src="screen-settings-audio.jpeg" alt="Audio settings" loading="lazy"></div><span class="sc-label">Audio</span></div>
+    <div style="flex-shrink:0;width:calc((100vw - min(1160px,100vw))/2 + 2rem)"></div>
   </div>
 </section>
 
-<!-- ── BLOG PREVIEW ── -->
-<section id="blog-preview" aria-label="Latest articles">
+<!-- ── TRAINING BLOG PREVIEW ── -->
+<section id="lab" aria-label="Training blog">
   <div class="wrap">
-    <div class="blog-header-row">
-      <div class="rv">
-        <span class="section-label">The Squash Lab</span>
-        <h2 class="section-title" style="margin-bottom:0">Training <em>intelligence</em></h2>
+    <div class="lab-row">
+      <div class="reveal">
+        <span class="eyebrow">The Squash Lab</span>
+        <h2 class="sec-title" style="margin-bottom:0">Training <em>intelligence</em></h2>
       </div>
-      <a href="blog/index.html" class="blog-see-all rv">
-        All articles
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </a>
+      <a href="blog/index.html" class="lab-all reveal">All articles <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
     </div>
-    <div class="blog-grid">
-      <a href="blog/neuroscience-court-movement/index.html" class="blog-card rv">
-        <div class="bc-emoji">🧠</div>
-        <div class="bc-tag">Training Science</div>
-        <div class="bc-title">The Neuroscience of Court Movement</div>
-        <div class="bc-excerpt">Your feet move before your brain decides. That's not talent — that's what ghosting actually builds at a neurological level.</div>
-        <div class="bc-footer">
-          <span class="bc-time">8 min read</span>
-          <span class="bc-read">Read →</span>
-        </div>
+    <div class="lab-grid">
+      <a href="blog/neuroscience-court-movement/index.html" class="lab-card reveal">
+        <div class="lc-emoji">&#129504;</div>
+        <div class="lc-tag">Training Science</div>
+        <div class="lc-title">The Neuroscience of Court Movement</div>
+        <div class="lc-excerpt">Your feet move before your brain decides. That&rsquo;s not talent &mdash; that&rsquo;s what ghosting actually builds at a neurological level.</div>
+        <div class="lc-footer"><span class="lc-time">8 min read</span><span class="lc-read">Read &#8594;</span></div>
       </a>
-      <a href="blog/zone-balance-data/index.html" class="blog-card rv d1">
-        <div class="bc-emoji">📈</div>
-        <div class="bc-tag">Analytics</div>
-        <div class="bc-title">Reading Your Zone Balance Data</div>
-        <div class="bc-excerpt">Most players are surprised by the gap between where they think they move and where the data says they actually go.</div>
-        <div class="bc-footer">
-          <span class="bc-time">6 min read</span>
-          <span class="bc-read">Read →</span>
-        </div>
+      <a href="blog/zone-balance-data/index.html" class="lab-card reveal d1">
+        <div class="lc-emoji">&#128200;</div>
+        <div class="lc-tag">Analytics</div>
+        <div class="lc-title">Reading Your Zone Balance Data</div>
+        <div class="lc-excerpt">Most players are surprised by the gap between where they think they move and where the data says they actually go.</div>
+        <div class="lc-footer"><span class="lc-time">6 min read</span><span class="lc-read">Read &#8594;</span></div>
       </a>
-      <a href="blog/4-week-ghosting-programme/index.html" class="blog-card rv d2">
-        <div class="bc-emoji">🔄</div>
-        <div class="bc-tag">Routines</div>
-        <div class="bc-title">Building a 4-Week Ghosting Programme</div>
-        <div class="bc-excerpt">Tournament in four weeks? Here's exactly what to do each week — and why the taper matters as much as the hard work.</div>
-        <div class="bc-footer">
-          <span class="bc-time">10 min read</span>
-          <span class="bc-read">Read →</span>
-        </div>
+      <a href="blog/4-week-ghosting-programme/index.html" class="lab-card reveal d2">
+        <div class="lc-emoji">&#128260;</div>
+        <div class="lc-tag">Routines</div>
+        <div class="lc-title">Building a 4-Week Ghosting Programme</div>
+        <div class="lc-excerpt">Tournament in four weeks? Here&rsquo;s exactly what to do each week &mdash; and why the taper matters as much as the hard work.</div>
+        <div class="lc-footer"><span class="lc-time">10 min read</span><span class="lc-read">Read &#8594;</span></div>
       </a>
     </div>
   </div>
 </section>
 
 <!-- ── FAQ ── -->
-<section id="faq" aria-label="Frequently asked questions">
+<section id="faq" aria-label="FAQ">
   <div class="wrap">
-    <div class="section-head tc rv">
-      <span class="section-label">Questions</span>
-      <h2 class="section-title">Frequently <em>asked</em></h2>
+    <div class="sec-head tc reveal">
+      <span class="eyebrow">Questions</span>
+      <h2 class="sec-title">Frequently <em>asked</em></h2>
     </div>
-    <div class="faq-list" role="list">
-
-      <div class="faq-item" role="listitem">
-        <button class="faq-q" aria-expanded="false">
-          Is SquashGhostingX really free?
-          <svg class="faq-chevron" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <div class="faq-a"><div class="faq-a-inner">Yes — the full app including both 6-point and 10-point ghosting systems, AI voice coaching, all analytics, all 20+ built-in programs, and unlimited session history is completely free. No trial period, no credit card, no hidden fees. Free forever.</div></div>
-      </div>
-
-      <div class="faq-item" role="listitem">
-        <button class="faq-q" aria-expanded="false">
-          What is squash ghosting?
-          <svg class="faq-chevron" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <div class="faq-a"><div class="faq-a-inner">Ghosting is a solo squash training drill where you move to each position on the court and play a shadow stroke — as if the ball were there — then recover to the T. It builds court movement, aerobic fitness, and muscle memory for automatic footwork in real matches.</div></div>
-      </div>
-
-      <div class="faq-item" role="listitem">
-        <button class="faq-q" aria-expanded="false">
-          What devices does it run on?
-          <svg class="faq-chevron" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <div class="faq-a"><div class="faq-a-inner">SquashGhostingX is available free on both iOS (App Store — iPhone and iPad) and Android (Google Play). No TestFlight or beta required on either platform. Just search "SquashGhostingX" or use the download links on this page.</div></div>
-      </div>
-
-      <div class="faq-item" role="listitem">
-        <button class="faq-q" aria-expanded="false">
-          Does it work without internet?
-          <svg class="faq-chevron" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <div class="faq-a"><div class="faq-a-inner">Yes, completely. SquashGhostingX works 100% offline. All session data is stored locally on your device using SQLite. No Wi-Fi or mobile data connection needed on court.</div></div>
-      </div>
-
-      <div class="faq-item" role="listitem">
-        <button class="faq-q" aria-expanded="false">
-          6-point vs 10-point — which should I use?
-          <svg class="faq-chevron" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <div class="faq-a"><div class="faq-a-inner">Start with 6-point. It covers the front corners, mid-court, and back corners — ideal for beginners through intermediate players. The 10-point system adds four bridging positions creating more complex patterns and longer movement arcs, designed for advanced and elite players who have mastered the basics.</div></div>
-      </div>
-
-      <div class="faq-item" role="listitem">
-        <button class="faq-q" aria-expanded="false">
-          Does the AI voice work with earphones?
-          <svg class="faq-chevron" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <div class="faq-a"><div class="faq-a-inner">Yes — earphones are the recommended setup. The AI voice calls each court position through any Bluetooth or wired headphones, so you never need to look at the screen mid-session. The app also bypasses iOS silent mode so it works even when your phone is on silent.</div></div>
-      </div>
-
+    <div class="faq-wrap">
+      <div class="fq reveal"><button class="fq-q" aria-expanded="false">Is SquashGhostingX really free?<svg class="fq-ico" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="fq-a"><div class="fq-a-in">Yes &mdash; completely free. The full app including 6-point and 10-point systems, AI voice coaching, all analytics, all 20+ programs, and unlimited session history. No trial, no subscription, no ads. Free forever.</div></div></div>
+      <div class="fq reveal d1"><button class="fq-q" aria-expanded="false">What exactly is squash ghosting?<svg class="fq-ico" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="fq-a"><div class="fq-a-in">Ghosting is a solo squash drill where you move to each court position and play a shadow stroke &mdash; as if the ball were there &mdash; then recover to the T. It builds court movement, aerobic fitness, and muscle memory that transfers directly to match play.</div></div></div>
+      <div class="fq reveal d1"><button class="fq-q" aria-expanded="false">iPhone and Android both supported?<svg class="fq-ico" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="fq-a"><div class="fq-a-in">Yes. Available free on both iOS (App Store &mdash; iPhone and iPad) and Android (Google Play). No TestFlight, no beta. Just search &ldquo;SquashGhostingX&rdquo; or tap the download buttons on this page.</div></div></div>
+      <div class="fq reveal d2"><button class="fq-q" aria-expanded="false">Does it work without internet on court?<svg class="fq-ico" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="fq-a"><div class="fq-a-in">Yes, 100% offline. Every session runs locally on your device. Your training data is stored using SQLite &mdash; nothing sent to any server. No Wi-Fi or mobile data needed on court.</div></div></div>
+      <div class="fq reveal d2"><button class="fq-q" aria-expanded="false">6-point or 10-point &mdash; where do I start?<svg class="fq-ico" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="fq-a"><div class="fq-a-in">Start with 6-point. It covers the front corners, mid-court, and back corners &mdash; the foundation of court movement for any level. Move to 10-point when you want longer arcs, more complex patterns, and greater physical demand.</div></div></div>
+      <div class="fq reveal d3"><button class="fq-q" aria-expanded="false">Does AI voice work with Bluetooth earphones?<svg class="fq-ico" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="fq-a"><div class="fq-a-in">Yes &mdash; earphones are the recommended setup. The app calls every position through any Bluetooth or wired headphones so you never look at the screen mid-session. Also bypasses iOS silent mode.</div></div></div>
     </div>
   </div>
 </section>
 
 <!-- ── DOWNLOAD CTA ── -->
-<section id="download" aria-label="Download the app">
-  <div class="wrap">
-    <div class="dl-inner rv">
-      <span class="section-label">Get started today</span>
-      <h2 class="section-title">Download free.<br><em>Train better tonight.</em></h2>
-      <p class="section-sub">No subscription. No account. No ads. Just open the app, step on court, and start ghosting.</p>
-      <div class="store-row">
-        <a href="https://apps.apple.com/app/squashghostingx/id6744036820" class="store-btn" target="_blank" rel="noopener noreferrer" aria-label="Download on the App Store">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="color:#fff"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-          <div class="store-btn-label">
-            <div class="store-btn-sub">Download on the</div>
-            <div class="store-btn-name">App Store</div>
-          </div>
-        </a>
-        <a href="https://play.google.com/store/apps/details?id=com.squashghostingx.app" class="store-btn" target="_blank" rel="noopener noreferrer" aria-label="Get it on Google Play">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="color:#3DDC84"><path d="M3.18 23.76c.37.2.8.2 1.18 0l11-6.35-2.37-2.37zm15.1-8.74L16.09 13l-2.45 2.45 2.45 2.45 2.21-1.28c.63-.36.63-1.24-.02-1.6zM3.18.24L13.64 10.7 11.27 8.35zm0 0L1.73 1.07A1.03 1.03 0 001 2v20c0 .38.2.73.52.93L13.64 10.7z"/></svg>
-          <div class="store-btn-label">
-            <div class="store-btn-sub">Get it on</div>
-            <div class="store-btn-name">Google Play</div>
-          </div>
-        </a>
-      </div>
+<section id="download" aria-label="Download">
+  <div class="dl-inner reveal">
+    <span class="eyebrow">Get started</span>
+    <h2 class="dl-h">Download free.<br><em>Train tonight.</em></h2>
+    <p class="dl-sub">No account. No ads. No subscription. Open the app, step on court, and start ghosting.</p>
+    <div class="stores dl-stores">
+      <a href="https://apps.apple.com/app/squashghostingx/id6744036820" class="store" target="_blank" rel="noopener noreferrer" aria-label="Download on the App Store">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="color:#fff;flex-shrink:0"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        <div class="store-text"><div class="store-sub">Download on the</div><div class="store-name">App Store</div></div>
+      </a>
+      <a href="https://play.google.com/store/apps/details?id=com.squashghostingx.app" class="store" target="_blank" rel="noopener noreferrer" aria-label="Get it on Google Play">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="color:#3DDC84;flex-shrink:0"><path d="M3.18 23.76c.37.2.8.2 1.18 0l11-6.35-2.37-2.37zm15.1-8.74L16.09 13l-2.45 2.45 2.45 2.45 2.21-1.28c.63-.36.63-1.24-.02-1.6zM3.18.24L13.64 10.7 11.27 8.35zm0 0L1.73 1.07A1.03 1.03 0 001 2v20c0 .38.2.73.52.93L13.64 10.7z"/></svg>
+        <div class="store-text"><div class="store-sub">Get it on</div><div class="store-name">Google Play</div></div>
+      </a>
     </div>
   </div>
 </section>
@@ -643,90 +563,86 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:2.5rem 0}
 </main>
 
 <!-- ── FOOTER ── -->
-<footer role="contentinfo">
+<footer>
   <div class="wrap">
     <div class="footer-inner">
       <a href="index.html" class="footer-logo" aria-label="SquashGhostingX home">
-        <div class="nav-logo-icon" aria-hidden="true" style="width:30px;height:30px;font-size:.75rem;border-radius:7px">SX</div>
-        <span>Squash<span class="nav-logo-g">GhostingX</span></span>
+        <div class="logo-mark" style="width:28px;height:28px;font-size:.72rem;border-radius:7px" aria-hidden="true">SX</div>
+        <span>Squash<span class="logo-g">GhostingX</span></span>
       </a>
       <nav class="footer-links" aria-label="Footer navigation">
         <a href="index.html">Home</a>
         <a href="blog/index.html">Training Blog</a>
         <a href="guide.html">App Guide</a>
         <a href="support.html">Support</a>
-        <a href="privacy.html">Privacy Policy</a>
-        <a href="terms.html">Terms of Use</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
       </nav>
-      <p class="footer-copy">&copy; 2026 SquashGhostingX &middot; All rights reserved</p>
+      <div class="footer-right">
+        <div class="footer-copy">&copy; 2026 SquashGhostingX</div>
+        <div class="footer-made">Made by <span>Varish &amp; Darshika Gahlot</span></div>
+      </div>
     </div>
   </div>
 </footer>
 
 <script>
-// Scroll progress
-var prog = document.getElementById('prog');
-window.addEventListener('scroll', function(){
-  var pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
-  prog.style.width = Math.min(100, pct) + '%';
-}, {passive:true});
+(function(){
+  var p=document.getElementById('prog');
+  window.addEventListener('scroll',function(){
+    p.style.width=Math.min(100,window.scrollY/(document.body.scrollHeight-window.innerHeight)*100)+'%';
+  },{passive:true});
+})();
 
-// Nav scroll class
-var nav = document.getElementById('nav');
-window.addEventListener('scroll', function(){
-  nav.classList.toggle('scrolled', window.scrollY > 40);
-}, {passive:true});
+(function(){
+  var n=document.getElementById('nav');
+  window.addEventListener('scroll',function(){n.classList.toggle('scrolled',window.scrollY>50);},{passive:true});
+})();
 
-// Hamburger
-var burger = document.getElementById('burger');
-var mobNav = document.getElementById('mob-nav');
-burger.addEventListener('click', function(){
-  var open = mobNav.classList.toggle('open');
-  burger.classList.toggle('open', open);
-  burger.setAttribute('aria-expanded', open);
-});
-function closeMob(){
-  mobNav.classList.remove('open');
-  burger.classList.remove('open');
-  burger.setAttribute('aria-expanded', 'false');
-}
-document.addEventListener('click', function(e){
-  if(!nav.contains(e.target) && !mobNav.contains(e.target)) closeMob();
-});
+(function(){
+  var btn=document.getElementById('burger');
+  var mob=document.getElementById('mob-nav');
+  btn.addEventListener('click',function(){
+    var o=mob.classList.toggle('open');
+    btn.classList.toggle('open',o);
+    btn.setAttribute('aria-expanded',o);
+    btn.setAttribute('aria-label',o?'Close menu':'Open menu');
+  });
+  window.closeMob=function(){mob.classList.remove('open');btn.classList.remove('open');btn.setAttribute('aria-expanded','false');};
+  document.addEventListener('click',function(e){if(!document.getElementById('nav').contains(e.target)&&!mob.contains(e.target))closeMob();});
+})();
 
-// Smooth scroll for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(function(a){
-  a.addEventListener('click', function(e){
-    var id = a.getAttribute('href').slice(1);
-    var el = document.getElementById(id);
+  a.addEventListener('click',function(e){
+    var el=document.getElementById(a.getAttribute('href').slice(1));
     if(el){e.preventDefault();closeMob();el.scrollIntoView({behavior:'smooth',block:'start'});}
   });
 });
 
-// FAQ accordion
-document.querySelectorAll('.faq-q').forEach(function(btn){
-  btn.addEventListener('click', function(){
-    var item = btn.closest('.faq-item');
-    var isOpen = item.classList.contains('open');
-    document.querySelectorAll('.faq-item').forEach(function(i){
+document.querySelectorAll('.fq-q').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var item=btn.closest('.fq');
+    var open=item.classList.contains('open');
+    document.querySelectorAll('.fq').forEach(function(i){
       i.classList.remove('open');
-      i.querySelector('.faq-q').setAttribute('aria-expanded','false');
-      i.querySelector('.faq-a').style.maxHeight = null;
+      i.querySelector('.fq-q').setAttribute('aria-expanded','false');
+      i.querySelector('.fq-a').style.maxHeight=null;
     });
-    if(!isOpen){
+    if(!open){
       item.classList.add('open');
       btn.setAttribute('aria-expanded','true');
-      item.querySelector('.faq-a').style.maxHeight = item.querySelector('.faq-a-inner').scrollHeight + 'px';
+      item.querySelector('.fq-a').style.maxHeight=item.querySelector('.fq-a-in').scrollHeight+'px';
     }
   });
 });
 
-// Reveal on scroll
-var rvEls = document.querySelectorAll('.rv');
-var io = new IntersectionObserver(function(entries){
-  entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('vis');io.unobserve(e.target);}});
-},{threshold:.12});
-rvEls.forEach(function(el){io.observe(el);});
+(function(){
+  var els=document.querySelectorAll('.reveal');
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+  },{threshold:.1});
+  els.forEach(function(el){io.observe(el);});
+})();
 </script>
 </body>
 </html>
