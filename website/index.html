@@ -114,7 +114,7 @@ section{padding:6rem 0}
 .hero-glow::before{content:'';position:absolute;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,rgba(255,107,53,.12) 0%,transparent 65%);top:-10%;left:-5%;pointer-events:none}
 .hero-glow::after{content:'';position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(255,107,53,.06) 0%,transparent 65%);bottom:0;right:-5%;pointer-events:none}
 .hero-noise{position:absolute;inset:0;opacity:.02;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");pointer-events:none}
-.hero-text{position:relative;z-index:2;padding:8rem 0 6rem 2rem;max-width:580px}
+.hero-text{position:relative;z-index:2;padding:5.5rem 0 4rem 2rem;max-width:580px}
 .hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.28);border-radius:100px;padding:.32rem 1rem;font-size:.72rem;font-weight:700;color:var(--orange);margin-bottom:2rem;letter-spacing:.06em;text-transform:uppercase}
 .badge-dot{width:6px;height:6px;background:var(--orange);border-radius:50%;animation:blink 2s ease-in-out infinite;flex-shrink:0}
 @keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.65)}}
@@ -206,17 +206,21 @@ section{padding:6rem 0}
 .hs h3{font-family:var(--fh);font-size:1.2rem;font-weight:900;color:var(--white);margin-bottom:.6rem}
 .hs p{font-size:.88rem;color:var(--dim);line-height:1.7}
 
-/* ─── APP GALLERY ─────────────────────────────────────────────── */
-#gallery{background:var(--ink);overflow:hidden}
-.gallery-track{display:flex;gap:1rem;overflow-x:auto;padding:.5rem 2rem 1.75rem;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--ink4) transparent;cursor:grab}
-.gallery-track:active{cursor:grabbing}
-.gallery-track::-webkit-scrollbar{height:3px}
-.gallery-track::-webkit-scrollbar-track{background:transparent}
-.gallery-track::-webkit-scrollbar-thumb{background:var(--ink4);border-radius:2px}
-.ga{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:.6rem}
-.ga-frame{width:150px;border-radius:26px;overflow:hidden;border:1px solid var(--line);background:#000;box-shadow:0 18px 44px rgba(0,0,0,.55)}
-.ga-frame img{width:100%;display:block;aspect-ratio:9/19.5;object-fit:cover;object-position:top}
-.ga-label{font-size:.7rem;color:var(--muted);font-weight:500;white-space:nowrap}
+/* ─── APP SHOWCASE ────────────────────────────────────────────── */
+#gallery{background:var(--ink2)}
+.journey-phases{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:2.5rem;margin-top:3rem}
+.jp{background:var(--ink3);border:1px solid var(--line);border-radius:var(--r2);padding:1.1rem 1.25rem;text-align:center}
+.jp-eyebrow{display:block;font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.25rem}
+.jp-label{font-family:var(--fh);font-size:1rem;font-weight:900;color:var(--white)}
+.jp-desc{font-size:.78rem;color:var(--muted);margin-top:.2rem}
+.gallery-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.gs-col{display:flex;flex-direction:column;gap:2rem}
+.gs-item{display:flex;flex-direction:column;gap:.9rem}
+.gs-phone{border-radius:30px;overflow:hidden;border:1px solid var(--line);background:#000;box-shadow:0 24px 56px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,.04);transition:transform .35s,box-shadow .35s}
+.gs-item:hover .gs-phone{transform:translateY(-6px);box-shadow:0 36px 72px rgba(0,0,0,.7),0 0 40px rgba(255,107,53,.09)}
+.gs-phone img{width:100%;display:block}
+.gs-label{font-family:var(--fh);font-size:1.05rem;font-weight:900;color:var(--white);letter-spacing:.01em}
+.gs-desc{font-size:.8rem;color:var(--muted);line-height:1.6}
 
 /* ─── BLOG PREVIEW ────────────────────────────────────────────── */
 #lab{background:var(--ink2)}
@@ -280,7 +284,7 @@ footer{background:var(--ink);border-top:1px solid var(--line);padding:3.5rem 0 2
 .court-card > p{font-size:.88rem;color:var(--dim);line-height:1.75;margin-bottom:1.75rem}
 .court-fig{position:relative;width:200px;margin:0 auto;border-radius:10px;overflow:hidden;box-shadow:0 28px 64px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,.06)}
 .court-svg-img{width:100%;display:block}
-.cp{position:absolute;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:var(--orange);border:2px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:.78rem;font-weight:900;color:#fff;box-shadow:0 0 14px rgba(255,107,53,.8);animation:cpulse 2.8s ease-in-out infinite}
+.cp{position:absolute;transform:translate(-50%,-50%);width:14px;height:14px;border-radius:50%;background:var(--orange);border:2px solid rgba(255,255,255,.4);box-shadow:0 0 10px rgba(255,107,53,.9);animation:cpulse 2.8s ease-in-out infinite}
 .cp.d0{animation-delay:0s}.cp.d1{animation-delay:.35s}.cp.d2{animation-delay:.7s}.cp.d3{animation-delay:1.05s}.cp.d4{animation-delay:1.4s}.cp.d5{animation-delay:1.75s}.cp.d6{animation-delay:2.1s}.cp.d7{animation-delay:2.45s}.cp.d8{animation-delay:2.8s}.cp.d9{animation-delay:3.15s}
 @keyframes cpulse{0%,100%{box-shadow:0 0 12px rgba(255,107,53,.7)}55%{box-shadow:0 0 22px rgba(255,107,53,1),0 0 38px rgba(255,107,53,.4)}}
 .ct{position:absolute;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:.55rem;font-weight:900;color:rgba(255,255,255,.9)}
@@ -292,7 +296,7 @@ footer{background:var(--ink);border-top:1px solid var(--line);padding:3.5rem 0 2
 /* ─── RESPONSIVE ──────────────────────────────────────────────── */
 @media(max-width:1100px){
   #hero{grid-template-columns:1fr;min-height:auto}
-  .hero-text{padding:8rem 2rem 1rem;max-width:100%;text-align:center}
+  .hero-text{padding:5.5rem 2rem 1rem;max-width:100%;text-align:center}
   .hero-lead,.hero-h1{max-width:100%}
   .hero-stores,.hero-proof{justify-content:center}
   .hero-visual{padding:1rem 2rem 5rem;height:auto}
@@ -316,11 +320,14 @@ footer{background:var(--ink);border-top:1px solid var(--line);padding:3.5rem 0 2
   .burger{display:flex}
   .lab-grid{grid-template-columns:1fr}
   .how-steps{grid-template-columns:1fr}
+  .gallery-cols{grid-template-columns:1fr}
+  .gs-col{gap:1.5rem}
+  .journey-phases{grid-template-columns:1fr}
 }
 @media(max-width:640px){
   section{padding:4.5rem 0}
   .wrap{padding:0 1.25rem}
-  .hero-text{padding:7rem 1.25rem 1rem}
+  .hero-text{padding:5rem 1.25rem 1rem}
   .stores{flex-direction:column;align-items:center}
   .store{justify-content:center;width:100%;max-width:240px}
   .strip-grid{grid-template-columns:1fr 1fr;gap:1.5rem}
@@ -573,7 +580,6 @@ footer{background:var(--ink);border-top:1px solid var(--line);padding:3.5rem 0 2
       <!-- 6-point -->
       <div class="court-card reveal">
         <div>
-          <div class="court-chip">Beginner &rarr; Intermediate</div>
           <h3>6-Point System</h3>
           <p>Six positions cover the four corners and both mid-court zones. The foundation of every ghosting programme &mdash; master the pattern and your court coverage fundamentally changes. Perfect for players building the movement habit from scratch.</p>
         </div>
@@ -581,17 +587,17 @@ footer{background:var(--ink);border-top:1px solid var(--line);padding:3.5rem 0 2
           <img src="court.svg" alt="Squash court wooden floor" class="court-svg-img" loading="lazy">
           <!-- 6-point markers. Positions as % of 640w x 975h viewBox -->
           <!-- FL: 130/640=20.3%, 95/975=9.7% -->
-          <div class="cp d0" style="left:20.3%;top:9.7%" aria-label="Position 1: Front Left">1</div>
+          <div class="cp d0" style="left:20.3%;top:9.7%" aria-hidden="true"></div>
           <!-- FR: 510/640=79.7%, 95/975=9.7% -->
-          <div class="cp d1" style="left:79.7%;top:9.7%" aria-label="Position 2: Front Right">2</div>
+          <div class="cp d1" style="left:79.7%;top:9.7%" aria-hidden="true"></div>
           <!-- ML: 100/640=15.6%, 506/975=51.9% -->
-          <div class="cp d2" style="left:15.6%;top:51.9%" aria-label="Position 3: Mid Left">3</div>
+          <div class="cp d2" style="left:15.6%;top:51.9%" aria-hidden="true"></div>
           <!-- MR: 540/640=84.4%, 506/975=51.9% -->
-          <div class="cp d3" style="left:84.4%;top:51.9%" aria-label="Position 4: Mid Right">4</div>
+          <div class="cp d3" style="left:84.4%;top:51.9%" aria-hidden="true"></div>
           <!-- BL: 155/640=24.2%, 865/975=88.7% -->
-          <div class="cp d4" style="left:24.2%;top:88.7%" aria-label="Position 5: Back Left">5</div>
+          <div class="cp d4" style="left:24.2%;top:88.7%" aria-hidden="true"></div>
           <!-- BR: 485/640=75.8%, 865/975=88.7% -->
-          <div class="cp d5" style="left:75.8%;top:88.7%" aria-label="Position 6: Back Right">6</div>
+          <div class="cp d5" style="left:75.8%;top:88.7%" aria-hidden="true"></div>
           <!-- T recovery: 320/640=50%, 450/975=46.2% -->
           <div class="ct" style="left:50%;top:46.2%" aria-label="T — recovery position">T</div>
         </figure>
@@ -604,28 +610,27 @@ footer{background:var(--ink);border-top:1px solid var(--line);padding:3.5rem 0 2
       <!-- 10-point -->
       <div class="court-card reveal d1">
         <div>
-          <div class="court-chip">Intermediate &rarr; Elite</div>
           <h3>10-Point System</h3>
           <p>Four bridging positions added between the standard six &mdash; creating longer movement arcs, more complex sequences, and greater aerobic demand. For players who&rsquo;ve built the base and want to push their movement to match-winning levels.</p>
         </div>
         <figure class="court-fig" aria-label="10-point court diagram">
           <img src="court.svg" alt="Squash court wooden floor" class="court-svg-img" loading="lazy">
           <!-- Same 6 base positions -->
-          <div class="cp d0" style="left:20.3%;top:9.7%">1</div>
-          <div class="cp d1" style="left:79.7%;top:9.7%">2</div>
-          <div class="cp d2" style="left:15.6%;top:51.9%">3</div>
-          <div class="cp d3" style="left:84.4%;top:51.9%">4</div>
-          <div class="cp d4" style="left:24.2%;top:88.7%">5</div>
-          <div class="cp d5" style="left:75.8%;top:88.7%">6</div>
+          <div class="cp d0" style="left:20.3%;top:9.7%" aria-hidden="true"></div>
+          <div class="cp d1" style="left:79.7%;top:9.7%" aria-hidden="true"></div>
+          <div class="cp d2" style="left:15.6%;top:51.9%" aria-hidden="true"></div>
+          <div class="cp d3" style="left:84.4%;top:51.9%" aria-hidden="true"></div>
+          <div class="cp d4" style="left:24.2%;top:88.7%" aria-hidden="true"></div>
+          <div class="cp d5" style="left:75.8%;top:88.7%" aria-hidden="true"></div>
           <!-- 4 bridging positions -->
           <!-- Left mid-front: 115/640=18%, 280/975=28.7% -->
-          <div class="cp d6" style="left:18%;top:28.7%">7</div>
+          <div class="cp d6" style="left:18%;top:28.7%" aria-hidden="true"></div>
           <!-- Right mid-front: 525/640=82%, 280/975=28.7% -->
-          <div class="cp d7" style="left:82%;top:28.7%">8</div>
+          <div class="cp d7" style="left:82%;top:28.7%" aria-hidden="true"></div>
           <!-- Left mid-back: 130/640=20.3%, 700/975=71.8% -->
-          <div class="cp d8" style="left:20.3%;top:71.8%">9</div>
+          <div class="cp d8" style="left:20.3%;top:71.8%" aria-hidden="true"></div>
           <!-- Right mid-back: 510/640=79.7%, 700/975=71.8% -->
-          <div class="cp d9" style="left:79.7%;top:71.8%">10</div>
+          <div class="cp d9" style="left:79.7%;top:71.8%" aria-hidden="true"></div>
           <!-- T recovery -->
           <div class="ct" style="left:50%;top:46.2%">T</div>
         </figure>
@@ -737,31 +742,93 @@ footer{background:var(--ink);border-top:1px solid var(--line);padding:3.5rem 0 2
 </section>
 
 <!-- ══════════════════════════════════════════════════════════════
-     APP GALLERY (all screens)
+     APP SHOWCASE
 ══════════════════════════════════════════════════════════════ -->
-<section id="gallery" aria-label="All app screens">
+<section id="gallery" aria-label="App walkthrough">
   <div class="wrap">
-    <div class="sec-head reveal">
-      <span class="eyebrow">Explore the app</span>
-      <h2 class="sec-h">Every screen. <em>Every detail.</em></h2>
-      <p class="sec-sub">Clean, readable at distance, built for the court &mdash; not a spreadsheet.</p>
+    <div class="sec-head tc reveal">
+      <span class="eyebrow">The full experience</span>
+      <h2 class="sec-h">Setup. Train. <em>Improve.</em></h2>
+      <p class="sec-sub">A complete training loop — from choosing your session to reviewing your data. Every screen designed for court-side use.</p>
     </div>
-  </div>
-  <div class="gallery-track" role="list" aria-label="App screen gallery">
-    <div style="flex-shrink:0;width:calc((100vw - min(1160px,100vw))/2 + 2rem)" aria-hidden="true"></div>
-    <div class="ga reveal" role="listitem"><div class="ga-frame"><img src="screen-welcome.jpeg" alt="Welcome screen" loading="lazy"></div><span class="ga-label">Welcome</span></div>
-    <div class="ga reveal d1" role="listitem"><div class="ga-frame"><img src="screen-home.jpeg" alt="Home dashboard" loading="lazy"></div><span class="ga-label">Dashboard</span></div>
-    <div class="ga reveal d1" role="listitem"><div class="ga-frame"><img src="screen-setup-session.jpeg" alt="Session setup" loading="lazy"></div><span class="ga-label">Session Setup</span></div>
-    <div class="ga reveal d2" role="listitem"><div class="ga-frame"><img src="screen-setup-drill-type.jpeg" alt="Drill type selection" loading="lazy"></div><span class="ga-label">Drill Type</span></div>
-    <div class="ga reveal d2" role="listitem"><div class="ga-frame"><img src="screen-setup-difficulty.jpeg" alt="Difficulty selection" loading="lazy"></div><span class="ga-label">Difficulty</span></div>
-    <div class="ga reveal d2" role="listitem"><div class="ga-frame"><img src="screen-setup-coverage.jpeg" alt="Coverage selection" loading="lazy"></div><span class="ga-label">Coverage</span></div>
-    <div class="ga reveal d3" role="listitem"><div class="ga-frame"><img src="screen-active-training.jpeg" alt="Active training session" loading="lazy"></div><span class="ga-label">Active Session</span></div>
-    <div class="ga reveal d3" role="listitem"><div class="ga-frame"><img src="screen-session-ended.jpeg" alt="Session summary" loading="lazy"></div><span class="ga-label">Summary</span></div>
-    <div class="ga reveal d3" role="listitem"><div class="ga-frame"><img src="screen-progress-overview.jpeg" alt="Progress overview" loading="lazy"></div><span class="ga-label">Progress</span></div>
-    <div class="ga reveal d4" role="listitem"><div class="ga-frame"><img src="screen-progress-sessions.jpeg" alt="Session history" loading="lazy"></div><span class="ga-label">History</span></div>
-    <div class="ga reveal d4" role="listitem"><div class="ga-frame"><img src="screen-programs.jpeg" alt="Training programs" loading="lazy"></div><span class="ga-label">Programs</span></div>
-    <div class="ga reveal d4" role="listitem"><div class="ga-frame"><img src="screen-settings-audio.jpeg" alt="Audio settings" loading="lazy"></div><span class="ga-label">Audio</span></div>
-    <div style="flex-shrink:0;width:calc((100vw - min(1160px,100vw))/2 + 2rem)" aria-hidden="true"></div>
+
+    <!-- Journey phase labels -->
+    <div class="journey-phases reveal">
+      <div class="jp">
+        <span class="jp-eyebrow">Phase 1</span>
+        <span class="jp-label">Before You Train</span>
+        <p class="jp-desc">Setup &amp; program selection</p>
+      </div>
+      <div class="jp">
+        <span class="jp-eyebrow">Phase 2</span>
+        <span class="jp-label">On Court</span>
+        <p class="jp-desc">AI voice coaching in session</p>
+      </div>
+      <div class="jp">
+        <span class="jp-eyebrow">Phase 3</span>
+        <span class="jp-label">After You Train</span>
+        <p class="jp-desc">Review data &amp; track progress</p>
+      </div>
+    </div>
+
+    <!-- 3-column phone showcase -->
+    <div class="gallery-cols">
+
+      <!-- Column 1: Before -->
+      <div class="gs-col">
+        <div class="gs-item reveal">
+          <div class="gs-phone">
+            <img src="screen-home.jpeg" alt="Training dashboard" loading="lazy">
+          </div>
+          <div class="gs-label">Dashboard</div>
+          <p class="gs-desc">Streak, weekly stats, quick-start and all your programs at a glance.</p>
+        </div>
+        <div class="gs-item reveal d1">
+          <div class="gs-phone">
+            <img src="screen-setup-session.jpeg" alt="Session setup" loading="lazy">
+          </div>
+          <div class="gs-label">Session Setup</div>
+          <p class="gs-desc">Choose your court system, duration and difficulty. Under 30 seconds.</p>
+        </div>
+      </div>
+
+      <!-- Column 2: During -->
+      <div class="gs-col">
+        <div class="gs-item reveal d1">
+          <div class="gs-phone">
+            <img src="screen-active-training.jpeg" alt="Active training session" loading="lazy">
+          </div>
+          <div class="gs-label">Live Session</div>
+          <p class="gs-desc">The AI calls each position. Phone in pocket. Eyes on the front wall.</p>
+        </div>
+        <div class="gs-item reveal d2">
+          <div class="gs-phone">
+            <img src="screen-programs.jpeg" alt="Training programs" loading="lazy">
+          </div>
+          <div class="gs-label">Training Programs</div>
+          <p class="gs-desc">20+ structured programmes with progressive load from beginner to elite.</p>
+        </div>
+      </div>
+
+      <!-- Column 3: After -->
+      <div class="gs-col">
+        <div class="gs-item reveal d2">
+          <div class="gs-phone">
+            <img src="screen-session-ended.jpeg" alt="Session summary" loading="lazy">
+          </div>
+          <div class="gs-label">Session Review</div>
+          <p class="gs-desc">Instant summary: positions hit, zone balance, time and personal bests.</p>
+        </div>
+        <div class="gs-item reveal d3">
+          <div class="gs-phone">
+            <img src="screen-progress-overview.jpeg" alt="Progress overview" loading="lazy">
+          </div>
+          <div class="gs-label">Long-Term Progress</div>
+          <p class="gs-desc">Trends across weeks and months — fitness, balance and consistency data.</p>
+        </div>
+      </div>
+
+    </div>
   </div>
 </section>
 
