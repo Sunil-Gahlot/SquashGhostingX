@@ -3,3 +3,28 @@
 /terms      /terms.html     200
 /guide      /guide.html     200
 /support    /support.html   200
+
+# Blog index
+/blog       /blog/index.html    200
+
+# Blog articles
+/blog/neuroscience-court-movement   /blog/neuroscience-court-movement.html   200
+/blog/zone-balance-data             /blog/zone-balance-data.html             200
+/blog/6-point-vs-10-point           /blog/6-point-vs-10-point.html           200
+/blog/t-position-habit              /blog/t-position-habit.html              200
+/blog/progressive-overload          /blog/progressive-overload.html          200
+/blog/ghosting-lunge-technique      /blog/ghosting-lunge-technique.html      200
+/blog/4-week-ghosting-programme     /blog/4-week-ghosting-programme.html     200
+/blog/voice-coaching                /blog/voice-coaching.html                200
+/blog/phone-as-squash-coach         /blog/phone-as-squash-coach.html         200
+/blog/back-corners-costing-matches  /blog/back-corners-costing-matches.html  200
+/blog/solo-squash-training          /blog/solo-squash-training.html          200
+/blog/15-minute-ghost-session       /blog/15-minute-ghost-session.html       200
+/blog/session-stats-explained       /blog/session-stats-explained.html       200
+/blog/front-court-drills            /blog/front-court-drills.html            200
+/blog/back-court-training           /blog/back-court-training.html           200
+/blog/forehand-backhand-balance     /blog/forehand-backhand-balance.html     200
+/blog/squash-training-zones         /blog/squash-training-zones.html         200
+
+# Catch-all: unknown paths → custom 404 page
+/*          /404.html       404
