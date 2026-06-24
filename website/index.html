@@ -126,7 +126,7 @@ section{padding:6rem 0}
 .hero-proof{display:flex;flex-wrap:wrap;gap:1.25rem}
 .hp{display:flex;align-items:center;gap:.4rem;font-size:.78rem;color:var(--muted)}
 .hp-tick{color:var(--orange)}
-.hero-visual{position:relative;z-index:2;display:flex;justify-content:center;align-items:flex-end;padding:8rem 2rem 4rem 0;height:100%}
+.hero-visual{position:relative;z-index:2;display:flex;justify-content:center;align-items:center;padding:5rem 2rem 4rem 0}
 .hero-phone-wrap{position:relative;display:inline-block}
 .hero-phone{width:270px;border-radius:40px;overflow:hidden;border:1px solid rgba(255,255,255,.14);background:#000;box-shadow:0 60px 120px rgba(0,0,0,.75),0 0 0 1px rgba(255,255,255,.04)}
 .hero-phone img{width:100%;display:block}
@@ -267,6 +267,28 @@ footer{background:var(--ink);border-top:1px solid var(--line);padding:3.5rem 0 2
 .footer-made{font-size:.75rem;color:var(--muted);margin-top:.25rem}
 .footer-made span{color:var(--orange)}
 
+/* ─── FOUNDER PHOTO ──────────────────────────────────────────────── */
+.fc-photo{width:90px;height:90px;border-radius:50%;object-fit:cover;object-position:top center;border:2px solid rgba(255,107,53,.35);box-shadow:0 0 32px rgba(255,107,53,.3),0 4px 20px rgba(0,0,0,.5);margin-bottom:1.75rem;flex-shrink:0;display:block}
+
+/* ─── COURT SYSTEMS ───────────────────────────────────────────────── */
+#courts{background:var(--ink2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.courts-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:3.5rem}
+.court-card{background:var(--ink3);border:1px solid var(--line);border-radius:var(--r3);padding:2rem 2rem 2.5rem;display:flex;flex-direction:column;transition:border-color .25s}
+.court-card:hover{border-color:var(--line-o)}
+.court-chip{display:inline-block;background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.22);border-radius:100px;padding:.3rem .85rem;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);margin-bottom:.7rem}
+.court-card h3{font-family:var(--fh);font-size:1.65rem;font-weight:900;color:var(--white);margin-bottom:.6rem}
+.court-card > p{font-size:.88rem;color:var(--dim);line-height:1.75;margin-bottom:1.75rem}
+.court-fig{position:relative;width:200px;margin:0 auto;border-radius:10px;overflow:hidden;box-shadow:0 28px 64px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,.06)}
+.court-svg-img{width:100%;display:block}
+.cp{position:absolute;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:var(--orange);border:2px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:.78rem;font-weight:900;color:#fff;box-shadow:0 0 14px rgba(255,107,53,.8);animation:cpulse 2.8s ease-in-out infinite}
+.cp.d0{animation-delay:0s}.cp.d1{animation-delay:.35s}.cp.d2{animation-delay:.7s}.cp.d3{animation-delay:1.05s}.cp.d4{animation-delay:1.4s}.cp.d5{animation-delay:1.75s}.cp.d6{animation-delay:2.1s}.cp.d7{animation-delay:2.45s}.cp.d8{animation-delay:2.8s}.cp.d9{animation-delay:3.15s}
+@keyframes cpulse{0%,100%{box-shadow:0 0 12px rgba(255,107,53,.7)}55%{box-shadow:0 0 22px rgba(255,107,53,1),0 0 38px rgba(255,107,53,.4)}}
+.ct{position:absolute;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:.55rem;font-weight:900;color:rgba(255,255,255,.9)}
+.court-legend{display:flex;flex-wrap:wrap;gap:.4rem .75rem;margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--line)}
+.cl-item{display:flex;align-items:center;gap:.35rem;font-size:.72rem;color:var(--muted)}
+.cl-dot{width:9px;height:9px;border-radius:50%;background:var(--orange);flex-shrink:0}
+.cl-t{background:rgba(255,255,255,.3);border:1px solid rgba(255,255,255,.5)}
+
 /* ─── RESPONSIVE ──────────────────────────────────────────────── */
 @media(max-width:1100px){
   #hero{grid-template-columns:1fr;min-height:auto}
@@ -283,6 +305,7 @@ footer{background:var(--ink);border-top:1px solid var(--line);padding:3.5rem 0 2
   .strip-grid{grid-template-columns:repeat(2,1fr);row-gap:2.5rem}
   .si+.si::before{display:none}
   .founders-grid{grid-template-columns:1fr}
+  .courts-grid{grid-template-columns:1fr}
   .footer-inner{grid-template-columns:1fr;text-align:center}
   .footer-right{text-align:center}
   .footer-nav{justify-content:center}
@@ -535,6 +558,88 @@ footer{background:var(--ink);border-top:1px solid var(--line);padding:3.5rem 0 2
 </section>
 
 <!-- ══════════════════════════════════════════════════════════════
+     COURT SYSTEMS
+══════════════════════════════════════════════════════════════ -->
+<section id="courts" aria-label="Court systems">
+  <div class="wrap">
+    <div class="sec-head tc reveal">
+      <span class="eyebrow">Court Configurations</span>
+      <h2 class="sec-h">Two systems. <em>Every level covered.</em></h2>
+      <p class="sec-sub">Both use the same wooden court your training is measured on. Choose your system based on your level &mdash; and progress when you&rsquo;re ready.</p>
+    </div>
+
+    <div class="courts-grid">
+
+      <!-- 6-point -->
+      <div class="court-card reveal">
+        <div>
+          <div class="court-chip">Beginner &rarr; Intermediate</div>
+          <h3>6-Point System</h3>
+          <p>Six positions cover the four corners and both mid-court zones. The foundation of every ghosting programme &mdash; master the pattern and your court coverage fundamentally changes. Perfect for players building the movement habit from scratch.</p>
+        </div>
+        <figure class="court-fig" aria-label="6-point court diagram">
+          <img src="court.svg" alt="Squash court wooden floor" class="court-svg-img" loading="lazy">
+          <!-- 6-point markers. Positions as % of 640w x 975h viewBox -->
+          <!-- FL: 130/640=20.3%, 95/975=9.7% -->
+          <div class="cp d0" style="left:20.3%;top:9.7%" aria-label="Position 1: Front Left">1</div>
+          <!-- FR: 510/640=79.7%, 95/975=9.7% -->
+          <div class="cp d1" style="left:79.7%;top:9.7%" aria-label="Position 2: Front Right">2</div>
+          <!-- ML: 100/640=15.6%, 506/975=51.9% -->
+          <div class="cp d2" style="left:15.6%;top:51.9%" aria-label="Position 3: Mid Left">3</div>
+          <!-- MR: 540/640=84.4%, 506/975=51.9% -->
+          <div class="cp d3" style="left:84.4%;top:51.9%" aria-label="Position 4: Mid Right">4</div>
+          <!-- BL: 155/640=24.2%, 865/975=88.7% -->
+          <div class="cp d4" style="left:24.2%;top:88.7%" aria-label="Position 5: Back Left">5</div>
+          <!-- BR: 485/640=75.8%, 865/975=88.7% -->
+          <div class="cp d5" style="left:75.8%;top:88.7%" aria-label="Position 6: Back Right">6</div>
+          <!-- T recovery: 320/640=50%, 450/975=46.2% -->
+          <div class="ct" style="left:50%;top:46.2%" aria-label="T — recovery position">T</div>
+        </figure>
+        <div class="court-legend">
+          <span class="cl-item"><span class="cl-dot"></span>1&ndash;6 court positions</span>
+          <span class="cl-item"><span class="cl-dot cl-t"></span>T &mdash; recovery point</span>
+        </div>
+      </div>
+
+      <!-- 10-point -->
+      <div class="court-card reveal d1">
+        <div>
+          <div class="court-chip">Intermediate &rarr; Elite</div>
+          <h3>10-Point System</h3>
+          <p>Four bridging positions added between the standard six &mdash; creating longer movement arcs, more complex sequences, and greater aerobic demand. For players who&rsquo;ve built the base and want to push their movement to match-winning levels.</p>
+        </div>
+        <figure class="court-fig" aria-label="10-point court diagram">
+          <img src="court.svg" alt="Squash court wooden floor" class="court-svg-img" loading="lazy">
+          <!-- Same 6 base positions -->
+          <div class="cp d0" style="left:20.3%;top:9.7%">1</div>
+          <div class="cp d1" style="left:79.7%;top:9.7%">2</div>
+          <div class="cp d2" style="left:15.6%;top:51.9%">3</div>
+          <div class="cp d3" style="left:84.4%;top:51.9%">4</div>
+          <div class="cp d4" style="left:24.2%;top:88.7%">5</div>
+          <div class="cp d5" style="left:75.8%;top:88.7%">6</div>
+          <!-- 4 bridging positions -->
+          <!-- Left mid-front: 115/640=18%, 280/975=28.7% -->
+          <div class="cp d6" style="left:18%;top:28.7%">7</div>
+          <!-- Right mid-front: 525/640=82%, 280/975=28.7% -->
+          <div class="cp d7" style="left:82%;top:28.7%">8</div>
+          <!-- Left mid-back: 130/640=20.3%, 700/975=71.8% -->
+          <div class="cp d8" style="left:20.3%;top:71.8%">9</div>
+          <!-- Right mid-back: 510/640=79.7%, 700/975=71.8% -->
+          <div class="cp d9" style="left:79.7%;top:71.8%">10</div>
+          <!-- T recovery -->
+          <div class="ct" style="left:50%;top:46.2%">T</div>
+        </figure>
+        <div class="court-legend">
+          <span class="cl-item"><span class="cl-dot"></span>1&ndash;10 court positions</span>
+          <span class="cl-item"><span class="cl-dot cl-t"></span>T &mdash; recovery point</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
      VISION / WHY WE BUILT THIS
 ══════════════════════════════════════════════════════════════ -->
 <section id="vision" aria-label="Our vision">
@@ -571,7 +676,7 @@ footer{background:var(--ink);border-top:1px solid var(--line);padding:3.5rem 0 2
 
       <!-- Varish -->
       <div class="fc reveal">
-        <div class="fc-avatar" aria-hidden="true">VG</div>
+        <img src="Co-Founder%20%26%20CEO-Varish.jpg" alt="Varish Gahlot, Co-Founder &amp; CEO of SquashGhostingX" class="fc-photo" loading="lazy">
         <div class="fc-name">Varish Gahlot</div>
         <div class="fc-role">Co-Founder &amp; CEO</div>
         <blockquote class="fc-quote">
@@ -585,7 +690,7 @@ footer{background:var(--ink);border-top:1px solid var(--line);padding:3.5rem 0 2
 
       <!-- Darshika -->
       <div class="fc reveal d1">
-        <div class="fc-avatar" aria-hidden="true">DG</div>
+        <img src="Co-Founder%20%26%20President-Darshika.JPG" alt="Darshika Gahlot, Co-Founder &amp; President of SquashGhostingX" class="fc-photo" loading="lazy">
         <div class="fc-name">Darshika Gahlot</div>
         <div class="fc-role">Co-Founder &amp; President</div>
         <blockquote class="fc-quote">
@@ -762,7 +867,6 @@ footer{background:var(--ink);border-top:1px solid var(--line);padding:3.5rem 0 2
       </nav>
       <div class="footer-right">
         <div class="footer-copy">&copy; 2026 SquashGhostingX</div>
-        <div class="footer-made">Made with purpose by <span>Varish &amp; Darshika Gahlot</span></div>
       </div>
     </div>
   </div>
