@@ -3,6 +3,3 @@
 /terms      /terms.html     200
 /guide      /guide.html     200
 /support    /support.html   200
-
-# Catch-all: unknown paths → custom 404 page
-/*          /404.html       404
