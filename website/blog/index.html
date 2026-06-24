@@ -18,73 +18,85 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#080401;--bg2:#0F0700;--bg3:#170C02;--bg4:#1E1104;
+  --bg:#0A0806;--bg2:#110D09;--bg3:#19120C;--bg4:#221810;
   --accent:#FF6B35;--accent-b:#CC4A18;--accent-l:#FF9268;
-  --glow:rgba(255,107,53,.08);--borderacc:rgba(255,107,53,.25);
+  --glow:rgba(255,107,53,.07);--glow2:rgba(255,107,53,.14);--borderacc:rgba(255,107,53,.28);
   --border:rgba(255,255,255,.07);
   --gray1:#C4A896;--gray2:#806050;
-  --white:#FFFFFF;--text:#E8D5C4;
+  --white:#fff;--text:#E8D5C4;
   --r8:8px;--r12:12px;--r16:16px;
-  --font-display:'Barlow Condensed',sans-serif;
-  --font-body:'DM Sans',sans-serif;
+  --fh:'Barlow Condensed',sans-serif;--fb:'DM Sans',sans-serif;
+  --max:1160px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{font-size:16px;overflow-x:hidden;scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:var(--font-body);line-height:1.7;overflow-x:hidden}
+html{overflow-x:hidden;scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);line-height:1.6;overflow-x:hidden}
 a{color:inherit;text-decoration:none}
-a:hover{text-decoration:none}
+a,button{-webkit-tap-highlight-color:transparent}
 
-nav{position:sticky;top:0;z-index:100;padding:0 1.5rem;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,4,1,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-.nav-logo{display:flex;align-items:center;gap:.75rem;font-family:var(--font-display);font-size:1.55rem;font-weight:900;letter-spacing:-.025em}
-.nav-logo-icon{width:38px;height:38px;background:linear-gradient(135deg,#FF6B35 0%,#c0392b 100%);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:900;color:#fff;font-family:var(--font-display);box-shadow:0 0 18px rgba(255,107,53,.5),0 2px 8px rgba(0,0,0,.4);flex-shrink:0}
-.nav-logo-squash{color:#fff}
-.nav-logo-ghosting{background:linear-gradient(135deg,#FF6B35 0%,#ff9f6b 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.nav-back{font-size:.85rem;font-weight:500;color:var(--gray1);display:flex;align-items:center;gap:.4rem;transition:color .2s;border:1px solid var(--border);padding:.4rem .9rem;border-radius:8px}
+/* NAV */
+nav{position:sticky;top:0;z-index:100;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;background:rgba(10,8,6,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-logo{display:flex;align-items:center;gap:.6rem;font-family:var(--fh);font-size:1.5rem;font-weight:900;letter-spacing:-.02em;color:var(--white)}
+.nav-logo-icon{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,#FF6B35,#c0392b);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:900;color:#fff;flex-shrink:0}
+.nav-logo-g{background:linear-gradient(135deg,#FF6B35,#ff9f6b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-back{display:flex;align-items:center;gap:.4rem;font-size:.85rem;font-weight:500;color:var(--gray1);border:1px solid var(--border);padding:.4rem .9rem;border-radius:var(--r8);transition:all .2s}
 .nav-back:hover{color:var(--accent);border-color:var(--borderacc)}
+.nav-back svg{flex-shrink:0}
 
-.page-wrap{max-width:1080px;margin:0 auto;padding:4rem 1.5rem 6rem}
+/* PAGE */
+.wrap{max-width:var(--max);margin:0 auto;padding:0 1.5rem}
+.page-wrap{max-width:var(--max);margin:0 auto;padding:4rem 1.5rem 6rem}
 
-.blog-header{text-align:center;margin-bottom:4rem}
-.blog-label{font-family:var(--font-display);font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem}
-.blog-title{font-family:var(--font-display);font-size:clamp(2.8rem,7vw,4.5rem);font-weight:900;color:var(--white);line-height:1.0;letter-spacing:-.025em;margin-bottom:.75rem}
-.blog-sub{font-size:1.05rem;color:var(--gray1);max-width:520px;margin:0 auto}
+/* HEADER */
+.blog-header{text-align:center;margin-bottom:3.5rem;padding-top:1rem}
+.blog-eyebrow{font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:.6rem}
+.blog-title{font-family:var(--fh);font-size:clamp(2.8rem,7vw,4.5rem);font-weight:900;color:var(--white);line-height:1;letter-spacing:-.025em;margin-bottom:.75rem}
+.blog-sub{font-size:1rem;color:var(--gray1);max-width:480px;margin:0 auto;line-height:1.7}
 
+/* FILTER */
 .filter-row{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-bottom:3rem}
-.filter-chip{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:.35rem .9rem;font-size:.8rem;color:var(--gray1);cursor:pointer;transition:all .2s}
-.filter-chip:hover,.filter-chip.active{background:var(--glow);border-color:var(--borderacc);color:var(--accent)}
+.filter-chip{background:var(--bg3);border:1px solid var(--border);border-radius:100px;padding:.35rem .9rem;font-size:.8rem;color:var(--gray1);cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent;user-select:none}
+.filter-chip:hover,.filter-chip.active{background:var(--glow2);border-color:var(--borderacc);color:var(--accent)}
 
-.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
-.blog-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:1.75rem;display:flex;flex-direction:column;transition:border-color .2s,transform .2s}
-.blog-card:hover{border-color:var(--borderacc);transform:translateY(-2px)}
-.blog-card-emoji{font-size:2rem;margin-bottom:1rem}
-.blog-card-tag{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.5rem}
-.blog-card-title{font-family:var(--font-display);font-size:1.25rem;font-weight:900;color:var(--white);line-height:1.2;margin-bottom:.75rem;flex:1}
-.blog-card-excerpt{font-size:.88rem;color:var(--gray1);line-height:1.65;margin-bottom:1.25rem}
-.blog-card-footer{display:flex;align-items:center;justify-content:space-between}
-.blog-card-time{font-size:.78rem;color:var(--gray2)}
-.blog-card-read{font-size:.82rem;font-weight:600;color:var(--accent)}
+/* GRID */
+.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+.blog-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:1.5rem;display:flex;flex-direction:column;transition:border-color .22s,transform .22s}
+.blog-card:hover{border-color:var(--borderacc);transform:translateY(-3px)}
+.bc-emoji{font-size:1.8rem;margin-bottom:.85rem}
+.bc-tag{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem}
+.bc-title{font-family:var(--fh);font-size:1.1rem;font-weight:900;color:var(--white);line-height:1.2;margin-bottom:.6rem;flex:1}
+.bc-excerpt{font-size:.84rem;color:var(--gray1);line-height:1.6;margin-bottom:1rem}
+.bc-footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:.5rem;border-top:1px solid var(--border)}
+.bc-time{font-size:.75rem;color:var(--gray2)}
+.bc-read{font-size:.78rem;font-weight:600;color:var(--accent)}
 
+/* NO RESULTS */
+.no-results{display:none;text-align:center;padding:3rem;color:var(--gray2);grid-column:1/-1}
+
+/* FOOTER */
 footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 1.5rem;text-align:center}
-.footer-copy{font-size:.82rem;color:var(--gray2);margin-bottom:.75rem}
-.footer-links-row{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap}
-.footer-links-row a{font-size:.82rem;color:var(--gray2);transition:color .2s}
-.footer-links-row a:hover{color:var(--accent)}
+.footer-copy{font-size:.82rem;color:var(--gray2);margin-bottom:.6rem}
+.footer-links{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap}
+.footer-links a{font-size:.82rem;color:var(--gray2);transition:color .2s}
+.footer-links a:hover{color:var(--accent)}
 
 @media(max-width:900px){.blog-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:560px){
+@media(max-width:580px){
   .blog-grid{grid-template-columns:1fr}
   .page-wrap{padding:2.5rem 1rem 4rem}
+  .filter-row{gap:.35rem}
+  .filter-chip{font-size:.75rem;padding:.3rem .75rem}
 }
 </style>
 </head>
 <body>
 
 <nav>
-  <a href="/" class="nav-logo">
+  <a href="../index.html" class="nav-logo" aria-label="SquashGhostingX home">
     <div class="nav-logo-icon">SX</div>
-    <span class="nav-logo-squash">Squash</span><span class="nav-logo-ghosting">GhostingX</span>
+    <span>Squash<span class="nav-logo-g">GhostingX</span></span>
   </a>
-  <a href="/" class="nav-back">
+  <a href="../index.html" class="nav-back">
     <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     Back to home
   </a>
@@ -93,242 +105,247 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 1.5
 <div class="page-wrap">
 
   <div class="blog-header">
-    <div class="blog-label">Training Intelligence</div>
+    <div class="blog-eyebrow">Training Intelligence</div>
     <h1 class="blog-title">The Squash Lab</h1>
     <p class="blog-sub">Real training advice from people who actually play.</p>
   </div>
 
-  <div class="filter-row">
-    <span class="filter-chip active">All</span>
-    <span class="filter-chip">Training Science</span>
-    <span class="filter-chip">Analytics</span>
-    <span class="filter-chip">Court Systems</span>
-    <span class="filter-chip">Tactics</span>
-    <span class="filter-chip">Conditioning</span>
-    <span class="filter-chip">Movement</span>
-    <span class="filter-chip">Routines</span>
-    <span class="filter-chip">Technology</span>
+  <div class="filter-row" role="group" aria-label="Filter articles by category">
+    <button class="filter-chip active" data-tag="All">All</button>
+    <button class="filter-chip" data-tag="Training Science">Training Science</button>
+    <button class="filter-chip" data-tag="Analytics">Analytics</button>
+    <button class="filter-chip" data-tag="Court Systems">Court Systems</button>
+    <button class="filter-chip" data-tag="Tactics">Tactics</button>
+    <button class="filter-chip" data-tag="Conditioning">Conditioning</button>
+    <button class="filter-chip" data-tag="Movement">Movement</button>
+    <button class="filter-chip" data-tag="Routines">Routines</button>
+    <button class="filter-chip" data-tag="Technology">Technology</button>
   </div>
 
-  <div class="blog-grid">
+  <div class="blog-grid" id="blog-grid">
 
-    <a href="/blog/neuroscience-court-movement" class="blog-card" data-tag="Training Science">
-      <div class="blog-card-emoji">🧠</div>
-      <div class="blog-card-tag">Training Science</div>
-      <div class="blog-card-title">The Neuroscience of Court Movement</div>
-      <div class="blog-card-excerpt">Your feet move before your brain decides. That's not talent — that's what ghosting actually builds at a neurological level.</div>
-      <div class="blog-card-footer">
-        <span class="blog-card-time">8 min read</span>
-        <span class="blog-card-read">Read article →</span>
+    <a href="neuroscience-court-movement/" class="blog-card" data-tag="Training Science">
+      <div class="bc-emoji">🧠</div>
+      <div class="bc-tag">Training Science</div>
+      <div class="bc-title">The Neuroscience of Court Movement</div>
+      <div class="bc-excerpt">Your feet move before your brain decides. That's not talent — that's what ghosting actually builds at a neurological level.</div>
+      <div class="bc-footer">
+        <span class="bc-time">8 min read</span>
+        <span class="bc-read">Read article →</span>
       </div>
     </a>
 
-    <a href="/blog/zone-balance-data" class="blog-card" data-tag="Analytics">
-      <div class="blog-card-emoji">📈</div>
-      <div class="blog-card-tag">Analytics</div>
-      <div class="blog-card-title">Reading Your Zone Balance Data</div>
-      <div class="blog-card-excerpt">Most players are surprised by the gap between where they think they move and where the data says they actually go.</div>
-      <div class="blog-card-footer">
-        <span class="blog-card-time">6 min read</span>
-        <span class="blog-card-read">Read article →</span>
+    <a href="zone-balance-data/" class="blog-card" data-tag="Analytics">
+      <div class="bc-emoji">📈</div>
+      <div class="bc-tag">Analytics</div>
+      <div class="bc-title">Reading Your Zone Balance Data</div>
+      <div class="bc-excerpt">Most players are surprised by the gap between where they think they move and where the data says they actually go.</div>
+      <div class="bc-footer">
+        <span class="bc-time">6 min read</span>
+        <span class="bc-read">Read article →</span>
       </div>
     </a>
 
-    <a href="/blog/6-point-vs-10-point" class="blog-card" data-tag="Court Systems">
-      <div class="blog-card-emoji">⚡</div>
-      <div class="blog-card-tag">Court Systems</div>
-      <div class="blog-card-title">6-Point vs 10-Point: Which Is Right for You?</div>
-      <div class="blog-card-excerpt">Not sure which to use? Start with 6-point. Here's when — and why — to move up to 10.</div>
-      <div class="blog-card-footer">
-        <span class="blog-card-time">7 min read</span>
-        <span class="blog-card-read">Read article →</span>
+    <a href="6-point-vs-10-point/" class="blog-card" data-tag="Court Systems">
+      <div class="bc-emoji">⚡</div>
+      <div class="bc-tag">Court Systems</div>
+      <div class="bc-title">6-Point vs 10-Point: Which Is Right for You?</div>
+      <div class="bc-excerpt">Not sure which to use? Start with 6-point. Here's when — and why — to move up to 10.</div>
+      <div class="bc-footer">
+        <span class="bc-time">7 min read</span>
+        <span class="bc-read">Read article →</span>
       </div>
     </a>
 
-    <a href="/blog/t-position-habit" class="blog-card" data-tag="Tactics">
-      <div class="blog-card-emoji">🎯</div>
-      <div class="blog-card-tag">Tactics</div>
-      <div class="blog-card-title">T-Position: The Most Important Habit in Squash</div>
-      <div class="blog-card-excerpt">The T-recovery isn't just good practice. It's the difference between controlling a rally and reacting to it.</div>
-      <div class="blog-card-footer">
-        <span class="blog-card-time">5 min read</span>
-        <span class="blog-card-read">Read article →</span>
+    <a href="t-position-habit/" class="blog-card" data-tag="Tactics">
+      <div class="bc-emoji">🎯</div>
+      <div class="bc-tag">Tactics</div>
+      <div class="bc-title">T-Position: The Most Important Habit in Squash</div>
+      <div class="bc-excerpt">The T-recovery isn't just good practice. It's the difference between controlling a rally and reacting to it.</div>
+      <div class="bc-footer">
+        <span class="bc-time">5 min read</span>
+        <span class="bc-read">Read article →</span>
       </div>
     </a>
 
-    <a href="/blog/progressive-overload" class="blog-card" data-tag="Conditioning">
-      <div class="blog-card-emoji">💪</div>
-      <div class="blog-card-tag">Conditioning</div>
-      <div class="blog-card-title">Progressive Overload for Squash Athletes</div>
-      <div class="blog-card-excerpt">If your ghosting sessions have looked the same for three months, your body stopped adapting weeks ago.</div>
-      <div class="blog-card-footer">
-        <span class="blog-card-time">9 min read</span>
-        <span class="blog-card-read">Read article →</span>
+    <a href="progressive-overload/" class="blog-card" data-tag="Conditioning">
+      <div class="bc-emoji">💪</div>
+      <div class="bc-tag">Conditioning</div>
+      <div class="bc-title">Progressive Overload for Squash Athletes</div>
+      <div class="bc-excerpt">If your ghosting sessions have looked the same for three months, your body stopped adapting weeks ago.</div>
+      <div class="bc-footer">
+        <span class="bc-time">9 min read</span>
+        <span class="bc-read">Read article →</span>
       </div>
     </a>
 
-    <a href="/blog/ghosting-lunge-technique" class="blog-card" data-tag="Movement">
-      <div class="blog-card-emoji">🏃</div>
-      <div class="blog-card-tag">Movement</div>
-      <div class="blog-card-title">The Perfect Ghosting Lunge Technique</div>
-      <div class="blog-card-excerpt">Done right, it's powerful and fast. Done wrong, it's months of knee problems waiting to happen.</div>
-      <div class="blog-card-footer">
-        <span class="blog-card-time">6 min read</span>
-        <span class="blog-card-read">Read article →</span>
+    <a href="ghosting-lunge-technique/" class="blog-card" data-tag="Movement">
+      <div class="bc-emoji">🏃</div>
+      <div class="bc-tag">Movement</div>
+      <div class="bc-title">The Perfect Ghosting Lunge Technique</div>
+      <div class="bc-excerpt">Done right, it's powerful and fast. Done wrong, it's months of knee problems waiting to happen.</div>
+      <div class="bc-footer">
+        <span class="bc-time">6 min read</span>
+        <span class="bc-read">Read article →</span>
       </div>
     </a>
 
-    <a href="/blog/4-week-ghosting-programme" class="blog-card" data-tag="Routines">
-      <div class="blog-card-emoji">🔄</div>
-      <div class="blog-card-tag">Routines</div>
-      <div class="blog-card-title">Building a 4-Week Ghosting Programme</div>
-      <div class="blog-card-excerpt">Tournament in four weeks? Here's exactly what to do each week — and why the taper matters as much as the hard work.</div>
-      <div class="blog-card-footer">
-        <span class="blog-card-time">10 min read</span>
-        <span class="blog-card-read">Read article →</span>
+    <a href="4-week-ghosting-programme/" class="blog-card" data-tag="Routines">
+      <div class="bc-emoji">🔄</div>
+      <div class="bc-tag">Routines</div>
+      <div class="bc-title">Building a 4-Week Ghosting Programme</div>
+      <div class="bc-excerpt">Tournament in four weeks? Here's exactly what to do each week — and why the taper matters as much as the hard work.</div>
+      <div class="bc-footer">
+        <span class="bc-time">10 min read</span>
+        <span class="bc-read">Read article →</span>
       </div>
     </a>
 
-    <a href="/blog/voice-coaching" class="blog-card" data-tag="Technology">
-      <div class="blog-card-emoji">🎤</div>
-      <div class="blog-card-tag">Technology</div>
-      <div class="blog-card-title">Why AI Voice Coaching Changes Everything</div>
-      <div class="blog-card-excerpt">Glancing at a screen for your next position drills the wrong habit. Your eyes should always be forward.</div>
-      <div class="blog-card-footer">
-        <span class="blog-card-time">7 min read</span>
-        <span class="blog-card-read">Read article →</span>
+    <a href="voice-coaching/" class="blog-card" data-tag="Technology">
+      <div class="bc-emoji">🎤</div>
+      <div class="bc-tag">Technology</div>
+      <div class="bc-title">Why AI Voice Coaching Changes Everything</div>
+      <div class="bc-excerpt">Glancing at a screen for your next position drills the wrong habit. Your eyes should always be forward.</div>
+      <div class="bc-footer">
+        <span class="bc-time">7 min read</span>
+        <span class="bc-read">Read article →</span>
       </div>
     </a>
 
-    <a href="/blog/phone-as-squash-coach" class="blog-card" data-tag="Technology">
-      <div class="blog-card-emoji">📱</div>
-      <div class="blog-card-tag">Mobile App</div>
-      <div class="blog-card-title">Your Phone Is the Best Squash Coach You've Never Had</div>
-      <div class="blog-card-excerpt">A phone can't replace a coach for technique. But for movement and conditioning solo? It's closer than you'd think.</div>
-      <div class="blog-card-footer">
-        <span class="blog-card-time">6 min read</span>
-        <span class="blog-card-read">Read article →</span>
+    <a href="phone-as-squash-coach/" class="blog-card" data-tag="Technology">
+      <div class="bc-emoji">📱</div>
+      <div class="bc-tag">Technology</div>
+      <div class="bc-title">Your Phone Is the Best Squash Coach You've Never Had</div>
+      <div class="bc-excerpt">A phone can't replace a coach for technique. But for movement and conditioning solo? It's closer than you'd think.</div>
+      <div class="bc-footer">
+        <span class="bc-time">6 min read</span>
+        <span class="bc-read">Read article →</span>
       </div>
     </a>
 
-    <a href="/blog/back-corners-costing-matches" class="blog-card" data-tag="Tactics">
-      <div class="blog-card-emoji">🔥</div>
-      <div class="blog-card-tag">Tactics</div>
-      <div class="blog-card-title">Why Your Back Corners Are Costing You Matches</div>
-      <div class="blog-card-excerpt">That scrambled back-corner reply isn't bad luck. It's a movement pattern you haven't fixed yet.</div>
-      <div class="blog-card-footer">
-        <span class="blog-card-time">5 min read</span>
-        <span class="blog-card-read">Read article →</span>
+    <a href="back-corners-costing-matches/" class="blog-card" data-tag="Tactics">
+      <div class="bc-emoji">🔥</div>
+      <div class="bc-tag">Tactics</div>
+      <div class="bc-title">Why Your Back Corners Are Costing You Matches</div>
+      <div class="bc-excerpt">That scrambled back-corner reply isn't bad luck. It's a movement pattern you haven't fixed yet.</div>
+      <div class="bc-footer">
+        <span class="bc-time">5 min read</span>
+        <span class="bc-read">Read article →</span>
       </div>
     </a>
 
-    <a href="/blog/solo-squash-training" class="blog-card" data-tag="Routines">
-      <div class="blog-card-emoji">🏅</div>
-      <div class="blog-card-tag">Training</div>
-      <div class="blog-card-title">How to Train Squash Solo When You Have No Partner</div>
-      <div class="blog-card-excerpt">Partner cancelled again? Solo court time works better than most people think — if you structure it properly.</div>
-      <div class="blog-card-footer">
-        <span class="blog-card-time">7 min read</span>
-        <span class="blog-card-read">Read article →</span>
+    <a href="solo-squash-training/" class="blog-card" data-tag="Routines">
+      <div class="bc-emoji">🏅</div>
+      <div class="bc-tag">Routines</div>
+      <div class="bc-title">How to Train Squash Solo When You Have No Partner</div>
+      <div class="bc-excerpt">Partner cancelled again? Solo court time works better than most people think — if you structure it properly.</div>
+      <div class="bc-footer">
+        <span class="bc-time">7 min read</span>
+        <span class="bc-read">Read article →</span>
       </div>
     </a>
 
-    <a href="/blog/15-minute-ghost-session" class="blog-card" data-tag="Routines">
-      <div class="blog-card-emoji">⏱️</div>
-      <div class="blog-card-tag">Routines</div>
-      <div class="blog-card-title">The 15-Minute Ghost Session That Actually Works</div>
-      <div class="blog-card-excerpt">Sometimes 15 minutes is all you've got. Here's how to make every one of them count.</div>
-      <div class="blog-card-footer">
-        <span class="blog-card-time">4 min read</span>
-        <span class="blog-card-read">Read article →</span>
+    <a href="15-minute-ghost-session/" class="blog-card" data-tag="Routines">
+      <div class="bc-emoji">⏱️</div>
+      <div class="bc-tag">Routines</div>
+      <div class="bc-title">The 15-Minute Ghost Session That Actually Works</div>
+      <div class="bc-excerpt">Sometimes 15 minutes is all you've got. Here's how to make every one of them count.</div>
+      <div class="bc-footer">
+        <span class="bc-time">4 min read</span>
+        <span class="bc-read">Read article →</span>
       </div>
     </a>
 
-    <a href="/blog/session-stats-explained" class="blog-card" data-tag="Analytics">
-      <div class="blog-card-emoji">📊</div>
-      <div class="blog-card-tag">Analytics</div>
-      <div class="blog-card-title">What Your Session Stats Are Actually Telling You</div>
-      <div class="blog-card-excerpt">Looking at your numbers after training and actually reading them are two very different things.</div>
-      <div class="blog-card-footer">
-        <span class="blog-card-time">6 min read</span>
-        <span class="blog-card-read">Read article →</span>
+    <a href="session-stats-explained/" class="blog-card" data-tag="Analytics">
+      <div class="bc-emoji">📊</div>
+      <div class="bc-tag">Analytics</div>
+      <div class="bc-title">What Your Session Stats Are Actually Telling You</div>
+      <div class="bc-excerpt">Looking at your numbers after training and actually reading them are two very different things.</div>
+      <div class="bc-footer">
+        <span class="bc-time">6 min read</span>
+        <span class="bc-read">Read article →</span>
       </div>
     </a>
 
-    <a href="/blog/front-court-drills" class="blog-card" data-tag="Movement">
-      <div class="blog-card-emoji">🏹</div>
-      <div class="blog-card-tag">Movement</div>
-      <div class="blog-card-title">Front Court Drills That Actually Build Speed</div>
-      <div class="blog-card-excerpt">The front court is where rallies are won and lost. Most players ghost it wrong. Here's how to do it right.</div>
-      <div class="blog-card-footer">
-        <span class="blog-card-time">7 min read</span>
-        <span class="blog-card-read">Read article →</span>
+    <a href="front-court-drills/" class="blog-card" data-tag="Movement">
+      <div class="bc-emoji">🏹</div>
+      <div class="bc-tag">Movement</div>
+      <div class="bc-title">Front Court Drills That Actually Build Speed</div>
+      <div class="bc-excerpt">The front court is where rallies are won and lost. Most players ghost it wrong. Here's how to do it right.</div>
+      <div class="bc-footer">
+        <span class="bc-time">7 min read</span>
+        <span class="bc-read">Read article →</span>
       </div>
     </a>
 
-    <a href="/blog/back-court-training" class="blog-card" data-tag="Conditioning">
-      <div class="blog-card-emoji">🎯</div>
-      <div class="blog-card-tag">Conditioning</div>
-      <div class="blog-card-title">Back Court Training: Building the Foundation</div>
-      <div class="blog-card-excerpt">You don't lose points at the front. You lose them recovering from the back. Here's how to stop doing that.</div>
-      <div class="blog-card-footer">
-        <span class="blog-card-time">8 min read</span>
-        <span class="blog-card-read">Read article →</span>
+    <a href="back-court-training/" class="blog-card" data-tag="Conditioning">
+      <div class="bc-emoji">🎯</div>
+      <div class="bc-tag">Conditioning</div>
+      <div class="bc-title">Back Court Training: Building the Foundation</div>
+      <div class="bc-excerpt">You don't lose points at the front. You lose them recovering from the back. Here's how to stop doing that.</div>
+      <div class="bc-footer">
+        <span class="bc-time">8 min read</span>
+        <span class="bc-read">Read article →</span>
       </div>
     </a>
 
-    <a href="/blog/forehand-backhand-balance" class="blog-card" data-tag="Analytics">
-      <div class="blog-card-emoji">⚖️</div>
-      <div class="blog-card-tag">Analytics</div>
-      <div class="blog-card-title">Forehand vs Backhand: Are You Training Both Sides?</div>
-      <div class="blog-card-excerpt">Almost every player has a weaker side. Your zone data will tell you which one — and by how much.</div>
-      <div class="blog-card-footer">
-        <span class="blog-card-time">6 min read</span>
-        <span class="blog-card-read">Read article →</span>
+    <a href="forehand-backhand-balance/" class="blog-card" data-tag="Analytics">
+      <div class="bc-emoji">⚖️</div>
+      <div class="bc-tag">Analytics</div>
+      <div class="bc-title">Forehand vs Backhand: Are You Training Both Sides?</div>
+      <div class="bc-excerpt">Almost every player has a weaker side. Your zone data will tell you which one — and by how much.</div>
+      <div class="bc-footer">
+        <span class="bc-time">6 min read</span>
+        <span class="bc-read">Read article →</span>
       </div>
     </a>
 
-    <a href="/blog/squash-training-zones" class="blog-card" data-tag="Training Science">
-      <div class="blog-card-emoji">🗺️</div>
-      <div class="blog-card-tag">Training Science</div>
-      <div class="blog-card-title">Understanding the Four Training Zones of a Squash Court</div>
-      <div class="blog-card-excerpt">Front, back, forehand, backhand. Each zone demands different things. Each one needs deliberate attention.</div>
-      <div class="blog-card-footer">
-        <span class="blog-card-time">8 min read</span>
-        <span class="blog-card-read">Read article →</span>
+    <a href="squash-training-zones/" class="blog-card" data-tag="Training Science">
+      <div class="bc-emoji">🗺️</div>
+      <div class="bc-tag">Training Science</div>
+      <div class="bc-title">Understanding the Four Training Zones of a Squash Court</div>
+      <div class="bc-excerpt">Front, back, forehand, backhand. Each zone demands different things. Each one needs deliberate attention.</div>
+      <div class="bc-footer">
+        <span class="bc-time">8 min read</span>
+        <span class="bc-read">Read article →</span>
       </div>
     </a>
+
+    <div class="no-results" id="no-results">No articles in this category yet.</div>
 
   </div>
 </div>
 
 <footer>
-  <div class="footer-copy">© 2026 SquashGhostingX · All rights reserved</div>
-  <div class="footer-links-row">
-    <a href="/">Home</a>
-    <a href="/blog">Training Blog</a>
-    <a href="/guide">App Guide</a>
-    <a href="/support">Support</a>
-    <a href="/privacy">Privacy Policy</a>
-    <a href="/terms">Terms of Use</a>
-  </div>
+  <div class="footer-copy">&copy; 2026 SquashGhostingX &middot; All rights reserved</div>
+  <nav class="footer-links" aria-label="Footer navigation">
+    <a href="../index.html">Home</a>
+    <a href="index.html">Training Blog</a>
+    <a href="../guide.html">App Guide</a>
+    <a href="../support.html">Support</a>
+    <a href="../privacy.html">Privacy Policy</a>
+    <a href="../terms.html">Terms of Use</a>
+  </nav>
 </footer>
 
 <script>
 (function(){
   var chips = document.querySelectorAll('.filter-chip');
   var cards = document.querySelectorAll('.blog-card');
+  var noResults = document.getElementById('no-results');
+
   chips.forEach(function(chip){
     chip.addEventListener('click', function(){
       chips.forEach(function(c){ c.classList.remove('active'); });
       chip.classList.add('active');
-      var tag = chip.textContent.trim();
+      var tag = chip.dataset.tag;
       var count = 0;
       cards.forEach(function(card){
         var match = tag === 'All' || card.dataset.tag === tag;
         card.style.display = match ? '' : 'none';
-        if (match) count++;
+        if(match) count++;
       });
+      noResults.style.display = count === 0 ? 'block' : 'none';
     });
   });
 })();
