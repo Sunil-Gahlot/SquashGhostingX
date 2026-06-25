@@ -426,7 +426,7 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
             </TouchableOpacity>
           </Card>
 
-          <Text style={styles.footer}>SquashGhostingX · v1.0.0</Text>
+          <Text style={styles.footer}>Squash GhostingX · v1.0.0</Text>
 
         </ScrollView>
       </KeyboardAvoidingView>

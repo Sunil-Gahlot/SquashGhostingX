@@ -275,7 +275,7 @@ Ghosting simultaneously develops four athletic qualities that most training meth
 
 The mental dimension of ghosting is underrated. Sustaining focused, high-quality movement for 30–45 minutes with no opponent, no ball, and no external motivation requires and builds the concentration discipline that separates players who execute well under pressure from those who lose focus in the fourth game. Solo training is harder to stay present for than match play, which is precisely why it trains the quality that match play does not.
 
-SquashGhostingX is built around this principle: structure the ghost session so that every repetition reinforces the movement skill, the fitness base, and the mental discipline simultaneously. The app's position calling, tempo control, and voice coaching are designed to remove the cognitive overhead of session design, so every second on court is spent training, not planning.`,
+Squash GhostingX is built around this principle: structure the ghost session so that every repetition reinforces the movement skill, the fitness base, and the mental discipline simultaneously. The app's position calling, tempo control, and voice coaching are designed to remove the cognitive overhead of session design, so every second on court is spent training, not planning.`,
   },
   {
     id: '12',
@@ -337,9 +337,9 @@ Anti-inflammatory nutrition supports recovery for players training three or more
     tagColor: '#007AFF',
     headerIcon: 'phone-portrait-outline',
     readTime: '4 min',
-    title: 'How SquashGhostingX Adapts to Your Skill Level',
+    title: 'How Squash GhostingX Adapts to Your Skill Level',
     summary: 'From beginner to pro: how the app\'s drill configuration, tempo system, and voice coaching scale with your ability and goals.',
-    content: `SquashGhostingX is built on a single design principle: every session should feel appropriately challenging regardless of where you are in your development. A beginner who is overwhelmed trains poorly; an advanced player who is under-challenged improves slowly. The app's configuration system is designed to keep every user in the productive zone between these two extremes.
+    content: `Squash GhostingX is built on a single design principle: every session should feel appropriately challenging regardless of where you are in your development. A beginner who is overwhelmed trains poorly; an advanced player who is under-challenged improves slowly. The app's configuration system is designed to keep every user in the productive zone between these two extremes.
 
 The skill level setting, Beginner through to Pro, controls more than just pace. It adjusts movement interval timing, rest period defaults, position sequence complexity, and the threshold at which the app considers a set complete. A Beginner session uses longer intervals between position calls, more predictable sequences, and generous rest ratios. A Pro session uses shorter intervals, random sequences with minimal pattern repetition, and rest periods that replicate competitive match demands. The same 15-minute session feels completely different at each end of the scale.
 
@@ -428,8 +428,8 @@ Include a 2-minute breathing reset at the end of the cool-down: seated, eyes clo
     headerIcon: 'stats-chart-outline',
     readTime: '5 min',
     title: 'Reading Your Session Data to Train Smarter',
-    summary: 'SquashGhostingX tracks more than just time. Here is how to read zone distribution, intensity scores, and completion data to guide your training.',
-    content: `Most squash players train by feel, where sessions are hard when they feel hard and progress is measured by subjective sense of improvement. SquashGhostingX replaces this with objective data: every session generates movement counts, zone distribution percentages, intensity scores, and completion rates that reveal patterns invisible to subjective assessment. Learning to read this data is the difference between training consistently and training intelligently.
+    summary: 'Squash GhostingX tracks more than just time. Here is how to read zone distribution, intensity scores, and completion data to guide your training.',
+    content: `Most squash players train by feel, where sessions are hard when they feel hard and progress is measured by subjective sense of improvement. Squash GhostingX replaces this with objective data: every session generates movement counts, zone distribution percentages, intensity scores, and completion rates that reveal patterns invisible to subjective assessment. Learning to read this data is the difference between training consistently and training intelligently.
 
 Zone distribution, the percentage of movements in front, mid, and back court, is one of the most revealing metrics. Most players assume they cover the court evenly. The data almost always shows otherwise. A back-heavy distribution (more than 45% of movements in the back zone) typically indicates a defensive court pattern where the player is comfortable in the back but initiates less movement to the front. A front-heavy distribution often indicates aggressive net play habits but reduced fitness for extended back-court retrievals. Compare your distribution across sessions to identify whether your patterns shift with fatigue, and most players show a progressive retreat to mid and back court as sessions progress.
 
@@ -596,7 +596,7 @@ export default function LibraryScreen() {
                 <Text style={styles.amReadTime}>{readingArticle?.readTime} read</Text>
               </View>
               <Text style={styles.amTitle}>{readingArticle?.title}</Text>
-              <Text style={styles.amByline}>SquashGhostingX Editorial</Text>
+              <Text style={styles.amByline}>Squash GhostingX Editorial</Text>
               <View style={styles.amDivider} />
               {readingArticle?.content.split('\n\n').map((para, i) => (
                 <Text key={i} style={styles.amPara}>{para}</Text>

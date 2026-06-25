@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity, Alert, Modal, Image, Linking,
+  InteractionManager,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -156,7 +157,7 @@ const TEST_PHRASES: Partial<Record<Language, string>> = {
 
 export default function SettingsScreen() {
   const db = useSQLiteContext() as any;
-  const { profile, resetProfile, signOut } = useProfileStore();
+  const { profile, resetProfile, signOut, deleteAccount } = useProfileStore();
   const settings       = useSettingsStore((s) => s.settings);
   const updateSettings = useSettingsStore((s) => s.updateSettings);
   const resetSettings  = useSettingsStore((s) => s.resetSettings);
@@ -257,8 +258,13 @@ export default function SettingsScreen() {
             await SecureStore.deleteItemAsync('sgx-auth-attempts').catch(() => {});
             clearCache();
             useBadgesStore.getState().resetBadges();
-            resetProfile();
             resetSettings();
+            // Defer auth state reset until the alert has fully dismissed so the
+            // AuthModal animates in cleanly on all platforms (Android in particular
+            // fires onPress before the native alert finishes animating out).
+            InteractionManager.runAfterInteractions(() => {
+              deleteAccount();
+            });
           },
         },
       ]
@@ -645,7 +651,7 @@ export default function SettingsScreen() {
             label="About" sub="Version 1.0.0 · All data stored locally on device"
             right={<Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />}
             onPress={() => Alert.alert(
-              'SquashGhostingX v1.0.0',
+              'Squash GhostingX v1.0.0',
               'AI-guided squash ghosting coach with real-time voice coaching, analytics, and structured training programs.\n\nAll training data is stored exclusively on your device. No server. No cloud.',
               [{ text: 'Close', style: 'cancel' }]
             )}
@@ -665,7 +671,7 @@ export default function SettingsScreen() {
           />
         </CollapsibleGroup>
 
-        <Text style={styles.footerText}>SquashGhostingX · v1.0.0</Text>
+        <Text style={styles.footerText}>Squash GhostingX · v1.0.0</Text>
       </ScrollView>
     </SafeAreaView>
   );

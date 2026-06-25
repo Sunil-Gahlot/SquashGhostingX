@@ -706,7 +706,7 @@ function AuthPage({
             <View style={aStyles.brandMark}>
               <Ionicons name="body" size={14} color={Colors.brand} />
             </View>
-            <Text style={aStyles.brandLabel}>SquashGhostingX</Text>
+            <Text style={aStyles.brandLabel}>Squash GhostingX</Text>
           </View>
 
           {/* Tab switcher */}

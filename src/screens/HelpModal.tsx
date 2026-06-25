@@ -251,7 +251,7 @@ export default function HelpModal({ visible, onClose }: { visible: boolean; onCl
       render: () => (
         <View style={s.body}>
           <Text style={s.para}>
-            SquashGhostingX coaches squash ghosting drills with real-time voice calls and court
+            Squash GhostingX coaches squash ghosting drills with real-time voice calls and court
             visuals. No opponent needed — just a squash court or any open space.
           </Text>
           <View style={s.twoCol}>
@@ -453,7 +453,7 @@ export default function HelpModal({ visible, onClose }: { visible: boolean; onCl
           {[
             {
               q: 'Do I need an internet connection?',
-              a: 'No. SquashGhostingX is fully offline. All data stays on your device.',
+              a: 'No. Squash GhostingX is fully offline. All data stays on your device.',
             },
             {
               q: 'Can I train without sound?',
@@ -507,7 +507,7 @@ export default function HelpModal({ visible, onClose }: { visible: boolean; onCl
             </View>
             <View>
               <Text style={s.headerTitle}>Help & Guide</Text>
-              <Text style={s.headerSub}>SquashGhostingX</Text>
+              <Text style={s.headerSub}>Squash GhostingX</Text>
             </View>
           </View>
           <TouchableOpacity
@@ -548,7 +548,7 @@ export default function HelpModal({ visible, onClose }: { visible: boolean; onCl
           })}
 
           <View style={s.footer}>
-            <Text style={s.footerText}>SquashGhostingX · Help Guide</Text>
+            <Text style={s.footerText}>Squash GhostingX · Help Guide</Text>
             <Text style={s.footerSub}>Questions? squash.ghostingx@gmail.com</Text>
           </View>
         </ScrollView>

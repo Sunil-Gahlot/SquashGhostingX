@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Front Court Drills: Master the Short Game — SquashGhostingX</title>
+<title>Front Court Drills: Master the Short Game — Squash GhostingX</title>
 <meta name="description" content="The front court separates players who scramble from players who control. Here's how to own it.">
 <meta name="robots" content="index,follow">
 <link rel="canonical" href="https://squashghostingx.com/blog/front-court-drills">
@@ -31,13 +31,29 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-body);line-he
 a{color:inherit;text-decoration:none}
 img{max-width:100%;display:block}
 
+
 /* NAV */
-nav{position:sticky;top:0;z-index:100;padding:0 1.5rem;height:60px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,4,1,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-.nav-logo{display:flex;align-items:center;gap:.75rem;font-family:var(--font-display);font-size:1.4rem;font-weight:900;color:var(--white)}
-.nav-logo-icon{width:34px;height:34px;background:linear-gradient(135deg,#FF6B35 0%,#c0392b 100%);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:900;color:#fff;font-family:var(--font-display)}
-.nav-logo-ghosting{background:linear-gradient(135deg,#FF6B35 0%,#ff9f6b 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.nav-back{display:flex;align-items:center;gap:.5rem;font-size:.85rem;font-weight:600;color:var(--gray1);transition:color .2s;border:1px solid var(--border);padding:.4rem .9rem;border-radius:8px}
-.nav-back:hover{color:var(--accent);border-color:var(--borderacc)}
+nav{position:sticky;top:0;z-index:100;padding:0 1.5rem;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,4,1,.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-logo{display:flex;align-items:center;gap:.7rem;font-family:var(--font-display);font-size:1.5rem;font-weight:900;color:var(--white);text-decoration:none;letter-spacing:-.02em}
+.nav-logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#FF6B35 0%,#c0392b 100%);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:900;color:#fff;box-shadow:0 0 14px rgba(255,107,53,.4);flex-shrink:0}
+.nav-logo-g{background:linear-gradient(135deg,#FF6B35 0%,#ff9f6b 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-links{display:flex;align-items:center;gap:1.5rem}
+.nav-links a{font-size:.84rem;font-weight:500;color:var(--gray1);transition:color .2s;text-decoration:none;white-space:nowrap}
+.nav-links a:hover{color:var(--white);text-decoration:none}
+.nav-cta{background:var(--accent);color:#fff !important;padding:.42rem 1rem;border-radius:8px;font-weight:700 !important;transition:background .2s !important}
+.nav-cta:hover{background:var(--accent-b) !important;color:#fff !important}
+.burger{display:none;flex-direction:column;gap:5px;width:26px;padding:2px;cursor:pointer;background:none;border:none}
+.burger b{display:block;height:1.5px;background:var(--white);border-radius:2px;transition:all .3s}
+.burger.open b:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.burger.open b:nth-child(2){opacity:0;transform:scaleX(0)}
+.burger.open b:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+#mob-nav{display:none;position:fixed;top:64px;left:0;right:0;background:rgba(8,4,1,.97);backdrop-filter:blur(20px);flex-direction:column;padding:.75rem 1.5rem 1.25rem;z-index:999;border-bottom:1px solid var(--border)}
+#mob-nav.open{display:flex}
+#mob-nav a{font-size:.95rem;font-weight:500;color:var(--gray1);padding:.6rem 0;border-bottom:1px solid var(--border);text-decoration:none;transition:color .2s}
+#mob-nav a:hover{color:var(--white)}
+#mob-nav a:last-child{margin-top:.5rem;background:var(--accent);color:#fff !important;text-align:center;border-radius:8px;padding:.7rem;border-bottom:none;font-weight:700}
+#mob-nav a:last-child:hover{background:var(--accent-b) !important}
+@media(max-width:860px){.nav-links{display:none}.burger{display:flex}}
 
 /* PAGE */
 .page-wrap{max-width:720px;margin:0 auto;padding:3rem 1.5rem 5rem}
@@ -88,12 +104,30 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 1.5
 </head>
 <body>
 <nav>
-  <a href="../../index.html" class="nav-logo">
+  <a href="../../index.html" class="nav-logo" aria-label="Squash GhostingX home">
     <div class="nav-logo-icon">SX</div>
-    <span>Squash</span><span class="nav-logo-ghosting">GhostingX</span>
+    <span>Squash </span><span class="nav-logo-g">GhostingX</span>
   </a>
-  <a href="../../blog/index.html" class="nav-back">← The Squash Lab</a>
+  <div class="nav-links">
+    <a href="../../index.html#feats">Features</a>
+    <a href="../../index.html#founders">Founders</a>
+    <a href="../index.html">Blog</a>
+    <a href="../../guide.html">Guide</a>
+    <a href="../../support.html">Support</a>
+    <a href="../../about.html">About</a>
+    <a href="https://apps.apple.com/app/squashghostingx/id6744036820" class="nav-cta" target="_blank" rel="noopener noreferrer">Download Free</a>
+  </div>
+  <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><b></b><b></b><b></b></button>
 </nav>
+<div id="mob-nav">
+  <a href="../../index.html#feats">Features</a>
+  <a href="../../index.html#founders">Founders</a>
+  <a href="../index.html">Blog</a>
+  <a href="../../guide.html">Guide</a>
+  <a href="../../support.html">Support</a>
+  <a href="../../about.html">About</a>
+  <a href="https://apps.apple.com/app/squashghostingx/id6744036820" target="_blank" rel="noopener noreferrer">Download Free</a>
+</div>
 
 <div class="page-wrap">
   <article>
@@ -112,7 +146,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 1.5
 
       <h4>Specific Drills and Technique</h4>
       <p>The split-step timing is everything in the front court. As you arrive within a racket length of the front corner, you should already be in your lunge. The cross-step with your dominant foot, toes turned out, knee tracking over the toe — the same mechanics that apply elsewhere on court, but executed faster and into a tighter space. Keep your racket up throughout the approach. Most front-court errors are caused by a late backswing, not a poor swing.</p>
-      <p>In SquashGhostingX, front-corner positions appear in both the 6-point and 10-point systems. For focused front-court work, use the session weighting to push front corners to 70–80% of total calls. Run it at Pace 2–3 first, focusing entirely on lunge mechanics and racket preparation. Once the technique is clean, bring the pace up. Sloppy mechanics at speed just ingrain the wrong pattern faster.</p>
+      <p>In Squash GhostingX, front-corner positions appear in both the 6-point and 10-point systems. For focused front-court work, use the session weighting to push front corners to 70–80% of total calls. Run it at Pace 2–3 first, focusing entirely on lunge mechanics and racket preparation. Once the technique is clean, bring the pace up. Sloppy mechanics at speed just ingrain the wrong pattern faster.</p>
 
       <h4>Integrating It Into Training</h4>
       <p>Front-court ghosting works best in short bursts rather than full-length sessions. Three to five minutes of high-concentration front-corner work at the start of a session, before fatigue sets in, produces better technical improvement than grinding through it tired at the end. Once a week, add a longer targeted block — ten minutes heavily weighted to front-corner positions — to build the conditioning alongside the movement quality.</p>
@@ -120,7 +154,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 1.5
     </div>
 
     <div class="art-cta">
-      <h3>Train With SquashGhostingX</h3>
+      <h3>Train With Squash GhostingX</h3>
       <p>Free on iOS and Android. No subscription, no ads, no catch.</p>
       <div style="display:flex;gap:1rem;flex-wrap:wrap">
         <a href="https://apps.apple.com/app/squashghostingx/id6744036820" target="_blank" rel="noopener noreferrer">iOS App Store</a>
@@ -157,13 +191,17 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 1.5
 <footer>
   <div class="footer-links">
     <a href="../../index.html">Home</a>
-    <a href="../../guide.html">App Guide</a>
+    <a href="../../about.html">About</a>
+    <a href="../index.html">Blog</a>
+    <a href="../../guide.html">Guide</a>
     <a href="../../support.html">Support</a>
     <a href="../../privacy.html">Privacy Policy</a>
     <a href="../../terms.html">Terms of Use</a>
-    <a href="../../blog/index.html">Training Blog</a>
   </div>
-  <div class="footer-copy">© 2026 SquashGhostingX · Varish &amp; Darshika Gahlot</div>
+  <div class="footer-copy">© 2026 Squash GhostingX · Varish &amp; Darshika Gahlot</div>
 </footer>
+<script>
+(function(){var b=document.getElementById('burger'),m=document.getElementById('mob-nav');if(!b||!m)return;b.addEventListener('click',function(){var o=m.classList.toggle('open');b.classList.toggle('open',o);b.setAttribute('aria-expanded',o)});m.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){m.classList.remove('open');b.classList.remove('open');b.setAttribute('aria-expanded','false')})})})();
+</script>
 </body>
 </html>

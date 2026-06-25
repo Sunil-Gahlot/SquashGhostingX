@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Privacy Policy — SquashGhostingX</title>
-<meta name="description" content="Privacy Policy for SquashGhostingX. All training data is stored locally on your device. No server. No cloud. No tracking.">
+<title>Privacy Policy — Squash GhostingX</title>
+<meta name="description" content="Privacy Policy for Squash GhostingX. All training data is stored locally on your device. No server. No cloud. No tracking.">
 <meta name="robots" content="index,follow">
 <link rel="canonical" href="https://squashghostingx.com/privacy">
 <meta name="theme-color" content="#FF6B35">
@@ -31,15 +31,29 @@ a{color:var(--accent);text-decoration:none}
 a:hover{text-decoration:underline}
 img{max-width:100%;display:block}
 
+
 /* NAV */
-nav{position:sticky;top:0;left:0;right:0;z-index:100;padding:0 1.5rem;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,4,1,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-.nav-logo{display:flex;align-items:center;gap:.75rem;font-family:var(--font-display);font-size:1.55rem;font-weight:900;letter-spacing:-.025em;text-decoration:none}
-.nav-logo-icon{width:38px;height:38px;background:linear-gradient(135deg,#FF6B35 0%,#c0392b 100%);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:900;color:#fff;font-family:var(--font-display);box-shadow:0 0 18px rgba(255,107,53,.5),0 2px 8px rgba(0,0,0,.4);flex-shrink:0}
-.nav-logo-squash{color:#fff}
-.nav-logo-ghosting{background:linear-gradient(135deg,#FF6B35 0%,#ff9f6b 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.nav-back{font-size:.85rem;font-weight:500;color:var(--gray1);display:flex;align-items:center;gap:.4rem;transition:color .2s}
-.nav-back:hover{color:var(--accent);text-decoration:none}
-.nav-back svg{flex-shrink:0}
+nav{position:sticky;top:0;z-index:100;padding:0 1.5rem;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,4,1,.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-logo{display:flex;align-items:center;gap:.7rem;font-family:var(--font-display);font-size:1.5rem;font-weight:900;color:var(--white);text-decoration:none;letter-spacing:-.02em}
+.nav-logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#FF6B35 0%,#c0392b 100%);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:900;color:#fff;box-shadow:0 0 14px rgba(255,107,53,.4);flex-shrink:0}
+.nav-logo-g{background:linear-gradient(135deg,#FF6B35 0%,#ff9f6b 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-links{display:flex;align-items:center;gap:1.5rem}
+.nav-links a{font-size:.84rem;font-weight:500;color:var(--gray1);transition:color .2s;text-decoration:none;white-space:nowrap}
+.nav-links a:hover{color:var(--white);text-decoration:none}
+.nav-cta{background:var(--accent);color:#fff !important;padding:.42rem 1rem;border-radius:8px;font-weight:700 !important;transition:background .2s !important}
+.nav-cta:hover{background:var(--accent-b) !important;color:#fff !important}
+.burger{display:none;flex-direction:column;gap:5px;width:26px;padding:2px;cursor:pointer;background:none;border:none}
+.burger b{display:block;height:1.5px;background:var(--white);border-radius:2px;transition:all .3s}
+.burger.open b:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.burger.open b:nth-child(2){opacity:0;transform:scaleX(0)}
+.burger.open b:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+#mob-nav{display:none;position:fixed;top:64px;left:0;right:0;background:rgba(8,4,1,.97);backdrop-filter:blur(20px);flex-direction:column;padding:.75rem 1.5rem 1.25rem;z-index:999;border-bottom:1px solid var(--border)}
+#mob-nav.open{display:flex}
+#mob-nav a{font-size:.95rem;font-weight:500;color:var(--gray1);padding:.6rem 0;border-bottom:1px solid var(--border);text-decoration:none;transition:color .2s}
+#mob-nav a:hover{color:var(--white)}
+#mob-nav a:last-child{margin-top:.5rem;background:var(--accent);color:#fff !important;text-align:center;border-radius:8px;padding:.7rem;border-bottom:none;font-weight:700}
+#mob-nav a:last-child:hover{background:var(--accent-b) !important}
+@media(max-width:860px){.nav-links{display:none}.burger{display:flex}}
 
 /* LAYOUT */
 .page-wrap{max-width:760px;margin:0 auto;padding:4rem 1.5rem 6rem}
@@ -92,15 +106,30 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 1.5
 <body>
 
 <nav>
-  <a href="index.html" class="nav-logo" aria-label="SquashGhostingX Home">
+  <a href="index.html" class="nav-logo" aria-label="Squash GhostingX home">
     <div class="nav-logo-icon">SX</div>
-    <span class="nav-logo-squash">Squash</span><span class="nav-logo-ghosting">GhostingX</span>
+    <span>Squash </span><span class="nav-logo-g">GhostingX</span>
   </a>
-  <a href="index.html" class="nav-back">
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    Back to home
-  </a>
+  <div class="nav-links">
+    <a href="index.html#feats">Features</a>
+    <a href="index.html#founders">Founders</a>
+    <a href="blog/index.html">Blog</a>
+    <a href="guide.html">Guide</a>
+    <a href="support.html">Support</a>
+    <a href="about.html">About</a>
+    <a href="https://apps.apple.com/app/squashghostingx/id6744036820" class="nav-cta" target="_blank" rel="noopener noreferrer">Download Free</a>
+  </div>
+  <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><b></b><b></b><b></b></button>
 </nav>
+<div id="mob-nav">
+  <a href="index.html#feats">Features</a>
+  <a href="index.html#founders">Founders</a>
+  <a href="blog/index.html">Blog</a>
+  <a href="guide.html">Guide</a>
+  <a href="support.html">Support</a>
+  <a href="about.html">About</a>
+  <a href="https://apps.apple.com/app/squashghostingx/id6744036820" target="_blank" rel="noopener noreferrer">Download Free</a>
+</div>
 
 <div class="page-wrap">
 
@@ -116,14 +145,14 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 1.5
   <div class="pp-banner">
     <div class="pp-banner-icon">🔒</div>
     <div class="pp-banner-text">
-      <strong>Short version:</strong> SquashGhostingX stores all your data — sessions, progress, credentials, and settings — <strong>exclusively on your device</strong>. Nothing is sent to any server, cloud, or third party. Ever.
+      <strong>Short version:</strong> Squash GhostingX stores all your data — sessions, progress, credentials, and settings — <strong>exclusively on your device</strong>. Nothing is sent to any server, cloud, or third party. Ever.
     </div>
   </div>
 
   <!-- WHO WE ARE -->
   <div class="pp-section">
     <h2>Who We Are</h2>
-    <p>SquashGhostingX ("the app", "we", "us", "our") is a squash ghosting training application developed by Varish Gahlot and Darshika Gahlot ("Developers").</p>
+    <p>Squash GhostingX ("the app", "we", "us", "our") is a squash ghosting training application developed by Varish Gahlot and Darshika Gahlot ("Developers").</p>
     <p>Contact: <a href="mailto:squash.ghostingx@gmail.com">squash.ghostingx@gmail.com</a><br>
     Website: <a href="https://squashghostingx.com">https://squashghostingx.com</a></p>
   </div>
@@ -207,7 +236,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 1.5
   <!-- CHILDREN'S PRIVACY -->
   <div class="pp-section">
     <h2>Children's Privacy</h2>
-    <p>SquashGhostingX is not directed at children under the age of 13. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe your child has provided data through the app, please contact us at <a href="mailto:squash.ghostingx@gmail.com">squash.ghostingx@gmail.com</a> and we will assist you.</p>
+    <p>Squash GhostingX is not directed at children under the age of 13. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe your child has provided data through the app, please contact us at <a href="mailto:squash.ghostingx@gmail.com">squash.ghostingx@gmail.com</a> and we will assist you.</p>
   </div>
 
   <div class="pp-divider"></div>
@@ -247,7 +276,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 1.5
     <h2>Contact Us</h2>
     <p>For any questions about this Privacy Policy, please contact:</p>
     <div class="pp-contact">
-      <div class="pp-contact-name">SquashGhostingX Team</div>
+      <div class="pp-contact-name">Squash GhostingX Team</div>
       <div class="pp-contact-row">
         <span>✉️</span>
         <a href="mailto:squash.ghostingx@gmail.com">squash.ghostingx@gmail.com</a>
@@ -262,16 +291,20 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 1.5
 </div>
 
 <footer>
-  <div class="footer-copy">© 2026 SquashGhostingX · All rights reserved</div>
-  <div class="footer-links-row">
+  <div class="footer-copy">© 2026 Squash GhostingX · All rights reserved</div>
+    <div class="footer-links-row">
     <a href="index.html">Home</a>
-    <a href="guide.html">App Guide</a>
-    <a href="blog/index.html">Training Blog</a>
+    <a href="about.html">About</a>
+    <a href="blog/index.html">Blog</a>
+    <a href="guide.html">Guide</a>
     <a href="support.html">Support</a>
-    <a href="privacy.html">Privacy Policy</a>
+    <a href="privacy.html" style="color:var(--accent)">Privacy Policy</a>
     <a href="terms.html">Terms of Use</a>
   </div>
 </footer>
 
+<script>
+(function(){var b=document.getElementById('burger'),m=document.getElementById('mob-nav');if(!b||!m)return;b.addEventListener('click',function(){var o=m.classList.toggle('open');b.classList.toggle('open',o);b.setAttribute('aria-expanded',o)});m.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){m.classList.remove('open');b.classList.remove('open');b.setAttribute('aria-expanded','false')})})})();
+</script>
 </body>
 </html>

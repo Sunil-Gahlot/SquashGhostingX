@@ -20,7 +20,7 @@ const SECTIONS = [
   },
   {
     title: '1. Acceptance of Terms',
-    body: `By downloading, installing, or using SquashGhostingX ("the App"), you agree to be legally bound by these Terms and Conditions ("Terms"). If you do not agree, you must not use the App.\n\nThese Terms constitute a legally binding agreement between you and the developer of SquashGhostingX. Use of the App confirms your full and unconditional acceptance of every provision below.`,
+    body: `By downloading, installing, or using Squash GhostingX ("the App"), you agree to be legally bound by these Terms and Conditions ("Terms"). If you do not agree, you must not use the App.\n\nThese Terms constitute a legally binding agreement between you and the developer of Squash GhostingX. Use of the App confirms your full and unconditional acceptance of every provision below.`,
   },
   {
     title: '2. Assumption of Risk — Physical Injury',
@@ -52,7 +52,7 @@ const SECTIONS = [
   },
   {
     title: '9. Privacy & Data',
-    body: `SquashGhostingX stores all data — including your profile, session history, and settings — locally on your device only. No personal data is collected, transmitted, or shared with any third party. The App does not require an internet connection to function.\n\nIf you create an account, credentials are stored securely on-device using your device's native secure storage. The developer has no access to your account or personal data.`,
+    body: `Squash GhostingX stores all data — including your profile, session history, and settings — locally on your device only. No personal data is collected, transmitted, or shared with any third party. The App does not require an internet connection to function.\n\nIf you create an account, credentials are stored securely on-device using your device's native secure storage. The developer has no access to your account or personal data.`,
   },
   {
     title: '10. Intellectual Property',
@@ -118,7 +118,7 @@ export default function TermsConsentModal({ viewOnly, onClose }: { viewOnly?: bo
         <View style={s.header}>
           <View style={s.logoRow}>
             <Ionicons name="shield-checkmark" size={24} color={Colors.brand} />
-            <Text style={s.appName}>SquashGhostingX</Text>
+            <Text style={s.appName}>Squash GhostingX</Text>
           </View>
           <Text style={s.title}>Terms & Conditions</Text>
           <Text style={s.subtitle}>Please read and accept before continuing</Text>
@@ -188,7 +188,7 @@ export default function TermsConsentModal({ viewOnly, onClose }: { viewOnly?: bo
                 </Text>
               </TouchableOpacity>
               <Text style={s.declineNote}>
-                You must accept these Terms to use SquashGhostingX. If you do not agree, please uninstall the App.
+                You must accept these Terms to use Squash GhostingX. If you do not agree, please uninstall the App.
               </Text>
             </>
           )}

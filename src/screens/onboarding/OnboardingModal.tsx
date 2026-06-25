@@ -73,7 +73,7 @@ function Step1({
 }) {
   return (
     <View style={stepStyles.container}>
-      <Text style={stepStyles.title}>Welcome to SquashGhostingX</Text>
+      <Text style={stepStyles.title}>Welcome to Squash GhostingX</Text>
       <Text style={stepStyles.tagline}>
         {'Train '}
         <Text style={stepStyles.taglineGreen}>Smart.</Text>
