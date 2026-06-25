@@ -310,6 +310,7 @@ export default function OnboardingModal() {
 
   function handleGender(v: string) {
     setGender(v);
+    setVoice(v as VoiceGender);
   }
 
   function handleNext() {

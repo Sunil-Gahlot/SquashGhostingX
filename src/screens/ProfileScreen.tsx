@@ -321,7 +321,14 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
                   { label: 'Female', value: 'female' },
                 ]}
                 selected={profile.gender ?? 'male'}
-                onSelect={(v) => setProfile({ gender: v })}
+                onSelect={(v) => {
+                  const voiceGender = v as VoiceGender;
+                  setProfile({ gender: v, voiceGender });
+                  if (!settings.voiceEnabled) return;
+                  Audio.initAudioSession().then(() => {
+                    Audio.speakText('Front Left. Recover to T.', settings.speechRate, profile.language, voiceGender);
+                  });
+                }}
                 size="sm"
               />
             </View>
