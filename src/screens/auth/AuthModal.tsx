@@ -71,11 +71,13 @@ const SLIDES = [
 const AUTH_CREDENTIALS_KEY = 'sgx-user-credentials';
 
 type StoredCreds =
+  | { version: 3; email: string; passwordHash: string; salt: string }
   | { version: 2; email: string; passwordHash: string }
   | { email: string; password: string };
 
-async function hashPassword(pw: string): Promise<string> {
-  return Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, pw);
+// salt defaults to '' for v2 legacy hash verification (SHA256('' + password) = original hash)
+async function hashPassword(pw: string, salt = ''): Promise<string> {
+  return Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, salt + pw);
 }
 
 // ─── Welcome page ─────────────────────────────────────────────────────────────
@@ -583,28 +585,42 @@ function AuthPage({
         // BUG-004: allow a different email to register — overwrite the stored credentials
         // so a second user (family member, new owner) can use the device.
         // The previous account data remains in the local DB but the new credentials take over.
-        const passwordHash = await hashPassword(password);
+        const salt = Crypto.randomUUID();
+        const passwordHash = await hashPassword(password, salt);
         await SecureStore.setItemAsync(
           AUTH_CREDENTIALS_KEY,
-          JSON.stringify({ email: trimmedEmail, passwordHash, version: 2 })
+          JSON.stringify({ email: trimmedEmail, passwordHash, salt, version: 3 })
         );
         await SecureStore.deleteItemAsync(AUTH_ATTEMPTS_KEY).catch(() => {});
         onComplete(trimmedEmail);
       } else {
         let passwordMatch = false;
         if (creds && creds.email === trimmedEmail) {
-          if ('version' in creds && creds.version === 2) {
-            // New format: compare hashes
+          if ('version' in creds && creds.version === 3) {
+            // Current format: salted hash
+            const inputHash = await hashPassword(password, creds.salt);
+            passwordMatch = inputHash === creds.passwordHash;
+          } else if ('version' in creds && creds.version === 2) {
+            // v2 unsalted hash — verify, then upgrade to v3 with a new salt
             const inputHash = await hashPassword(password);
             passwordMatch = inputHash === creds.passwordHash;
-          } else if ('password' in creds) {
-            // Legacy plain-text format: direct compare, then upgrade on success
-            if (creds.password === password) {
-              passwordMatch = true;
-              const passwordHash = await hashPassword(password);
+            if (passwordMatch) {
+              const salt = Crypto.randomUUID();
+              const passwordHash = await hashPassword(password, salt);
               await SecureStore.setItemAsync(
                 AUTH_CREDENTIALS_KEY,
-                JSON.stringify({ email: trimmedEmail, passwordHash, version: 2 })
+                JSON.stringify({ email: trimmedEmail, passwordHash, salt, version: 3 })
+              ).catch(() => {});
+            }
+          } else if ('password' in creds) {
+            // Legacy plain-text format: direct compare, then upgrade to v3
+            if (creds.password === password) {
+              passwordMatch = true;
+              const salt = Crypto.randomUUID();
+              const passwordHash = await hashPassword(password, salt);
+              await SecureStore.setItemAsync(
+                AUTH_CREDENTIALS_KEY,
+                JSON.stringify({ email: trimmedEmail, passwordHash, salt, version: 3 })
               ).catch(() => {});
             }
           }

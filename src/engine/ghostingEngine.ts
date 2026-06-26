@@ -330,15 +330,11 @@ function buildPool(config: SessionConfig): Position[] {
   if (pool.length < 2) {
     const zoneWithT = base.filter((p) => filter.includes(p));
     if (zoneWithT.length >= 2) return zoneWithT;
-    return base.filter((p) => p !== 'T').slice(0, 2);
+    // Last resort: return the 2 most front-biased positions from the zone filter,
+    // falling back to the full base only when the zone yields nothing at all.
+    const zoneAny = filter.length >= 2 ? filter.slice(0, 2) as Position[] : base.filter((p) => p !== 'T').slice(0, 2);
+    return zoneAny;
   }
-
-  // ── DIAGNOSTIC LOG — remove once pool bugs are resolved ──────────────────
-  console.log(
-    `\n[GhostEngine] coverage=${config.coverage}  drill=${config.drillType}  hand=${config.dominantHand}\n` +
-    `  pool (${pool.length}): [${pool.join(', ')}]\n`
-  );
-  // ─────────────────────────────────────────────────────────────────────────
 
   return pool;
 }

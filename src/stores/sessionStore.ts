@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import * as Crypto from 'expo-crypto';
 import { ActiveSession, SessionConfig, SessionState, Position, SessionCheckpoint } from '../types';
+import { PACE_STEPS_MS } from '../constants/timing';
 
 function generateId(): string {
   return Crypto.randomUUID();
@@ -116,7 +117,7 @@ export const useSessionStore = create<SessionStore>((set) => ({
       s.session ? { session: { ...s.session, setIndex: s.session.setIndex + 1, moveIndex: 0 } } : s),
 
   setPaceStep: (step) =>
-    set((s) => s.session ? { session: { ...s.session, livePaceStep: Math.min(6, Math.max(0, step)) } } : s),
+    set((s) => s.session ? { session: { ...s.session, livePaceStep: Math.min(PACE_STEPS_MS.length - 1, Math.max(0, step)) } } : s),
 
   setWorkSecsRemaining: (secs) =>
     set((s) => s.session ? { session: { ...s.session, workSecsRemaining: secs } } : s),

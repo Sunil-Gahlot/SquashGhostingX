@@ -90,7 +90,7 @@ export const useProgressStore = create<ProgressStore>()(
       setNewPBFlag:         (sessionId) => set({ newPBSessionId: sessionId }),
       setLastSessionConfig: (config)    => set({ lastSessionConfig: config }),
 
-      clearCache: () => set({ recentSessions: [], stats: EMPTY_STATS, newPBSessionId: null, lastSessionConfig: null }),
+      clearCache: () => set({ recentSessions: [], stats: EMPTY_STATS, newPBSessionId: null, lastSessionConfig: null, lastSessionCompletedAt: 0 }),
     }),
     {
       name: 'progress-storage',

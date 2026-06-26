@@ -16,18 +16,19 @@ import { getSuggestedDrill } from '../data/builtinPrograms';
 import { SessionConfig } from '../types';
 import ProfileScreen from './ProfileScreen';
 import HelpModal from './HelpModal';
+import { ARTICLE_ID_FOOTWORK, ARTICLE_ID_HABIT } from './LibraryScreen';
 
 type PopularBase = Omit<SessionConfig, 'dominantHand' | 'voiceGender' | 'language'>;
 
 const ARTICLE_PREVIEWS = [
   {
-    id: '1', icon: 'body-outline' as const, tag: 'TECHNIQUE', tagColor: '#0A84FF',
+    id: ARTICLE_ID_FOOTWORK, icon: 'body-outline' as const, tag: 'TECHNIQUE', tagColor: '#0A84FF',
     title: 'The Science of Squash Footwork',
     summary: 'How biomechanics research is reshaping elite court coverage.',
     readTime: '6 min',
   },
   {
-    id: '2', icon: 'timer-outline' as const, tag: 'TRAINING', tagColor: '#FF6B35',
+    id: ARTICLE_ID_HABIT, icon: 'timer-outline' as const, tag: 'TRAINING', tagColor: '#FF6B35',
     title: 'Building a 30-Day Ghosting Habit',
     summary: 'A structured progressive plan for sustainable daily practice.',
     readTime: '5 min',

@@ -45,6 +45,10 @@ const VIDEOS: VideoItem[] = [
   { id: '4', youtubeId: 'U52zeGOXJvw', title: '6 Point Ghosting Drill',  subtitle: 'Visual Guide', duration: '0:24', category: '6pt'  },
 ];
 
+// Exported so HomeScreen can deep-link to a specific article without magic-string IDs.
+export const ARTICLE_ID_FOOTWORK = '1';
+export const ARTICLE_ID_HABIT    = '2';
+
 const CAT_COLOR: Record<string, string> = {
   '10pt': Colors.accentProgress,
   '6pt':  Colors.accentRoutines,

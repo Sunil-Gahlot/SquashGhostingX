@@ -241,6 +241,13 @@ export function useSessionEngine(db: SQLiteDatabase) {
       await deleteCheckpoint(db as any);
     } catch (e) {
       console.warn('[Session] SQLite save failed:', e);
+      if (!abandoned) {
+        Alert.alert(
+          'Session not saved',
+          'Your session completed but could not be saved due to a storage error. Your progress for this session will not appear in your history.',
+          [{ text: 'OK' }],
+        );
+      }
     }
 
     // ── Upsert personal bests (completed sessions only) ────────────────────
@@ -693,7 +700,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
     const s = getSettings();
     if (s.voiceEnabled) speak('Go!');
     if (s.hapticsEnabled) Haptics.onRestEnd();
-    setTimeout(fireMoveLoop, 300);
+    addTimer(setTimeout(fireMoveLoop, 300));
   }, [fireMoveLoop]);
 
   const endSession = useCallback(() => {
