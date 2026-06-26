@@ -96,7 +96,6 @@ const COACHING_INTERVAL_SECS = 90;
 
 export function useSessionEngine(db: SQLiteDatabase) {
   const store      = useSessionStore;        // static ref — access inside timeouts
-  const settings = useSettingsStore((s) => s.settings);
   const getSettings = () => useSettingsStore.getState().settings ?? DEFAULT_SETTINGS;
   const { profile }   = useProfileStore();
   const progressStore = useProgressStore();
@@ -282,7 +281,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
     }
 
     isCompletingRef.current = false;
-  }, [db, settings]);
+  }, [db]);
 
   // ── Rest period ────────────────────────────────────────────────────────────
 
@@ -331,7 +330,8 @@ export function useSessionEngine(db: SQLiteDatabase) {
       restTimer.current = setTimeout(() => tick(remaining - 1), 1000);
     }
     tick(restSecs);
-  }, [settings]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── Core move loop ─────────────────────────────────────────────────────────
 
@@ -463,7 +463,8 @@ export function useSessionEngine(db: SQLiteDatabase) {
       fireMoveLoop();
     }, effectiveIntervalMs);
 
-  }, [settings, completeSession, startRest]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [completeSession, startRest]);
 
   // Keep ref current so the pace subscription below can always call the latest fireMoveLoop
   fireMoveLoopRef.current = fireMoveLoop;

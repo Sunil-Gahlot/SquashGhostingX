@@ -800,6 +800,7 @@ export default function SessionModal() {
       animationType="slide"
       presentationStyle="fullScreen"
       statusBarTranslucent
+      onRequestClose={() => {}}
     >
       <SafeAreaProvider>
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>

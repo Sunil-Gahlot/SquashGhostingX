@@ -158,7 +158,7 @@ export const POSITION_SHOT_MATRIX: Record<Position, ShotEntry[]> = {
   FMCR: [
     { name: 'Volley Drive',     voiceText: 'volley drive',        weight: 'primary',   groups: ['volleys',   'drives', 'mixed'] },
     { name: 'Volley Drop',      voiceText: 'volley drop',         weight: 'primary',   groups: ['volleys',   'drops', 'mixed'] },
-    { name: 'Volley Crosscourt',voiceText: 'volley crosscourt',   weight: 'secondary', groups: ['volleys',   'mixed'] },
+    { name: 'Volley Crosscourt',voiceText: 'volley crosscourt',   weight: 'secondary', groups: ['volleys',   'drives', 'mixed'] },
     { name: 'Volley Kill',      voiceText: 'volley kill',         weight: 'secondary', groups: ['volleys',   'kills', 'mixed'] },
     { name: 'Volley Lob',       voiceText: 'volley lob',          weight: 'secondary', groups: ['volleys',   'lobs', 'mixed'] },
     { name: 'Hold & Flick',     voiceText: 'hold and flick',      weight: 'advanced',  groups: ['deception', 'mixed'] },
@@ -168,7 +168,7 @@ export const POSITION_SHOT_MATRIX: Record<Position, ShotEntry[]> = {
   FMCL: [
     { name: 'Volley Drive',     voiceText: 'volley drive',        weight: 'primary',   groups: ['volleys',   'drives', 'mixed'] },
     { name: 'Volley Drop',      voiceText: 'volley drop',         weight: 'primary',   groups: ['volleys',   'drops', 'mixed'] },
-    { name: 'Volley Crosscourt',voiceText: 'volley crosscourt',   weight: 'secondary', groups: ['volleys',   'mixed'] },
+    { name: 'Volley Crosscourt',voiceText: 'volley crosscourt',   weight: 'secondary', groups: ['volleys',   'drives', 'mixed'] },
     { name: 'Volley Kill',      voiceText: 'volley kill',         weight: 'secondary', groups: ['volleys',   'kills', 'mixed'] },
     { name: 'Volley Lob',       voiceText: 'volley lob',          weight: 'secondary', groups: ['volleys',   'lobs', 'mixed'] },
     { name: 'Hold & Flick',     voiceText: 'hold and flick',      weight: 'advanced',  groups: ['deception', 'mixed'] },
@@ -189,6 +189,7 @@ export const POSITION_SHOT_MATRIX: Record<Position, ShotEntry[]> = {
     { name: 'Attacking Boast',  voiceText: 'attacking boast',     weight: 'secondary', groups: ['boasts',    'mixed'] },
     { name: 'Defensive Boast',  voiceText: 'defensive boast',     weight: 'secondary', groups: ['boasts',    'mixed'] },
     { name: 'Hold & Drive',     voiceText: 'hold and drive',      weight: 'advanced',  groups: ['deception', 'drives', 'mixed'] },
+    { name: 'Dying Length',     voiceText: 'dying length',        weight: 'advanced',  groups: ['lengths',   'drops', 'mixed'] },
   ],
 
   BMCL: [
@@ -201,6 +202,7 @@ export const POSITION_SHOT_MATRIX: Record<Position, ShotEntry[]> = {
     { name: 'Attacking Boast',  voiceText: 'attacking boast',     weight: 'secondary', groups: ['boasts',    'mixed'] },
     { name: 'Defensive Boast',  voiceText: 'defensive boast',     weight: 'secondary', groups: ['boasts',    'mixed'] },
     { name: 'Hold & Drive',     voiceText: 'hold and drive',      weight: 'advanced',  groups: ['deception', 'drives', 'mixed'] },
+    { name: 'Dying Length',     voiceText: 'dying length',        weight: 'advanced',  groups: ['lengths',   'drops', 'mixed'] },
   ],
 
   // ── T Position (center recovery hub + volley intercept) ──────────────────
@@ -209,7 +211,7 @@ export const POSITION_SHOT_MATRIX: Record<Position, ShotEntry[]> = {
 
   T: [
     { name: 'Volley Drive',     voiceText: 'volley drive',        weight: 'primary',   groups: ['volleys',   'drives', 'mixed'] },
-    { name: 'Volley Crosscourt',voiceText: 'volley crosscourt',   weight: 'primary',   groups: ['volleys',   'mixed'] },
+    { name: 'Volley Crosscourt',voiceText: 'volley crosscourt',   weight: 'primary',   groups: ['volleys',   'drives', 'mixed'] },
     { name: 'Volley Drop',      voiceText: 'volley drop',         weight: 'secondary', groups: ['volleys',   'drops', 'mixed'] },
     { name: 'Volley Kill',      voiceText: 'volley kill',         weight: 'secondary', groups: ['volleys',   'kills', 'mixed'] },
     { name: 'Hold & Drive',     voiceText: 'hold and drive',      weight: 'advanced',  groups: ['deception', 'drives', 'mixed'] },

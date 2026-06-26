@@ -75,16 +75,22 @@ export const useProfileStore = create<ProfileStore>()(
         })),
 
       signOut: () =>
-        set((s) => ({
-          hasCompletedAuth: false,
-          profile: { ...s.profile, isGuest: true },
-        })),
+        set({
+          profile:               DEFAULT_PROFILE,
+          isOnboardingComplete:  false,
+          hasCompletedAuth:      false,
+          hasSeenCourtTutorial:  false,
+          hasSeenPaceTutorial:   false,
+          hasStartedAnySession:  false,
+          hasShownAndroidVolumeHint: false,
+          // hasAcceptedTerms kept: device-level acceptance survives sign-out
+        }),
 
       resetProfile: () =>
         set({ profile: DEFAULT_PROFILE, isOnboardingComplete: false, hasCompletedAuth: false, hasSeenCourtTutorial: false, hasSeenPaceTutorial: false, hasStartedAnySession: false, hasAcceptedTerms: false, hasShownAndroidVolumeHint: false }),
 
       deleteAccount: () =>
-        set({ profile: DEFAULT_PROFILE, hasCompletedAuth: false, hasAcceptedTerms: false, hasSeenCourtTutorial: false, hasSeenPaceTutorial: false, hasStartedAnySession: false, hasShownAndroidVolumeHint: false }),
+        set({ profile: DEFAULT_PROFILE, isOnboardingComplete: false, hasCompletedAuth: false, hasAcceptedTerms: false, hasSeenCourtTutorial: false, hasSeenPaceTutorial: false, hasStartedAnySession: false, hasShownAndroidVolumeHint: false }),
 
       markCourtTutorialSeen: () => set({ hasSeenCourtTutorial: true }),
       markPaceTutorialSeen: () => set({ hasSeenPaceTutorial: true }),

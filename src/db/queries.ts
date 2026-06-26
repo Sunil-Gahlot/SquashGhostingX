@@ -7,15 +7,16 @@ type DB = SQLiteDatabase;
 
 export async function saveSession(
   db: DB,
-  session: SessionRecord
+  session: SessionRecord,
+  userId = 'local'
 ): Promise<void> {
   await db.runAsync(
     `INSERT INTO sessions
-     (id, drill_type, court_system, tempo, difficulty, duration_s,
+     (id, user_id, drill_type, court_system, tempo, difficulty, duration_s,
       movements_total, movements_planned, completion_pct, intensity_score,
       zone_front_pct, zone_mid_pct, zone_back_pct, started_at, ended_at, synced)
-     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-    session.id, session.drillType, session.courtSystem, session.tempo,
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+    session.id, userId, session.drillType, session.courtSystem, session.tempo,
     session.difficulty, session.durationSeconds, session.movementsTotal,
     session.movementsPlanned, session.completionPct, session.intensityScore,
     session.zoneFrontPct, session.zoneMidPct, session.zoneBackPct,
@@ -25,7 +26,8 @@ export async function saveSession(
 
 export async function getRecentSessions(
   db: DB,
-  limit = 30
+  limit = 30,
+  userId = 'local'
 ): Promise<SessionRecord[]> {
   const rows = await db.getAllAsync<{
     id: string; drill_type: string; court_system: string; tempo: string;
@@ -33,7 +35,10 @@ export async function getRecentSessions(
     movements_planned: number; completion_pct: number; intensity_score: number;
     zone_front_pct: number; zone_mid_pct: number; zone_back_pct: number;
     started_at: string; ended_at: string; synced: number;
-  }>('SELECT * FROM sessions ORDER BY started_at DESC LIMIT ?', limit);
+  }>(
+    'SELECT * FROM sessions WHERE user_id = ? OR user_id IS NULL ORDER BY started_at DESC LIMIT ?',
+    userId, limit
+  );
 
   return rows.map((r) => ({
     id: r.id,
@@ -156,8 +161,8 @@ export async function getProgressStats(db: DB, userId = 'local'): Promise<Progre
            SUM(movements_total) as total_movements,
            SUM(CAST(duration_s AS REAL) / 60.0) as total_minutes,
            MAX(started_at) as last_at
-    FROM sessions WHERE ended_at IS NOT NULL
-  `);
+    FROM sessions WHERE ended_at IS NOT NULL AND (user_id = ? OR user_id IS NULL)
+  `, userId);
 
   // Weekly activity (last 7 days)
   const weekRows = await db.getAllAsync<{ day: string; movements: number; intensity: number }>(`
@@ -165,9 +170,11 @@ export async function getProgressStats(db: DB, userId = 'local'): Promise<Progre
            SUM(movements_total) as movements,
            AVG(intensity_score) as intensity
     FROM sessions
-    WHERE date(started_at, 'localtime') >= date('now', 'localtime', '-6 days') AND ended_at IS NOT NULL
+    WHERE date(started_at, 'localtime') >= date('now', 'localtime', '-6 days')
+      AND ended_at IS NOT NULL
+      AND (user_id = ? OR user_id IS NULL)
     GROUP BY day ORDER BY day ASC
-  `);
+  `, userId);
 
   const weeklyActivity: WeeklyActivity[] = weekRows.map((r) => ({
     date: r.day, movements: r.movements, intensity: r.intensity,
@@ -176,8 +183,8 @@ export async function getProgressStats(db: DB, userId = 'local'): Promise<Progre
   // Zone distribution (all time)
   const zoneRow = await db.getFirstAsync<{ f: number; m: number; b: number }>(`
     SELECT AVG(zone_front_pct) as f, AVG(zone_mid_pct) as m, AVG(zone_back_pct) as b
-    FROM sessions WHERE ended_at IS NOT NULL
-  `);
+    FROM sessions WHERE ended_at IS NOT NULL AND (user_id = ? OR user_id IS NULL)
+  `, userId);
 
   const zoneDistribution: ZoneDistribution = {
     front: zoneRow?.f ?? 0,
@@ -189,8 +196,8 @@ export async function getProgressStats(db: DB, userId = 'local'): Promise<Progre
   // so gaps are detected correctly regardless of whether the user trained today.
   const dayRows = await db.getAllAsync<{ day: string }>(`
     SELECT DISTINCT date(started_at, 'localtime') as day FROM sessions
-    WHERE ended_at IS NOT NULL ORDER BY day DESC
-  `);
+    WHERE ended_at IS NOT NULL AND (user_id = ? OR user_id IS NULL) ORDER BY day DESC
+  `, userId);
 
   let currentStreak = 0;
   let longestStreak = 0;

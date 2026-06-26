@@ -1099,6 +1099,7 @@ export default function AuthModal() {
       visible={!hasCompletedAuth}
       animationType="fade"
       presentationStyle="fullScreen"
+      onRequestClose={() => {}}
     >
       <SafeAreaProvider>
       <SafeAreaView style={modalStyles.safe} edges={['top', 'bottom']}>

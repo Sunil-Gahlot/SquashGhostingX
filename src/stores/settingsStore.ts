@@ -28,7 +28,7 @@ export interface AppSettings {
 export const DEFAULT_SETTINGS: AppSettings = {
   voiceEnabled: true,
   hapticsEnabled: true,
-  speechRate: 0.95,
+  speechRate: 0.85,
   coachingCues: true,
   defaultDrillType: 'movement',
   defaultCourtSystem: '6pt',
@@ -60,7 +60,7 @@ export const useSettingsStore = create<SettingsStore>()(
     {
       name: 'settings-storage',
       storage: createJSONStorage(() => AsyncStorage),
-      version: 4,
+      version: 5,
       migrate: (persisted: any, version: number) => {
         if (version < 1) {
           const cm = persisted?.state?.settings?.courtMode;
@@ -87,6 +87,10 @@ export const useSettingsStore = create<SettingsStore>()(
             s.defaultPaceStep = idx >= 0 ? idx : 3;
             delete s.movementPaceExtraMs;
           }
+        }
+        if (version < 5) {
+          const s = persisted?.state?.settings;
+          if (s && s.speechRate === 0.95) s.speechRate = 0.85;
         }
         return persisted;
       },

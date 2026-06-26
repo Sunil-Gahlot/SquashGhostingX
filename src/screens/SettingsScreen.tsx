@@ -22,6 +22,7 @@ import * as Audio from '../engine/audioEngine';
 import ProfileScreen from './ProfileScreen';
 import HelpModal from './HelpModal';
 import TermsConsentModal from './TermsConsentModal';
+import { useSignOut } from '../hooks/useSignOut';
 
 // ─── Row components ───────────────────────────────────────────────────────────
 
@@ -157,11 +158,12 @@ const TEST_PHRASES: Partial<Record<Language, string>> = {
 
 export default function SettingsScreen() {
   const db = useSQLiteContext() as any;
-  const { profile, resetProfile, signOut, deleteAccount } = useProfileStore();
+  const { profile, resetProfile, deleteAccount } = useProfileStore();
   const settings       = useSettingsStore((s) => s.settings);
   const updateSettings = useSettingsStore((s) => s.updateSettings);
   const resetSettings  = useSettingsStore((s) => s.resetSettings);
   const { clearCache } = useProgressStore();
+  const performSignOut = useSignOut();
 
   const [profileVisible, setProfileVisible] = useState(false);
   const [helpVisible, setHelpVisible]       = useState(false);
@@ -212,7 +214,7 @@ export default function SettingsScreen() {
       'Are you sure you want to sign out?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Sign Out', style: 'destructive', onPress: () => signOut() },
+        { text: 'Sign Out', style: 'destructive', onPress: () => performSignOut() },
       ],
     );
   }

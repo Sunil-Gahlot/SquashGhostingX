@@ -13,6 +13,7 @@ import { FontSize, FontWeight, Spacing, BorderRadius } from '../constants/layout
 import { LANGUAGE_OPTIONS, getLanguageLabel } from '../constants/languages';
 import PillSelector from '../components/ui/PillSelector';
 import { useProfileStore } from '../stores/profileStore';
+import { useSignOut } from '../hooks/useSignOut';
 import { useSettingsStore } from '../stores/settingsStore';
 import { SkillLevel, TrainingGoal, DominantHand, VoiceGender } from '../types';
 import * as Audio from '../engine/audioEngine';
@@ -76,7 +77,8 @@ function Div() {
 // ─── Main screen ──────────────────────────────────────────────────────────────
 
 export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}) {
-  const { profile, setProfile, signOut } = useProfileStore();
+  const { profile, setProfile } = useProfileStore();
+  const performSignOut = useSignOut();
   const settings = useSettingsStore((s) => s.settings);
 
   const [langVisible, setLangVisible] = useState(false);
@@ -122,7 +124,7 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
           style: 'destructive',
           onPress: () => {
             onClose?.();  // close the modal before signing out so AuthModal can show
-            signOut();
+            performSignOut();
           },
         },
       ],

@@ -11,6 +11,7 @@ import { useProgressStore } from '../stores/progressStore';
 import { useSessionStore } from '../stores/sessionStore';
 import { useSettingsStore } from '../stores/settingsStore';
 import { useProgressLoader } from '../hooks/useProgressLoader';
+import { useSignOut } from '../hooks/useSignOut';
 import { getSuggestedDrill } from '../data/builtinPrograms';
 import { SessionConfig } from '../types';
 import ProfileScreen from './ProfileScreen';
@@ -115,11 +116,12 @@ function greeting(): string {
 }
 
 export default function HomeScreen({ navigation }: any) {
-  const { profile, signOut, hasCompletedAuth, hasStartedAnySession } = useProfileStore();
+  const { profile, hasCompletedAuth, hasStartedAnySession } = useProfileStore();
   const { stats, lastSessionCompletedAt, recentSessions, lastSessionConfig } = useProgressStore();
   const settings = useSettingsStore((s) => s.settings);
   const { setPendingConfig, openDrillConfig } = useSessionStore();
   const { loadData } = useProgressLoader();
+  const performSignOut = useSignOut();
   const scrollRef      = useRef<ScrollView>(null);
   const prevAuthRef    = useRef(hasCompletedAuth);
   const glowAnim       = useRef(new Animated.Value(0.5)).current;
@@ -276,7 +278,7 @@ export default function HomeScreen({ navigation }: any) {
       'Are you sure you want to sign out?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Sign Out', style: 'destructive', onPress: () => signOut() },
+        { text: 'Sign Out', style: 'destructive', onPress: () => performSignOut() },
       ],
     );
   }

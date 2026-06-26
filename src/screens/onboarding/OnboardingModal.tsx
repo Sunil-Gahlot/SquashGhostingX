@@ -336,6 +336,7 @@ export default function OnboardingModal() {
       visible={hasCompletedAuth && !isOnboardingComplete}
       animationType="fade"
       presentationStyle="fullScreen"
+      onRequestClose={() => {}}
     >
       <SafeAreaProvider>
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
