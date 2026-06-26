@@ -107,7 +107,7 @@ a,button{-webkit-tap-highlight-color:transparent}
 .nav-links{display:flex;align-items:center;gap:1.75rem}
 .nav-links a{font-size:.84rem;font-weight:500;color:var(--muted);transition:color .2s;letter-spacing:.01em}
 .nav-links a:hover{color:var(--white)}
-.nav-links a[aria-current="page"]{color:var(--orange);font-weight:600}
+.nav-links a[aria-current="page"]{color:var(--orange)}
 .nav-cta{background:var(--orange);color:#fff !important;padding:.42rem 1.1rem;border-radius:8px;font-size:.84rem;font-weight:600 !important;transition:background .2s,transform .15s,box-shadow .2s}
 .nav-cta:hover{background:var(--orange-b) !important;transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,107,53,.4)}
 .burger{display:none;flex-direction:column;justify-content:center;align-items:center;gap:5px;min-width:44px;min-height:44px;padding:0;cursor:pointer}
@@ -440,10 +440,10 @@ footer{background:var(--ink);border-top:1px solid var(--line);padding:3.5rem 0 2
 <div id="mob-nav">
   <a href="#feats" onclick="closeMob()">Features</a>
   <a href="#founders" onclick="closeMob()">Founders</a>
-  <a href="blog/index.html">Blog</a>
-  <a href="guide.html">Guide</a>
-  <a href="support.html">Support</a>
-  <a href="about.html">About</a>
+  <a href="blog/index.html" onclick="closeMob()">Blog</a>
+  <a href="guide.html" onclick="closeMob()">Guide</a>
+  <a href="support.html" onclick="closeMob()">Support</a>
+  <a href="about.html" onclick="closeMob()">About</a>
   <div class="mob-theme-row">
     <span class="mob-theme-label">Theme</span>
     <div class="mob-theme-dots">
@@ -1161,6 +1161,33 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a){
     if(el){e.preventDefault();closeMob();window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-64,behavior:'smooth'});}
   });
 });
+
+// Scroll-spy: highlight Features / Founders as user scrolls
+(function(){
+  var SECS=[{id:'feats',href:'#feats'},{id:'founders',href:'#founders'}];
+  function setNavActive(href){
+    document.querySelectorAll('.nav-links a, #mob-nav a').forEach(function(a){
+      var h=a.getAttribute('href');
+      if(h==='#feats'||h==='#founders'){
+        if(h===href) a.setAttribute('aria-current','page');
+        else a.removeAttribute('aria-current');
+      }
+    });
+  }
+  function tick(){
+    var y=window.scrollY+100;
+    var active='';
+    SECS.forEach(function(s){
+      var el=document.getElementById(s.id);
+      if(el&&(el.getBoundingClientRect().top+window.scrollY)<=y) active=s.href;
+    });
+    setNavActive(active);
+  }
+  window.addEventListener('scroll',tick,{passive:true});
+  // Honour hash on initial load (e.g. arriving from an inner page via index.html#feats)
+  if(location.hash) setNavActive(location.hash);
+  tick();
+})();
 
 document.querySelectorAll('.fq-q').forEach(function(btn){
   btn.addEventListener('click',function(){
