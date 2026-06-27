@@ -1,7 +1,13 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import { UserProfile, DominantHand, SkillLevel, VoiceGender, TrainingGoal, Language } from '../types';
+
+// SecureStore key for PII fields (name, dob, gender) — kept out of plaintext AsyncStorage
+const SGX_PII_KEY    = 'sgx-user-pii';
+const PII_FIELDS     = ['name', 'dobDay', 'dobMonth', 'dobYear', 'gender'] as const;
+type PiiField        = typeof PII_FIELDS[number];
 
 const DEFAULT_PROFILE: UserProfile = {
   id: '',
@@ -43,6 +49,7 @@ interface ProfileStore {
   markSessionStarted: () => void;
   acceptTerms: () => void;
   markAndroidVolumeHintShown: () => void;
+  hydratePii: () => Promise<void>;
 }
 
 export const useProfileStore = create<ProfileStore>()(
@@ -57,8 +64,26 @@ export const useProfileStore = create<ProfileStore>()(
       hasAcceptedTerms: false,
       hasShownAndroidVolumeHint: false,
 
-      setProfile: (updates) =>
-        set((s) => ({ profile: { ...s.profile, ...updates } })),
+      setProfile: (updates) => {
+        // Capture new PII outside the set() callback so we can write async after state settles
+        let newPii: Record<string, string | null> | null = null;
+        set((s) => {
+          const newProfile = { ...s.profile, ...updates };
+          if ((PII_FIELDS as readonly string[]).some(k => k in updates)) {
+            newPii = {
+              name:     newProfile.name,
+              dobDay:   newProfile.dobDay,
+              dobMonth: newProfile.dobMonth,
+              dobYear:  newProfile.dobYear,
+              gender:   newProfile.gender,
+            };
+          }
+          return { profile: newProfile };
+        });
+        if (newPii !== null) {
+          SecureStore.setItemAsync(SGX_PII_KEY, JSON.stringify(newPii)).catch(() => {});
+        }
+      },
 
       completeOnboarding: () => set({ isOnboardingComplete: true }),
 
@@ -74,34 +99,88 @@ export const useProfileStore = create<ProfileStore>()(
           },
         })),
 
-      signOut: () =>
+      signOut: () => {
+        SecureStore.deleteItemAsync(SGX_PII_KEY).catch(() => {});
         set({
           profile:               DEFAULT_PROFILE,
-          isOnboardingComplete:  false,
           hasCompletedAuth:      false,
-          hasSeenCourtTutorial:  false,
-          hasSeenPaceTutorial:   false,
           hasStartedAnySession:  false,
-          hasShownAndroidVolumeHint: false,
-          // hasAcceptedTerms kept: device-level acceptance survives sign-out
-        }),
+          // isOnboardingComplete, hasSeenCourtTutorial, hasSeenPaceTutorial,
+          // hasShownAndroidVolumeHint, hasAcceptedTerms: all device-level, survive sign-out
+        });
+      },
 
-      resetProfile: () =>
-        set({ profile: DEFAULT_PROFILE, isOnboardingComplete: false, hasCompletedAuth: false, hasSeenCourtTutorial: false, hasSeenPaceTutorial: false, hasStartedAnySession: false, hasAcceptedTerms: false, hasShownAndroidVolumeHint: false }),
+      resetProfile: () => {
+        SecureStore.deleteItemAsync(SGX_PII_KEY).catch(() => {});
+        set({ profile: DEFAULT_PROFILE, isOnboardingComplete: false, hasCompletedAuth: false, hasSeenCourtTutorial: false, hasSeenPaceTutorial: false, hasStartedAnySession: false, hasAcceptedTerms: false, hasShownAndroidVolumeHint: false });
+      },
 
-      deleteAccount: () =>
-        set({ profile: DEFAULT_PROFILE, isOnboardingComplete: false, hasCompletedAuth: false, hasAcceptedTerms: false, hasSeenCourtTutorial: false, hasSeenPaceTutorial: false, hasStartedAnySession: false, hasShownAndroidVolumeHint: false }),
+      deleteAccount: () => {
+        SecureStore.deleteItemAsync(SGX_PII_KEY).catch(() => {});
+        set({ profile: DEFAULT_PROFILE, isOnboardingComplete: false, hasCompletedAuth: false, hasAcceptedTerms: false, hasSeenCourtTutorial: false, hasSeenPaceTutorial: false, hasStartedAnySession: false, hasShownAndroidVolumeHint: false });
+      },
 
       markCourtTutorialSeen: () => set({ hasSeenCourtTutorial: true }),
       markPaceTutorialSeen: () => set({ hasSeenPaceTutorial: true }),
       markSessionStarted: () => set({ hasStartedAnySession: true }),
       acceptTerms: () => set({ hasAcceptedTerms: true }),
       markAndroidVolumeHintShown: () => set({ hasShownAndroidVolumeHint: true }),
+
+      hydratePii: async () => {
+        try {
+          const raw = await SecureStore.getItemAsync(SGX_PII_KEY);
+          if (!raw) return;
+          const pii = JSON.parse(raw) as Partial<Pick<UserProfile, PiiField>>;
+          set((s) => ({ profile: { ...s.profile, ...pii } }));
+        } catch {}
+      },
     }),
     {
       name: 'profile-storage',
       storage: createJSONStorage(() => AsyncStorage),
-      version: 8,
+      version: 9,
+
+      // Deep-merge persisted profile with initial state so DEFAULT_PROFILE fields
+      // act as fallbacks for any fields absent from the stored JSON (e.g. PII fields
+      // stripped by partialize below).
+      merge: (persistedState: any, currentState: ProfileStore) => ({
+        ...currentState,
+        ...persistedState,
+        profile: {
+          ...currentState.profile,
+          ...(persistedState as any)?.profile,
+        },
+      }),
+
+      // Strip PII (name, dob, gender) from AsyncStorage — stored in SecureStore instead.
+      partialize: (state) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { name: _n, dobDay: _dd, dobMonth: _dm, dobYear: _dy, gender: _g, ...safeProfile } = state.profile;
+        return { ...state, profile: safeProfile as UserProfile };
+      },
+
+      // After AsyncStorage hydration: migrate existing PII to SecureStore (one-time, v8→v9),
+      // then load PII back into state. The subsequent set() triggers partialize, which writes
+      // the AsyncStorage blob without PII — completing the migration atomically.
+      onRehydrateStorage: () => (state, error) => {
+        if (error || !state) return;
+        (async () => {
+          try {
+            const existing = await SecureStore.getItemAsync(SGX_PII_KEY);
+            if (!existing && (state.profile.name || state.profile.dobDay || state.profile.gender)) {
+              await SecureStore.setItemAsync(SGX_PII_KEY, JSON.stringify({
+                name:     state.profile.name,
+                dobDay:   state.profile.dobDay,
+                dobMonth: state.profile.dobMonth,
+                dobYear:  state.profile.dobYear,
+                gender:   state.profile.gender,
+              }));
+            }
+          } catch {}
+          state.hydratePii();
+        })();
+      },
+
       migrate: (persisted: any, version: number) => {
         if (version < 1) {
           persisted = { ...persisted, hasCompletedAuth: false };
@@ -141,11 +220,13 @@ export const useProfileStore = create<ProfileStore>()(
         }
         if (version < 8) {
           // Restore hasAcceptedTerms for users affected by the v7 forced reset.
-          // T&C acceptance is now embedded in the auth flow and only shown to users
-          // who have not yet completed account setup — not to existing logged-in users.
           if (persisted?.state && persisted.state.hasCompletedAuth) {
             persisted.state.hasAcceptedTerms = true;
           }
+        }
+        if (version < 9) {
+          // PII (name, dob, gender) moved from AsyncStorage to SecureStore (SGX_PII_KEY).
+          // One-time migration handled in onRehydrateStorage above — no sync work needed here.
         }
         return persisted;
       },

@@ -1,4 +1,18 @@
-User-agent: *
+# Allow AI search agents and crawlers
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: PerplexityBot
+User-agent: FirecrawlAgent
+User-agent: AndiBot
+User-agent: ExaBot
+User-agent: PhindBot
+User-agent: YouBot
+User-agent: Google-Extended
+User-agent: Bingbot
 Allow: /
 
+User-agent: *
+Disallow:
 Sitemap: https://squashghostingx.com/sitemap.xml

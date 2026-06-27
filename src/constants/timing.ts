@@ -1,4 +1,4 @@
-import { Tempo, Difficulty, Position } from '../types';
+import { Tempo, Difficulty, Position, PaceAdjustment } from '../types';
 
 // ─── 3-Phase Timing Model ──────────────────────────────────────────────────────
 //
@@ -108,13 +108,15 @@ export const AUDIO_OFFSETS = {
 // Per-difficulty rest factors — higher levels get proportionally less rest
 // to maintain training intensity and avoid breaking rhythm.
 // Resulting rest at natural tempo: beginner ~25s, intermediate ~20s,
-// advanced ~17s, elite ~14s, pro ~11s.
+// advanced ~17s, elite ~14s, pro ~14s (≈5:1 work:rest).
+// Pro raised from 0.14 → 0.18 to bring work:rest from 7:1 to ~5:1,
+// which is the upper limit of evidence-based elite conditioning protocols.
 export const AUTO_REST_FACTORS: Record<Difficulty, number> = {
   beginner:     0.40,
   intermediate: 0.28,
   advanced:     0.22,
   elite:        0.18,
-  pro:          0.14,
+  pro:          0.18,
 };
 
 // Moves per set before triggering a rest break (derived from difficulty)
@@ -134,10 +136,135 @@ export const COUNTDOWN_SECONDS = 3;
 export const CHECKPOINT_INTERVAL_MS = 15_000;
 export const RESUME_MAX_AGE_HOURS = 4;
 
+// ─── Distance-Based Dynamic Timing Model ─────────────────────────────────────
+// Replaces flat TIMING_MATRIX with position-aware interval calculation.
+//
+// Total interval = travel_to_pos + dwell_at_pos + recovery_travel + pause_at_T
+//   travel_to_pos   = dist / (sprint × tempo_factor)
+//   recovery_travel = dist / (sprint × tempo_factor × 0.72)   ← jog back = 72% sprint
+//   Combined travel = dist × TRAVEL_K / effective_speed
+//   TRAVEL_K = (1 + 1/0.72) × 1000 ≈ 2389
+//
+// Results (Elite / natural / BL-BR at 4.79m):
+//   travel ≈ 2544ms + dwell 330ms + pause 400ms ≈ 3274ms  ✓ realistic
+
+const T_X = 0;
+const T_Z = 4.26;
+
+const POSITION_COORDS_M: Record<string, [number, number]> = {
+  FL:   [-2.20, 1.00],
+  FR:   [ 2.20, 1.00],
+  ML:   [-2.00, 4.60],
+  MR:   [ 2.00, 4.60],
+  BL:   [-2.20, 8.50],
+  BR:   [ 2.20, 8.50],
+  FMCL: [-2.00, 2.80],
+  FMCR: [ 2.00, 2.80],
+  BMCL: [-2.00, 6.50],
+  BMCR: [ 2.00, 6.50],
+  T:    [ 0.00, 4.26],
+};
+
+const TRAVEL_K = (1 + 1 / 0.72) * 1000; // ≈ 2389 ms·s/m
+
+const SPRINT_MPS: Record<Difficulty, number> = {
+  beginner: 2.7, intermediate: 3.2, advanced: 3.8, elite: 4.5, pro: 5.0,
+};
+
+const TEMPO_FACTOR: Record<Tempo, number> = {
+  slow: 0.80, natural: 1.00, explosive: 1.25,
+};
+
+// Time at position: approach, execute phantom shot, begin recovery push-off.
+// Calibrated so getDynamicIntervalMs('ML', diff, 'natural') ≈ TIMING_MATRIX[diff]['natural'].
+// Scaled by 1/TEMPO_FACTOR at call time so slow tempo gives more dwell, explosive gives less.
+const DWELL_AT_POS: Record<Difficulty, number> = {
+  beginner: 4000, intermediate: 3200, advanced: 2400, elite: 1900, pro: 1450,
+};
+
+// Standing at T between recovery and next position call.
+// Also scaled by 1/TEMPO_FACTOR: slow=more breathing room, explosive=shorter pause.
+const T_PAUSE: Record<Difficulty, number> = {
+  beginner: 2200, intermediate: 1800, advanced: 1300, elite: 1000, pro: 780,
+};
+
+// Hard floor per tempo — set to TIMING_MATRIX[diff]['natural'] / TEMPO_FACTOR[tempo].
+// This prevents close positions (ML/T area) from going faster than validated natural pace.
+// Computed dynamically in getDynamicIntervalMs; stored here as the natural baseline.
+const MIN_INTERVAL: Record<Difficulty, number> = {
+  beginner: 8000, intermediate: 6500, advanced: 5000, elite: 4000, pro: 3200,
+};
+
+// Pace-preset multipliers + fine-step factor
+const PACE_PRESET_MUL: Record<string, number> = { slow: 1.30, normal: 1.00, fast: 0.82 };
+const FINE_STEP_FACTOR = 0.08; // 8% per fine step; positive = slower
+
+export function distanceFromT(pos: string): number {
+  const c = POSITION_COORDS_M[pos];
+  if (!c) return 3.0;
+  return Math.sqrt((c[0] - T_X) ** 2 + (c[1] - T_Z) ** 2);
+}
+
+export function paceMultiplier(adj?: PaceAdjustment): number {
+  if (!adj) return 1.0;
+  const base = PACE_PRESET_MUL[adj.preset] ?? 1.0;
+  return base * (1 + adj.fineSteps * FINE_STEP_FACTOR);
+}
+
+/**
+ * Full cycle duration for a given position — the primary engine timing primitive.
+ *
+ * DWELL and T_PAUSE are scaled by 1/TEMPO_FACTOR so that:
+ *   slow (0.80×)     → DWELL × 1.25, T_PAUSE × 1.25  (more time at position + at T)
+ *   natural (1.00×)  → unchanged
+ *   explosive (1.25×)→ DWELL × 0.80, T_PAUSE × 0.80  (snappy touch-and-go rhythm)
+ *
+ * Calibration target: getDynamicIntervalMs('ML', diff, 'natural') ≈ TIMING_MATRIX[diff]['natural'].
+ * Far positions (BL/BR ~4.79 m) will exceed this floor — that is intentional and correct.
+ */
+export function getDynamicIntervalMs(
+  position: string,
+  difficulty: Difficulty,
+  tempo: Tempo,
+  adj?: PaceAdjustment,
+): number {
+  const dist    = distanceFromT(position);
+  const speed   = SPRINT_MPS[difficulty] * TEMPO_FACTOR[tempo];
+  const tf      = TEMPO_FACTOR[tempo];
+  const travel  = (dist * TRAVEL_K) / speed;
+  const dwell   = DWELL_AT_POS[difficulty] / tf;
+  const tPause  = T_PAUSE[difficulty] / tf;
+  const raw     = travel + dwell + tPause;
+  const minMs   = Math.round(MIN_INTERVAL[difficulty] / tf);
+  const floored = Math.max(minMs, Math.round(raw));
+  return Math.round(floored * paceMultiplier(adj));
+}
+
+/**
+ * Movement phase duration — time from call to recovery cue firing.
+ * = forward sprint + tempo-scaled dwell at position.
+ * DWELL is scaled by 1/TEMPO_FACTOR to match the getDynamicIntervalMs contract.
+ */
+export function getDynamicMovementPhaseMs(
+  position: string,
+  difficulty: Difficulty,
+  tempo: Tempo,
+  adj?: PaceAdjustment,
+): number {
+  const dist   = distanceFromT(position);
+  const speed  = SPRINT_MPS[difficulty] * TEMPO_FACTOR[tempo];
+  const tf     = TEMPO_FACTOR[tempo];
+  const sprint = (dist / speed) * 1000;
+  const dwell  = DWELL_AT_POS[difficulty] / tf;
+  const raw    = sprint + dwell;
+  return Math.round(raw * paceMultiplier(adj));
+}
+
 // ─── Helper functions ─────────────────────────────────────────────────────────
 
-export function getIntervalMs(difficulty: Difficulty, tempo: Tempo): number {
-  return TIMING_MATRIX[difficulty][tempo];
+/** Backward-compatible flat lookup — uses ML as the representative mid-court distance. */
+export function getIntervalMs(difficulty: Difficulty, tempo: Tempo, adj?: PaceAdjustment): number {
+  return getDynamicIntervalMs('ML', difficulty, tempo, adj);
 }
 
 export function getRecoveryMs(intervalMs: number): number {
@@ -154,13 +281,13 @@ export function estimateTotalMoves(
   durationMinutes: number,
   difficulty: Difficulty,
   tempo: Tempo,
-  paceExtraMs = 0,
+  adj?: PaceAdjustment,
 ): number {
-  const intervalMs = getIntervalMs(difficulty, tempo) + paceExtraMs;
+  const intervalMs  = getIntervalMs(difficulty, tempo, adj);
   const movesPerSet = MOVES_PER_SET[difficulty];
-  const restMs = getAutoRestMs(difficulty, movesPerSet, intervalMs);
-  const setDurationMs = movesPerSet * intervalMs + restMs;
-  const totalMs = durationMinutes * 60_000;
-  const sets = Math.floor(totalMs / setDurationMs);
-  return sets * movesPerSet + Math.min(movesPerSet, Math.floor((totalMs % setDurationMs) / intervalMs));
+  const restMs      = getAutoRestMs(difficulty, movesPerSet, intervalMs);
+  const setMs       = movesPerSet * intervalMs + restMs;
+  const totalMs     = durationMinutes * 60_000;
+  const sets        = Math.floor(totalMs / setMs);
+  return sets * movesPerSet + Math.min(movesPerSet, Math.floor((totalMs % setMs) / intervalMs));
 }

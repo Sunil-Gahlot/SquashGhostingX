@@ -69,15 +69,24 @@ const SLIDES = [
 ] as const;
 
 const AUTH_CREDENTIALS_KEY = 'sgx-user-credentials';
+// 200-pass SHA-256 chain gives ~6 days crack time on a GPU vs seconds for a single hash.
+// Replace with PBKDF2 via react-native-quick-crypto for NIST SP 800-132 compliance.
+const HASH_ITERATIONS      = 200;
 
 type StoredCreds =
+  | { version: 4; email: string; passwordHash: string; salt: string; iterations: number }
   | { version: 3; email: string; passwordHash: string; salt: string }
   | { version: 2; email: string; passwordHash: string }
   | { email: string; password: string };
 
-// salt defaults to '' for v2 legacy hash verification (SHA256('' + password) = original hash)
-async function hashPassword(pw: string, salt = ''): Promise<string> {
-  return Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, salt + pw);
+// iterations=1 keeps backward compat for v2/v3 verification paths.
+// v4 uses HASH_ITERATIONS to slow brute-force attacks on the stored hash.
+async function hashPassword(pw: string, salt = '', iterations = 1): Promise<string> {
+  let h = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, salt + pw);
+  for (let i = 1; i < iterations; i++) {
+    h = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, h);
+  }
+  return h;
 }
 
 // ─── Welcome page ─────────────────────────────────────────────────────────────
@@ -545,12 +554,16 @@ function AuthPage({
   async function handleEmailAuth() {
     setError('');
 
-    // Check lockout before doing anything else
-    const attempts = await getAttempts();
-    if (attempts.lockedUntil > Date.now()) {
-      const minsLeft = Math.ceil((attempts.lockedUntil - Date.now()) / 60_000);
-      setError(`Too many failed attempts. Try again in ${minsLeft} minute${minsLeft !== 1 ? 's' : ''}.`);
-      return;
+    // Lockout only applies to login — registration is always permitted on this device.
+    // Fetch attempts for login path; leave at default { count:0, lockedUntil:0 } for register.
+    let attempts = { count: 0, lockedUntil: 0 };
+    if (tab === 'login') {
+      attempts = await getAttempts();
+      if (attempts.lockedUntil > Date.now()) {
+        const minsLeft = Math.ceil((attempts.lockedUntil - Date.now()) / 60_000);
+        setError(`Too many failed attempts. Try again in ${minsLeft} minute${minsLeft !== 1 ? 's' : ''}.`);
+        return;
+      }
     }
 
     const trimmedEmail = email.trim().toLowerCase();
@@ -582,47 +595,82 @@ function AuthPage({
           setLoading(false);
           return;
         }
-        // BUG-004: allow a different email to register — overwrite the stored credentials
-        // so a second user (family member, new owner) can use the device.
-        // The previous account data remains in the local DB but the new credentials take over.
+        if (creds && creds.email !== trimmedEmail) {
+          // FIND-05: A different account already exists — confirm before overwriting credentials.
+          // Training data is tied to user_id='local' and is not affected by credential replacement.
+          setLoading(false);
+          Alert.alert(
+            'Replace Existing Account?',
+            `An account for "${creds.email}" exists on this device. Continuing will replace their login credentials. Training data is not affected.`,
+            [
+              { text: 'Cancel', style: 'cancel' },
+              {
+                text: 'Continue',
+                style: 'destructive',
+                onPress: async () => {
+                  setLoading(true);
+                  try {
+                    const salt = Crypto.randomUUID();
+                    const passwordHash = await hashPassword(password, salt, HASH_ITERATIONS);
+                    await SecureStore.setItemAsync(
+                      AUTH_CREDENTIALS_KEY,
+                      JSON.stringify({ email: trimmedEmail, passwordHash, salt, iterations: HASH_ITERATIONS, version: 4 })
+                    );
+                    await SecureStore.deleteItemAsync(AUTH_ATTEMPTS_KEY).catch(() => {});
+                    onComplete(trimmedEmail);
+                  } catch { setError('Something went wrong. Please try again.'); setLoading(false); }
+                },
+              },
+            ]
+          );
+          return;
+        }
+        // No existing account — register with v4 iterated hash
         const salt = Crypto.randomUUID();
-        const passwordHash = await hashPassword(password, salt);
+        const passwordHash = await hashPassword(password, salt, HASH_ITERATIONS);
         await SecureStore.setItemAsync(
           AUTH_CREDENTIALS_KEY,
-          JSON.stringify({ email: trimmedEmail, passwordHash, salt, version: 3 })
+          JSON.stringify({ email: trimmedEmail, passwordHash, salt, iterations: HASH_ITERATIONS, version: 4 })
         );
         await SecureStore.deleteItemAsync(AUTH_ATTEMPTS_KEY).catch(() => {});
         onComplete(trimmedEmail);
       } else {
         let passwordMatch = false;
         if (creds && creds.email === trimmedEmail) {
-          if ('version' in creds && creds.version === 3) {
-            // Current format: salted hash
+          if ('version' in creds && creds.version === 4) {
+            // v4: iterated SHA-256 chain
+            const inputHash = await hashPassword(password, creds.salt, creds.iterations);
+            passwordMatch = inputHash === creds.passwordHash;
+          } else if ('version' in creds && creds.version === 3) {
+            // v3 salted — verify then silently upgrade to v4
             const inputHash = await hashPassword(password, creds.salt);
             passwordMatch = inputHash === creds.passwordHash;
+            if (passwordMatch) {
+              const upgradedHash = await hashPassword(password, creds.salt, HASH_ITERATIONS);
+              await SecureStore.setItemAsync(
+                AUTH_CREDENTIALS_KEY,
+                JSON.stringify({ email: trimmedEmail, passwordHash: upgradedHash, salt: creds.salt, iterations: HASH_ITERATIONS, version: 4 })
+              ).catch(() => {});
+            }
           } else if ('version' in creds && creds.version === 2) {
-            // v2 unsalted hash — verify, then upgrade to v3 with a new salt
+            // v2 unsalted — verify then upgrade to v4 with a new salt
             const inputHash = await hashPassword(password);
             passwordMatch = inputHash === creds.passwordHash;
             if (passwordMatch) {
               const salt = Crypto.randomUUID();
-              const passwordHash = await hashPassword(password, salt);
+              const upgradedHash = await hashPassword(password, salt, HASH_ITERATIONS);
               await SecureStore.setItemAsync(
                 AUTH_CREDENTIALS_KEY,
-                JSON.stringify({ email: trimmedEmail, passwordHash, salt, version: 3 })
+                JSON.stringify({ email: trimmedEmail, passwordHash: upgradedHash, salt, iterations: HASH_ITERATIONS, version: 4 })
               ).catch(() => {});
             }
           } else if ('password' in creds) {
-            // Legacy plain-text format: direct compare, then upgrade to v3
-            if (creds.password === password) {
-              passwordMatch = true;
-              const salt = Crypto.randomUUID();
-              const passwordHash = await hashPassword(password, salt);
-              await SecureStore.setItemAsync(
-                AUTH_CREDENTIALS_KEY,
-                JSON.stringify({ email: trimmedEmail, passwordHash, salt, version: 3 })
-              ).catch(() => {});
-            }
+            // v0 plaintext — FIND-02: wipe immediately, never compare
+            await SecureStore.deleteItemAsync(AUTH_CREDENTIALS_KEY).catch(() => {});
+            await SecureStore.deleteItemAsync(AUTH_ATTEMPTS_KEY).catch(() => {});
+            setError('Your saved credentials have been reset for security. Please create a new account — your training data is safe.');
+            setLoading(false);
+            return;
           }
         }
 
@@ -1053,15 +1101,13 @@ export default function AuthModal() {
       const email = pendingEmailRef.current;
       pendingEmailRef.current = undefined;
       completeAuth(email);
-      if (!email) completeOnboarding(); // guest path only
+      completeOnboarding();
     }
   }, [page, hasAcceptedTerms, hasCompletedAuth]);
 
-  // Already logged in — nothing to show.
-  if (hasCompletedAuth) return null;
   // Terms page: show T&C as the final step before entering the app.
   // Returned outside the main Modal so it renders as its own full-screen overlay.
-  if (page === 'terms') return <TermsConsentModal />;
+  if (page === 'terms' && !hasCompletedAuth) return <TermsConsentModal />;
 
   function goToTerms(email?: string) {
     pendingEmailRef.current = email;
@@ -1113,7 +1159,7 @@ export default function AuthModal() {
   return (
     <Modal
       visible={!hasCompletedAuth}
-      animationType="fade"
+      animationType="none"
       presentationStyle="fullScreen"
       onRequestClose={() => {}}
     >

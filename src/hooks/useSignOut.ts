@@ -5,6 +5,7 @@ import * as SecureStore from 'expo-secure-store';
 import { useProfileStore } from '../stores/profileStore';
 import { useProgressStore } from '../stores/progressStore';
 import { useBadgesStore } from '../stores/badgesStore';
+import { useSessionStore } from '../stores/sessionStore';
 
 /**
  * Single source of truth for signing out.
@@ -29,9 +30,10 @@ export function useSignOut() {
       );
     } catch {}
 
-    // 3. Clear in-memory caches
+    // 3. Clear in-memory caches and dismiss any active/complete session
     clearCache();
     useBadgesStore.getState().resetBadges();
+    useSessionStore.getState().endSession();
 
     // 4. Reset auth/profile state after any active animations settle
     InteractionManager.runAfterInteractions(() => {

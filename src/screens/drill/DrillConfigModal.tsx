@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Modal, View, Text, StyleSheet, ScrollView, TouchableOpacity,
+  Platform, KeyboardAvoidingView,
 } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,8 +15,9 @@ import { useProfileStore } from '../../stores/profileStore';
 import {
   SessionConfig, DrillType, CourtSystem, CoverageMode,
   PatternType, ShotGroup, Tempo, Difficulty, RestMode, VoiceMode,
+  PaceAdjustment, PacePreset,
 } from '../../types';
-import { getIntervalMs, PACE_STEPS_MS } from '../../constants/timing';
+import { getIntervalMs, paceMultiplier } from '../../constants/timing';
 import { COVERAGE_FILTER, POSITIONS_6PT, POSITIONS_10PT } from '../../constants/positions';
 
 // ─── Step option type ─────────────────────────────────────────────────────────
@@ -82,7 +84,7 @@ const TEMPO_OPTIONS = [
 ];
 
 const REST_MODE_OPTIONS = [
-  { label: 'Auto (40% of set)', value: 'auto' },
+  { label: 'Auto (level-based)', value: 'auto' },
   { label: 'Manual', value: 'manual' },
   { label: 'No Rest', value: 'none' },
 ];
@@ -380,8 +382,8 @@ function CompactSection({ title, children }: { title: string; children: React.Re
   );
 }
 
-function IntervalPreview({ difficulty, tempo, extraMs = 0 }: { difficulty: Difficulty; tempo: Tempo; extraMs?: number }) {
-  const ms = getIntervalMs(difficulty, tempo) + extraMs;
+function IntervalPreview({ difficulty, tempo, paceAdjustment }: { difficulty: Difficulty; tempo: Tempo; paceAdjustment?: PaceAdjustment }) {
+  const ms = Math.round(getIntervalMs(difficulty, tempo) * paceMultiplier(paceAdjustment));
   const perMin = Math.round(60_000 / ms);
   return (
     <View style={{ backgroundColor: Colors.brandSoft, borderRadius: BorderRadius.sm, padding: Spacing.sm, marginBottom: Spacing.lg, alignItems: 'center' }}>
@@ -392,12 +394,102 @@ function IntervalPreview({ difficulty, tempo, extraMs = 0 }: { difficulty: Diffi
   );
 }
 
+// ─── Pace Adjustment Picker ───────────────────────────────────────────────────
+
+const PACE_PRESETS: { label: string; value: PacePreset; sub: string }[] = [
+  { label: 'Slow',   value: 'slow',   sub: '+30%' },
+  { label: 'Normal', value: 'normal', sub: 'Baseline' },
+  { label: 'Fast',   value: 'fast',   sub: '−18%' },
+];
+
+function PaceAdjustmentPicker({ value, onChange }: { value: PaceAdjustment; onChange: (v: PaceAdjustment) => void }) {
+  const mul = paceMultiplier(value);
+  const pct = Math.round((mul - 1) * 100);
+  const pctLabel = pct === 0 ? 'Baseline pace' : pct > 0 ? `+${pct}% slower` : `${Math.abs(pct)}% faster`;
+
+  return (
+    <View>
+      <View style={paStyles.presetRow}>
+        {PACE_PRESETS.map((p) => {
+          const sel = value.preset === p.value;
+          return (
+            <TouchableOpacity
+              key={p.value}
+              style={[paStyles.presetTab, sel && paStyles.presetTabSel]}
+              onPress={() => onChange({ preset: p.value, fineSteps: value.fineSteps })}
+              activeOpacity={0.75}
+            >
+              <Text style={[paStyles.presetLabel, sel && paStyles.presetLabelSel]}>{p.label}</Text>
+              <Text style={[paStyles.presetSub,   sel && paStyles.presetSubSel]}>{p.sub}</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+
+      <View style={paStyles.fineRow}>
+        <TouchableOpacity
+          style={[paStyles.fineBtn, value.fineSteps <= -5 && paStyles.fineBtnDim]}
+          onPress={() => onChange({ ...value, fineSteps: Math.max(-5, value.fineSteps - 1) })}
+          disabled={value.fineSteps <= -5}
+          activeOpacity={0.75}
+        >
+          <Ionicons name="remove" size={18} color={value.fineSteps <= -5 ? Colors.textDisabled : Colors.textPrimary} />
+        </TouchableOpacity>
+
+        <View style={paStyles.fineCenter}>
+          <Text style={paStyles.fineValue}>
+            {value.fineSteps === 0 ? '±0' : value.fineSteps > 0 ? `+${value.fineSteps}` : `${value.fineSteps}`}
+          </Text>
+          <Text style={paStyles.finePct}>{pctLabel}</Text>
+        </View>
+
+        <TouchableOpacity
+          style={[paStyles.fineBtn, value.fineSteps >= 5 && paStyles.fineBtnDim]}
+          onPress={() => onChange({ ...value, fineSteps: Math.min(5, value.fineSteps + 1) })}
+          disabled={value.fineSteps >= 5}
+          activeOpacity={0.75}
+        >
+          <Ionicons name="add" size={18} color={value.fineSteps >= 5 ? Colors.textDisabled : Colors.textPrimary} />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+const paStyles = StyleSheet.create({
+  presetRow: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.sm },
+  presetTab: {
+    flex: 1, alignItems: 'center', paddingVertical: Spacing.sm + 2,
+    borderRadius: BorderRadius.md, borderWidth: 1.5, borderColor: Colors.border,
+    backgroundColor: Colors.surface,
+  },
+  presetTabSel:   { borderColor: Colors.brand, backgroundColor: Colors.brandSoft },
+  presetLabel:    { fontSize: FontSize.label, fontWeight: FontWeight.semiBold, color: Colors.textSecondary },
+  presetLabelSel: { color: Colors.brand },
+  presetSub:      { fontSize: FontSize.micro, color: Colors.textDisabled, marginTop: 2 },
+  presetSubSel:   { color: Colors.brand },
+
+  fineRow: {
+    flexDirection: 'row', alignItems: 'center',
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.md, borderWidth: 1, borderColor: Colors.border,
+    padding: Spacing.sm,
+  },
+  fineBtn:    { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: BorderRadius.sm },
+  fineBtnDim: { opacity: 0.35 },
+  fineCenter: { flex: 1, alignItems: 'center' },
+  fineValue:  { fontSize: FontSize.label, fontWeight: FontWeight.bold, color: Colors.textPrimary },
+  finePct:    { fontSize: FontSize.caption, color: Colors.textMuted, marginTop: 1 },
+});
+
 // ─── Main modal ───────────────────────────────────────────────────────────────
 
 export default function DrillConfigModal() {
   const { drillConfigVisible, closeDrillConfig, setPendingConfig } = useSessionStore();
   const settings = useSettingsStore((s) => s.settings);
   const { profile }  = useProfileStore();
+
+  const startedRef = useRef(false);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [drillType,   setDrillType]   = useState<DrillType>(settings.defaultDrillType);
@@ -410,16 +502,28 @@ export default function DrillConfigModal() {
   const [duration,    setDuration]    = useState<number>(settings.defaultDuration);
   const [tempo,       setTempo]       = useState<Tempo>(settings.defaultTempo);
   const [difficulty,  setDifficulty]  = useState<Difficulty>(settings.defaultDifficulty);
-  const [restMode,    setRestMode]    = useState<RestMode>('auto');
-  const [restSeconds, setRestSeconds] = useState<number>(15);
-  const [voiceMode,   setVoiceMode]   = useState<VoiceMode>(settings.defaultVoiceMode);
+  const [restMode,       setRestMode]       = useState<RestMode>('auto');
+  const [restSeconds,    setRestSeconds]    = useState<number>(15);
+  const [voiceMode,      setVoiceMode]      = useState<VoiceMode>(settings.defaultVoiceMode);
+  const [paceAdjustment, setPaceAdjustment] = useState<PaceAdjustment>({ preset: 'normal', fineSteps: 0 });
 
-  // Reset step and voice mode on each open; keep other selections as defaults
-  // so backing out of step 1 and reopening doesn't lose drill/difficulty choices.
+  // Reset all config state on each open so the modal always starts fresh.
   useEffect(() => {
     if (drillConfigVisible) {
       setCurrentStep(1);
+      setDrillType(settings.defaultDrillType);
+      setCourtSystem(settings.defaultCourtSystem);
+      setCoverage('full');
+      setPatternType('random');
+      setShotGroups(['mixed']);
+      setDuration(settings.defaultDuration);
+      setTempo(settings.defaultTempo);
+      setDifficulty(settings.defaultDifficulty);
+      setRestMode('auto');
+      setRestSeconds(15);
       setVoiceMode(settings.defaultVoiceMode);
+      setPaceAdjustment({ preset: 'normal', fineSteps: 0 });
+      startedRef.current = false;
     }
   }, [drillConfigVisible]);
 
@@ -471,6 +575,8 @@ export default function DrillConfigModal() {
     setCurrentStep((s) => s - 1);
   }
   function handleStart() {
+    if (startedRef.current) return;
+    startedRef.current = true;
     // match-sim skips the pattern step, so patternType stays at its default 'random'.
     // Enforce the correct patternType so the engine uses rally templates.
     const effectivePatternType: PatternType =
@@ -483,6 +589,9 @@ export default function DrillConfigModal() {
       dominantHand: profile.dominantHand,
       voiceGender:  profile.voiceGender,
       language:     profile.language,
+      paceAdjustment: (paceAdjustment.preset === 'normal' && paceAdjustment.fineSteps === 0)
+        ? undefined
+        : paceAdjustment,
     };
     closeDrillConfig();
     setTimeout(() => setPendingConfig(config), 300);
@@ -505,11 +614,17 @@ export default function DrillConfigModal() {
     <Modal
       visible={drillConfigVisible}
       animationType="slide"
-      presentationStyle="formSheet"
+      presentationStyle={Platform.OS === 'ios' ? 'formSheet' : 'fullScreen'}
       onRequestClose={closeDrillConfig}
     >
       <SafeAreaProvider>
-      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+      {/* KeyboardAvoidingView protects the footer Next/Start button from being
+          obscured by the soft keyboard on iOS and desktop web browsers. */}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+      <SafeAreaView style={[styles.safe, Platform.OS === 'web' && styles.safeWeb]} edges={['top', 'bottom']}>
 
         {/* ── ORANGE HEADER BAR ─────────────────────────────── */}
         <View style={styles.headerBar}>
@@ -696,22 +811,28 @@ export default function DrillConfigModal() {
           {stepKey === 'session' && (
             <>
               <CompactSection title="DURATION">
+                {/* On web: wrap to multiple rows (no horizontal scroll on desktop mouse). */}
                 <PillSelector options={DURATION_OPTIONS} selected={String(duration)}
-                  onSelect={(v) => setDuration(Number(v))} scrollable />
+                  onSelect={(v) => setDuration(Number(v))}
+                  scrollable={Platform.OS !== 'web'} wrap={Platform.OS === 'web'} />
               </CompactSection>
               <CompactSection title="TEMPO">
                 <PillSelector options={TEMPO_OPTIONS} selected={tempo}
-                  onSelect={(v) => setTempo(v as Tempo)} />
+                  onSelect={(v) => setTempo(v as Tempo)} wrap />
               </CompactSection>
-              <IntervalPreview difficulty={difficulty} tempo={tempo} extraMs={PACE_STEPS_MS[settings.defaultPaceStep ?? 3] ?? 0} />
+              <CompactSection title="PACE ADJUSTMENT">
+                <PaceAdjustmentPicker value={paceAdjustment} onChange={setPaceAdjustment} />
+              </CompactSection>
+              <IntervalPreview difficulty={difficulty} tempo={tempo} paceAdjustment={paceAdjustment} />
               <CompactSection title="REST INTERVAL">
                 <PillSelector options={REST_MODE_OPTIONS} selected={restMode}
-                  onSelect={(v) => setRestMode(v as RestMode)} />
+                  onSelect={(v) => setRestMode(v as RestMode)} wrap />
                 {restMode === 'manual' && (
                   <View style={styles.restRow}>
                     <Text style={styles.restLabel}>Duration:</Text>
                     <PillSelector options={REST_SECONDS_OPTIONS} selected={String(restSeconds)}
-                      onSelect={(v) => setRestSeconds(Number(v))} scrollable />
+                      onSelect={(v) => setRestSeconds(Number(v))}
+                      scrollable={Platform.OS !== 'web'} wrap={Platform.OS === 'web'} />
                   </View>
                 )}
                 {restMode === 'none' && (
@@ -720,7 +841,8 @@ export default function DrillConfigModal() {
               </CompactSection>
               <CompactSection title="VOICE MODE">
                 <PillSelector options={VOICE_MODE_OPTIONS} selected={voiceMode}
-                  onSelect={(v) => setVoiceMode(v as VoiceMode)} scrollable />
+                  onSelect={(v) => setVoiceMode(v as VoiceMode)}
+                  scrollable={Platform.OS !== 'web'} wrap={Platform.OS === 'web'} />
               </CompactSection>
             </>
           )}
@@ -741,13 +863,16 @@ export default function DrillConfigModal() {
         </View>
 
       </SafeAreaView>
+      </KeyboardAvoidingView>
       </SafeAreaProvider>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.background },
+  safe:    { flex: 1, backgroundColor: Colors.background },
+  // Web: constrain to phone-width so the wizard doesn't stretch across a 1920pt desktop window.
+  safeWeb: { maxWidth: 600, width: '100%', alignSelf: 'center' as any },
 
   // Orange header bar — matches reference exactly
   headerBar: {

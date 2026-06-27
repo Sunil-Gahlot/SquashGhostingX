@@ -56,7 +56,7 @@
       [
         "expo-secure-store",
         {
-          "configureAndroidBackup": true,
+          "configureAndroidBackup": false,
           "faceIDPermission": "Used to secure your login credentials."
         }
       ],

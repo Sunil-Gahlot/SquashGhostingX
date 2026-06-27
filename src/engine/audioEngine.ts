@@ -2,8 +2,16 @@ import * as Speech from 'expo-speech';
 import { setAudioModeAsync, setIsAudioActiveAsync } from 'expo-audio';
 import { VoiceGender } from '../types';
 
-// Rotating recovery cues — natural coach-like calls, no abrupt "T!" shortcut
-const RECOVERY_CUES = ['Back to T!', 'Recover to T!', 'Back to the T!'];
+// Rotating recovery cues — natural coach-like calls that fire after every position for all levels.
+// Six phrases prevent the cycle feeling mechanical in long sessions.
+const RECOVERY_CUES = [
+  'Back to T!',
+  'Recover to T!',
+  'Back to the T!',
+  'Return to T!',
+  'T position!',
+  'And T!',
+];
 
 const COACHING_PHRASES = [
   'Great work, keep going',
@@ -76,7 +84,7 @@ export async function initAudioSession(): Promise<void> {
   // Configure audio session for court training with expo-audio v1.x API:
   //   playsInSilentMode   → audible even when iOS silent/vibrate switch is on (critical for court use)
   //   allowsRecording     → false forces AVAudioSessionCategoryPlayback → routes to Bluetooth A2DP speaker
-  //   interruptionMode    → 'doNotMix': our audio owns the session; other apps pause while we speak
+  //   interruptionMode    → 'duckOthers': TTS ducks background music rather than stopping it
   //   shouldPlayInBackground → keeps session alive when screen dims between calls
   //   shouldRouteThroughEarpiece → false: loudspeaker / Bluetooth, not earpiece
   try {
@@ -86,7 +94,7 @@ export async function initAudioSession(): Promise<void> {
     await setAudioModeAsync({
       playsInSilentMode:          true,
       allowsRecording:            false,
-      interruptionMode:           'doNotMix',
+      interruptionMode:           'duckOthers',
       shouldPlayInBackground:     true,
       shouldRouteThroughEarpiece: false,
     });
@@ -121,7 +129,7 @@ export function speakText(
   setAudioModeAsync({
     playsInSilentMode: true,
     allowsRecording: false,
-    interruptionMode: 'doNotMix',
+    interruptionMode: 'duckOthers',
     shouldPlayInBackground: true,
     shouldRouteThroughEarpiece: false,
   }).catch(() => {});
@@ -148,6 +156,14 @@ export function speakText(
 
 export function stopAudio(): void {
   try { Speech.stop(); } catch {}
+}
+
+// Releases the audio session after a training session ends so the app no longer
+// appears as "using audio" in iOS Control Center / Android notification shade.
+// Call after the completion speech has finished (use a setTimeout delay if needed).
+export async function teardownAudioSession(): Promise<void> {
+  try { await setIsAudioActiveAsync(false); } catch {}
+  try { await setAudioModeAsync({ playsInSilentMode: false, shouldPlayInBackground: false }); } catch {}
 }
 
 /** Returns rotated recovery cue: "recover to T" → "back to T" → "return to T" */

@@ -23,6 +23,7 @@ import ProfileScreen from './ProfileScreen';
 import HelpModal from './HelpModal';
 import TermsConsentModal from './TermsConsentModal';
 import { useSignOut } from '../hooks/useSignOut';
+import { useSessionStore } from '../stores/sessionStore';
 
 // ─── Row components ───────────────────────────────────────────────────────────
 
@@ -224,6 +225,7 @@ export default function SettingsScreen() {
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Reset', style: 'destructive', onPress: async () => {
+          useSessionStore.getState().endSession();
           try {
             await db.execAsync(
               'DELETE FROM movements; DELETE FROM personal_bests; DELETE FROM checkpoints; DELETE FROM sessions;'

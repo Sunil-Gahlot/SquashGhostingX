@@ -15,6 +15,7 @@ import { useSessionStore } from '../stores/sessionStore';
 import { useProfileStore } from '../stores/profileStore';
 import { useSettingsStore } from '../stores/settingsStore';
 import { getProgramById } from '../data/builtinPrograms';
+import { getIntervalMs, AUTO_REST_FACTORS, MOVES_PER_SET } from '../constants/timing';
 import { useBadgesStore, BADGE_DEFS } from '../stores/badgesStore';
 
 const SCREEN_W = Dimensions.get('window').width;
@@ -548,8 +549,14 @@ export default function ProgressScreen() {
         const clampedPct = Math.min(100, Math.max(0, s.completionPct));
         const mm = String(Math.floor(s.durationSeconds / 60)).padStart(2, '0');
         const ss2 = String(s.durationSeconds % 60).padStart(2, '0');
+        // Estimate net active time by subtracting auto-rest (restMode not stored; approximation).
+        const movesPerSet     = MOVES_PER_SET[s.difficulty] ?? 12;
+        const intervalMs      = getIntervalMs(s.difficulty, s.tempo);
+        const restPerSetSecs  = Math.round(movesPerSet * intervalMs * (AUTO_REST_FACTORS[s.difficulty] ?? 0.28) / 1000);
+        const setsCompleted   = s.movementsTotal > 0 ? Math.ceil(s.movementsTotal / movesPerSet) : 0;
+        const netActiveSecs   = Math.max(1, s.durationSeconds - setsCompleted * restPerSetSecs);
         const avgRep = s.movementsTotal > 0
-          ? (s.durationSeconds / s.movementsTotal).toFixed(1)
+          ? (netActiveSecs / s.movementsTotal).toFixed(1)
           : '—';
         return (
           <Modal visible transparent animationType="slide" onRequestClose={() => setSelectedSession(null)}>

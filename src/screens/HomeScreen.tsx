@@ -317,7 +317,7 @@ export default function HomeScreen({ navigation }: any) {
               <TouchableOpacity onPress={() => setHelpVisible(true)} style={styles.helpBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
                 <Ionicons name="help-circle-outline" size={22} color="rgba(255,255,255,0.6)" />
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={styles.settingsBtn}>
+              <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={styles.settingsBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
                 <Ionicons name="settings-outline" size={22} color="rgba(255,255,255,0.7)" />
               </TouchableOpacity>
               <TouchableOpacity onPress={handleSignOut} style={styles.signOutBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
@@ -746,7 +746,8 @@ const styles = StyleSheet.create({
     fontSize: 34,
     fontWeight: FontWeight.black,
     color: Colors.textPrimary,
-    lineHeight: 38,
+    // No fixed lineHeight — auto-scales correctly with iOS Dynamic Type and
+    // Android font-scale accessibility settings (fixed 38 broke two-line layout).
     letterSpacing: -0.5,
     marginBottom: Spacing.md,
     textAlign: 'center',

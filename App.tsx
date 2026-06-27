@@ -1,13 +1,14 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useRef, Component, ReactNode } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
 import { SQLiteProvider } from 'expo-sqlite';
 import { Ionicons } from '@expo/vector-icons';
+import * as SecureStore from 'expo-secure-store';
 
 import HomeScreen       from './src/screens/HomeScreen';
 import RoutinesScreen   from './src/screens/RoutinesScreen';
@@ -61,7 +62,41 @@ const eb = StyleSheet.create({
   btnTxt:    { fontSize: 15, fontWeight: '700', color: '#000' },
 });
 
+// Web: phone-width canvas — matches widest iPhone (430pt Pro Max).
+// Centers the app in the browser with a solid background on the side gutters.
+const webContainer = StyleSheet.create({
+  root: {
+    flex: 1,
+    width: '100%',
+    maxWidth: 430,
+    alignSelf: 'center',
+    overflow: 'hidden' as any,
+    // Side-gutter colour on desktop browsers
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.35,
+    shadowRadius: 40,
+  },
+});
+
 const navigationRef = createNavigationContainerRef<RootTabParamList>();
+
+// FIND-03: Verify that a registered user's SecureStore credentials still exist on startup.
+// If they were wiped externally (jailbreak read, backup restore without key) force re-auth.
+function StartupSecurityChecks() {
+  const hasCompletedAuth = useProfileStore((s) => s.hasCompletedAuth);
+  const isGuest          = useProfileStore((s) => s.profile.isGuest);
+  const signOut          = useProfileStore((s) => s.signOut);
+
+  useEffect(() => {
+    if (!hasCompletedAuth || isGuest) return;
+    SecureStore.getItemAsync('sgx-user-credentials')
+      .then((creds) => { if (!creds) signOut(); })
+      .catch(() => {});
+  }, [hasCompletedAuth, isGuest]);
+
+  return null;
+}
 
 // Navigates to Train whenever the user completes auth+onboarding (including after sign-out+re-login).
 function NavToTrainAfterAuth() {
@@ -88,14 +123,72 @@ const TAB_ICONS: Record<TabName, { focused: keyof typeof Ionicons.glyphMap; outl
   Settings: { focused: 'settings',  outline: 'settings-outline'  },
 };
 
+// Extracted so useSafeAreaInsets can run inside SafeAreaProvider.
+// Adds the device's bottom inset (home indicator / Android gesture bar) to the
+// tab bar height and paddingBottom so icons and labels are never clipped behind
+// the system UI — critical on iPhone 13–17, Galaxy S/Z/A in gesture mode, and iPad.
+function AppTabs() {
+  const insets = useSafeAreaInsets();
+  return (
+    <Tab.Navigator
+      initialRouteName="Train"
+      screenOptions={({ route }) => {
+        const name = route.name as TabName;
+        return {
+          headerShown: false,
+          tabBarActiveTintColor:        Colors.tabActive,
+          tabBarInactiveTintColor:      Colors.tabInactive,
+          tabBarActiveBackgroundColor:  'rgba(255,107,53,0.08)',
+          tabBarStyle: {
+            backgroundColor: Colors.tabBackground,
+            borderTopColor:  Colors.border,
+            borderTopWidth:  0.5,
+            height:        72 + insets.bottom,
+            paddingTop:    6,
+            paddingBottom: 12 + insets.bottom,
+          },
+          tabBarLabelStyle: {
+            fontSize:      FontSize.caption,
+            fontWeight:    FontWeight.semiBold,
+            letterSpacing: 0.2,
+            marginTop: 1,
+          },
+          tabBarItemStyle: {
+            borderRadius: 12,
+            marginHorizontal: 2,
+            marginTop: 4,
+          },
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons
+              name={focused ? TAB_ICONS[name].focused : TAB_ICONS[name].outline}
+              size={focused ? size + 1 : size}
+              color={color}
+            />
+          ),
+        };
+      }}
+    >
+      <Tab.Screen name="Train"    component={HomeScreen}     options={{ tabBarLabel: 'Train'    }} />
+      <Tab.Screen name="Routines" component={RoutinesScreen} options={{ tabBarLabel: 'Routines' }} />
+      <Tab.Screen name="Progress" component={ProgressScreen} options={{ tabBarLabel: 'Progress' }} />
+      <Tab.Screen name="Library"  component={LibraryScreen}  options={{ tabBarLabel: 'Library'  }} />
+      <Tab.Screen name="Settings" component={SettingsScreen} options={{ tabBarLabel: 'Settings' }} />
+    </Tab.Navigator>
+  );
+}
+
 
 export default function App() {
   return (
     <AppErrorBoundary>
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
+        {/* Web: constrain to a phone-width canvas centred in the browser window.
+            On iOS/Android this View is transparent (flex:1 fills the screen). */}
+        <View style={Platform.OS === 'web' ? webContainer.root : { flex: 1 }}>
         <SQLiteProvider databaseName="squashghostingx.db" onInit={migrateDatabase}>
 
+          <StartupSecurityChecks />
           <AuthModal />
           <OnboardingModal />
           <DrillConfigModal />
@@ -104,53 +197,11 @@ export default function App() {
 
           <NavigationContainer ref={navigationRef}>
             <StatusBar style="light" backgroundColor={Colors.background} />
-            <Tab.Navigator
-              initialRouteName="Train"
-              screenOptions={({ route }) => {
-                const name = route.name as TabName;
-                return {
-                  headerShown: false,
-                  tabBarActiveTintColor:        Colors.tabActive,
-                  tabBarInactiveTintColor:      Colors.tabInactive,
-                  tabBarActiveBackgroundColor:  'rgba(255,107,53,0.08)',
-                  tabBarStyle: {
-                    backgroundColor: Colors.tabBackground,
-                    borderTopColor:  Colors.border,
-                    borderTopWidth:  0.5,
-                    height: 72,
-                    paddingTop: 6,
-                    paddingBottom: 12,
-                  },
-                  tabBarLabelStyle: {
-                    fontSize:      FontSize.caption,
-                    fontWeight:    FontWeight.semiBold,
-                    letterSpacing: 0.2,
-                    marginTop: 1,
-                  },
-                  tabBarItemStyle: {
-                    borderRadius: 12,
-                    marginHorizontal: 2,
-                    marginTop: 4,
-                  },
-                  tabBarIcon: ({ focused, color, size }) => (
-                    <Ionicons
-                      name={focused ? TAB_ICONS[name].focused : TAB_ICONS[name].outline}
-                      size={focused ? size + 1 : size}
-                      color={color}
-                    />
-                  ),
-                };
-              }}
-            >
-              <Tab.Screen name="Train"    component={HomeScreen}     options={{ tabBarLabel: 'Train'    }} />
-              <Tab.Screen name="Routines" component={RoutinesScreen} options={{ tabBarLabel: 'Routines' }} />
-              <Tab.Screen name="Progress" component={ProgressScreen} options={{ tabBarLabel: 'Progress' }} />
-              <Tab.Screen name="Library"  component={LibraryScreen}  options={{ tabBarLabel: 'Library'  }} />
-              <Tab.Screen name="Settings" component={SettingsScreen} options={{ tabBarLabel: 'Settings' }} />
-            </Tab.Navigator>
+            <AppTabs />
           </NavigationContainer>
 
         </SQLiteProvider>
+        </View>
       </SafeAreaProvider>
     </GestureHandlerRootView>
     </AppErrorBoundary>

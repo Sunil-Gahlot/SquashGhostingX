@@ -16,7 +16,7 @@ import {
   getPositionLabel, POSITION_ZONE, POSITION_INFO,
 } from '../constants/positions';
 import {
-  AUDIO_OFFSETS, MOVEMENT_PHASE_MS, MOVES_PER_SET, getIntervalMs,
+  AUDIO_OFFSETS, MOVES_PER_SET, getIntervalMs,
   getAutoRestMs, CHECKPOINT_INTERVAL_MS, COUNTDOWN_SECONDS,
   T_POSE_CLEAR_DELAY_MS, T_START_PAUSE_MS, PACE_STEPS_MS, PACE_DEFAULT_STEP,
   estimateTotalMoves,
@@ -33,45 +33,45 @@ type TimerId = ReturnType<typeof setTimeout>;
 type IntervalId = ReturnType<typeof setInterval>;
 
 // ─── Voice call builder — builds one complete call phrase per spec ─────────────
+//
+// Movement-Based:    Position only.            e.g. "Front Right"
+// Shot-Based:        Position + Shot.           e.g. "Front Left, straight drop"
+// Match Simulation:  Position + Shot + Next.    e.g. "Back Right, straight drive, Front Left, drop"
+//   The next position+shot preview primes the player to start reading their next movement
+//   while still executing the current one — matches how elite coaches call rallies.
 
-// Movement cues by zone — short squash coaching calls
-const MOVEMENT_MODIFIERS = {
-  front: ['lunge', 'quick lunge', 'reach low'],
-  mid:   ['shuffle across', 'step and split', 'side step'],
-  back:  ['sprint back', 'full stretch', 'push back'],
-} as const;
-
-function getMovementModifier(zone: string, callIndex: number): string {
-  const arr = MOVEMENT_MODIFIERS[zone as keyof typeof MOVEMENT_MODIFIERS] ?? MOVEMENT_MODIFIERS.mid;
-  return arr[callIndex % arr.length];
-}
-
-/**
- * Build position instruction. Recovery cue fires separately at ~65% of interval.
- * Format: "[position], [modifier/shot]" — comma gives TTS a natural brief pause.
- */
 function buildVoiceCall(opts: {
   drillType: string;
   positionLabel: string;
-  positionZone: string;
   shot: string | null;
   nextPositionLabel: string | null;
-  callIndex: number;
+  nextShot: string | null;
 }): string {
-  const { drillType, positionLabel, positionZone, shot, nextPositionLabel, callIndex } = opts;
+  const { drillType, positionLabel, shot, nextPositionLabel, nextShot } = opts;
 
   switch (drillType) {
     case 'movement':
-      return `${positionLabel}, ${getMovementModifier(positionZone, callIndex)}`;
+      // Position name only — no modifier suffix. Movement modifier was coach shorthand;
+      // position-only calls are cleaner at pace and match how squash coaches call ghosting.
+      return positionLabel;
 
     case 'shot-based':
-      // BUG-026: T position shots need context — player is already there, no movement required.
+      // T position shots need context — player is already there, no movement required.
       if (positionLabel === 'the T' && shot) return `From the T, ${shot}`;
       return shot ? `${positionLabel}, ${shot}` : positionLabel;
 
-    case 'match-sim':
-      // BUG-013: do NOT pre-announce next position — match-sim should feel like a real rally
-      return shot ? `${positionLabel}, ${shot}` : positionLabel;
+    case 'match-sim': {
+      // Announce current position + shot, then prime with next position + shot.
+      // Each comma gives TTS a natural brief pause between segments.
+      const current = shot ? `${positionLabel}, ${shot}` : positionLabel;
+      if (nextPositionLabel && nextShot) {
+        return `${current}, ${nextPositionLabel}, ${nextShot}`;
+      }
+      if (nextPositionLabel) {
+        return `${current}, ${nextPositionLabel}`;
+      }
+      return current;
+    }
 
     case 'custom':
       return shot ? `${positionLabel}, ${shot}` : positionLabel;
@@ -97,7 +97,9 @@ const COACHING_INTERVAL_SECS = 90;
 export function useSessionEngine(db: SQLiteDatabase) {
   const store      = useSessionStore;        // static ref — access inside timeouts
   const getSettings = () => useSettingsStore.getState().settings ?? DEFAULT_SETTINGS;
-  const { profile }   = useProfileStore();
+  const profileDominantHand = useProfileStore((s) => s.profile.dominantHand);
+  const profileVoiceGender  = useProfileStore((s) => s.profile.voiceGender);
+  const profileLanguage     = useProfileStore((s) => s.profile.language);
   const progressStore = useProgressStore();
 
   // ── Speak helpers — always use current config's language + voiceGender ──────
@@ -194,6 +196,10 @@ export function useSessionEngine(db: SQLiteDatabase) {
     if (ssettings.hapticsEnabled) {
       abandoned ? Haptics.onSessionAbandoned() : Haptics.onSessionComplete();
     }
+    // FIND-10: release audio session after completion speech finishes (~5s for the utterance).
+    // Abandoned sessions have no speech so teardown is immediate.
+    const teardownDelay = (!abandoned && ssettings.voiceEnabled) ? 6000 : 0;
+    setTimeout(() => { Audio.teardownAudioSession().catch(() => {}); }, teardownDelay);
 
     // ── Calculate zone distribution ─────────────────────────────────────────
     const movements = movementsRef.current;
@@ -300,6 +306,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
     // Reset to T pose immediately — clearMoveTimers() may cancel the T-pose clear
     // timeout before it fires, leaving currentPosition stuck on the last position.
     store.getState().setCurrentPosition(null, null);
+    store.getState().setNextPosition(null);
 
     // BUG-005: restMode 'none' means skip rest entirely — go straight to next set.
     if (config.restMode === 'none') {
@@ -312,7 +319,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
     store.getState().advanceSet();
 
     const movesPerSet = MOVES_PER_SET[config.difficulty];
-    const intervalMs  = getIntervalMs(config.difficulty, config.tempo);
+    const intervalMs  = getIntervalMs(config.difficulty, config.tempo, config.paceAdjustment);
     const restMs = config.restMode === 'manual' && config.restSeconds > 0
       ? config.restSeconds * 1000
       : getAutoRestMs(config.difficulty, movesPerSet, intervalMs);
@@ -374,11 +381,10 @@ export function useSessionEngine(db: SQLiteDatabase) {
     // Pre-compute effective interval here so T-pose clear can clamp against it (BUG-006)
     const livePaceStep    = store.getState().session?.livePaceStep ?? PACE_DEFAULT_STEP;
     const paceOffset      = PACE_STEPS_MS[livePaceStep] ?? 0;
-    const movementPhase   = MOVEMENT_PHASE_MS[config.difficulty][config.tempo];
-    // Floor includes phaseOffsetMs so the gap between the recovery cue and the next
-    // position call is consistent across all positions (front corners no longer feel rushed
-    // vs mid/back positions at fast pace).
-    const effectiveIntervalMs = Math.max(movementPhase + move.phaseOffsetMs + 400, move.intervalMs + paceOffset);
+    // move.movementPhaseMs is the distance-based movement phase from getDynamicMovementPhaseMs().
+    // It replaces the old flat MOVEMENT_PHASE_MS table lookup and already includes the
+    // position's travel time, so no separate phaseOffsetMs addition is needed here.
+    const effectiveIntervalMs = Math.max(move.movementPhaseMs + 400, move.intervalMs + paceOffset);
 
     // T+positionCallMs: court and voice update simultaneously.
     // BUG-007: skip visual update in voice-only mode (voice-only = no court highlight).
@@ -396,18 +402,17 @@ export function useSessionEngine(db: SQLiteDatabase) {
       addTimer(setTimeout(() => {
         if (store.getState().session?.state !== 'active') return;
         const posLabel  = getPositionLabel(move.position, config.dominantHand);
-        const posInfo   = POSITION_ZONE[move.position];
         // Read directly from engine — independent of store state since we fire before setNextPosition.
         const nextPos   = engine.peekNextPosition();
         const nextLabel = nextPos ? getPositionLabel(nextPos, config.dominantHand) : null;
 
+        callIndexRef.current++;
         const callText = buildVoiceCall({
           drillType:         config.drillType,
           positionLabel:     posLabel,
-          positionZone:      posInfo ?? 'mid',
           shot:              move.shot,
           nextPositionLabel: nextLabel,
-          callIndex:         callIndexRef.current++,
+          nextShot:          move.nextShot,
         });
 
         speak(callText);
@@ -416,7 +421,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
       // Recovery cue: skip when position IS the T, or when the gap between the cue and the
       // next call is too tight to complete the utterance. Threshold scales with interval so
       // faster pace doesn't skip the cue disproportionately vs slower settings.
-      const recoveryCallMs  = MOVEMENT_PHASE_MS[config.difficulty][config.tempo] + move.phaseOffsetMs;
+      const recoveryCallMs  = move.movementPhaseMs;
       const gapAfterCue     = effectiveIntervalMs - recoveryCallMs;
       const skipThresholdMs = Math.max(600, effectiveIntervalMs * 0.22);
       const skipRecoveryCue = move.position === 'T' || gapAfterCue < skipThresholdMs;
@@ -431,9 +436,8 @@ export function useSessionEngine(db: SQLiteDatabase) {
 
     // T-pose clear fires in ALL voiceModes (voice+visual, voice-only, visual-only, beep).
     // BUG-006: clamp so clear always fires before the next cycle starts.
-    // phaseOffsetMs shifts the clear point for front corners in sync with the recovery cue.
     const tPoseClearMs = Math.min(
-      movementPhase + move.phaseOffsetMs + T_POSE_CLEAR_DELAY_MS,
+      move.movementPhaseMs + T_POSE_CLEAR_DELAY_MS,
       effectiveIntervalMs - 100,
     );
     addTimer(setTimeout(() => {
@@ -442,12 +446,11 @@ export function useSessionEngine(db: SQLiteDatabase) {
       }
     }, tPoseClearMs));
 
-    // Haptic "return to T" fires with recovery cue — shifted by phaseOffsetMs for front corners.
-    const recoveryMs = MOVEMENT_PHASE_MS[config.difficulty][config.tempo] + move.phaseOffsetMs;
+    // Haptic "return to T" fires in sync with the recovery cue.
     if (getSettings().hapticsEnabled) {
       addTimer(setTimeout(() => {
         Haptics.onReturnToT();
-      }, recoveryMs));
+      }, move.movementPhaseMs));
     }
 
     // T+intervalMs: trigger next cycle using pre-computed effectiveIntervalMs.
@@ -494,10 +497,10 @@ export function useSessionEngine(db: SQLiteDatabase) {
       const config = configRef.current;
       if (!config) return;
 
-      const paceOffset    = PACE_STEPS_MS[step] ?? 0;
-      const movementPhase = MOVEMENT_PHASE_MS[config.difficulty][config.tempo];
-      const baseInterval  = getIntervalMs(config.difficulty, config.tempo);
-      const newInterval   = Math.max(movementPhase + 400, baseInterval + paceOffset);
+      const paceOffset   = PACE_STEPS_MS[step] ?? 0;
+      const baseInterval = getIntervalMs(config.difficulty, config.tempo, config.paceAdjustment);
+      // Floor: movement phase ≈ 45% of total interval (distance-based average), +400ms safety
+      const newInterval  = Math.max(Math.round(baseInterval * 0.45) + 400, baseInterval + paceOffset);
 
       const elapsed   = Date.now() - cycleStartRef.current;
       const remaining = Math.max(100, newInterval - elapsed);
@@ -626,9 +629,9 @@ export function useSessionEngine(db: SQLiteDatabase) {
     // Merge user profile into config (override dominantHand, voiceGender, language)
     const fullConfig: SessionConfig = {
       ...config,
-      dominantHand: profile.dominantHand,
-      voiceGender: profile.voiceGender,
-      language: profile.language,
+      dominantHand: profileDominantHand,
+      voiceGender:  profileVoiceGender,
+      language:     profileLanguage,
     };
 
     configRef.current                = fullConfig;
@@ -662,7 +665,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
       fullConfig.duration,
       fullConfig.difficulty,
       fullConfig.tempo,
-      PACE_STEPS_MS[defaultPaceStep] ?? 0,
+      fullConfig.paceAdjustment,
     );
     store.getState().initSession(fullConfig, totalMoves, defaultPaceStep);
     useProfileStore.getState().markSessionStarted();
@@ -675,11 +678,12 @@ export function useSessionEngine(db: SQLiteDatabase) {
     } else {
       runCountdown(COUNTDOWN_SECONDS);
     }
-  }, [profile, runCountdown]);
+  }, [profileDominantHand, profileVoiceGender, profileLanguage, runCountdown]);
 
   const pauseSession = useCallback(() => {
     const state = store.getState().session?.state;
-    if (state !== 'active' && state !== 'countdown' && state !== 'rest') return;
+    // Countdown cannot be paused — resuming would skip remaining numbers and leave the player unprepared.
+    if (state !== 'active' && state !== 'rest') return;
     clearAllTimers();   // stops move loop + secondTimer + cpTimer + restTimer
     Audio.stopAudio();
     store.getState().setState('paused');
@@ -710,6 +714,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
   const dismissSession = useCallback(() => {
     clearAllTimers();
     Audio.stopAudio();
+    Audio.teardownAudioSession().catch(() => {});
     progressStore.setNewPBFlag(null);
     store.getState().endSession();
   }, []);
@@ -720,6 +725,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
     return () => {
       clearAllTimers();
       Audio.stopAudio();
+      Audio.teardownAudioSession().catch(() => {});
     };
   }, []);
 

@@ -191,7 +191,7 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
           <View style={styles.modalBarSide} />
           <Text style={styles.modalBarTitle}>Your Profile</Text>
           <TouchableOpacity
-            onPress={onClose}
+            onPress={() => { setProfile({ name: localName.trim() }); onClose?.(); }}
             style={styles.modalBarSide}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
@@ -324,11 +324,10 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
                 ]}
                 selected={profile.gender ?? 'male'}
                 onSelect={(v) => {
-                  const voiceGender = v as VoiceGender;
-                  setProfile({ gender: v, voiceGender });
+                  setProfile({ gender: v });
                   if (!settings.voiceEnabled) return;
                   Audio.initAudioSession().then(() => {
-                    Audio.speakText('Front Left. Recover to T.', settings.speechRate, profile.language, voiceGender);
+                    Audio.speakText('Front Left. Recover to T.', settings.speechRate, profile.language, profile.voiceGender);
                   });
                 }}
                 size="sm"

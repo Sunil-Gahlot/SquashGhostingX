@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import {
   Modal, View, Text, StyleSheet, TouchableOpacity,
   Animated, ScrollView, AppState, AppStateStatus,
+  useWindowDimensions, Platform,
 } from 'react-native';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
@@ -44,7 +45,7 @@ function CountdownView({ session }: { session: ActiveSession }) {
     <View style={cdStyles.container}>
       <Text style={cdStyles.caption}>GET READY</Text>
       <Animated.View style={[cdStyles.circle, { transform: [{ scale }], opacity }]}>
-        <Text style={[cdStyles.number, isGo && cdStyles.numberGo]}>{display}</Text>
+        <Text style={[cdStyles.number, isGo && cdStyles.numberGo]} allowFontScaling={false}>{display}</Text>
       </Animated.View>
       <Text style={cdStyles.instruction}>Move to the T</Text>
       <Text style={cdStyles.drillInfo}>
@@ -345,6 +346,15 @@ function PausedView({
   courtMode: 'glass' | 'wooden';
   gender: string | null;
 }) {
+  const { width: screenW, height: screenH } = useWindowDimensions();
+  // Court: 80% wide, capped at 500pt (iPad / Galaxy Z Fold inner screen).
+  // Height capped at 47% of full screen height — leaves room for title, stats
+  // and two action buttons on every device including iPhone SE (375×667).
+  const courtMaxW  = Math.min(screenW * 0.80, 500);
+  const naturalH   = courtMaxW * (975 / 640);
+  const courtH     = Math.min(naturalH, screenH * 0.47);
+  const courtW     = courtH < naturalH ? courtH * (640 / 975) : courtMaxW;
+
   const em = String(Math.floor(session.elapsedSeconds / 60)).padStart(2, '0');
   const es = String(session.elapsedSeconds % 60).padStart(2, '0');
   return (
@@ -361,8 +371,7 @@ function PausedView({
         dominantHand={session.config.dominantHand}
         gender={gender}
         courtMode={courtMode}
-        style={pvStyles.court}
-
+        style={[pvStyles.court, { width: courtW, height: courtH }]}
       />
       <View style={pvStyles.actions}>
         <TouchableOpacity onPress={onResume} style={[pvStyles.btn, pvStyles.btnPrimary]}>
@@ -383,7 +392,7 @@ const pvStyles = StyleSheet.create({
   reps:      { fontSize: FontSize.body, color: Colors.textMuted },
   statSep:   { fontSize: FontSize.body, color: Colors.textDisabled },
   elapsed:   { fontSize: FontSize.body, color: Colors.brand, fontWeight: FontWeight.medium },
-  court:     { width: '80%', aspectRatio: 640 / 975 },
+  court:     {},
   actions:   { width: '100%', gap: Spacing.md },
   btn:       { width: '100%', height: ButtonHeight.lg, borderRadius: BorderRadius.full, alignItems: 'center', justifyContent: 'center' },
   btnPrimary:{ backgroundColor: Colors.brand },
@@ -394,17 +403,26 @@ const pvStyles = StyleSheet.create({
 // ─── RestView ─────────────────────────────────────────────────────────────────
 
 function RestView({ session, onSkip, courtMode, gender }: { session: ActiveSession; onSkip: () => void; courtMode: 'glass' | 'wooden'; gender: string | null }) {
+  const { width: screenW, height: screenH } = useWindowDimensions();
+  // Court: 70% wide, capped at 440pt (iPad / Galaxy Z Fold inner screen).
+  // Height capped at 40% of full screen — the 96pt countdown digit needs ~115pt;
+  // leaving 40% for the court keeps "Skip Rest" reachable on iPhone SE (375×667).
+  const courtMaxW = Math.min(screenW * 0.70, 440);
+  const naturalH  = courtMaxW * (975 / 640);
+  const courtH    = Math.min(naturalH, screenH * 0.40);
+  const courtW    = courtH < naturalH ? courtH * (640 / 975) : courtMaxW;
+
   return (
     <View style={rvStyles.container}>
       <Text style={rvStyles.label}>REST</Text>
-      <Text style={rvStyles.countdown}>{session.restSecsRemaining}</Text>
+      <Text style={rvStyles.countdown} allowFontScaling={false}>{session.restSecsRemaining}</Text>
       <CourtCanvas
         activePosition={null}
         courtSystem={session.config.courtSystem}
         dominantHand={session.config.dominantHand}
         gender={gender}
         courtMode={courtMode}
-        style={rvStyles.court}
+        style={[rvStyles.court, { width: courtW, height: courtH }]}
       />
       <Text style={rvStyles.nextLabel}>
         {session.nextPosition
@@ -422,7 +440,7 @@ const rvStyles = StyleSheet.create({
   container: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.lg },
   label:     { fontSize: FontSize.label, fontWeight: FontWeight.bold, color: Colors.rest, letterSpacing: 3 },
   countdown: { fontSize: 96, fontWeight: FontWeight.black, color: Colors.rest, lineHeight: 104 },
-  court:     { width: '70%', aspectRatio: 640 / 975, opacity: 0.5 },
+  court:     { opacity: 0.5 },
   nextLabel: { fontSize: FontSize.label, color: Colors.textMuted },
   skipBtn:   {
     paddingHorizontal: Spacing.xl, paddingVertical: Spacing.md,
@@ -472,7 +490,7 @@ function SessionSummaryView({
   const cfg = session.config;
   const restPerSetSecs = cfg.restMode === 'none' ? 0 :
     cfg.restMode === 'manual' ? cfg.restSeconds :
-    Math.round(MOVES_PER_SET[cfg.difficulty] * getIntervalMs(cfg.difficulty, cfg.tempo) * AUTO_REST_FACTORS[cfg.difficulty] / 1000);
+    Math.round(MOVES_PER_SET[cfg.difficulty] * getIntervalMs(cfg.difficulty, cfg.tempo, cfg.paceAdjustment) * AUTO_REST_FACTORS[cfg.difficulty] / 1000);
   const totalRestSecs   = session.setIndex * restPerSetSecs;
   const activeTimeSecs  = Math.max(1, durationSecs - totalRestSecs);
   const avgReact = session.repCount > 0 ? (activeTimeSecs / session.repCount).toFixed(1) : '—';
@@ -759,12 +777,15 @@ export default function SessionModal() {
     };
 
     if (isRunning) {
+      let cancelled = false;
       Brightness.getBrightnessAsync()
         .then((current) => {
-          savedBrightnessRef.current = current;
+          if (cancelled) return;
+          if (savedBrightnessRef.current === null) savedBrightnessRef.current = current;
           return Brightness.setBrightnessAsync(1.0);
         })
         .catch(() => {});
+      return () => { cancelled = true; };
     } else {
       restoreBrightness();
     }
@@ -803,7 +824,7 @@ export default function SessionModal() {
       onRequestClose={() => {}}
     >
       <SafeAreaProvider>
-      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+      <SafeAreaView style={[styles.safe, Platform.OS === 'web' && styles.safeWeb]} edges={['top', 'bottom']}>
         {/* Route to the correct view based on session state */}
         {session?.state === 'idle' && (
           <View style={idleStyles.container}>
@@ -865,7 +886,9 @@ export default function SessionModal() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.background },
+  safe:    { flex: 1, backgroundColor: Colors.background },
+  // Web: keeps the session view in a phone-width column at the centre of a desktop browser.
+  safeWeb: { maxWidth: 430, width: '100%', alignSelf: 'center' as any },
 });
 
 const idleStyles = StyleSheet.create({

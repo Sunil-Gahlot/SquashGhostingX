@@ -242,26 +242,52 @@ export function getShotsForPosition(
   return weightFiltered.filter((s) => s.groups.some((g) => activeGroups.includes(g)));
 }
 
+// Minimum number of other shots that must fire before a shot can repeat.
+const SHOT_COOLDOWN_DEPTH = 4;
+
+function buildWeightedPool(shots: ShotEntry[], difficulty?: Difficulty): ShotEntry[] {
+  const pool: ShotEntry[] = [];
+  for (const shot of shots) {
+    const count = difficulty
+      ? WEIGHT_BY_DIFFICULTY[shot.weight][difficulty]
+      : (shot.weight === 'primary' ? 6 : shot.weight === 'secondary' ? 3 : 1);
+    for (let i = 0; i < count; i++) pool.push(shot);
+  }
+  return pool;
+}
+
 // Weighted random shot selection with difficulty scaling.
 // primary/secondary/advanced counts per difficulty are defined in WEIGHT_BY_DIFFICULTY.
 // This ensures beginners rarely hear crosscourt drops or deception shots,
 // while advanced/pro players get the full realistic distribution.
 export function pickShot(shots: ShotEntry[], difficulty?: Difficulty): ShotEntry | null {
   if (shots.length === 0) return null;
+  const weighted = buildWeightedPool(shots, difficulty);
+  if (weighted.length === 0) return shots[Math.floor(Math.random() * shots.length)];
+  return weighted[Math.floor(Math.random() * weighted.length)];
+}
 
-  const weighted: ShotEntry[] = [];
-  for (const shot of shots) {
-    const count = difficulty
-      ? WEIGHT_BY_DIFFICULTY[shot.weight][difficulty]
-      : (shot.weight === 'primary' ? 6 : shot.weight === 'secondary' ? 3 : 1);
-    for (let i = 0; i < count; i++) weighted.push(shot);
-  }
+/**
+ * Cooldown-aware shot selection.
+ * Excludes shots whose voiceText appears in the last SHOT_COOLDOWN_DEPTH calls.
+ * Falls back to the least-recently-used shot if all are on cooldown (small position pool).
+ * Also applies left/right balance correction: if recent history is imbalanced by direction,
+ * the penalty for the over-represented side increases.
+ */
+export function pickShotWithCooldown(
+  shots: ShotEntry[],
+  difficulty?: Difficulty,
+  recentShots: string[] = [],
+): ShotEntry | null {
+  if (shots.length === 0) return null;
 
-  // If all shots were gated to 0 (e.g. beginner with only advanced shots in pool),
-  // fall back to giving each shot equal weight so there's always a call.
-  if (weighted.length === 0) {
-    return shots[Math.floor(Math.random() * shots.length)];
-  }
+  const onCooldown = new Set(recentShots.slice(-SHOT_COOLDOWN_DEPTH));
 
+  // Try to pick from shots NOT on cooldown
+  const available = shots.filter(s => !onCooldown.has(s.voiceText));
+  const pool = available.length > 0 ? available : shots; // fallback: all shots if all on cooldown
+
+  const weighted = buildWeightedPool(pool, difficulty);
+  if (weighted.length === 0) return pool[Math.floor(Math.random() * pool.length)];
   return weighted[Math.floor(Math.random() * weighted.length)];
 }

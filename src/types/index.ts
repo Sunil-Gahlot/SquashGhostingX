@@ -23,6 +23,13 @@ export type VoiceMode = 'voice+visual' | 'voice-only' | 'visual-only' | 'beep';
 export type ShotGroup = 'drives' | 'lengths' | 'drops' | 'kills' | 'lobs' | 'boasts' | 'volleys' | 'deception' | 'mixed';
 export type RestMode = 'auto' | 'manual' | 'none';
 
+export type PacePreset = 'slow' | 'normal' | 'fast';
+
+export interface PaceAdjustment {
+  preset: PacePreset;
+  fineSteps: number;  // -5 to +5; 0 = at preset level; positive = slower, negative = faster
+}
+
 export interface SessionConfig {
   drillType: DrillType;
   courtSystem: CourtSystem;
@@ -38,6 +45,7 @@ export interface SessionConfig {
   dominantHand: DominantHand;
   voiceGender: VoiceGender;
   language: Language;
+  paceAdjustment?: PaceAdjustment;  // pre-session pace setting; undefined = use Normal preset
 }
 
 // ─── Active Session Runtime ───────────────────────────────────────────────────
@@ -58,6 +66,7 @@ export interface ActiveSession {
   currentPosition: Position | null;
   nextPosition: Position | null;
   currentShot: string | null;
+  nextShot?: string | null;
   repCount: number;
   setIndex: number;           // which rest-period cycle we're on
   moveIndex: number;          // move within current set
