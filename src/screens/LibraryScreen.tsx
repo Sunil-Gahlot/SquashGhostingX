@@ -610,35 +610,72 @@ export default function LibraryScreen() {
               <View style={styles.amNavDivider} />
               <Text style={styles.amNavHeading}>More Articles</Text>
               <View style={styles.amNavCards}>
-                {prevArticle ? (
-                  <TouchableOpacity
-                    style={styles.amNavCard}
-                    onPress={() => openArticle(prevArticle)}
-                    activeOpacity={0.8}
-                  >
-                    <View style={styles.amNavCardHeader}>
-                      <Ionicons name="arrow-back" size={13} color={prevArticle.tagColor} />
-                      <Text style={[styles.amNavDir, { color: prevArticle.tagColor }]}>Previous</Text>
-                    </View>
-                    <Text style={styles.amNavCardTitle} numberOfLines={2}>{prevArticle.title}</Text>
-                    <View style={[styles.amNavCardAccent, { backgroundColor: prevArticle.tagColor }]} />
-                  </TouchableOpacity>
-                ) : <View style={styles.amNavCardBlank} />}
+                {/* On web: Next left, Previous right. On app: Previous left, Next right. */}
+                {Platform.OS === 'web' ? (
+                  <>
+                    {nextArticle ? (
+                      <TouchableOpacity
+                        style={styles.amNavCard}
+                        onPress={() => openArticle(nextArticle)}
+                        activeOpacity={0.8}
+                      >
+                        <View style={styles.amNavCardHeader}>
+                          <Ionicons name="arrow-forward" size={13} color={nextArticle.tagColor} />
+                          <Text style={[styles.amNavDir, { color: nextArticle.tagColor }]}>Next</Text>
+                        </View>
+                        <Text style={styles.amNavCardTitle} numberOfLines={2}>{nextArticle.title}</Text>
+                        <View style={[styles.amNavCardAccent, { backgroundColor: nextArticle.tagColor }]} />
+                      </TouchableOpacity>
+                    ) : <View style={styles.amNavCardBlank} />}
 
-                {nextArticle ? (
-                  <TouchableOpacity
-                    style={[styles.amNavCard, { alignItems: 'flex-end' }]}
-                    onPress={() => openArticle(nextArticle)}
-                    activeOpacity={0.8}
-                  >
-                    <View style={styles.amNavCardHeader}>
-                      <Text style={[styles.amNavDir, { color: nextArticle.tagColor }]}>Next</Text>
-                      <Ionicons name="arrow-forward" size={13} color={nextArticle.tagColor} />
-                    </View>
-                    <Text style={[styles.amNavCardTitle, { textAlign: 'right' }]} numberOfLines={2}>{nextArticle.title}</Text>
-                    <View style={[styles.amNavCardAccent, { backgroundColor: nextArticle.tagColor }]} />
-                  </TouchableOpacity>
-                ) : <View style={styles.amNavCardBlank} />}
+                    {prevArticle ? (
+                      <TouchableOpacity
+                        style={[styles.amNavCard, { alignItems: 'flex-end' }]}
+                        onPress={() => openArticle(prevArticle)}
+                        activeOpacity={0.8}
+                      >
+                        <View style={styles.amNavCardHeader}>
+                          <Text style={[styles.amNavDir, { color: prevArticle.tagColor }]}>Previous</Text>
+                          <Ionicons name="arrow-back" size={13} color={prevArticle.tagColor} />
+                        </View>
+                        <Text style={[styles.amNavCardTitle, { textAlign: 'right' }]} numberOfLines={2}>{prevArticle.title}</Text>
+                        <View style={[styles.amNavCardAccent, { backgroundColor: prevArticle.tagColor }]} />
+                      </TouchableOpacity>
+                    ) : <View style={styles.amNavCardBlank} />}
+                  </>
+                ) : (
+                  <>
+                    {prevArticle ? (
+                      <TouchableOpacity
+                        style={styles.amNavCard}
+                        onPress={() => openArticle(prevArticle)}
+                        activeOpacity={0.8}
+                      >
+                        <View style={styles.amNavCardHeader}>
+                          <Ionicons name="arrow-back" size={13} color={prevArticle.tagColor} />
+                          <Text style={[styles.amNavDir, { color: prevArticle.tagColor }]}>Previous</Text>
+                        </View>
+                        <Text style={styles.amNavCardTitle} numberOfLines={2}>{prevArticle.title}</Text>
+                        <View style={[styles.amNavCardAccent, { backgroundColor: prevArticle.tagColor }]} />
+                      </TouchableOpacity>
+                    ) : <View style={styles.amNavCardBlank} />}
+
+                    {nextArticle ? (
+                      <TouchableOpacity
+                        style={[styles.amNavCard, { alignItems: 'flex-end' }]}
+                        onPress={() => openArticle(nextArticle)}
+                        activeOpacity={0.8}
+                      >
+                        <View style={styles.amNavCardHeader}>
+                          <Text style={[styles.amNavDir, { color: nextArticle.tagColor }]}>Next</Text>
+                          <Ionicons name="arrow-forward" size={13} color={nextArticle.tagColor} />
+                        </View>
+                        <Text style={[styles.amNavCardTitle, { textAlign: 'right' }]} numberOfLines={2}>{nextArticle.title}</Text>
+                        <View style={[styles.amNavCardAccent, { backgroundColor: nextArticle.tagColor }]} />
+                      </TouchableOpacity>
+                    ) : <View style={styles.amNavCardBlank} />}
+                  </>
+                )}
               </View>
 
               <View style={{ height: 64 }} />
