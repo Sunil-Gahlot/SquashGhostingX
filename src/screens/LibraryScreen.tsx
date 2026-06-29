@@ -49,6 +49,10 @@ const VIDEOS: VideoItem[] = [
 export const ARTICLE_ID_FOOTWORK = '1';
 export const ARTICLE_ID_HABIT    = '2';
 
+// Exported YouTube IDs so HomeScreen video tiles deep-link to the correct video.
+export const VIDEO_YOUTUBE_10PT_COACH = 'WXNJNci6hfo';
+export const VIDEO_YOUTUBE_6PT_COACH  = 'j5CypiAZpoc';
+
 const CAT_COLOR: Record<string, string> = {
   '10pt': Colors.accentProgress,
   '6pt':  Colors.accentRoutines,
@@ -448,7 +452,7 @@ Personal bests track peak performance across specific drill types and metrics. R
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function LibraryScreen() {
-  const route = useRoute<RouteProp<{ Library: { articleId?: string } }, 'Library'>>();
+  const route = useRoute<RouteProp<{ Library: { articleId?: string; videoYoutubeId?: string } }, 'Library'>>();
   const [modalVideo,      setModalVideo]      = useState<VideoItem | null>(null);
   const [readingArticle,  setReadingArticle]  = useState<ArticleItem | null>(null);
   // BUG-023: track navigation history so ← goes back through prev/next chain.
@@ -467,6 +471,14 @@ export default function LibraryScreen() {
       setTimeout(() => articleScrollRef.current?.scrollTo({ y: 0, animated: false }), 30);
     }
   }, [route.params?.articleId]);
+
+  // Open a specific video when navigated from HomeScreen video tiles
+  useEffect(() => {
+    const youtubeId = route.params?.videoYoutubeId;
+    if (!youtubeId) return;
+    const target = VIDEOS.find((v) => v.youtubeId === youtubeId);
+    if (target) setModalVideo(target);
+  }, [route.params?.videoYoutubeId]);
 
   const articleIdx  = readingArticle ? ARTICLES.findIndex(a => a.id === readingArticle.id) : -1;
   const prevArticle = articleIdx > 0 ? ARTICLES[articleIdx - 1] : null;
@@ -550,6 +562,13 @@ export default function LibraryScreen() {
                   <View style={styles.vmLoading}>
                     <Ionicons name="logo-youtube" size={48} color="#FF0000" />
                     <Text style={styles.vmLoadingText}>Loading…</Text>
+                  </View>
+                )}
+                renderError={() => (
+                  <View style={styles.vmLoading}>
+                    <Ionicons name="wifi-outline" size={48} color="rgba(255,255,255,0.4)" />
+                    <Text style={styles.vmLoadingText}>Video unavailable</Text>
+                    <Text style={[styles.vmLoadingText, { fontSize: 12, marginTop: 4 }]}>Check your connection and try again</Text>
                   </View>
                 )}
               />

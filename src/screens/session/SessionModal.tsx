@@ -1,11 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Modal, View, Text, StyleSheet, TouchableOpacity,
   Animated, ScrollView, AppState, AppStateStatus,
-  useWindowDimensions, Platform,
+  useWindowDimensions, Platform, Alert,
 } from 'react-native';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
-import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSQLiteContext } from 'expo-sqlite';
 import * as Brightness from 'expo-brightness';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,8 +20,10 @@ import { useProfileStore } from '../../stores/profileStore';
 import { useBadgesStore, BADGE_DEFS } from '../../stores/badgesStore';
 import { useSessionEngine } from '../../hooks/useSessionEngine';
 import { ActiveSession, Difficulty } from '../../types';
-import { POSITION_INFO } from '../../constants/positions';
 import { PACE_STEPS_MS, PACE_STEP_LABELS, MOVES_PER_SET, getIntervalMs, AUTO_REST_FACTORS } from '../../constants/timing';
+import {
+  getStartCue, getPositionVoiceLabel, getNextLabel, getPrepareForNextSetLabel,
+} from '../../constants/voiceI18n';
 
 // ─── CountdownView ────────────────────────────────────────────────────────────
 
@@ -47,7 +49,7 @@ function CountdownView({ session }: { session: ActiveSession }) {
       <Animated.View style={[cdStyles.circle, { transform: [{ scale }], opacity }]}>
         <Text style={[cdStyles.number, isGo && cdStyles.numberGo]} allowFontScaling={false}>{display}</Text>
       </Animated.View>
-      <Text style={cdStyles.instruction}>Move to the T</Text>
+      <Text style={cdStyles.instruction}>{getStartCue(session.config.language)}</Text>
       <Text style={cdStyles.drillInfo}>
         {fmtCoverage(session.config.coverage)}  ·  {fmtLabel(session.config.drillType)}  ·  {session.config.difficulty}
       </Text>
@@ -111,6 +113,23 @@ function ActiveTrainingView({
   const setPaceStep = useSessionStore((s) => s.setPaceStep);
   const paceStep    = session.livePaceStep;
 
+  // Fade out current shot label — duration capped relative to the movement interval
+  // so fast-pace cycles don't produce overlapping animations.
+  const shotOpacity = useRef(new Animated.Value(0)).current;
+  const prevShot    = useRef<string | null>(null);
+  useEffect(() => {
+    if (session.currentShot && session.currentShot !== prevShot.current) {
+      prevShot.current = session.currentShot;
+      const intervalMs   = getIntervalMs(session.config.difficulty, session.config.tempo, session.config.paceAdjustment);
+      const fadeDuration = Math.min(1200, Math.max(200, Math.round(intervalMs * 0.35)));
+      const fadeDelay    = Math.min(800,  Math.max(100, Math.round(intervalMs * 0.25)));
+      shotOpacity.setValue(1);
+      Animated.timing(shotOpacity, {
+        toValue: 0, duration: fadeDuration, delay: fadeDelay, useNativeDriver: true,
+      }).start();
+    }
+  }, [session.currentShot]);
+
   const elapsed   = session.elapsedSeconds;
   const total     = session.config.duration * 60;
   const remaining = Math.max(0, total - elapsed);
@@ -118,6 +137,21 @@ function ActiveTrainingView({
   const rss = String(remaining % 60).padStart(2, '0');
 
   const diffLabel = session.config.difficulty.charAt(0).toUpperCase() + session.config.difficulty.slice(1);
+
+  const nextPosLabel = session.nextPosition
+    ? getPositionVoiceLabel(session.nextPosition, session.config.dominantHand, session.config.language)
+    : null;
+
+  function handleEndPress() {
+    Alert.alert(
+      'End Session?',
+      'Your progress so far will be saved.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'End Session', style: 'destructive', onPress: onEnd },
+      ]
+    );
+  }
 
   return (
     <View style={atStyles.container}>
@@ -141,12 +175,20 @@ function ActiveTrainingView({
         </View>
       </View>
 
-      {/* ── Drill metadata bar (static) ───────────────────────────── */}
-      <View style={atStyles.metaBar}>
-        <Text style={atStyles.metaText}>
-          {fmtCoverage(session.config.coverage)}  ·  {fmtLabel(session.config.drillType)}  ·  {session.config.courtSystem.toUpperCase()}
-        </Text>
-      </View>
+      {/* ── Current shot label (voice+visual / shot-based drills) ─── */}
+      {session.currentShot ? (
+        <Animated.View style={[atStyles.shotLabel, { opacity: shotOpacity }]}>
+          <Text style={atStyles.shotLabelText} allowFontScaling={false}>
+            {session.currentShot.replace(/\b\w/g, (c) => c.toUpperCase())}
+          </Text>
+        </Animated.View>
+      ) : (
+        <View style={atStyles.metaBar}>
+          <Text style={atStyles.metaText}>
+            {fmtCoverage(session.config.coverage)}  ·  {fmtLabel(session.config.drillType)}  ·  {session.config.courtSystem.toUpperCase()}
+          </Text>
+        </View>
+      )}
 
       {/* ── Court (fills remaining space) ─────────────────────────── */}
       <CourtCanvas
@@ -157,6 +199,14 @@ function ActiveTrainingView({
         courtMode={courtMode}
         style={atStyles.court}
       />
+
+      {/* ── Next position hint ────────────────────────────────────── */}
+      {nextPosLabel && (
+        <View style={atStyles.nextPosBar}>
+          <Ionicons name="arrow-forward-circle-outline" size={13} color={Colors.textMuted} />
+          <Text style={atStyles.nextPosText}>{getNextLabel(session.config.language)}: {nextPosLabel}</Text>
+        </View>
+      )}
 
       {/* ── Progress bar ──────────────────────────────────────────── */}
       <View style={atStyles.progressWrap}>
@@ -199,14 +249,16 @@ function ActiveTrainingView({
         </View>
       </View>
 
-      {/* ── END | PAUSE buttons ───────────────────────────────────── */}
+      {/* ── PAUSE (primary) | END (subordinate) ───────────────────── */}
+      {/* PAUSE is the larger, filled, default-reach action; END is a smaller ghost
+          button so a sweaty grab at arm's length doesn't accidentally end the session. */}
       <View style={atStyles.controls}>
-        <TouchableOpacity onPress={onEnd} style={[atStyles.btn, atStyles.btnEnd]} activeOpacity={0.82}>
-          <Text style={atStyles.btnEndText}>END</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={onPause} style={[atStyles.btn, atStyles.btnPause]} activeOpacity={0.82}>
-          <Ionicons name="pause" size={16} color={Colors.textPrimary} />
+        <TouchableOpacity onPress={onPause} style={atStyles.btnPause} activeOpacity={0.85}>
+          <Ionicons name="pause" size={18} color={Colors.background} />
           <Text style={atStyles.btnPauseText}>PAUSE</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleEndPress} style={atStyles.btnEnd} activeOpacity={0.75} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+          <Text style={atStyles.btnEndText}>End</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -257,6 +309,36 @@ const atStyles = StyleSheet.create({
     color: Colors.textMuted,
     letterSpacing: 0.8,
     textTransform: 'uppercase',
+  },
+
+  // Current shot overlay (fades after each call)
+  shotLabel: {
+    marginHorizontal: Spacing.base,
+    marginBottom: Spacing.sm,
+    alignItems: 'center',
+    paddingVertical: 5,
+  },
+  shotLabelText: {
+    fontSize: FontSize.title,
+    fontWeight: FontWeight.bold,
+    color: Colors.brand,
+    letterSpacing: 0.4,
+    textAlign: 'center',
+  },
+
+  // Next position hint shown below the court
+  nextPosBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    marginHorizontal: Spacing.base,
+    paddingVertical: 3,
+  },
+  nextPosText: {
+    fontSize: FontSize.caption,
+    color: Colors.textMuted,
+    fontWeight: FontWeight.medium,
   },
 
   // Court
@@ -325,14 +407,20 @@ const atStyles = StyleSheet.create({
 
   // Controls
   controls: {
-    flexDirection: 'row', gap: Spacing.md,
+    flexDirection: 'row', alignItems: 'center', gap: Spacing.md,
     paddingHorizontal: Spacing.base, paddingBottom: Spacing.xl, paddingTop: Spacing.xs,
   },
-  btn:    { flex: 1, height: ButtonHeight.md, borderRadius: BorderRadius.full, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 6 },
-  btnEnd: { backgroundColor: Colors.background, borderWidth: 2, borderColor: Colors.danger },
-  btnPause: { backgroundColor: Colors.surface },
-  btnEndText:   { fontSize: FontSize.label, fontWeight: FontWeight.bold, color: Colors.danger, letterSpacing: 1 },
-  btnPauseText: { fontSize: FontSize.label, fontWeight: FontWeight.bold, color: Colors.textPrimary, letterSpacing: 1 },
+  btnPause: {
+    flex: 1, height: ButtonHeight.lg, borderRadius: BorderRadius.full,
+    alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8,
+    backgroundColor: Colors.brand,
+  },
+  btnEnd: {
+    paddingHorizontal: Spacing.lg, height: ButtonHeight.md, borderRadius: BorderRadius.full,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  btnPauseText: { fontSize: FontSize.body, fontWeight: FontWeight.bold, color: Colors.background, letterSpacing: 1 },
+  btnEndText:   { fontSize: FontSize.label, fontWeight: FontWeight.medium, color: Colors.textMuted, letterSpacing: 0.5 },
 });
 
 // ─── PausedView ───────────────────────────────────────────────────────────────
@@ -426,8 +514,8 @@ function RestView({ session, onSkip, courtMode, gender }: { session: ActiveSessi
       />
       <Text style={rvStyles.nextLabel}>
         {session.nextPosition
-          ? `Next: ${POSITION_INFO[session.nextPosition]?.label ?? ''}`
-          : 'Prepare for next set'}
+          ? `${getNextLabel(session.config.language)}: ${getPositionVoiceLabel(session.nextPosition, session.config.dominantHand, session.config.language)}`
+          : getPrepareForNextSetLabel(session.config.language)}
       </Text>
       <TouchableOpacity onPress={onSkip} style={rvStyles.skipBtn} activeOpacity={0.8}>
         <Text style={rvStyles.skipText}>Skip Rest  →</Text>
@@ -474,6 +562,11 @@ function SessionSummaryView({
 }) {
   const { stats, newPBSessionId, recentSessions } = useProgressStore();
   const { justEarned, clearJustEarned } = useBadgesStore();
+  const isGuest = useProfileStore((s) => s.profile.isGuest);
+  const hasCompletedAuth = useProfileStore((s) => s.hasCompletedAuth);
+
+  // Show a one-time "save your progress" nudge to guest users who have completed 3+ sessions.
+  const showGuestNudge = isGuest && !hasCompletedAuth && recentSessions.length >= 3;
 
   const durationSecs = session.elapsedSeconds;
   const mm = String(Math.floor(durationSecs / 60)).padStart(2, '0');
@@ -495,11 +588,14 @@ function SessionSummaryView({
   const activeTimeSecs  = Math.max(1, durationSecs - totalRestSecs);
   const avgReact = session.repCount > 0 ? (activeTimeSecs / session.repCount).toFixed(1) : '—';
 
-  // BUG-020: calories should scale with difficulty (higher difficulty = more intense = more calories).
-  const calPerRep: Record<Difficulty, number> = {
-    beginner: 1.2, intermediate: 1.8, advanced: 2.4, elite: 3.0, pro: 3.6,
+  // Calories estimated from MET values (Compendium of Physical Activities, squash) scaled by
+  // active time rather than rep count — rep-count scaling previously produced 4-6x inflated
+  // values at high difficulty since higher difficulty also means more reps per minute.
+  const metPerDiff: Record<Difficulty, number> = {
+    beginner: 7.3, intermediate: 9.0, advanced: 11.0, elite: 13.0, pro: 15.0,
   };
-  const calories = Math.round(session.repCount * (calPerRep[cfg.difficulty] ?? 1.8));
+  const KCAL_PER_MET_MIN = 70 * 3.5 / 200; // 70kg reference body weight
+  const calories = Math.round((metPerDiff[cfg.difficulty] ?? 9.0) * KCAL_PER_MET_MIN * (activeTimeSecs / 60));
 
   const isNewPB = newPBSessionId === session.sessionId;
 
@@ -531,12 +627,10 @@ function SessionSummaryView({
       <Text style={ssStyles.subline}>
         {wasComplete ? 'Great effort. Keep the streak going.' : 'Good work. Every session counts.'}
       </Text>
-      {wasComplete && (
-        <View style={ssStyles.savedRow}>
-          <Ionicons name="checkmark-circle" size={16} color={Colors.primary} />
-          <Text style={ssStyles.savedText}>Session saved</Text>
-        </View>
-      )}
+      <View style={ssStyles.savedRow}>
+        <Ionicons name="checkmark-circle" size={16} color={Colors.primary} />
+        <Text style={ssStyles.savedText}>Session saved</Text>
+      </View>
 
       {/* PB banner */}
       {isNewPB && (
@@ -593,7 +687,7 @@ function SessionSummaryView({
         />
         <SummaryStatCard
           icon="bar-chart" iconBg={`${Colors.accentProgress}22`} iconColor={Colors.accentProgress}
-          value={`${completion}%`} label="Consistency"
+          value={`${completion}%`} label="Completion"
         />
         <SummaryStatCard
           icon="flame" iconBg="#FF450022" iconColor="#FF4500"
@@ -616,6 +710,19 @@ function SessionSummaryView({
           <Text style={ssStyles.nudgeBody}>
             3 sessions at {session.config.difficulty} with 90%+ — try stepping up to {nextDiff}.
           </Text>
+        </View>
+      )}
+
+      {/* Guest nudge — shown after 3 sessions to encourage account creation */}
+      {showGuestNudge && (
+        <View style={ssStyles.guestNudge}>
+          <Ionicons name="cloud-upload-outline" size={18} color={Colors.brand} />
+          <View style={ssStyles.guestNudgeText}>
+            <Text style={ssStyles.guestNudgeTitle}>Save your progress?</Text>
+            <Text style={ssStyles.guestNudgeBody}>
+              Create a free account so your sessions are protected if you change devices or reinstall.
+            </Text>
+          </View>
         </View>
       )}
 
@@ -727,6 +834,21 @@ const ssStyles = StyleSheet.create({
     fontSize: FontSize.caption, color: Colors.textMuted,
   },
 
+  // Guest nudge
+  guestNudge: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: Spacing.md,
+    backgroundColor: Colors.brandSoft,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1, borderColor: Colors.borderBrand,
+    padding: Spacing.md,
+  },
+  guestNudgeText: { flex: 1, gap: 3 },
+  guestNudgeTitle: { fontSize: FontSize.label, fontWeight: FontWeight.semiBold, color: Colors.brand },
+  guestNudgeBody:  { fontSize: FontSize.caption, color: Colors.textSecondary, lineHeight: 18 },
+
   // Buttons
   doneBtn: {
     width: '100%', height: ButtonHeight.xl,
@@ -778,13 +900,17 @@ export default function SessionModal() {
 
     if (isRunning) {
       let cancelled = false;
-      Brightness.getBrightnessAsync()
-        .then((current) => {
-          if (cancelled) return;
-          if (savedBrightnessRef.current === null) savedBrightnessRef.current = current;
-          return Brightness.setBrightnessAsync(1.0);
-        })
-        .catch(() => {});
+      const boostBrightness = async () => {
+        if (Platform.OS === 'android') {
+          const { status } = await Brightness.requestPermissionsAsync().catch(() => ({ status: 'denied' as const }));
+          if (status !== 'granted') return;
+        }
+        const current = await Brightness.getBrightnessAsync().catch(() => null);
+        if (cancelled || current === null) return;
+        if (savedBrightnessRef.current === null) savedBrightnessRef.current = current;
+        await Brightness.setBrightnessAsync(1.0).catch(() => {});
+      };
+      boostBrightness();
       return () => { cancelled = true; };
     } else {
       restoreBrightness();
@@ -823,7 +949,6 @@ export default function SessionModal() {
       statusBarTranslucent
       onRequestClose={() => {}}
     >
-      <SafeAreaProvider>
       <SafeAreaView style={[styles.safe, Platform.OS === 'web' && styles.safeWeb]} edges={['top', 'bottom']}>
         {/* Route to the correct view based on session state */}
         {session?.state === 'idle' && (
@@ -880,7 +1005,6 @@ export default function SessionModal() {
           />
         )}
       </SafeAreaView>
-      </SafeAreaProvider>
     </Modal>
   );
 }

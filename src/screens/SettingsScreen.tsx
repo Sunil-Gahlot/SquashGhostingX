@@ -24,6 +24,7 @@ import HelpModal from './HelpModal';
 import TermsConsentModal from './TermsConsentModal';
 import { useSignOut } from '../hooks/useSignOut';
 import { useSessionStore } from '../stores/sessionStore';
+import Constants from 'expo-constants';
 
 // ─── Row components ───────────────────────────────────────────────────────────
 
@@ -161,6 +162,8 @@ const TEST_PHRASES: Partial<Record<Language, string>> = {
   ha: 'Gaban hagu. Koma zuwa T.',
 };
 
+const APP_VERSION = Constants.expoConfig?.version ?? '1.0.0';
+
 export default function SettingsScreen() {
   const db = useSQLiteContext() as any;
   const { profile, resetProfile, deleteAccount } = useProfileStore();
@@ -170,9 +173,10 @@ export default function SettingsScreen() {
   const { clearCache } = useProgressStore();
   const performSignOut = useSignOut();
 
-  const [profileVisible, setProfileVisible] = useState(false);
-  const [helpVisible, setHelpVisible]       = useState(false);
-  const [termsVisible, setTermsVisible]     = useState(false);
+  const [profileVisible, setProfileVisible]   = useState(false);
+  const [helpVisible, setHelpVisible]         = useState(false);
+  const [termsVisible, setTermsVisible]       = useState(false);
+  const [privacyVisible, setPrivacyVisible]   = useState(false);
 
   const displayName = profile.name.trim() || 'Player';
   const skillColor  = SKILL_COLORS[profile.skillLevel] ?? Colors.levelIntermediate;
@@ -293,7 +297,8 @@ export default function SettingsScreen() {
       </Modal>
 
       <HelpModal visible={helpVisible} onClose={() => setHelpVisible(false)} />
-      {termsVisible && <TermsConsentModal viewOnly onClose={() => setTermsVisible(false)} />}
+      {termsVisible  && <TermsConsentModal viewOnly onClose={() => setTermsVisible(false)} />}
+      {privacyVisible && <TermsConsentModal privacyOnly onClose={() => setPrivacyVisible(false)} />}
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
@@ -625,7 +630,7 @@ export default function SettingsScreen() {
             label="Privacy Policy"
             sub="All data stored locally — nothing leaves your device"
             right={<Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />}
-            onPress={() => setTermsVisible(true)}
+            onPress={() => setPrivacyVisible(true)}
           />
           <SettingsRow
             icon="document-text" iconBg={`${Colors.accentProgress}22`} iconColor={Colors.accentProgress}
@@ -650,10 +655,10 @@ export default function SettingsScreen() {
         >
           <SettingsRow
             icon="information-circle" iconBg={`${Colors.accentProgress}22`} iconColor={Colors.accentProgress}
-            label="About" sub="Version 1.0.0 · All data stored locally on device"
+            label="About" sub={`Version ${APP_VERSION} · All data stored locally on device`}
             right={<Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />}
             onPress={() => Alert.alert(
-              'Squash GhostingX v1.0.0',
+              `Squash GhostingX v${APP_VERSION}`,
               'AI-guided squash ghosting coach with real-time voice coaching, analytics, and structured training programs.\n\nAll training data is stored exclusively on your device. No server. No cloud.',
               [{ text: 'Close', style: 'cancel' }]
             )}
@@ -673,7 +678,7 @@ export default function SettingsScreen() {
           />
         </CollapsibleGroup>
 
-        <Text style={styles.footerText}>Squash GhostingX · v1.0.0</Text>
+        <Text style={styles.footerText}>Squash GhostingX · v{APP_VERSION}</Text>
       </ScrollView>
     </SafeAreaView>
   );

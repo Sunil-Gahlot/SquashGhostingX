@@ -16,7 +16,8 @@ import { getSuggestedDrill } from '../data/builtinPrograms';
 import { SessionConfig } from '../types';
 import ProfileScreen from './ProfileScreen';
 import HelpModal from './HelpModal';
-import { ARTICLE_ID_FOOTWORK, ARTICLE_ID_HABIT } from './LibraryScreen';
+import { ARTICLE_ID_FOOTWORK, ARTICLE_ID_HABIT, VIDEO_YOUTUBE_6PT_COACH, VIDEO_YOUTUBE_10PT_COACH } from './LibraryScreen';
+import { getHeroHeadlines } from '../constants/voiceI18n';
 
 type PopularBase = Omit<SessionConfig, 'dominantHand' | 'voiceGender' | 'language'>;
 
@@ -35,16 +36,7 @@ const ARTICLE_PREVIEWS = [
   },
 ];
 
-const HERO_HEADLINES = [
-  'Ready to\nDominate the Court?',
-  'Push Your\nLimits Today.',
-  'Every Move\nMatters.',
-  'Outwork.\nOutmove. Win.',
-  'Champions Train\nEvery Day.',
-  'Your Best Game\nStarts Here.',
-  'No Limits.\nFull Court.',
-  'Consistency\nBuilds Champions.',
-] as const;
+const HERO_HEADLINE_COUNT = 8;
 
 type ProgramCard = {
   id: string;
@@ -132,6 +124,7 @@ export default function HomeScreen({ navigation }: any) {
   const [headlineIdx, setHeadlineIdx] = useState(0);
   const [profileVisible, setProfileVisible] = useState(false);
   const [helpVisible, setHelpVisible]       = useState(false);
+  const [photoImgError, setPhotoImgError]   = useState(false);
 
   const name = profile.name.trim() || 'Player';
 
@@ -151,7 +144,7 @@ export default function HomeScreen({ navigation }: any) {
   useEffect(() => {
     const t = setInterval(() => {
       Animated.timing(headlineFade, { toValue: 0, duration: 350, useNativeDriver: true }).start(() => {
-        const next = (headlineIdxRef.current + 1) % HERO_HEADLINES.length;
+        const next = (headlineIdxRef.current + 1) % HERO_HEADLINE_COUNT;
         headlineIdxRef.current = next;
         setHeadlineIdx(next);
         headlineLift.setValue(14);
@@ -172,7 +165,7 @@ export default function HomeScreen({ navigation }: any) {
         if (Math.abs(gs.dx) < 40) return;
         const dir = gs.dx < 0 ? 1 : -1;
         Animated.timing(headlineFade, { toValue: 0, duration: 200, useNativeDriver: true }).start(() => {
-          const next = (headlineIdxRef.current + HERO_HEADLINES.length + dir) % HERO_HEADLINES.length;
+          const next = (headlineIdxRef.current + HERO_HEADLINE_COUNT + dir) % HERO_HEADLINE_COUNT;
           headlineIdxRef.current = next;
           setHeadlineIdx(next);
           headlineLift.setValue(dir > 0 ? 14 : -14);
@@ -303,8 +296,12 @@ export default function HomeScreen({ navigation }: any) {
             <View style={styles.heroTop}>
               <TouchableOpacity style={styles.heroIdentity} onPress={() => setProfileVisible(true)} activeOpacity={0.8}>
                 <View style={styles.avatarWrap}>
-                  {profile.photoUri ? (
-                    <Image source={{ uri: profile.photoUri }} style={styles.avatarPhoto} />
+                  {profile.photoUri && !photoImgError ? (
+                    <Image
+                      source={{ uri: profile.photoUri }}
+                      style={styles.avatarPhoto}
+                      onError={() => setPhotoImgError(true)}
+                    />
                   ) : (
                     <Text style={styles.avatarText}>{getInitials(name)}</Text>
                   )}
@@ -330,10 +327,10 @@ export default function HomeScreen({ navigation }: any) {
               <Animated.Text
                 style={[styles.heroHeadline, { opacity: headlineFade, transform: [{ translateY: headlineLift }] }]}
               >
-                {HERO_HEADLINES[headlineIdx]}
+                {getHeroHeadlines(profile.language)[headlineIdx]}
               </Animated.Text>
               <View style={styles.headlineDots}>
-                {HERO_HEADLINES.map((_, i) => (
+                {Array.from({ length: HERO_HEADLINE_COUNT }, (_, i) => (
                   <View key={i} style={[styles.headlineDot, i === headlineIdx && styles.headlineDotActive]} />
                 ))}
               </View>
@@ -549,14 +546,14 @@ export default function HomeScreen({ navigation }: any) {
             <LibraryTile
               title="6-Point Ghosting Drill"
               duration="0:22"
-              youtubeId="j5CypiAZpoc"
-              onPress={() => navigation.navigate('Library')}
+              youtubeId={VIDEO_YOUTUBE_6PT_COACH}
+              onPress={() => navigation.navigate('Library', { videoYoutubeId: VIDEO_YOUTUBE_6PT_COACH } as any)}
             />
             <LibraryTile
               title="10-Point Ghosting Drill"
               duration="0:42"
-              youtubeId="WXNJNci6hfo"
-              onPress={() => navigation.navigate('Library')}
+              youtubeId={VIDEO_YOUTUBE_10PT_COACH}
+              onPress={() => navigation.navigate('Library', { videoYoutubeId: VIDEO_YOUTUBE_10PT_COACH } as any)}
             />
           </View>
 
@@ -606,7 +603,11 @@ function LibraryTile({ title, duration, youtubeId, onPress }: {
   const thumbUri = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
   return (
     <TouchableOpacity style={libStyles.tile} onPress={onPress} activeOpacity={0.82}>
-      {!imgError && (
+      {imgError ? (
+        <View style={libStyles.thumbFallback}>
+          <Ionicons name="play-circle-outline" size={38} color={Colors.textMuted} />
+        </View>
+      ) : (
         <Image source={{ uri: thumbUri }} style={libStyles.thumb} resizeMode="cover" onError={() => setImgError(true)} />
       )}
       <View style={libStyles.overlay} />
@@ -632,6 +633,11 @@ const libStyles = StyleSheet.create({
   },
   thumb: {
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+  },
+  thumbFallback: {
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: Colors.surfaceElevated,
   },
   overlay: {
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,

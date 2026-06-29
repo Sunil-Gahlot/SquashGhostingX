@@ -42,11 +42,11 @@ const DRILL_TYPE_OPTS: StepOption[] = [
 ];
 
 const DIFFICULTY_OPTS: StepOption[] = [
-  { value: 'beginner',     title: 'Beginner',     desc: 'Simple patterns, 6-point court, one shot per position.',                    icon: 'leaf',    iconColor: Colors.levelBeginner,     iconBg: `${Colors.levelBeginner}22` },
-  { value: 'intermediate', title: 'Intermediate', desc: '2–3 shot options, semi-random patterns.',                                    icon: 'trending-up', iconColor: Colors.levelIntermediate, iconBg: `${Colors.levelIntermediate}22` },
-  { value: 'advanced',     title: 'Advanced',     desc: 'Full shot variety, 10-point court recommended.',                             icon: 'flash',   iconColor: Colors.levelAdvanced,     iconBg: `${Colors.levelAdvanced}22` },
-  { value: 'elite',        title: 'Elite',        desc: 'Fully random, all shots, fastest timing.',                                   icon: 'medal',   iconColor: Colors.levelElite,        iconBg: `${Colors.levelElite}22` },
-  { value: 'pro',          title: 'Pro',          desc: 'Competition-level pace — maximum speed and variety.',                        icon: 'diamond', iconColor: Colors.levelPro,          iconBg: `${Colors.levelPro}22` },
+  { value: 'beginner',     title: 'Beginner',     desc: 'Fundamentals: straight drives, lobs and basic boasts. 6-point court recommended.',                          icon: 'leaf',        iconColor: Colors.levelBeginner,     iconBg: `${Colors.levelBeginner}22` },
+  { value: 'intermediate', title: 'Intermediate', desc: 'Wide shot variety including volleys and deception. Advanced shots appear rarely.',                          icon: 'trending-up', iconColor: Colors.levelIntermediate, iconBg: `${Colors.levelIntermediate}22` },
+  { value: 'advanced',     title: 'Advanced',     desc: 'Full shot range with frequent deception. 10-point court recommended.',                                      icon: 'flash',       iconColor: Colors.levelAdvanced,     iconBg: `${Colors.levelAdvanced}22` },
+  { value: 'elite',        title: 'Elite',        desc: 'Maximum shot variety, fast timing, high deception frequency.',                                             icon: 'medal',       iconColor: Colors.levelElite,        iconBg: `${Colors.levelElite}22` },
+  { value: 'pro',          title: 'Pro',          desc: 'Competition-level pace — all shots, all positions, maximum speed.',                                        icon: 'diamond',     iconColor: Colors.levelPro,          iconBg: `${Colors.levelPro}22` },
 ];
 
 const COVERAGE_OPTS: StepOption[] = [
@@ -137,7 +137,7 @@ function buildDrillTypeOpts(coverage: CoverageMode): StepOption[] {
 
 const STEPS_BASE     = ['coverage', 'drillType', 'difficulty', 'courtSystem', 'pattern', 'session'] as const;
 const STEPS_MATCHSIM = ['coverage', 'drillType', 'difficulty', 'courtSystem',            'session'] as const;
-// Zone-specific drills (front/back/forehand/backhand) are always 6pt — court system step is skipped.
+// Zone drills skip the court system step and use the user's default court system setting.
 const STEPS_ZONE     = ['coverage', 'drillType', 'difficulty',               'pattern', 'session'] as const;
 type StepKey = typeof STEPS_BASE[number];
 
@@ -608,7 +608,13 @@ export default function DrillConfigModal() {
     }
   }
 
-  const nextEnabled = true;
+  const nextEnabled: boolean = (() => {
+    switch (stepKey) {
+      case 'session':  return duration > 0;
+      case 'pattern':  return drillType !== 'shot-based' || shotGroups.length > 0;
+      default:         return true;
+    }
+  })();
 
   return (
     <Modal

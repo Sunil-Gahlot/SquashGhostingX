@@ -92,10 +92,16 @@ export async function saveCheckpoint(
 }
 
 export async function getCheckpoint(db: DB): Promise<SessionCheckpoint | null> {
+  // RESUME_MAX_AGE_HOURS (timing.ts) — checkpoints older than 4 hours are stale and
+  // should not be offered as a resumable session. saved_at is stored via toISOString()
+  // (e.g. "2026-06-29T10:30:00.123Z"), so the cutoff must be computed in the same format —
+  // SQLite's datetime('now') returns a space-separated, no-millisecond, no-Z string, which
+  // compares incorrectly against ISO strings using a plain text >= comparison.
+  const cutoff = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
   const row = await db.getFirstAsync<{
     session_id: string; config_json: string; set_index: number;
     move_index: number; movements_done: number; elapsed_s: number; saved_at: string;
-  }>('SELECT * FROM checkpoints ORDER BY saved_at DESC LIMIT 1');
+  }>('SELECT * FROM checkpoints WHERE saved_at >= ? ORDER BY saved_at DESC LIMIT 1', cutoff);
 
   if (!row) return null;
   let config: any;
@@ -106,6 +112,10 @@ export async function getCheckpoint(db: DB): Promise<SessionCheckpoint | null> {
     await db.runAsync('DELETE FROM checkpoints').catch(() => {});
     return null;
   }
+  // Clean up any stale checkpoints (older than the resume window) so they don't
+  // accumulate indefinitely in the table.
+  await db.runAsync('DELETE FROM checkpoints WHERE saved_at < ?', cutoff).catch(() => {});
+
   return {
     sessionId: row.session_id,
     config,

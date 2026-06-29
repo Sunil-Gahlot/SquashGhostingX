@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Modal, View, Text, StyleSheet, TouchableOpacity, Alert,
 } from 'react-native';
-import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSQLiteContext } from 'expo-sqlite';
 
 import { Colors } from '../../constants/colors';
@@ -60,7 +60,6 @@ export default function ResumePromptModal() {
   return (
     <Modal visible transparent animationType="fade" onRequestClose={handleDiscard}>
       <View style={styles.backdrop}>
-        <SafeAreaProvider>
         <SafeAreaView edges={['bottom']}>
           <View style={styles.sheet}>
             {/* Header */}
@@ -99,7 +98,6 @@ export default function ResumePromptModal() {
             </TouchableOpacity>
           </View>
         </SafeAreaView>
-        </SafeAreaProvider>
       </View>
     </Modal>
   );

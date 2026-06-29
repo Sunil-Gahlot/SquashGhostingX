@@ -84,7 +84,17 @@ const SECTIONS = [
   },
 ];
 
-export default function TermsConsentModal({ viewOnly, onClose }: { viewOnly?: boolean; onClose?: () => void } = {}) {
+const PRIVACY_SECTION = SECTIONS.find((s) => s.title.startsWith('9.'))!;
+
+export default function TermsConsentModal({
+  viewOnly,
+  privacyOnly,
+  onClose,
+}: {
+  viewOnly?: boolean;
+  privacyOnly?: boolean;
+  onClose?: () => void;
+} = {}) {
   const hasAcceptedTerms = useProfileStore((s) => s.hasAcceptedTerms);
   const acceptTerms      = useProfileStore((s) => s.acceptTerms);
 
@@ -93,10 +103,10 @@ export default function TermsConsentModal({ viewOnly, onClose }: { viewOnly?: bo
 
   // Reset scroll state each time the modal becomes visible (e.g. after account deletion).
   useEffect(() => {
-    if (!hasAcceptedTerms && !viewOnly) {
+    if (!hasAcceptedTerms && !viewOnly && !privacyOnly) {
       setScrolledToBottom(false);
     }
-  }, [hasAcceptedTerms, viewOnly]);
+  }, [hasAcceptedTerms, viewOnly, privacyOnly]);
 
   function handleScroll(e: NativeSyntheticEvent<NativeScrollEvent>) {
     const { layoutMeasurement, contentOffset, contentSize } = e.nativeEvent;
@@ -104,6 +114,43 @@ export default function TermsConsentModal({ viewOnly, onClose }: { viewOnly?: bo
     const requiresScroll = contentSize.height > layoutMeasurement.height + 120;
     const isBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height - 40;
     if (!requiresScroll || isBottom) setScrolledToBottom(true);
+  }
+
+  // Privacy-only view: a standalone modal showing only the Privacy & Data section.
+  if (privacyOnly) {
+    return (
+      <Modal visible animationType="slide" presentationStyle="formSheet" onRequestClose={onClose}>
+        <SafeAreaView style={s.safe}>
+          <View style={s.header}>
+            <View style={s.logoRow}>
+              <Ionicons name="lock-closed" size={24} color={Colors.brand} />
+              <Text style={s.appName}>Squash GhostingX</Text>
+            </View>
+            <Text style={s.title}>Privacy Policy</Text>
+            <Text style={s.subtitle}>How your data is stored and protected</Text>
+            <Text style={s.version}>Effective {EFFECTIVE_DATE}</Text>
+          </View>
+          <ScrollView style={s.scroll} contentContainerStyle={s.scrollContent} showsVerticalScrollIndicator>
+            <View style={s.section}>
+              <Text style={s.sectionTitle}>{PRIVACY_SECTION.title}</Text>
+              <Text style={s.sectionBody}>{PRIVACY_SECTION.body}</Text>
+            </View>
+            <View style={[s.section, { marginTop: Spacing.sm }]}>
+              <Text style={s.sectionTitle}>Data Stored On-Device</Text>
+              <Text style={s.sectionBody}>
+                {'• Session history (date, duration, reps, difficulty)\n• Movement recordings (anonymised position sequences)\n• Personal bests\n• Profile name, date of birth, and gender (encrypted via device Keychain/Keystore)\n• App settings and preferences\n\nNone of this data ever leaves your device. Deleting the app removes all data permanently.'}
+              </Text>
+            </View>
+          </ScrollView>
+          <View style={s.footer}>
+            <TouchableOpacity style={s.agreeBtn} onPress={onClose} activeOpacity={0.85}>
+              <Ionicons name="close-circle-outline" size={18} color={Colors.textPrimary} />
+              <Text style={s.agreeBtnText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </Modal>
+    );
   }
 
   // Always keep this component mounted — control visibility via the `visible` prop only.

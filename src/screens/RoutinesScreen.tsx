@@ -12,6 +12,7 @@ import { useProfileStore } from '../stores/profileStore';
 import { useProgressStore } from '../stores/progressStore';
 import { useSettingsStore } from '../stores/settingsStore';
 import { Program, SkillLevel } from '../types';
+import { getComingSoonLabel, getProgramsInDevLabel } from '../constants/voiceI18n';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -77,7 +78,7 @@ function CategoryCard({ gridKey, onPress }: { gridKey: GridKey; onPress: () => v
       <View style={styles.cardFooter}>
         <View style={[styles.badge, { backgroundColor: `${meta.color}1A` }]}>
           <Text style={[styles.badgeText, { color: meta.color }]}>
-            {isCustom ? 'Build now' : count! > 0 ? `${count} programs` : 'Coming soon'}
+            {isCustom ? 'New Drill' : count! > 0 ? `${count} programs` : 'Coming soon'}
           </Text>
         </View>
         <Ionicons name="chevron-forward" size={12} color={Colors.textMuted} />
@@ -203,8 +204,8 @@ export default function RoutinesScreen() {
               <View style={[styles.emptyIconBox, { backgroundColor: `${meta.color}18` }]}>
                 <Ionicons name="hourglass-outline" size={28} color={meta.color} />
               </View>
-              <Text style={styles.emptyTitle}>Coming Soon</Text>
-              <Text style={styles.emptySub}>Pro-level programs are in development</Text>
+              <Text style={styles.emptyTitle}>{getComingSoonLabel(profile.language)}</Text>
+              <Text style={styles.emptySub}>{getProgramsInDevLabel(profile.language)}</Text>
             </View>
           )}
         </ScrollView>

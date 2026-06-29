@@ -1,29 +1,32 @@
 import 'react-native-gesture-handler';
 import React, { useEffect, useRef, Component, ReactNode } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform, useWindowDimensions } from 'react-native';
 import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
-import { SQLiteProvider } from 'expo-sqlite';
+import { SQLiteProvider, useSQLiteContext } from 'expo-sqlite';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
 
-import HomeScreen       from './src/screens/HomeScreen';
-import RoutinesScreen   from './src/screens/RoutinesScreen';
-import ProgressScreen   from './src/screens/ProgressScreen';
-import LibraryScreen    from './src/screens/LibraryScreen';
-import SettingsScreen   from './src/screens/SettingsScreen';
-import SessionModal     from './src/screens/session/SessionModal';
-import DrillConfigModal from './src/screens/drill/DrillConfigModal';
-import OnboardingModal  from './src/screens/onboarding/OnboardingModal';
-import AuthModal        from './src/screens/auth/AuthModal';
+import HomeScreen          from './src/screens/HomeScreen';
+import RoutinesScreen      from './src/screens/RoutinesScreen';
+import ProgressScreen      from './src/screens/ProgressScreen';
+import LibraryScreen       from './src/screens/LibraryScreen';
+import SettingsScreen      from './src/screens/SettingsScreen';
+import SessionModal        from './src/screens/session/SessionModal';
+import ResumePromptModal   from './src/screens/session/ResumePromptModal';
+import DrillConfigModal    from './src/screens/drill/DrillConfigModal';
+import OnboardingModal     from './src/screens/onboarding/OnboardingModal';
+import AuthModal           from './src/screens/auth/AuthModal';
 
 import { Colors } from './src/constants/colors';
 import { FontSize, FontWeight } from './src/constants/layout';
 import { migrateDatabase } from './src/db/schema';
+import { getCheckpoint } from './src/db/queries';
 import { useProfileStore } from './src/stores/profileStore';
+import { useSessionStore } from './src/stores/sessionStore';
 import { RootTabParamList } from './src/types';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
@@ -95,6 +98,20 @@ function StartupSecurityChecks() {
       .catch(() => {});
   }, [hasCompletedAuth, isGuest]);
 
+  return null;
+}
+
+// Loads any saved checkpoint on startup and surfaces it via pendingCheckpoint so
+// ResumePromptModal can offer the user a resume option.
+function StartupCheckpointLoader() {
+  const db = useSQLiteContext() as any;
+  const setPendingCheckpoint = useSessionStore((s) => s.setPendingCheckpoint);
+  useEffect(() => {
+    getCheckpoint(db)
+      .then((cp) => { if (cp) setPendingCheckpoint(cp); })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return null;
 }
 
@@ -179,19 +196,25 @@ function AppTabs() {
 
 
 export default function App() {
+  const { width } = useWindowDimensions();
   return (
     <AppErrorBoundary>
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         {/* Web: constrain to a phone-width canvas centred in the browser window.
-            On iOS/Android this View is transparent (flex:1 fills the screen). */}
-        <View style={Platform.OS === 'web' ? webContainer.root : { flex: 1 }}>
+            Tablets (iPad, large Android): centre content in a phone-width column
+            so it doesn't stretch to the full 768–1024pt tablet width. Reactive
+            to window resize (Stage Manager, Split View) via useWindowDimensions.
+            On iPhone/Android phone this View is transparent (flex:1). */}
+        <View style={(Platform.OS === 'web' || width >= 600) ? webContainer.root : { flex: 1 }}>
         <SQLiteProvider databaseName="squashghostingx.db" onInit={migrateDatabase}>
 
           <StartupSecurityChecks />
+          <StartupCheckpointLoader />
           <AuthModal />
           <OnboardingModal />
           <DrillConfigModal />
+          <ResumePromptModal />
           <SessionModal />
           <NavToTrainAfterAuth />
 

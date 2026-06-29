@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, View, StyleSheet, ViewStyle, Image as RNImage } from 'react-native';
+import { Animated, View, StyleSheet, ViewStyle, StyleProp, Image as RNImage } from 'react-native';
 import Svg, {
   Circle, G, Line, Rect,
 } from 'react-native-svg';
@@ -157,7 +157,7 @@ interface CourtCanvasProps {
   dominantHand:   'left' | 'right';
   gender?:        string | null;
   courtMode?:     CourtMode;
-  style?:         ViewStyle;
+  style?:         StyleProp<ViewStyle>;
 }
 
 export default function CourtCanvas({

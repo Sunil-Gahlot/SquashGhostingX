@@ -13,6 +13,13 @@ import {
 import { getShotsForPosition, pickShotWithCooldown } from './positionShotMatrix';
 import { pickNextPattern } from './patternLibrary';
 import { pickNextTemplate, RallyStep } from './rallyTemplates';
+import {
+  RallyContext,
+  createRallyContext,
+  resetRallyContextForNewSet,
+  advanceRallyContext,
+  applyRallyContext,
+} from './rallyStateEngine';
 
 // ─── Public interface ─────────────────────────────────────────────────────────
 
@@ -71,12 +78,12 @@ export interface GhostingEngine {
 const SHOT_GROUP_POSITIONS: Partial<Record<ShotGroup, Position[]>> = {
   drives:    ['T', 'FR', 'FL', 'FMCR', 'FMCL', 'MR', 'ML', 'BMCR', 'BMCL', 'BR', 'BL'],
   lengths:   ['BR', 'BL', 'BMCR', 'BMCL', 'MR', 'ML'],
-  drops:     ['FR', 'FL', 'FMCR', 'FMCL'],
+  drops:     ['FR', 'FL', 'FMCR', 'FMCL', 'MR', 'ML'],
   kills:     ['FR', 'FL', 'FMCR', 'FMCL', 'MR', 'ML', 'T'],
   lobs:      ['BR', 'BL', 'BMCR', 'BMCL', 'MR', 'ML', 'FR', 'FL', 'FMCR', 'FMCL'],
-  boasts:    ['BR', 'BL', 'BMCR', 'BMCL', 'MR', 'ML'],
+  boasts:    ['FR', 'FL', 'BR', 'BL', 'BMCR', 'BMCL', 'MR', 'ML'],
   volleys:   ['T', 'FMCR', 'FMCL', 'MR', 'ML'],
-  deception: ['T', 'FMCR', 'FMCL', 'MR', 'ML', 'BR', 'BL'],
+  deception: ['T', 'FR', 'FL', 'FMCR', 'FMCL', 'MR', 'ML', 'BR', 'BL'],
 };
 
 // ─── Private helpers ──────────────────────────────────────────────────────────
@@ -245,9 +252,24 @@ function matchSimSet(
     recentTemplateNames.push(template.name);
     if (recentTemplateNames.length > 50) recentTemplateNames.shift();
 
-    const positions = Array.from({ length: count }, (_, i) => template.steps[i % template.steps.length].position);
-    const shots     = Array.from({ length: count }, (_, i) => template.steps[i % template.steps.length].shot);
-    return { positions, shots };
+    // Use the template steps once per set rather than cycling them — a real coach never
+    // calls the same 4-7 step rally pattern 3-5 times in a row within one set. If the set
+    // needs more moves than the template provides, fill the remainder with randomised
+    // (non-templated) positions from the pool.
+    const templateLen = template.steps.length;
+    if (count <= templateLen) {
+      const positions = template.steps.slice(0, count).map((s: RallyStep) => s.position);
+      const shots     = template.steps.slice(0, count).map((s: RallyStep) => s.shot);
+      return { positions, shots };
+    }
+
+    const tmplPositions = template.steps.map((s: RallyStep) => s.position);
+    const tmplShots     = template.steps.map((s: RallyStep) => s.shot);
+    const remaining     = shuffleNoRepeat(pool, count - templateLen);
+    return {
+      positions: [...tmplPositions, ...remaining],
+      shots:     [...tmplShots, ...new Array(remaining.length).fill(null) as (string | null)[]],
+    };
   }
 
   // No compatible template — fall back to random positions without template shots
@@ -276,6 +298,9 @@ export function createGhostingEngine(config: SessionConfig): GhostingEngine {
   // they are different physical actions (forehand vs backhand) and should vary independently.
   const recentShotsPerPos: Partial<Record<string, string[]>> = {};
 
+  // Rally state machine — drives shot context filtering (drop cap, kill gate, anti-repeat)
+  let rallyContext: RallyContext = createRallyContext();
+
   function effectiveIntervalMs(position: Position): number {
     const base = getDynamicIntervalMs(position, config.difficulty, config.tempo, config.paceAdjustment);
     if (config.patternType !== 'match-sim') return base;
@@ -290,7 +315,11 @@ export function createGhostingEngine(config: SessionConfig): GhostingEngine {
     return Math.max(floor, Math.round(base * (1 - reduction)));
   }
 
-  function buildSet(): void {
+  function buildSet(fresh = false): void {
+    // Reset rally context: fresh=true for session start/reset/seek (no carry-over);
+    // fresh=false for automatic set rollover (carry last 3 shots + spacing counters).
+    rallyContext = fresh ? createRallyContext() : resetRallyContextForNewSet(rallyContext);
+
     const nullShots = (positions: Position[]) => ({
       positions,
       shots: new Array(positions.length).fill(null) as (string | null)[],
@@ -322,7 +351,7 @@ export function createGhostingEngine(config: SessionConfig): GhostingEngine {
     sequenceShots = result.shots;
   }
 
-  buildSet();
+  buildSet(true);
 
   return {
     getNextMove(): SessionMove {
@@ -338,24 +367,33 @@ export function createGhostingEngine(config: SessionConfig): GhostingEngine {
 
       // Shot selection:
       //   movement drills  → no shots
-      //   match-sim        → use template shot
-      //   shot-based/other → pick from position-shot matrix with per-position cooldown
+      //   match-sim        → use template shot (rally context updated for state tracking only)
+      //   shot-based/other → pick from position-shot matrix, filtered by rally context
       let shot: string | null = null;
       if (config.drillType !== 'movement') {
         if (templateShot !== null) {
           shot = templateShot;
+          // Keep rally state machine synchronized with template shots so that
+          // when the engine falls back from match-sim to random (no compatible template),
+          // the context filter has accurate phase/cap state.
+          rallyContext = advanceRallyContext(rallyContext, shot);
         } else {
           const shotLookupPos = config.dominantHand === 'left' ? HAND_MIRROR[position] : position;
-          const shots  = getShotsForPosition(shotLookupPos, config.shotGroups, config.difficulty);
+          // Layer 1: difficulty gate + shot group filter (existing)
+          const rawShots = getShotsForPosition(shotLookupPos, config.shotGroups, config.difficulty);
+          // Layer 2: rally context filter — drop cap, kill gate, lob cap, anti-near-repeat
+          const contextShots = applyRallyContext(rawShots, rallyContext);
+          // Layer 3: per-position cooldown (existing) applied to already-filtered list
           const posKey = shotLookupPos as string;
           if (!recentShotsPerPos[posKey]) recentShotsPerPos[posKey] = [];
           const posHistory = recentShotsPerPos[posKey]!;
-          const entry  = pickShotWithCooldown(shots, config.difficulty, posHistory);
+          const entry = pickShotWithCooldown(contextShots, config.difficulty, posHistory);
           shot = entry?.voiceText ?? null;
           if (shot !== null) {
             posHistory.push(shot);
             if (posHistory.length > 8) posHistory.shift();
           }
+          rallyContext = advanceRallyContext(rallyContext, shot);
         }
       }
 
@@ -419,13 +457,13 @@ export function createGhostingEngine(config: SessionConfig): GhostingEngine {
       Object.keys(recentShotsPerPos).forEach(k => { delete recentShotsPerPos[k]; });
       recentPatternNames.length  = 0;
       recentTemplateNames.length = 0;
-      buildSet();
+      buildSet(true);
     },
 
     seekToSet(targetSetIndex: number): void {
       setIndex  = Math.max(0, targetSetIndex);
       moveIndex = 0;
-      buildSet();
+      buildSet(true);
     },
   };
 }

@@ -565,6 +565,7 @@ export default function ProgressScreen() {
         return (
           <Modal visible transparent animationType="slide" onRequestClose={() => setSelectedSession(null)}>
             <View style={sdStyles.backdrop}>
+              <SafeAreaView edges={['bottom']} style={sdStyles.safeSheet}>
               <View style={sdStyles.sheet}>
                 {/* Handle */}
                 <View style={sdStyles.handle} />
@@ -610,6 +611,7 @@ export default function ProgressScreen() {
                   <Text style={sdStyles.closeBtnText}>Close</Text>
                 </TouchableOpacity>
               </View>
+              </SafeAreaView>
             </View>
           </Modal>
         );
@@ -622,11 +624,15 @@ export default function ProgressScreen() {
 
 const sdStyles = StyleSheet.create({
   backdrop:   { flex: 1, backgroundColor: Colors.overlay, justifyContent: 'flex-end' },
-  sheet: {
+  safeSheet: {
     backgroundColor: Colors.surface,
     borderTopLeftRadius: BorderRadius.xl, borderTopRightRadius: BorderRadius.xl,
-    padding: Spacing.base, paddingBottom: Spacing.xxxl,
     borderTopWidth: 1, borderTopColor: Colors.border,
+    overflow: 'hidden',
+  },
+  sheet: {
+    backgroundColor: Colors.surface,
+    padding: Spacing.base, paddingBottom: Spacing.xl,
   },
   handle: {
     alignSelf: 'center', width: 36, height: 4,

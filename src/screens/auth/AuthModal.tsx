@@ -69,9 +69,9 @@ const SLIDES = [
 ] as const;
 
 const AUTH_CREDENTIALS_KEY = 'sgx-user-credentials';
-// 200-pass SHA-256 chain gives ~6 days crack time on a GPU vs seconds for a single hash.
-// Replace with PBKDF2 via react-native-quick-crypto for NIST SP 800-132 compliance.
-const HASH_ITERATIONS      = 200;
+// 10,000-pass SHA-256 chain — ~50× harder to brute-force than the original 200.
+// Still not NIST SP 800-132 (PBKDF2), but the best available without adding a native crypto package.
+const HASH_ITERATIONS      = 10_000;
 
 type StoredCreds =
   | { version: 4; email: string; passwordHash: string; salt: string; iterations: number }
@@ -807,6 +807,7 @@ function AuthPage({
                 autoCapitalize="none"
                 autoCorrect={false}
                 returnKeyType="next"
+                maxLength={254}
               />
             </View>
 
@@ -822,6 +823,7 @@ function AuthPage({
                 autoCapitalize="none"
                 returnKeyType={isRegister ? 'next' : 'done'}
                 onSubmitEditing={isRegister ? undefined : handleEmailAuth}
+                maxLength={128}
               />
               <TouchableOpacity
                 onPress={() => setShowPassword(!showPassword)}
@@ -849,6 +851,7 @@ function AuthPage({
                   autoCapitalize="none"
                   returnKeyType="done"
                   onSubmitEditing={handleEmailAuth}
+                  maxLength={128}
                 />
               </View>
             )}

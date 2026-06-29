@@ -13,8 +13,12 @@ import * as Haptics from '../engine/hapticsEngine';
 
 import { SessionConfig, SessionRecord, MovementRecord, ProgressStats } from '../types';
 import {
-  getPositionLabel, POSITION_ZONE, POSITION_INFO,
+  POSITION_ZONE, POSITION_INFO,
 } from '../constants/positions';
+import {
+  getPositionVoiceLabel, getRecoveryCueI18n, getCoachingPhraseI18n,
+  getStartCue, getFromTPrefix, getRestCue, getGoCue, getCompletionSpeech,
+} from '../constants/voiceI18n';
 import {
   AUDIO_OFFSETS, MOVES_PER_SET, getIntervalMs,
   getAutoRestMs, CHECKPOINT_INTERVAL_MS, COUNTDOWN_SECONDS,
@@ -42,12 +46,14 @@ type IntervalId = ReturnType<typeof setInterval>;
 
 function buildVoiceCall(opts: {
   drillType: string;
+  positionCode: string;
   positionLabel: string;
   shot: string | null;
   nextPositionLabel: string | null;
   nextShot: string | null;
+  language: string;
 }): string {
-  const { drillType, positionLabel, shot, nextPositionLabel, nextShot } = opts;
+  const { drillType, positionCode, positionLabel, shot, nextPositionLabel, nextShot, language } = opts;
 
   switch (drillType) {
     case 'movement':
@@ -57,7 +63,7 @@ function buildVoiceCall(opts: {
 
     case 'shot-based':
       // T position shots need context — player is already there, no movement required.
-      if (positionLabel === 'the T' && shot) return `From the T, ${shot}`;
+      if (positionCode === 'T' && shot) return `${getFromTPrefix(language as any)}, ${shot}`;
       return shot ? `${positionLabel}, ${shot}` : positionLabel;
 
     case 'match-sim': {
@@ -191,7 +197,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
 
     const ssettings = getSettings();
     if (!abandoned && ssettings.voiceEnabled) {
-      speak(`Back to T. Session complete. ${s.repCount} movements. Well done.`);
+      speak(getCompletionSpeech(s.repCount, s.config.language));
     }
     if (ssettings.hapticsEnabled) {
       abandoned ? Haptics.onSessionAbandoned() : Haptics.onSessionComplete();
@@ -278,6 +284,9 @@ export function useSessionEngine(db: SQLiteDatabase) {
     progressStore.addSession(record);
     progressStore.markSessionCompleted();   // triggers reactive reload in Home + Progress
     progressStore.setLastSessionConfig(s.config); // Quick Start replays exact config next time
+    // Replace optimistic stats (addSession doesn't recompute streak) with the DB-accurate
+    // values so the summary screen shows the correct streak immediately, not a stale one.
+    if (freshStats) progressStore.setStats(freshStats);
 
     // ── Badge checks ────────────────────────────────────────────────────────
     if (!abandoned && freshStats) {
@@ -327,7 +336,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
 
     store.getState().setRestSecsRemaining(restSecs);
     const s = getSettings();
-    if (s.voiceEnabled) speak('Rest');
+    if (s.voiceEnabled) speak(getRestCue(configRef.current?.language ?? 'en-US'));
     if (s.hapticsEnabled) Haptics.onRestStart();
 
     // Countdown the rest period
@@ -336,7 +345,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
       if (remaining <= 0) {
         store.getState().setState('active');
         const s2 = getSettings();
-        if (s2.voiceEnabled) speak('Go!');
+        if (s2.voiceEnabled) speak(getGoCue(configRef.current?.language ?? 'en-US'));
         if (s2.hapticsEnabled) Haptics.onRestEnd();
         restTimer.current = setTimeout(() => fireMoveLoop(), 400);
         return;
@@ -401,18 +410,20 @@ export function useSessionEngine(db: SQLiteDatabase) {
       // brings the spoken word into sync with the court highlight appearing at positionCallMs.
       addTimer(setTimeout(() => {
         if (store.getState().session?.state !== 'active') return;
-        const posLabel  = getPositionLabel(move.position, config.dominantHand);
+        const posLabel  = getPositionVoiceLabel(move.position, config.dominantHand, config.language);
         // Read directly from engine — independent of store state since we fire before setNextPosition.
         const nextPos   = engine.peekNextPosition();
-        const nextLabel = nextPos ? getPositionLabel(nextPos, config.dominantHand) : null;
+        const nextLabel = nextPos ? getPositionVoiceLabel(nextPos, config.dominantHand, config.language) : null;
 
         callIndexRef.current++;
         const callText = buildVoiceCall({
           drillType:         config.drillType,
+          positionCode:      move.position,
           positionLabel:     posLabel,
           shot:              move.shot,
           nextPositionLabel: nextLabel,
           nextShot:          move.nextShot,
+          language:          config.language,
         });
 
         speak(callText);
@@ -433,7 +444,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
       if (!skipRecoveryCue) {
         addTimer(setTimeout(() => {
           if (store.getState().session?.state !== 'active') return;
-          const recoveryCue = Audio.getRecoveryCue(recoveryCueIdxRef.current++);
+          const recoveryCue = getRecoveryCueI18n(recoveryCueIdxRef.current++, config.language);
           speak(recoveryCue);
         }, recoveryCallMs));
       }
@@ -564,7 +575,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
       ) {
         lastCoachingCueSecsRef.current = s.elapsedSeconds;
         const cueIdx = Math.floor(s.elapsedSeconds / COACHING_INTERVAL_SECS) - 1;
-        speakCoach(Audio.getCoachingPhrase(cueIdx));
+        speakCoach(getCoachingPhraseI18n(cueIdx, s.config.language));
       }
     }, 1000);
 
@@ -621,7 +632,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
     } else {
       // n===0 → "GO!"
       addTimer(setTimeout(() => {
-        if (s.voiceEnabled) speak('Go!');
+        if (s.voiceEnabled) speak(getGoCue(configRef.current?.language ?? 'en-US'));
         if (s.hapticsEnabled) Haptics.onSessionStart();
         addTimer(setTimeout(() => startActive(false), 700));
       }, 300));
@@ -678,7 +689,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
     // Announce "Move to the T" before countdown numbers begin
     const sForStart = getSettings();
     if (sForStart.voiceEnabled && fullConfig.voiceMode !== 'beep' && fullConfig.voiceMode !== 'visual-only') {
-      Audio.speakText('Move to the T', sForStart.speechRate, fullConfig.language, fullConfig.voiceGender);
+      Audio.speakText(getStartCue(fullConfig.language), sForStart.speechRate, fullConfig.language, fullConfig.voiceGender);
       addTimer(setTimeout(() => runCountdown(COUNTDOWN_SECONDS), 2500));
     } else {
       runCountdown(COUNTDOWN_SECONDS);
@@ -706,8 +717,9 @@ export function useSessionEngine(db: SQLiteDatabase) {
   const skipRest = useCallback(() => {
     if (restTimer.current) { clearTimeout(restTimer.current); restTimer.current = null; }
     store.getState().setState('active');
+    store.getState().setRestSecsRemaining(0);
     const s = getSettings();
-    if (s.voiceEnabled) speak('Go!');
+    if (s.voiceEnabled) speak(getGoCue(configRef.current?.language ?? 'en-US'));
     if (s.hapticsEnabled) Haptics.onRestEnd();
     addTimer(setTimeout(fireMoveLoop, 300));
   }, [fireMoveLoop]);

@@ -81,8 +81,9 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
   const performSignOut = useSignOut();
   const settings = useSettingsStore((s) => s.settings);
 
-  const [langVisible, setLangVisible] = useState(false);
-  const [localName,   setLocalName]   = useState(profile.name);
+  const [langVisible, setLangVisible]     = useState(false);
+  const [photoImgError, setPhotoImgError] = useState(false);
+  const [localName,   setLocalName]       = useState(profile.name);
   const [dobDay,      setDobDay]      = useState(profile.dobDay   ?? '');
   const [dobMonth,    setDobMonth]    = useState(profile.dobMonth ?? '');
   const [dobYear,     setDobYear]     = useState(profile.dobYear  ?? '');
@@ -211,8 +212,12 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
           <View style={styles.hero}>
             <TouchableOpacity onPress={pickPhoto} style={styles.avatarWrap} activeOpacity={0.85}>
               <View style={[styles.avatar, { borderColor: skillColor }]}>
-                {profile.photoUri ? (
-                  <Image source={{ uri: profile.photoUri }} style={styles.avatarImg} />
+                {profile.photoUri && !photoImgError ? (
+                  <Image
+                    source={{ uri: profile.photoUri }}
+                    style={styles.avatarImg}
+                    onError={() => setPhotoImgError(true)}
+                  />
                 ) : (
                   <Text style={[styles.avatarInitial, { color: skillColor }]}>
                     {displayName.charAt(0).toUpperCase()}

@@ -32,7 +32,7 @@ import { Position, ShotEntry, ShotGroup, Difficulty } from '../types';
 const WEIGHT_BY_DIFFICULTY: Record<'primary' | 'secondary' | 'advanced', Record<Difficulty, number>> = {
   primary:   { beginner: 6, intermediate: 6, advanced: 6, elite: 6, pro: 6 },
   secondary: { beginner: 1, intermediate: 3, advanced: 3, elite: 3, pro: 3 },
-  advanced:  { beginner: 0, intermediate: 0, advanced: 1, elite: 2, pro: 3 },
+  advanced:  { beginner: 0, intermediate: 1, advanced: 2, elite: 3, pro: 4 },
 };
 
 export const POSITION_SHOT_MATRIX: Record<Position, ShotEntry[]> = {
@@ -56,6 +56,7 @@ export const POSITION_SHOT_MATRIX: Record<Position, ShotEntry[]> = {
     { name: 'Crosscourt Lob',   voiceText: 'crosscourt lob',      weight: 'advanced',  groups: ['lobs',      'mixed'] },
     { name: 'Crosscourt Drive', voiceText: 'crosscourt drive',    weight: 'advanced',  groups: ['drives',    'mixed'] },
     { name: 'Reverse Angle',    voiceText: 'reverse angle',       weight: 'advanced',  groups: ['deception', 'mixed'] },
+    { name: 'Hold & Boast',     voiceText: 'hold and boast',      weight: 'advanced',  groups: ['deception', 'boasts', 'mixed'] },
   ],
 
   FL: [
@@ -70,6 +71,7 @@ export const POSITION_SHOT_MATRIX: Record<Position, ShotEntry[]> = {
     { name: 'Crosscourt Lob',   voiceText: 'crosscourt lob',      weight: 'advanced',  groups: ['lobs',      'mixed'] },
     { name: 'Crosscourt Drive', voiceText: 'crosscourt drive',    weight: 'advanced',  groups: ['drives',    'mixed'] },
     { name: 'Reverse Angle',    voiceText: 'reverse angle',       weight: 'advanced',  groups: ['deception', 'mixed'] },
+    { name: 'Hold & Boast',     voiceText: 'hold and boast',      weight: 'advanced',  groups: ['deception', 'boasts', 'mixed'] },
   ],
 
   // ── Mid Right / Mid Left (T area / service-line zone) ────────────────────
@@ -92,8 +94,10 @@ export const POSITION_SHOT_MATRIX: Record<Position, ShotEntry[]> = {
     { name: 'Crosscourt Drop',   voiceText: 'crosscourt drop',     weight: 'secondary', groups: ['drops',     'mixed'] },
     { name: 'Dying Length',      voiceText: 'dying length',        weight: 'advanced',  groups: ['lengths',   'drops', 'mixed'] },
     { name: 'Volley Drop',       voiceText: 'volley drop',         weight: 'advanced',  groups: ['volleys',   'drops', 'mixed'] },
+    { name: 'Straight Kill',     voiceText: 'straight kill',       weight: 'advanced',  groups: ['kills',     'mixed'] },
     { name: 'Hold & Drive',      voiceText: 'hold and drive',      weight: 'advanced',  groups: ['deception', 'drives', 'mixed'] },
     { name: 'Hold & Drop',       voiceText: 'hold and drop',       weight: 'advanced',  groups: ['deception', 'drops', 'mixed'] },
+    { name: 'Hold & Boast',      voiceText: 'hold and boast',      weight: 'advanced',  groups: ['deception', 'boasts', 'mixed'] },
   ],
 
   ML: [
@@ -112,8 +116,10 @@ export const POSITION_SHOT_MATRIX: Record<Position, ShotEntry[]> = {
     { name: 'Crosscourt Drop',   voiceText: 'crosscourt drop',     weight: 'secondary', groups: ['drops',     'mixed'] },
     { name: 'Dying Length',      voiceText: 'dying length',        weight: 'advanced',  groups: ['lengths',   'drops', 'mixed'] },
     { name: 'Volley Drop',       voiceText: 'volley drop',         weight: 'advanced',  groups: ['volleys',   'drops', 'mixed'] },
+    { name: 'Straight Kill',     voiceText: 'straight kill',       weight: 'advanced',  groups: ['kills',     'mixed'] },
     { name: 'Hold & Drive',      voiceText: 'hold and drive',      weight: 'advanced',  groups: ['deception', 'drives', 'mixed'] },
     { name: 'Hold & Drop',       voiceText: 'hold and drop',       weight: 'advanced',  groups: ['deception', 'drops', 'mixed'] },
+    { name: 'Hold & Boast',      voiceText: 'hold and boast',      weight: 'advanced',  groups: ['deception', 'boasts', 'mixed'] },
   ],
 
   // ── Back Right / Back Left (deep corner) ──────────────────────────────────
@@ -132,10 +138,12 @@ export const POSITION_SHOT_MATRIX: Record<Position, ShotEntry[]> = {
     { name: 'Defensive Boast',          voiceText: 'defensive boast',         weight: 'secondary', groups: ['boasts',    'mixed'] },
     { name: 'Dying Length',             voiceText: 'dying length',            weight: 'advanced',  groups: ['lengths',   'drops', 'mixed'] },
     { name: 'Reverse Boast',            voiceText: 'reverse boast',           weight: 'advanced',  groups: ['boasts',    'mixed'] },
+    { name: 'Attacking Boast',          voiceText: 'attacking boast',         weight: 'advanced',  groups: ['boasts',    'mixed'] },
     { name: 'Back-Court Drop',          voiceText: 'back-court drop',         weight: 'advanced',  groups: ['drops',     'mixed'] },
     { name: 'Back-Court Crosscourt Drop', voiceText: 'back-court crosscourt drop', weight: 'advanced', groups: ['drops', 'mixed'] },
     { name: 'Hold & Drive',             voiceText: 'hold and drive',          weight: 'advanced',  groups: ['deception', 'drives', 'mixed'] },
     { name: 'Hold & Flick',             voiceText: 'hold and flick',          weight: 'advanced',  groups: ['deception', 'mixed'] },
+    { name: 'Hold & Boast',             voiceText: 'hold and boast',          weight: 'advanced',  groups: ['deception', 'boasts', 'mixed'] },
   ],
 
   BL: [
@@ -149,10 +157,12 @@ export const POSITION_SHOT_MATRIX: Record<Position, ShotEntry[]> = {
     { name: 'Defensive Boast',          voiceText: 'defensive boast',         weight: 'secondary', groups: ['boasts',    'mixed'] },
     { name: 'Dying Length',             voiceText: 'dying length',            weight: 'advanced',  groups: ['lengths',   'drops', 'mixed'] },
     { name: 'Reverse Boast',            voiceText: 'reverse boast',           weight: 'advanced',  groups: ['boasts',    'mixed'] },
+    { name: 'Attacking Boast',          voiceText: 'attacking boast',         weight: 'advanced',  groups: ['boasts',    'mixed'] },
     { name: 'Back-Court Drop',          voiceText: 'back-court drop',         weight: 'advanced',  groups: ['drops',     'mixed'] },
     { name: 'Back-Court Crosscourt Drop', voiceText: 'back-court crosscourt drop', weight: 'advanced', groups: ['drops', 'mixed'] },
     { name: 'Hold & Drive',             voiceText: 'hold and drive',          weight: 'advanced',  groups: ['deception', 'drives', 'mixed'] },
     { name: 'Hold & Flick',             voiceText: 'hold and flick',          weight: 'advanced',  groups: ['deception', 'mixed'] },
+    { name: 'Hold & Boast',             voiceText: 'hold and boast',          weight: 'advanced',  groups: ['deception', 'boasts', 'mixed'] },
   ],
 
   // ── Front Volley Right / Left (FMCR/FMCL — early interception zone) ───────
@@ -167,6 +177,7 @@ export const POSITION_SHOT_MATRIX: Record<Position, ShotEntry[]> = {
     { name: 'Volley Lob',       voiceText: 'volley lob',          weight: 'secondary', groups: ['volleys',   'lobs', 'mixed'] },
     { name: 'Hold & Flick',     voiceText: 'hold and flick',      weight: 'advanced',  groups: ['deception', 'mixed'] },
     { name: 'Hold & Drop',      voiceText: 'hold and drop',       weight: 'advanced',  groups: ['deception', 'drops', 'mixed'] },
+    { name: 'Hold & Boast',     voiceText: 'hold and boast',      weight: 'advanced',  groups: ['deception', 'boasts', 'mixed'] },
   ],
 
   FMCL: [
@@ -177,6 +188,7 @@ export const POSITION_SHOT_MATRIX: Record<Position, ShotEntry[]> = {
     { name: 'Volley Lob',       voiceText: 'volley lob',          weight: 'secondary', groups: ['volleys',   'lobs', 'mixed'] },
     { name: 'Hold & Flick',     voiceText: 'hold and flick',      weight: 'advanced',  groups: ['deception', 'mixed'] },
     { name: 'Hold & Drop',      voiceText: 'hold and drop',       weight: 'advanced',  groups: ['deception', 'drops', 'mixed'] },
+    { name: 'Hold & Boast',     voiceText: 'hold and boast',      weight: 'advanced',  groups: ['deception', 'boasts', 'mixed'] },
   ],
 
   // ── Back Mid Right / Left (BMCR/BMCL — mid-back diagonal) ────────────────
@@ -193,6 +205,8 @@ export const POSITION_SHOT_MATRIX: Record<Position, ShotEntry[]> = {
     { name: 'Attacking Boast',  voiceText: 'attacking boast',     weight: 'secondary', groups: ['boasts',    'mixed'] },
     { name: 'Defensive Boast',  voiceText: 'defensive boast',     weight: 'secondary', groups: ['boasts',    'mixed'] },
     { name: 'Hold & Drive',     voiceText: 'hold and drive',      weight: 'advanced',  groups: ['deception', 'drives', 'mixed'] },
+    { name: 'Hold & Drop',      voiceText: 'hold and drop',       weight: 'advanced',  groups: ['deception', 'drops', 'mixed'] },
+    { name: 'Hold & Boast',     voiceText: 'hold and boast',      weight: 'advanced',  groups: ['deception', 'boasts', 'mixed'] },
     { name: 'Dying Length',     voiceText: 'dying length',        weight: 'advanced',  groups: ['lengths',   'drops', 'mixed'] },
   ],
 
@@ -206,6 +220,8 @@ export const POSITION_SHOT_MATRIX: Record<Position, ShotEntry[]> = {
     { name: 'Attacking Boast',  voiceText: 'attacking boast',     weight: 'secondary', groups: ['boasts',    'mixed'] },
     { name: 'Defensive Boast',  voiceText: 'defensive boast',     weight: 'secondary', groups: ['boasts',    'mixed'] },
     { name: 'Hold & Drive',     voiceText: 'hold and drive',      weight: 'advanced',  groups: ['deception', 'drives', 'mixed'] },
+    { name: 'Hold & Drop',      voiceText: 'hold and drop',       weight: 'advanced',  groups: ['deception', 'drops', 'mixed'] },
+    { name: 'Hold & Boast',     voiceText: 'hold and boast',      weight: 'advanced',  groups: ['deception', 'boasts', 'mixed'] },
     { name: 'Dying Length',     voiceText: 'dying length',        weight: 'advanced',  groups: ['lengths',   'drops', 'mixed'] },
   ],
 
@@ -221,6 +237,7 @@ export const POSITION_SHOT_MATRIX: Record<Position, ShotEntry[]> = {
     { name: 'Hold & Drive',     voiceText: 'hold and drive',      weight: 'advanced',  groups: ['deception', 'drives', 'mixed'] },
     { name: 'Hold & Drop',      voiceText: 'hold and drop',       weight: 'advanced',  groups: ['deception', 'drops', 'mixed'] },
     { name: 'Hold & Flick',     voiceText: 'hold and flick',      weight: 'advanced',  groups: ['deception', 'mixed'] },
+    { name: 'Hold & Boast',     voiceText: 'hold and boast',      weight: 'advanced',  groups: ['deception', 'boasts', 'mixed'] },
     { name: 'Volley Lob',       voiceText: 'volley lob',          weight: 'advanced',  groups: ['volleys',   'lobs', 'mixed'] },
   ],
 };
@@ -234,12 +251,10 @@ export function getShotsForPosition(
 ): ShotEntry[] {
   const all = POSITION_SHOT_MATRIX[position] ?? [];
 
-  // Gate advanced shots: beginners and intermediates don't use advanced shots
-  const weightAllowed = !difficulty || difficulty === 'advanced' || difficulty === 'elite' || difficulty === 'pro'
+  // beginners: primary + secondary only; all other levels include advanced (weight scales by difficulty)
+  const weightAllowed = !difficulty || difficulty !== 'beginner'
     ? ['primary', 'secondary', 'advanced'] as const
-    : difficulty === 'intermediate'
-      ? ['primary', 'secondary'] as const
-      : ['primary', 'secondary'] as const; // beginner: secondary still included but at low count via pickShot
+    : ['primary', 'secondary'] as const;
 
   const weightFiltered = all.filter(s => (weightAllowed as readonly string[]).includes(s.weight));
   if (activeGroups.includes('mixed')) return weightFiltered;
