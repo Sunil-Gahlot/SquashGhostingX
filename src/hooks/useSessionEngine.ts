@@ -418,13 +418,18 @@ export function useSessionEngine(db: SQLiteDatabase) {
         speak(callText);
       }, AUDIO_OFFSETS.voiceCallMs));
 
-      // Recovery cue: skip when position IS the T, or when the gap between the cue and the
-      // next call is too tight to complete the utterance. Threshold scales with interval so
-      // faster pace doesn't skip the cue disproportionately vs slower settings.
-      const recoveryCallMs  = move.movementPhaseMs;
-      const gapAfterCue     = effectiveIntervalMs - recoveryCallMs;
-      const skipThresholdMs = Math.max(600, effectiveIntervalMs * 0.22);
-      const skipRecoveryCue = move.position === 'T' || gapAfterCue < skipThresholdMs;
+      // Recovery cue — anchored relative to the next call so it always completes cleanly.
+      // At normal pace it fires at movementPhaseMs (after shot execution at position).
+      // At fast pace it pulls earlier to effectiveIntervalMs − 950 ms so the utterance
+      // ("Back to T!") finishes before Speech.stop() fires for the next position call,
+      // preventing the cue from being cut off mid-phrase.
+      // Skipped only when position is T (player is already there) or interval is so short
+      // there is genuinely no room for any utterance.
+      const RECOVERY_CUE_LEAD_MS = 950; // ~800 ms TTS + 150 ms buffer
+      const anchoredFireMs  = effectiveIntervalMs - RECOVERY_CUE_LEAD_MS;
+      const minFireMs       = AUDIO_OFFSETS.positionCallMs + 400; // allow position call to start
+      const recoveryCallMs  = Math.max(minFireMs, Math.min(move.movementPhaseMs, anchoredFireMs));
+      const skipRecoveryCue = move.position === 'T' || anchoredFireMs < minFireMs;
       if (!skipRecoveryCue) {
         addTimer(setTimeout(() => {
           if (store.getState().session?.state !== 'active') return;

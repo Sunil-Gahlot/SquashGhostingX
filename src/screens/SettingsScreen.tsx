@@ -155,6 +155,10 @@ const TEST_PHRASES: Partial<Record<Language, string>> = {
   zh: '前左角。回到T位。',
   ja: 'フロントレフト。Tポジションに戻れ。',
   ko: '앞 왼쪽. T자리로 돌아가세요.',
+  he: 'קדמי שמאלי. חזור ל-T.',
+  sw: 'Mbele kushoto. Rudi kwenye T.',
+  qu: 'Ñawpaq lloq\'e. Kutiy T-man.',
+  ha: 'Gaban hagu. Koma zuwa T.',
 };
 
 export default function SettingsScreen() {
@@ -304,13 +308,7 @@ export default function SettingsScreen() {
               <Text style={styles.heroAppNameAccent}>GhostingX</Text>
             </Text>
           </View>
-          <View style={styles.heroTitleRow}>
-            <Text style={styles.heroTitle}>Settings</Text>
-            <TouchableOpacity onPress={handleSignOut} style={styles.signOutBtn} activeOpacity={0.7}>
-              <Ionicons name="log-out-outline" size={15} color={Colors.danger} />
-              <Text style={styles.signOutBtnText}>Sign Out</Text>
-            </TouchableOpacity>
-          </View>
+          <Text style={styles.heroTitle}>Settings</Text>
         </View>
 
         {/* ── PROFILE CARD ──────────────────────────────────── */}
@@ -728,10 +726,7 @@ const styles = StyleSheet.create({
   heroAppIcon:      { width: 32, height: 32, borderRadius: 9, backgroundColor: Colors.brandMuted, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: `${Colors.brand}30` },
   heroAppName:      { fontSize: 18, fontWeight: FontWeight.bold, color: Colors.textPrimary, letterSpacing: 0.1 },
   heroAppNameAccent:{ color: Colors.brand },
-  heroTitleRow:    { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   heroTitle:       { fontSize: 34, fontWeight: FontWeight.black, color: Colors.textPrimary, letterSpacing: -0.5 },
-  signOutBtn:      { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: `${Colors.danger}18`, borderWidth: 1, borderColor: `${Colors.danger}35`, borderRadius: BorderRadius.full, paddingHorizontal: Spacing.md, paddingVertical: 7 },
-  signOutBtnText:  { fontSize: FontSize.caption, fontWeight: FontWeight.semiBold, color: Colors.danger },
 
   sectionLabel: {
     fontSize: FontSize.caption, fontWeight: FontWeight.bold,

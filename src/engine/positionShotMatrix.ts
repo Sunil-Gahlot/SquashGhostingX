@@ -77,39 +77,43 @@ export const POSITION_SHOT_MATRIX: Record<Position, ShotEntry[]> = {
   // boasts are attacking options; hold shots are advanced deception.
 
   MR: [
-    { name: 'Straight Drive',   voiceText: 'straight drive',      weight: 'primary',   groups: ['drives',    'mixed'] },
-    { name: 'Working Length',   voiceText: 'working length',      weight: 'primary',   groups: ['lengths',   'drives', 'mixed'] },
-    { name: 'Crosscourt Drive', voiceText: 'crosscourt drive',    weight: 'secondary', groups: ['drives',    'mixed'] },
-    { name: 'Hard Length',      voiceText: 'hard length',         weight: 'secondary', groups: ['lengths',   'drives', 'mixed'] },
-    { name: 'Straight Drop',    voiceText: 'straight drop',       weight: 'secondary', groups: ['drops',     'mixed'] },
-    { name: 'Straight Lob',     voiceText: 'straight lob',        weight: 'secondary', groups: ['lobs',      'mixed'] },
-    { name: 'Crosscourt Lob',   voiceText: 'crosscourt lob',      weight: 'secondary', groups: ['lobs',      'mixed'] },
-    { name: 'Volley Drive',     voiceText: 'volley drive',        weight: 'secondary', groups: ['volleys',   'drives', 'mixed'] },
-    { name: 'Attacking Boast',  voiceText: 'attacking boast',     weight: 'secondary', groups: ['boasts',    'mixed'] },
-    { name: 'Defensive Boast',  voiceText: 'defensive boast',     weight: 'secondary', groups: ['boasts',    'mixed'] },
-    { name: 'Crosscourt Drop',  voiceText: 'crosscourt drop',     weight: 'secondary', groups: ['drops',     'mixed'] },
-    { name: 'Dying Length',     voiceText: 'dying length',        weight: 'advanced',  groups: ['lengths',   'drops', 'mixed'] },
-    { name: 'Volley Drop',      voiceText: 'volley drop',         weight: 'advanced',  groups: ['volleys',   'drops', 'mixed'] },
-    { name: 'Hold & Drive',     voiceText: 'hold and drive',      weight: 'advanced',  groups: ['deception', 'drives', 'mixed'] },
-    { name: 'Hold & Drop',      voiceText: 'hold and drop',       weight: 'advanced',  groups: ['deception', 'drops', 'mixed'] },
+    { name: 'Straight Drive',    voiceText: 'straight drive',      weight: 'primary',   groups: ['drives',    'mixed'] },
+    { name: 'Working Length',    voiceText: 'working length',      weight: 'primary',   groups: ['lengths',   'drives', 'mixed'] },
+    { name: 'Crosscourt Drive',  voiceText: 'crosscourt drive',    weight: 'secondary', groups: ['drives',    'mixed'] },
+    { name: 'Hard Length',       voiceText: 'hard length',         weight: 'secondary', groups: ['lengths',   'drives', 'mixed'] },
+    { name: 'Straight Drop',     voiceText: 'straight drop',       weight: 'secondary', groups: ['drops',     'mixed'] },
+    { name: 'Straight Lob',      voiceText: 'straight lob',        weight: 'secondary', groups: ['lobs',      'mixed'] },
+    { name: 'Crosscourt Lob',    voiceText: 'crosscourt lob',      weight: 'secondary', groups: ['lobs',      'mixed'] },
+    { name: 'Volley Drive',      voiceText: 'volley drive',        weight: 'secondary', groups: ['volleys',   'drives', 'mixed'] },
+    { name: 'Volley Crosscourt', voiceText: 'volley crosscourt',   weight: 'secondary', groups: ['volleys',   'drives', 'mixed'] },
+    { name: 'Volley Kill',       voiceText: 'volley kill',         weight: 'secondary', groups: ['volleys',   'kills',  'mixed'] },
+    { name: 'Attacking Boast',   voiceText: 'attacking boast',     weight: 'secondary', groups: ['boasts',    'mixed'] },
+    { name: 'Defensive Boast',   voiceText: 'defensive boast',     weight: 'secondary', groups: ['boasts',    'mixed'] },
+    { name: 'Crosscourt Drop',   voiceText: 'crosscourt drop',     weight: 'secondary', groups: ['drops',     'mixed'] },
+    { name: 'Dying Length',      voiceText: 'dying length',        weight: 'advanced',  groups: ['lengths',   'drops', 'mixed'] },
+    { name: 'Volley Drop',       voiceText: 'volley drop',         weight: 'advanced',  groups: ['volleys',   'drops', 'mixed'] },
+    { name: 'Hold & Drive',      voiceText: 'hold and drive',      weight: 'advanced',  groups: ['deception', 'drives', 'mixed'] },
+    { name: 'Hold & Drop',       voiceText: 'hold and drop',       weight: 'advanced',  groups: ['deception', 'drops', 'mixed'] },
   ],
 
   ML: [
-    { name: 'Straight Drive',   voiceText: 'straight drive',      weight: 'primary',   groups: ['drives',    'mixed'] },
-    { name: 'Working Length',   voiceText: 'working length',      weight: 'primary',   groups: ['lengths',   'drives', 'mixed'] },
-    { name: 'Crosscourt Drive', voiceText: 'crosscourt drive',    weight: 'secondary', groups: ['drives',    'mixed'] },
-    { name: 'Hard Length',      voiceText: 'hard length',         weight: 'secondary', groups: ['lengths',   'drives', 'mixed'] },
-    { name: 'Straight Drop',    voiceText: 'straight drop',       weight: 'secondary', groups: ['drops',     'mixed'] },
-    { name: 'Straight Lob',     voiceText: 'straight lob',        weight: 'secondary', groups: ['lobs',      'mixed'] },
-    { name: 'Crosscourt Lob',   voiceText: 'crosscourt lob',      weight: 'secondary', groups: ['lobs',      'mixed'] },
-    { name: 'Volley Drive',     voiceText: 'volley drive',        weight: 'secondary', groups: ['volleys',   'drives', 'mixed'] },
-    { name: 'Attacking Boast',  voiceText: 'attacking boast',     weight: 'secondary', groups: ['boasts',    'mixed'] },
-    { name: 'Defensive Boast',  voiceText: 'defensive boast',     weight: 'secondary', groups: ['boasts',    'mixed'] },
-    { name: 'Crosscourt Drop',  voiceText: 'crosscourt drop',     weight: 'secondary', groups: ['drops',     'mixed'] },
-    { name: 'Dying Length',     voiceText: 'dying length',        weight: 'advanced',  groups: ['lengths',   'drops', 'mixed'] },
-    { name: 'Volley Drop',      voiceText: 'volley drop',         weight: 'advanced',  groups: ['volleys',   'drops', 'mixed'] },
-    { name: 'Hold & Drive',     voiceText: 'hold and drive',      weight: 'advanced',  groups: ['deception', 'drives', 'mixed'] },
-    { name: 'Hold & Drop',      voiceText: 'hold and drop',       weight: 'advanced',  groups: ['deception', 'drops', 'mixed'] },
+    { name: 'Straight Drive',    voiceText: 'straight drive',      weight: 'primary',   groups: ['drives',    'mixed'] },
+    { name: 'Working Length',    voiceText: 'working length',      weight: 'primary',   groups: ['lengths',   'drives', 'mixed'] },
+    { name: 'Crosscourt Drive',  voiceText: 'crosscourt drive',    weight: 'secondary', groups: ['drives',    'mixed'] },
+    { name: 'Hard Length',       voiceText: 'hard length',         weight: 'secondary', groups: ['lengths',   'drives', 'mixed'] },
+    { name: 'Straight Drop',     voiceText: 'straight drop',       weight: 'secondary', groups: ['drops',     'mixed'] },
+    { name: 'Straight Lob',      voiceText: 'straight lob',        weight: 'secondary', groups: ['lobs',      'mixed'] },
+    { name: 'Crosscourt Lob',    voiceText: 'crosscourt lob',      weight: 'secondary', groups: ['lobs',      'mixed'] },
+    { name: 'Volley Drive',      voiceText: 'volley drive',        weight: 'secondary', groups: ['volleys',   'drives', 'mixed'] },
+    { name: 'Volley Crosscourt', voiceText: 'volley crosscourt',   weight: 'secondary', groups: ['volleys',   'drives', 'mixed'] },
+    { name: 'Volley Kill',       voiceText: 'volley kill',         weight: 'secondary', groups: ['volleys',   'kills',  'mixed'] },
+    { name: 'Attacking Boast',   voiceText: 'attacking boast',     weight: 'secondary', groups: ['boasts',    'mixed'] },
+    { name: 'Defensive Boast',   voiceText: 'defensive boast',     weight: 'secondary', groups: ['boasts',    'mixed'] },
+    { name: 'Crosscourt Drop',   voiceText: 'crosscourt drop',     weight: 'secondary', groups: ['drops',     'mixed'] },
+    { name: 'Dying Length',      voiceText: 'dying length',        weight: 'advanced',  groups: ['lengths',   'drops', 'mixed'] },
+    { name: 'Volley Drop',       voiceText: 'volley drop',         weight: 'advanced',  groups: ['volleys',   'drops', 'mixed'] },
+    { name: 'Hold & Drive',      voiceText: 'hold and drive',      weight: 'advanced',  groups: ['deception', 'drives', 'mixed'] },
+    { name: 'Hold & Drop',       voiceText: 'hold and drop',       weight: 'advanced',  groups: ['deception', 'drops', 'mixed'] },
   ],
 
   // ── Back Right / Back Left (deep corner) ──────────────────────────────────
@@ -243,7 +247,8 @@ export function getShotsForPosition(
 }
 
 // Minimum number of other shots that must fire before a shot can repeat.
-const SHOT_COOLDOWN_DEPTH = 4;
+// Raised from 4 → 6 to push variety further and prevent micro-cycles of 2–3 shots.
+const SHOT_COOLDOWN_DEPTH = 6;
 
 function buildWeightedPool(shots: ShotEntry[], difficulty?: Difficulty): ShotEntry[] {
   const pool: ShotEntry[] = [];

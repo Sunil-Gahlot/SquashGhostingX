@@ -39,18 +39,18 @@ const PAUSE_AT_T_MS: Record<Difficulty, number> = {
 // TIMING_MATRIX = MOVEMENT_PHASE + RECOVERY_TRAVEL + PAUSE_AT_T
 //   beginner/natural:      4800 + 1500 + 1700 =  8000 ms  (~ 8 s per rep — controlled pace)
 //   intermediate/natural:  4000 + 1200 + 1300 =  6500 ms  (~6.5 s per rep — match-like)
-//   advanced/natural:      3000 + 1000 + 1000 =  5000 ms  (~ 5 s per rep — rally pace)
+//   advanced/natural:      3000 + 1100 + 1100 =  5200 ms  (~5.2 s per rep — rally pace)
 //   elite/natural:         2400 +  800 +  800 =  4000 ms  (~ 4 s per rep — tournament)
-//   pro/natural:           1700 +  600 +  900 =  3200 ms  (~3.2 s per rep — pro level)
+//   pro/natural:           1800 +  700 +  950 =  3500 ms  (~3.5 s per rep — pro level)
 //
 // Players who need more T-pause time can use Settings → Movement Pace (+1s / +2s / +3s).
 // Players who want faster: choose Explosive tempo or a higher difficulty.
 export const TIMING_MATRIX: Record<Difficulty, Record<Tempo, number>> = {
   beginner:     { slow: 10000, natural: 8000, explosive: 6500 },
   intermediate: { slow:  8500, natural: 6500, explosive: 5200 },
-  advanced:     { slow:  6500, natural: 5000, explosive: 4000 },
+  advanced:     { slow:  6700, natural: 5200, explosive: 4200 },
   elite:        { slow:  5200, natural: 4000, explosive: 3300 },
-  pro:          { slow:  4200, natural: 3200, explosive: 2800 },
+  pro:          { slow:  4600, natural: 3500, explosive: 2800 },
 };
 
 // ─── In-drill live pace control ───────────────────────────────────────────────
@@ -178,21 +178,26 @@ const TEMPO_FACTOR: Record<Tempo, number> = {
 // Time at position: approach, execute phantom shot, begin recovery push-off.
 // Calibrated so getDynamicIntervalMs('ML', diff, 'natural') ≈ TIMING_MATRIX[diff]['natural'].
 // Scaled by 1/TEMPO_FACTOR at call time so slow tempo gives more dwell, explosive gives less.
+// Advanced raised 2400→2500 and Pro raised 1450→1650 so phantom-shot execution feels
+// realistic and less mechanical at those difficulty levels.
 const DWELL_AT_POS: Record<Difficulty, number> = {
-  beginner: 4000, intermediate: 3200, advanced: 2400, elite: 1900, pro: 1450,
+  beginner: 4000, intermediate: 3200, advanced: 2500, elite: 1900, pro: 1650,
 };
 
 // Standing at T between recovery and next position call.
 // Also scaled by 1/TEMPO_FACTOR: slow=more breathing room, explosive=shorter pause.
+// Advanced raised 1300→1400, Pro raised 780→950 to give a clear recovery beat at T
+// and make the Pro pace feel achievable rather than frantic.
 const T_PAUSE: Record<Difficulty, number> = {
-  beginner: 2200, intermediate: 1800, advanced: 1300, elite: 1000, pro: 780,
+  beginner: 2200, intermediate: 1800, advanced: 1400, elite: 1000, pro: 950,
 };
 
 // Hard floor per tempo — set to TIMING_MATRIX[diff]['natural'] / TEMPO_FACTOR[tempo].
 // This prevents close positions (ML/T area) from going faster than validated natural pace.
 // Computed dynamically in getDynamicIntervalMs; stored here as the natural baseline.
+// advanced: 1277 + 2500 + 1400 = 5177 → 5100 floor  pro: 970 + 1650 + 950 = 3570 → 3500 floor
 const MIN_INTERVAL: Record<Difficulty, number> = {
-  beginner: 8000, intermediate: 6500, advanced: 5000, elite: 4000, pro: 3200,
+  beginner: 8000, intermediate: 6500, advanced: 5100, elite: 4000, pro: 3500,
 };
 
 // Pace-preset multipliers + fine-step factor

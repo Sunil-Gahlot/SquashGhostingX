@@ -72,7 +72,7 @@ const SHOT_GROUP_POSITIONS: Partial<Record<ShotGroup, Position[]>> = {
   drives:    ['T', 'FR', 'FL', 'FMCR', 'FMCL', 'MR', 'ML', 'BMCR', 'BMCL', 'BR', 'BL'],
   lengths:   ['BR', 'BL', 'BMCR', 'BMCL', 'MR', 'ML'],
   drops:     ['FR', 'FL', 'FMCR', 'FMCL'],
-  kills:     ['FR', 'FL', 'FMCR', 'FMCL', 'T'],
+  kills:     ['FR', 'FL', 'FMCR', 'FMCL', 'MR', 'ML', 'T'],
   lobs:      ['BR', 'BL', 'BMCR', 'BMCL', 'MR', 'ML', 'FR', 'FL', 'FMCR', 'FMCL'],
   boasts:    ['BR', 'BL', 'BMCR', 'BMCL', 'MR', 'ML'],
   volleys:   ['T', 'FMCR', 'FMCL', 'MR', 'ML'],

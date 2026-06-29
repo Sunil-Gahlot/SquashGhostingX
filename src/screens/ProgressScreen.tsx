@@ -51,7 +51,7 @@ function WeeklyBars({
         </Defs>
         {DAYS.map((_, i) => {
           const dow      = (i + 1) % 7;
-          const activity = weeklyActivity.find((a) => new Date(a.date).getDay() === dow);
+          const activity = weeklyActivity.find((a) => new Date(a.date + 'T12:00:00').getDay() === dow);
           const val      = activity?.movements ?? 0;
           const barH     = val > 0 ? Math.max(10, Math.round((val / maxVal) * CHART_H)) : 5;
           const x        = i * (BAR_W + BAR_GAP);
@@ -445,7 +445,11 @@ export default function ProgressScreen() {
                       <Ionicons name={icon as any} size={16} color={color} />
                     </View>
                     <Text style={[styles.pbVal, { color }]}>
-                      {isReps ? Math.round(pb.value) : `${Math.round(pb.value)}%`}
+                      {isReps
+                        ? Math.round(pb.value)
+                        : pb.metric === 'completion'
+                        ? `${Math.round(pb.value)}%`
+                        : Math.round(pb.value)}
                     </Text>
                     <Text style={styles.pbMetric}>
                       {isReps ? 'Most Reps' : pb.metric === 'completion' ? 'Completion' : 'Intensity'}
