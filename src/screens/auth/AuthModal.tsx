@@ -69,9 +69,10 @@ const SLIDES = [
 ] as const;
 
 const AUTH_CREDENTIALS_KEY = 'sgx-user-credentials';
-// 10,000-pass SHA-256 chain — ~50× harder to brute-force than the original 200.
-// Still not NIST SP 800-132 (PBKDF2), but the best available without adding a native crypto package.
-const HASH_ITERATIONS      = 10_000;
+// 200,000-pass SHA-256 chain — approaches OWASP 2023 guidance for PBKDF2-SHA256 (210,000 iterations).
+// This is the strongest option available without adding a native crypto package.
+// Adds ~1 s to sign-in on older devices, which is acceptable for local-only auth.
+const HASH_ITERATIONS      = 200_000;
 
 type StoredCreds =
   | { version: 4; email: string; passwordHash: string; salt: string; iterations: number }
@@ -508,6 +509,10 @@ const AUTH_ATTEMPTS_KEY = 'sgx-auth-attempts';
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCKOUT_MS = 5 * 60 * 1000; // 5 minutes
 
+// lockedUntil is an absolute epoch timestamp (Date.now() + LOCKOUT_MS).
+// On iOS, SecureStore survives app reinstall by default (keychain persists).
+// On Android, SecureStore is tied to the app install and is cleared on reinstall,
+// which resets the lockout counter — this is an acceptable platform trade-off.
 interface AttemptRecord { count: number; lockedUntil: number; }
 
 async function getAttempts(): Promise<AttemptRecord> {
@@ -1443,6 +1448,7 @@ function GuestNamePage({
   const [dobYear,     setDobYear]     = useState('');
   const [nameError,   setNameError]   = useState('');
   const [genderError, setGenderError] = useState('');
+  const [dobError,    setDobError]    = useState('');
   const scrollRef = useRef<ScrollView>(null);
 
   // Letters, spaces, hyphens, apostrophes only (covers accented names like O'Brien, María)
@@ -1467,6 +1473,19 @@ function GuestNamePage({
       scrollRef.current?.scrollTo({ y: 0, animated: true });
       return;
     }
+    // Validate DOB only when all three fields are filled (DOB is optional).
+    if (dobMonth && dobDay && dobYear) {
+      const m = parseInt(dobMonth, 10) - 1;
+      const d = parseInt(dobDay,   10);
+      const y = parseInt(dobYear,  10);
+      const date = new Date(y, m, d);
+      const valid = date.getFullYear() === y && date.getMonth() === m && date.getDate() === d;
+      if (!valid) {
+        setDobError('Please enter a valid date of birth.');
+        return;
+      }
+    }
+    setDobError('');
     onContinue(name, gender, dobMonth, dobDay, dobYear);
   }
 
@@ -1550,8 +1569,14 @@ function GuestNamePage({
         <Text style={[gnStyles.fieldLabel, { marginTop: Spacing.md }]}>DATE OF BIRTH <Text style={gnStyles.fieldLabelOptional}>(optional)</Text></Text>
         <DobPickerCombined
           dobMonth={dobMonth} dobDay={dobDay} dobYear={dobYear}
-          onConfirm={(m, d, y) => { setDobMonth(m); setDobDay(d); setDobYear(y); }}
+          onConfirm={(m, d, y) => { setDobMonth(m); setDobDay(d); setDobYear(y); setDobError(''); }}
         />
+        {dobError ? (
+          <View style={[aStyles.errorWrap, { marginTop: Spacing.xs }]}>
+            <Ionicons name="alert-circle-outline" size={15} color={Colors.danger} />
+            <Text style={aStyles.errorText}>{dobError}</Text>
+          </View>
+        ) : null}
 
         <TouchableOpacity
           style={[aStyles.submitBtn, { marginTop: Spacing.xl }]}
@@ -1629,6 +1654,7 @@ function GuestPrefsPage({
     { value: 'intermediate', label: 'Intermediate' },
     { value: 'advanced',     label: 'Advanced' },
     { value: 'elite',        label: 'Elite' },
+    { value: 'pro',          label: 'Pro' },
   ];
 
   return (

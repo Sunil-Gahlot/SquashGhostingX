@@ -86,6 +86,7 @@ export interface SessionCheckpoint {
   moveIndex: number;
   movementsCompleted: number;
   elapsedSeconds: number;
+  livePaceStep?: number;      // restores live pace on resume; absent in older checkpoints
   savedAt: string;            // ISO timestamp
 }
 
@@ -130,6 +131,7 @@ export type Language = 'en-US' | 'en-GB' | 'es' | 'fr' | 'de' | 'hi' | 'ar' | 'z
 export interface UserProfile {
   id: string;
   name: string;
+  /** @deprecated Never computed; derive age at runtime from dobYear/dobMonth/dobDay. */
   age: number | null;
   dobDay: string;
   dobMonth: string;

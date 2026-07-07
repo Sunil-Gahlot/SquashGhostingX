@@ -308,10 +308,11 @@ export function createGhostingEngine(config: SessionConfig): GhostingEngine {
     // Floor is 75% of the explosive-tempo baseline for this position — this ensures
     // back-corner positions (BL/BR at ~4.8m from T) never drop below what is
     // physically achievable even for pro-level players on the fastest setting.
+    const MATCH_SIM_SPEED_FLOOR_FACTOR = 0.75;
     const stepRate      = MATCH_SIM_STEP_RATE[config.difficulty] ?? 0.10;
     const reduction     = Math.floor(setIndex / 3) * stepRate;
     const explosiveBase = getDynamicIntervalMs(position, config.difficulty, 'explosive');
-    const floor         = Math.round(explosiveBase * 0.75);
+    const floor         = Math.round(explosiveBase * MATCH_SIM_SPEED_FLOOR_FACTOR);
     return Math.max(floor, Math.round(base * (1 - reduction)));
   }
 

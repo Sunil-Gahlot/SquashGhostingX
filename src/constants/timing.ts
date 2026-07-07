@@ -288,7 +288,12 @@ export function estimateTotalMoves(
   tempo: Tempo,
   adj?: PaceAdjustment,
 ): number {
-  const intervalMs  = getIntervalMs(difficulty, tempo, adj);
+  // Use a weighted average across the six standard positions rather than only ML
+  // so corner-heavy sessions (with longer BL/BR intervals) are not over-estimated.
+  const STD_POSITIONS = ['FL', 'FR', 'ML', 'MR', 'BL', 'BR'];
+  const intervalMs = Math.round(
+    STD_POSITIONS.reduce((sum, p) => sum + getDynamicIntervalMs(p, difficulty, tempo, adj), 0) / STD_POSITIONS.length
+  );
   const movesPerSet = MOVES_PER_SET[difficulty];
   const restMs      = getAutoRestMs(difficulty, movesPerSet, intervalMs);
   const setMs       = movesPerSet * intervalMs + restMs;

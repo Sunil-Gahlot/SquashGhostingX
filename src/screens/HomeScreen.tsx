@@ -201,7 +201,7 @@ export default function HomeScreen({ navigation }: any) {
     profile.skillLevel,
   );
 
-  useEffect(() => { loadData(); }, [lastSessionCompletedAt]);
+  useEffect(() => { loadData(); }, [lastSessionCompletedAt, loadData]);
 
   // Scroll to top whenever the user completes a fresh sign-in
   useEffect(() => {

@@ -37,6 +37,8 @@ interface ProfileStore {
   hasStartedAnySession: boolean;
   hasAcceptedTerms: boolean;
   hasShownAndroidVolumeHint: boolean;
+  /** True once hydratePii() has loaded PII from SecureStore. Guards UI from flash of empty name. */
+  piiLoaded: boolean;
 
   setProfile: (updates: Partial<UserProfile>) => void;
   completeOnboarding: () => void;
@@ -63,6 +65,7 @@ export const useProfileStore = create<ProfileStore>()(
       hasStartedAnySession: false,
       hasAcceptedTerms: false,
       hasShownAndroidVolumeHint: false,
+      piiLoaded: false,
 
       setProfile: (updates) => {
         // Capture new PII outside the set() callback so we can write async after state settles
@@ -129,10 +132,12 @@ export const useProfileStore = create<ProfileStore>()(
       hydratePii: async () => {
         try {
           const raw = await SecureStore.getItemAsync(SGX_PII_KEY);
-          if (!raw) return;
-          const pii = JSON.parse(raw) as Partial<Pick<UserProfile, PiiField>>;
-          set((s) => ({ profile: { ...s.profile, ...pii } }));
+          if (raw) {
+            const pii = JSON.parse(raw) as Partial<Pick<UserProfile, PiiField>>;
+            set((s) => ({ profile: { ...s.profile, ...pii } }));
+          }
         } catch {}
+        set({ piiLoaded: true });
       },
     }),
     {
@@ -153,10 +158,13 @@ export const useProfileStore = create<ProfileStore>()(
       }),
 
       // Strip PII (name, dob, gender) from AsyncStorage — stored in SecureStore instead.
+      // Also exclude piiLoaded — it's runtime state that resets on each app launch.
       partialize: (state) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { name: _n, dobDay: _dd, dobMonth: _dm, dobYear: _dy, gender: _g, ...safeProfile } = state.profile;
-        return { ...state, profile: safeProfile as UserProfile };
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { piiLoaded: _pl, ...rest } = state;
+        return { ...rest, profile: safeProfile as UserProfile };
       },
 
       // After AsyncStorage hydration: migrate existing PII to SecureStore (one-time, v8→v9),

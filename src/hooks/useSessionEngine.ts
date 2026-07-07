@@ -91,9 +91,10 @@ const TEMPO_WEIGHT: Record<string, number> = { slow: 0.7, natural: 1.0, explosiv
 const DIFF_WEIGHT:  Record<string, number> = {
   beginner: 0.5, intermediate: 0.7, advanced: 1.0, elite: 1.3, pro: 1.5,
 };
-// Ceiling for intensity normalization: pro + explosive = 1.5 × 1.4 = 2.1
-// Dividing by this makes the full 0-100 scale usable instead of clamping at ~48% completion for pro.
-const INTENSITY_MAX = 1.5 * 1.4;
+// Ceiling for intensity normalization — derived from the max values in the weight tables
+// so it automatically stays correct if the weights are ever adjusted.
+const INTENSITY_MAX =
+  Math.max(...Object.values(TEMPO_WEIGHT)) * Math.max(...Object.values(DIFF_WEIGHT));
 
 // Coaching cues fire every N seconds of active training
 const COACHING_INTERVAL_SECS = 90;
@@ -138,12 +139,13 @@ export function useSessionEngine(db: SQLiteDatabase) {
   const lastCoachingCueSecsRef = useRef<number>(-COACHING_INTERVAL_SECS);
 
   // Timer refs
-  const moveTimers      = useRef<TimerId[]>([]);
-  const loopTimer       = useRef<TimerId | null>(null);
-  const restTimer       = useRef<TimerId | null>(null);
-  const secondTimer     = useRef<IntervalId | null>(null);
-  const cpTimer         = useRef<IntervalId | null>(null);
-  const isCompletingRef = useRef(false);
+  const moveTimers       = useRef<TimerId[]>([]);
+  const loopTimer        = useRef<TimerId | null>(null);
+  const restTimer        = useRef<TimerId | null>(null);
+  const secondTimer      = useRef<IntervalId | null>(null);
+  const cpTimer          = useRef<IntervalId | null>(null);
+  const teardownTimerRef = useRef<TimerId | null>(null);
+  const isCompletingRef  = useRef(false);
 
   // Tracks when the current move cycle started — used to reschedule loopTimer on live pace change
   const cycleStartRef     = useRef<number>(0);
@@ -204,8 +206,13 @@ export function useSessionEngine(db: SQLiteDatabase) {
     }
     // FIND-10: release audio session after completion speech finishes (~5s for the utterance).
     // Abandoned sessions have no speech so teardown is immediate.
+    // Track the timer so dismissSession / startSession can cancel it before it fires.
     const teardownDelay = (!abandoned && ssettings.voiceEnabled) ? 6000 : 0;
-    setTimeout(() => { Audio.teardownAudioSession().catch(() => {}); }, teardownDelay);
+    if (teardownTimerRef.current) clearTimeout(teardownTimerRef.current);
+    teardownTimerRef.current = setTimeout(() => {
+      teardownTimerRef.current = null;
+      Audio.teardownAudioSession().catch(() => {});
+    }, teardownDelay);
 
     // ── Calculate zone distribution ─────────────────────────────────────────
     const movements = movementsRef.current;
@@ -318,9 +325,10 @@ export function useSessionEngine(db: SQLiteDatabase) {
     store.getState().setNextPosition(null);
 
     // BUG-005: restMode 'none' means skip rest entirely — go straight to next set.
+    // Defer via setTimeout(0) to avoid deep call-stack buildup in long no-rest sessions.
     if (config.restMode === 'none') {
       store.getState().advanceSet();
-      fireMoveLoop();
+      setTimeout(() => fireMoveLoop(), 0);
       return;
     }
 
@@ -519,7 +527,9 @@ export function useSessionEngine(db: SQLiteDatabase) {
       const newInterval  = Math.max(Math.round(baseInterval * 0.45) + 400, baseInterval + paceOffset);
 
       const elapsed   = Date.now() - cycleStartRef.current;
-      const remaining = Math.max(100, newInterval - elapsed);
+      // Floor at 15% of the new interval so the player always gets a minimum preparation
+      // window even when accelerating mid-cycle from a slow pace to a fast one.
+      const remaining = Math.max(Math.round(newInterval * 0.15), newInterval - elapsed);
 
       clearTimeout(loopTimer.current!);
       loopTimer.current = setTimeout(fireMoveLoopRef.current, remaining);
@@ -545,6 +555,10 @@ export function useSessionEngine(db: SQLiteDatabase) {
       // set count are correct (engine can't restore exact positions since they're random).
       if (engineRef.current && typeof resume.setIndex === 'number' && resume.setIndex > 0) {
         engineRef.current.seekToSet(resume.setIndex);
+      }
+      // Restore live pace step so the player resumes at the same pace they were training at.
+      if (typeof resume.livePaceStep === 'number') {
+        store.getState().setPaceStep(resume.livePaceStep);
       }
       store.getState().setResumeFromCheckpoint(null);
     }
@@ -589,6 +603,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
         moveIndex: s0.moveIndex,
         movementsCompleted: s0.repCount,
         elapsedSeconds: s0.elapsedSeconds,
+        livePaceStep: s0.livePaceStep,
         savedAt: new Date().toISOString(),
       }).catch(() => {});
     }
@@ -605,6 +620,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
           moveIndex: s.moveIndex,
           movementsCompleted: s.repCount,
           elapsedSeconds: s.elapsedSeconds,
+          livePaceStep: s.livePaceStep,
           savedAt: new Date().toISOString(),
         });
       } catch {}
@@ -650,6 +666,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
       language:     profileLanguage,
     };
 
+    if (teardownTimerRef.current) { clearTimeout(teardownTimerRef.current); teardownTimerRef.current = null; }
     configRef.current                = fullConfig;
     movementsRef.current             = [];
     recoveryCueIdxRef.current        = 0;
@@ -730,6 +747,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
 
   const dismissSession = useCallback(() => {
     clearAllTimers();
+    if (teardownTimerRef.current) { clearTimeout(teardownTimerRef.current); teardownTimerRef.current = null; }
     Audio.stopAudio();
     Audio.teardownAudioSession().catch(() => {});
     progressStore.setNewPBFlag(null);
@@ -746,23 +764,20 @@ export function useSessionEngine(db: SQLiteDatabase) {
     };
   }, []);
 
-  // Audio session management across foreground/background transitions.
-  // The app is designed to keep running in the background — player may lock the screen
-  // and use Bluetooth, speaker, or headphones on court.
-  // iOS: UIBackgroundModes:audio + shouldPlayInBackground:true allows continued execution
-  //      as long as the audio session remains active (each TTS call re-asserts it).
-  // Android: FOREGROUND_SERVICE_MEDIA_PLAYBACK permission keeps TTS audio running.
+  // Audio session management across screen-lock and background transitions.
+  // bgLoopPlayer (silent loop) keeps the AVAudioSession continuously active so iOS never
+  // suspends the JS thread during silent gaps between cues (rest periods, movement phase).
   useEffect(() => {
     const sub = AppState.addEventListener('change', (nextState) => {
       if (nextState === 'active') {
-        // Re-init audio in case it was interrupted (phone call, Siri, system sound)
-        Audio.initAudioSession().catch(() => {});
-      } else if (nextState === 'background') {
-        // Re-assert audio session so the OS keeps the process alive via the audio background mode.
-        // Do NOT pause — the session must continue with screen locked / phone in pocket.
-        Audio.initAudioSession().catch(() => {});
+        // Returning to foreground: re-assert session in case a phone call or Siri interrupted it.
+        // resumeAudioSession() is lightweight — it does NOT recreate the loop player.
+        Audio.resumeAudioSession().catch(() => {});
       }
-      // 'inactive' (iOS only — Control Centre, notification shade): transient, no action needed.
+      // background / inactive: do nothing.
+      // Calling initAudioSession() here destroys and recreates bgLoopPlayer, creating a gap
+      // at exactly the wrong moment (screen lock / home press) and can cut off a mid-cue utterance.
+      // The loop player keeps the session alive without any intervention needed.
     });
     return () => sub.remove();
   }, []);

@@ -16,7 +16,7 @@ import { useSettingsStore } from '../stores/settingsStore';
 import { useProgressStore } from '../stores/progressStore';
 import { useBadgesStore } from '../stores/badgesStore';
 import { getLanguageLabel } from '../constants/languages';
-import { getIntervalMs, MOVES_PER_SET, MOVEMENT_PHASE_MS, PACE_STEPS_MS } from '../constants/timing';
+import { getIntervalMs, getDynamicMovementPhaseMs, MOVES_PER_SET, PACE_STEPS_MS } from '../constants/timing';
 import { Language } from '../types';
 import * as Audio from '../engine/audioEngine';
 import ProfileScreen from './ProfileScreen';
@@ -183,7 +183,7 @@ export default function SettingsScreen() {
 
   const paceOffset  = PACE_STEPS_MS[settings.defaultPaceStep ?? 3] ?? 0;
   const rawInterval = getIntervalMs(settings.defaultDifficulty, settings.defaultTempo) + paceOffset;
-  const movPhase    = MOVEMENT_PHASE_MS[settings.defaultDifficulty][settings.defaultTempo];
+  const movPhase    = getDynamicMovementPhaseMs('ML', settings.defaultDifficulty, settings.defaultTempo);
   const interval    = Math.max(movPhase + 400, rawInterval);
   const movesPerSet = MOVES_PER_SET[settings.defaultDifficulty];
   const repsPerMin  = Math.round(60_000 / interval);

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import {
   View, Text, Image, StyleSheet, ScrollView, TouchableOpacity,
-  Modal, Platform, StatusBar, Dimensions,
+  Modal, Platform, StatusBar, useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
@@ -34,9 +34,6 @@ interface ArticleItem {
 
 // ─── Video data ───────────────────────────────────────────────────────────────
 
-const SCREEN_W   = Dimensions.get('window').width;
-const VG_CARD_W  = Math.floor((SCREEN_W - Spacing.base * 2 - Spacing.sm) / 2);
-const VG_THUMB_H = Math.round(VG_CARD_W * 9 / 16);
 
 const VIDEOS: VideoItem[] = [
   { id: '1', youtubeId: 'WXNJNci6hfo', title: '10 Point Ghosting Drill', subtitle: 'Coach Demo',   duration: '0:42', category: '10pt' },
@@ -452,6 +449,10 @@ Personal bests track peak performance across specific drill types and metrics. R
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function LibraryScreen() {
+  const { width: screenW } = useWindowDimensions();
+  const vgCardW  = Math.floor((screenW - Spacing.base * 2 - Spacing.sm) / 2);
+  const vgThumbH = Math.round(vgCardW * 9 / 16);
+
   const route = useRoute<RouteProp<{ Library: { articleId?: string; videoYoutubeId?: string } }, 'Library'>>();
   const [modalVideo,      setModalVideo]      = useState<VideoItem | null>(null);
   const [readingArticle,  setReadingArticle]  = useState<ArticleItem | null>(null);
@@ -751,11 +752,11 @@ export default function LibraryScreen() {
           {VIDEOS.map((v) => (
             <TouchableOpacity
               key={v.id}
-              style={styles.videoCard}
+              style={[styles.videoCard, { width: vgCardW }]}
               onPress={() => setModalVideo(v)}
               activeOpacity={0.85}
             >
-              <View style={styles.vcThumbWrap}>
+              <View style={[styles.vcThumbWrap, { width: vgCardW, height: vgThumbH }]}>
                 {failedThumbs.has(v.youtubeId) ? (
                   <View style={[styles.vcThumb, styles.vcThumbFallback]}>
                     <Ionicons name="logo-youtube" size={28} color="rgba(255,255,255,0.3)" />
@@ -862,10 +863,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.base, gap: Spacing.sm,
     marginBottom: Spacing.lg,
   },
-  videoCard: { width: VG_CARD_W },
+  videoCard: { /* width set dynamically via vgCardW */ },
 
   vcThumbWrap: {
-    width: VG_CARD_W, height: VG_THUMB_H,
+    /* width/height set dynamically via vgCardW/vgThumbH */
     borderRadius: BorderRadius.md, overflow: 'hidden',
     backgroundColor: Colors.surfaceElevated, marginBottom: 6,
   },

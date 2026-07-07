@@ -15,8 +15,8 @@ interface SessionStore {
   drillConfigVisible: boolean;
   /** Checkpoint found on startup — drives ResumePromptModal */
   pendingCheckpoint: SessionCheckpoint | null;
-  /** Set by ResumePromptModal — engine reads this in startActive to restore time/reps + sessionId + setIndex */
-  resumeFromCheckpoint: { elapsedSeconds: number; repCount: number; sessionId?: string; setIndex?: number } | null;
+  /** Set by ResumePromptModal — engine reads this in startActive to restore time/reps + sessionId + setIndex + livePaceStep */
+  resumeFromCheckpoint: { elapsedSeconds: number; repCount: number; sessionId?: string; setIndex?: number; livePaceStep?: number } | null;
 
   // Drill config modal
   openDrillConfig: () => void;
@@ -24,7 +24,7 @@ interface SessionStore {
 
   // Checkpoint
   setPendingCheckpoint: (cp: SessionCheckpoint | null) => void;
-  setResumeFromCheckpoint: (data: { elapsedSeconds: number; repCount: number; sessionId?: string; setIndex?: number } | null) => void;
+  setResumeFromCheckpoint: (data: { elapsedSeconds: number; repCount: number; sessionId?: string; setIndex?: number; livePaceStep?: number } | null) => void;
   setSessionId: (id: string) => void;
 
   // Lifecycle
@@ -130,6 +130,8 @@ export const useSessionStore = create<SessionStore>((set) => ({
       s.session ? { session: {
         ...s.session,
         elapsedSeconds: s.session.elapsedSeconds + 1,
+        // workSecsRemaining counts down through the full session including rest periods —
+        // it tracks total session time remaining, not just active-work time.
         workSecsRemaining: Math.max(0, s.session.workSecsRemaining - 1),
       } } : s),
 

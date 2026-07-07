@@ -1,30 +1,13 @@
 import * as Speech from 'expo-speech';
-import { setAudioModeAsync, setIsAudioActiveAsync } from 'expo-audio';
+import { createAudioPlayer, type AudioPlayer, setAudioModeAsync, setIsAudioActiveAsync } from 'expo-audio';
 import { VoiceGender } from '../types';
 
-// Rotating recovery cues — natural coach-like calls that fire after every position for all levels.
-// Six phrases prevent the cycle feeling mechanical in long sessions.
-const RECOVERY_CUES = [
-  'Back to T!',
-  'Recover to T!',
-  'Back to the T!',
-  'Return to T!',
-  'T position!',
-  'And T!',
-];
-
-const COACHING_PHRASES = [
-  'Great work, keep going',
-  'Stay focused, push through',
-  'Good movement, keep the pace',
-  "You're doing great",
-  'Stay low and fast',
-  'Excellent work, keep it up',
-  'Push harder, you can do it',
-  'Nice footwork, stay sharp',
-  'Keep your energy up',
-  'Almost there, stay strong',
-];
+// Looping near-silent clip that keeps the AVAudioSession continuously active.
+// iOS suspends the JS thread (killing setTimeout/setInterval) during silent gaps between
+// TTS cues unless audio is actively playing. Volume 0 = inaudible but the audio pipeline
+// remains open, preventing thread suspension.
+// Re-created each session so there is no leak between sessions.
+let bgLoopPlayer: AudioPlayer | null = null;
 
 // Pitch fallback — used when no matching named voice is found
 // Male: 0.75 gives a noticeably deeper voice even on the default iOS TTS engine
@@ -42,7 +25,7 @@ const FEMALE_VOICE_KEYWORDS = ['samantha', 'ava', 'allison', 'karen', 'moira', '
 let cachedVoices: Speech.Voice[] = [];
 
 /** Pick best voice for the given language and gender.
- *  Prefers Enhanced quality voices over Default quality.
+ *  Prefers Enhanced quality voices over Default/Compact quality.
  *  Returns undefined → use system default + pitch fallback. */
 function pickVoice(language: string, gender: VoiceGender): string | undefined {
   if (cachedVoices.length === 0) return undefined;
@@ -55,8 +38,8 @@ function pickVoice(language: string, gender: VoiceGender): string | undefined {
   }
   if (pool.length === 0) return undefined;
 
-  // Prefer Enhanced quality only (not Compact — Compact can sound robotic)
-  const enhanced = pool.filter((v) => (v as any).quality === 'Enhanced');
+  // Prefer Enhanced quality (Neural voices) — excludes Compact/Default which sound robotic
+  const enhanced = pool.filter((v) => v.quality === Speech.VoiceQuality.Enhanced);
   const candidates = enhanced.length > 0 ? enhanced : pool;
 
   const keywords = gender === 'male' ? MALE_VOICE_KEYWORDS : FEMALE_VOICE_KEYWORDS;
@@ -85,7 +68,7 @@ export async function initAudioSession(): Promise<void> {
   //   playsInSilentMode   → audible even when iOS silent/vibrate switch is on (critical for court use)
   //   allowsRecording     → false forces AVAudioSessionCategoryPlayback → routes to Bluetooth A2DP speaker
   //   interruptionMode    → 'duckOthers': TTS ducks background music rather than stopping it
-  //   shouldPlayInBackground → keeps session alive when screen dims between calls
+  //   shouldPlayInBackground → keeps session timer alive during silent gaps when screen is locked
   //   shouldRouteThroughEarpiece → false: loudspeaker / Bluetooth, not earpiece
   try {
     await setIsAudioActiveAsync(true);
@@ -105,6 +88,19 @@ export async function initAudioSession(): Promise<void> {
     const voices = await Speech.getAvailableVoicesAsync();
     if (voices && voices.length > 0) cachedVoices = voices;
   } catch { /* voice list unavailable — will use pitch fallback */ }
+
+  // Start the silent background loop AFTER the audio session is configured.
+  if (bgLoopPlayer) {
+    try { bgLoopPlayer.remove(); } catch {}
+    bgLoopPlayer = null;
+  }
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    bgLoopPlayer = createAudioPlayer(require('../../assets/silent-loop.wav'));
+    bgLoopPlayer.loop   = true;
+    bgLoopPlayer.volume = 0;
+    bgLoopPlayer.play();
+  } catch { /* non-critical — session still works, just may be suspended in background */ }
 }
 
 /**
@@ -119,33 +115,26 @@ export function speakText(
   language = 'en-US',
   voiceGender: VoiceGender = 'female',
 ): void {
-  // Re-assert audio session before each utterance.
-  // On failure the session was interrupted (phone call, Siri, notification) — re-init to recover.
+  // Re-assert the audio session is active (fast no-op if already active).
+  // If it fails the session was lost (phone call, Siri) — full re-init to recover.
   setIsAudioActiveAsync(true).catch(() => {
     initAudioSession().catch(() => {});
   });
-  // Re-assert routing so an earphone disconnect mid-session doesn't silently reroute to earpiece.
-  // iOS can short-circuit this call when routing is already correct — overhead is negligible.
-  setAudioModeAsync({
-    playsInSilentMode: true,
-    allowsRecording: false,
-    interruptionMode: 'duckOthers',
-    shouldPlayInBackground: true,
-    shouldRouteThroughEarpiece: false,
-  }).catch(() => {});
   try {
     Speech.stop();
     const voiceId = pickVoice(language, voiceGender);
     // Court use: clamp between 0.7 (Bluetooth delay compensation) and 1.6 (max useful rate).
-    // Default raised to 1.1 so calls are punchy and cut through court noise.
     const adjustedRate = Math.min(1.6, Math.max(0.7, rate));
     Speech.speak(text, {
       language,
       rate:   adjustedRate,
-      // Use neutral pitch when a named voice is found — the voice already handles gender.
-      // Apply gender pitch only as a fallback when the system gives us the default voice.
+      // Neutral pitch when a named voice is selected; gender pitch only as fallback.
       pitch:  voiceId ? 1.0 : (GENDER_PITCH[voiceGender] ?? 1.0),
       volume: 1.0,
+      // Critical for background audio: use our app's audio session (configured with
+      // UIBackgroundModes:audio + shouldPlayInBackground) instead of iOS creating a
+      // separate session that has no background entitlement.
+      useApplicationAudioSession: true,
       ...(voiceId ? { voice: voiceId } : {}),
       onError: (e) => console.warn('[Audio] Speech.speak error:', e),
     });
@@ -158,20 +147,26 @@ export function stopAudio(): void {
   try { Speech.stop(); } catch {}
 }
 
+// Lightweight re-assertion for returning to foreground after an interruption (phone call, Siri).
+// Does NOT recreate the bgLoopPlayer — just re-activates the session and resumes the loop
+// if iOS paused it during the interruption.
+export async function resumeAudioSession(): Promise<void> {
+  try { await setIsAudioActiveAsync(true); } catch {}
+  if (bgLoopPlayer) {
+    try { if (!bgLoopPlayer.playing) bgLoopPlayer.play(); } catch {}
+  }
+}
+
 // Releases the audio session after a training session ends so the app no longer
 // appears as "using audio" in iOS Control Center / Android notification shade.
 // Call after the completion speech has finished (use a setTimeout delay if needed).
 export async function teardownAudioSession(): Promise<void> {
+  if (bgLoopPlayer) {
+    try { bgLoopPlayer.pause(); } catch {}
+    try { bgLoopPlayer.remove(); } catch {}
+    bgLoopPlayer = null;
+  }
   try { await setIsAudioActiveAsync(false); } catch {}
   try { await setAudioModeAsync({ playsInSilentMode: false, shouldPlayInBackground: false }); } catch {}
 }
 
-/** Returns rotated recovery cue: "recover to T" → "back to T" → "return to T" */
-export function getRecoveryCue(callIndex: number): string {
-  return RECOVERY_CUES[callIndex % RECOVERY_CUES.length];
-}
-
-/** Returns rotating mid-session coaching encouragement. */
-export function getCoachingPhrase(callIndex: number): string {
-  return COACHING_PHRASES[callIndex % COACHING_PHRASES.length];
-}

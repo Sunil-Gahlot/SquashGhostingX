@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Modal,
+  View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
@@ -18,7 +18,10 @@ import { getProgramById } from '../data/builtinPrograms';
 import { getIntervalMs, AUTO_REST_FACTORS, MOVES_PER_SET } from '../constants/timing';
 import { useBadgesStore, BADGE_DEFS } from '../stores/badgesStore';
 
-const SCREEN_W = Dimensions.get('window').width;
+// Minimum sessions before the coach insight card activates (avoids premature advice).
+const COACH_MIN_SESSIONS    = 5;
+// Zone percentage below which the coach flags it as underworked.
+const COACH_ZONE_THRESHOLD  = 25;
 
 // ─── Weekly activity bar chart ────────────────────────────────────────────────
 
@@ -192,9 +195,9 @@ export default function ProgressScreen() {
     ? `${Math.floor(roundedMinutes / 60)}h ${roundedMinutes % 60}m`
     : `${roundedMinutes}m`;
 
-  const coachWeakZone = stats.totalSessions >= 5
-    ? (stats.zoneDistribution.back  < 25 ? 'back'
-      : stats.zoneDistribution.front < 25 ? 'front' : null)
+  const coachWeakZone = stats.totalSessions >= COACH_MIN_SESSIONS
+    ? (stats.zoneDistribution.back  < COACH_ZONE_THRESHOLD ? 'back'
+      : stats.zoneDistribution.front < COACH_ZONE_THRESHOLD ? 'front' : null)
     : null;
   const coachDrillId = coachWeakZone === 'back'
     ? (['advanced', 'elite', 'pro'].includes(profile.skillLevel) ? 'ghost-master' : 'back-court-power')

@@ -1,6 +1,12 @@
 import { type SQLiteDatabase } from 'expo-sqlite';
 
-/** Run a single SQL statement, silently ignoring errors (e.g. "duplicate column"). */
+/**
+ * Run a single SQL statement, silently ignoring errors.
+ * ONLY use for idempotent additive migrations (ALTER TABLE ADD COLUMN).
+ * SQLite throws "duplicate column name" if the column already exists — that is expected.
+ * Never use for CREATE TABLE or PRAGMA — those errors must propagate so the app fails
+ * fast rather than silently running with a broken schema.
+ */
 async function safeExec(db: SQLiteDatabase, sql: string): Promise<void> {
   try { await db.execAsync(sql); } catch {}
 }

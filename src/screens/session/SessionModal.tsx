@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   Modal, View, Text, StyleSheet, TouchableOpacity,
   Animated, ScrollView, AppState, AppStateStatus,
-  useWindowDimensions, Platform, Alert,
+  useWindowDimensions, Platform, Alert, InteractionManager,
 } from 'react-native';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -594,7 +594,7 @@ function SessionSummaryView({
   const metPerDiff: Record<Difficulty, number> = {
     beginner: 7.3, intermediate: 9.0, advanced: 11.0, elite: 13.0, pro: 15.0,
   };
-  const KCAL_PER_MET_MIN = 70 * 3.5 / 200; // 70kg reference body weight
+  const KCAL_PER_MET_MIN = 70 * 3.5 / 200; // 70 kg reference body weight (WHO healthy adult); 3.5 ml/kg/min = 1 MET
   const calories = Math.round((metPerDiff[cfg.difficulty] ?? 9.0) * KCAL_PER_MET_MIN * (activeTimeSecs / 60));
 
   const isNewPB = newPBSessionId === session.sessionId;
@@ -947,7 +947,14 @@ export default function SessionModal() {
       animationType="slide"
       presentationStyle="fullScreen"
       statusBarTranslucent
-      onRequestClose={() => {}}
+      onRequestClose={() => {
+        // Allow Android back gesture/button to dismiss the summary screen,
+        // but block it during active training to prevent accidental exit.
+        const state = session?.state;
+        if (state === 'complete' || state === 'abandoned') {
+          engine.dismissSession();
+        }
+      }}
     >
       <SafeAreaView style={[styles.safe, Platform.OS === 'web' && styles.safeWeb]} edges={['top', 'bottom']}>
         {/* Route to the correct view based on session state */}
@@ -998,9 +1005,10 @@ export default function SessionModal() {
               // BUG-031: clear PB flag so it doesn't bleed into the next session's summary.
               useProgressStore.getState().setNewPBFlag(null);
               engine.dismissSession();
-              setTimeout(() => {
+              // Wait for the modal slide-out animation to complete before showing the next session.
+              InteractionManager.runAfterInteractions(() => {
                 useSessionStore.getState().setPendingConfig(config);
-              }, 300);
+              });
             }}
           />
         )}

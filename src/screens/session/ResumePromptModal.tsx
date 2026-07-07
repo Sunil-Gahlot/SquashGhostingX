@@ -33,6 +33,7 @@ export default function ResumePromptModal() {
       repCount: cp.movementsCompleted,
       sessionId: cp.sessionId,
       setIndex: cp.setIndex,
+      livePaceStep: cp.livePaceStep,
     });
     setPendingConfig(cp.config);
     setPendingCheckpoint(null);
