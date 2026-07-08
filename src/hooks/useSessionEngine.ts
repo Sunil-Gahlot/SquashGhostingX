@@ -116,13 +116,13 @@ export function useSessionEngine(db: SQLiteDatabase) {
     lastVoiceCallMsRef.current = Date.now();
     const cfg = configRef.current;
     const s = getSettings();
-    Audio.speakText(text, s.speechRate, cfg?.language ?? 'en-US', cfg?.voiceGender ?? 'female');
+    Audio.speakText(text, s.speechRate, cfg?.language ?? 'en-US', cfg?.voiceGender ?? 'female', s.preferredVoiceId);
   }
   // speakCoach(): coaching encouragement only — does NOT stamp lastVoiceCallMsRef.
   function speakCoach(text: string) {
     const cfg = configRef.current;
     const s = getSettings();
-    Audio.speakText(text, s.speechRate, cfg?.language ?? 'en-US', cfg?.voiceGender ?? 'female');
+    Audio.speakText(text, s.speechRate, cfg?.language ?? 'en-US', cfg?.voiceGender ?? 'female', s.preferredVoiceId);
   }
 
   // ── Mutable refs (never cause re-renders) ──────────────────────────────────
@@ -706,7 +706,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
     // Announce "Move to the T" before countdown numbers begin
     const sForStart = getSettings();
     if (sForStart.voiceEnabled && fullConfig.voiceMode !== 'beep' && fullConfig.voiceMode !== 'visual-only') {
-      Audio.speakText(getStartCue(fullConfig.language), sForStart.speechRate, fullConfig.language, fullConfig.voiceGender);
+      Audio.speakText(getStartCue(fullConfig.language), sForStart.speechRate, fullConfig.language, fullConfig.voiceGender, sForStart.preferredVoiceId);
       addTimer(setTimeout(() => runCountdown(COUNTDOWN_SECONDS), 2500));
     } else {
       runCountdown(COUNTDOWN_SECONDS);

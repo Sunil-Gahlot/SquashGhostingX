@@ -2,8 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import {
   View, Text, Image, StyleSheet, ScrollView, TouchableOpacity,
-  Modal, Platform, StatusBar, useWindowDimensions,
+  Modal, Platform, useWindowDimensions,
 } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import { Ionicons } from '@expo/vector-icons';
@@ -523,7 +524,7 @@ export default function LibraryScreen() {
       >
         <SafeAreaProvider>
           <View style={styles.vmContainer}>
-            <StatusBar barStyle="light-content" backgroundColor="#000" />
+            <StatusBar style="light" backgroundColor="#000" />
             <SafeAreaView edges={['top']} style={{ backgroundColor: '#111' }}>
               <View style={styles.vmHeader}>
                 <View style={styles.vmTitleRow}>
@@ -587,7 +588,7 @@ export default function LibraryScreen() {
       >
         <SafeAreaProvider>
           <View style={styles.amContainer}>
-          <StatusBar barStyle="light-content" backgroundColor="transparent" />
+          <StatusBar style="light" backgroundColor="transparent" />
 
           {/* Scrollable content — starts from very top (behind floating header) */}
           <ScrollView

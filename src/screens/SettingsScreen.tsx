@@ -1,7 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity, Alert, Modal, Image, Linking,
-  InteractionManager,
+  InteractionManager, Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -143,23 +143,23 @@ const SKILL_COLORS: Record<string, string> = {
 // ─── Main screen ──────────────────────────────────────────────────────────────
 
 const TEST_PHRASES: Partial<Record<Language, string>> = {
-  'en-US': 'Front left. Back right. Recover to T.',
-  'en-GB': 'Front left. Back right. Recover to T.',
-  es: 'Esquina delantera izquierda. Vuelve a la T.',
-  fr: 'Avant gauche. Récupère le T.',
-  de: 'Vorne links. Zurück zur T-Position.',
-  it: 'Angolo anteriore sinistro. Torna alla T.',
-  pt: 'Frente esquerda. Volte para o T.',
-  nl: 'Voor links. Terug naar de T.',
-  hi: 'आगे बाईं तरफ। टी पर वापस जाएं।',
-  ar: 'الأمام الأيسر. العودة إلى مركز الملعب.',
-  zh: '前左角。回到T位。',
-  ja: 'フロントレフト。Tポジションに戻れ。',
-  ko: '앞 왼쪽. T자리로 돌아가세요.',
-  he: 'קדמי שמאלי. חזור ל-T.',
-  sw: 'Mbele kushoto. Rudi kwenye T.',
-  qu: 'Ñawpaq lloq\'e. Kutiy T-man.',
-  ha: 'Gaban hagu. Koma zuwa T.',
+  'en-US': 'Front left! Back right. Recover to T. Keep moving, stay sharp!',
+  'en-GB': 'Front left! Back right. Recover to T. Keep moving, stay sharp!',
+  es: 'Esquina delantera izquierda. Vuelve a la T. Sigue moviéndote.',
+  fr: 'Avant gauche. Récupère le T. Continue à bouger.',
+  de: 'Vorne links. Zurück zur T-Position. Bleib in Bewegung.',
+  it: 'Angolo anteriore sinistro. Torna alla T. Continua a muoverti.',
+  pt: 'Frente esquerda. Volte para o T. Continue se movendo.',
+  nl: 'Voor links. Terug naar de T. Blijf bewegen.',
+  hi: 'आगे बाईं तरफ। टी पर वापस जाएं। चलते रहो।',
+  ar: 'الأمام الأيسر. العودة إلى مركز الملعب. استمر في الحركة.',
+  zh: '前左角。回到T位。继续移动。',
+  ja: 'フロントレフト。Tポジションに戻れ。動き続けろ。',
+  ko: '앞 왼쪽. T자리로 돌아가세요. 계속 움직이세요.',
+  he: 'קדמי שמאלי. חזור ל-T. המשך לנוע.',
+  sw: 'Mbele kushoto. Rudi kwenye T. Endelea kusogea.',
+  qu: 'Ñawpaq lloq\'e. Kutiy T-man. Purispa kakuy.',
+  ha: 'Gaban hagu. Koma zuwa T. Ci gaba da tafiya.',
 };
 
 const APP_VERSION = Constants.expoConfig?.version ?? '1.0.0';
@@ -177,6 +177,14 @@ export default function SettingsScreen() {
   const [helpVisible, setHelpVisible]         = useState(false);
   const [termsVisible, setTermsVisible]       = useState(false);
   const [privacyVisible, setPrivacyVisible]   = useState(false);
+  const [voicePickerVisible, setVoicePickerVisible] = useState(false);
+  const [voiceOptions, setVoiceOptions] = useState<Audio.VoiceDisplayOption[]>([]);
+
+  const currentVoiceLabel = useMemo(() => {
+    if (!settings.preferredVoiceId) return 'Auto';
+    const found = voiceOptions.find((o) => o.id === settings.preferredVoiceId);
+    return found ? found.name : 'Auto';
+  }, [settings.preferredVoiceId, voiceOptions]);
 
   const displayName = profile.name.trim() || 'Player';
   const skillColor  = SKILL_COLORS[profile.skillLevel] ?? Colors.levelIntermediate;
@@ -192,7 +200,14 @@ export default function SettingsScreen() {
   async function testVoice() {
     await Audio.initAudioSession();
     const phrase = TEST_PHRASES[profile.language] ?? 'Front left. Back right. Recover to T.';
-    Audio.speakText(phrase, settings.speechRate, profile.language, profile.voiceGender);
+    Audio.speakText(phrase, settings.speechRate, profile.language, profile.voiceGender, settings.preferredVoiceId);
+  }
+
+  async function openVoicePicker() {
+    await Audio.initAudioSession();
+    const opts = Audio.getVoicesForDisplay(profile.language);
+    setVoiceOptions(opts);
+    setVoicePickerVisible(true);
   }
 
   function handleResetProgress() {
@@ -299,6 +314,76 @@ export default function SettingsScreen() {
       <HelpModal visible={helpVisible} onClose={() => setHelpVisible(false)} />
       {termsVisible  && <TermsConsentModal viewOnly onClose={() => setTermsVisible(false)} />}
       {privacyVisible && <TermsConsentModal privacyOnly onClose={() => setPrivacyVisible(false)} />}
+
+      {/* ── Voice picker sheet ─────────────────────────────── */}
+      <Modal
+        visible={voicePickerVisible}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setVoicePickerVisible(false)}
+      >
+        <SafeAreaView style={vpStyles.container} edges={['top', 'bottom']}>
+          <View style={vpStyles.header}>
+            <View style={{ flex: 1 }}>
+              <Text style={vpStyles.title}>Voice Selection</Text>
+              <Text style={vpStyles.subtitle}>{langLabel} · {profile.voiceGender === 'female' ? 'Female' : 'Male'}</Text>
+            </View>
+            <TouchableOpacity onPress={() => setVoicePickerVisible(false)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <Ionicons name="close-circle" size={28} color={Colors.textMuted} />
+            </TouchableOpacity>
+          </View>
+
+          {voiceOptions.length <= 1 && (
+            <View style={vpStyles.emptyCard}>
+              <Ionicons name="mic-off-outline" size={32} color={Colors.textMuted} style={{ marginBottom: 8 }} />
+              <Text style={vpStyles.emptyTitle}>No voices found</Text>
+              <Text style={vpStyles.emptyNote}>
+                {Platform.OS === 'ios'
+                  ? 'Download voices in iOS Settings → Accessibility → Spoken Content → Voices'
+                  : 'Install Google TTS voices via Android Settings → Accessibility → Text-to-Speech'}
+              </Text>
+            </View>
+          )}
+
+          <ScrollView style={vpStyles.list} contentContainerStyle={{ paddingBottom: 24 }}>
+            {voiceOptions.map((opt) => {
+              const isSelected = (settings.preferredVoiceId ?? undefined) === opt.id;
+              return (
+                <TouchableOpacity
+                  key={opt.id ?? '__auto__'}
+                  style={[vpStyles.voiceRow, isSelected && vpStyles.voiceRowSelected]}
+                  onPress={() => {
+                    updateSettings({ preferredVoiceId: opt.id });
+                    setVoicePickerVisible(false);
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <View style={{ flex: 1 }}>
+                    <Text style={[vpStyles.voiceName, isSelected && vpStyles.voiceNameSelected]}>
+                      {opt.name}
+                    </Text>
+                    {opt.quality !== 'Auto' && (
+                      <View style={[vpStyles.qualityPill, opt.quality === 'Enhanced' ? vpStyles.pillEnhanced : vpStyles.pillCompact]}>
+                        <Text style={[vpStyles.qualityText, opt.quality === 'Enhanced' ? vpStyles.textEnhanced : vpStyles.textCompact]}>
+                          {opt.quality}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                  {isSelected && <Ionicons name="checkmark-circle" size={22} color={Colors.brand} />}
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+
+          {Platform.OS === 'ios' && voiceOptions.length > 1 && (
+            <Text style={vpStyles.tip}>
+              Enhanced voices are higher quality. Download more voices in{'\n'}
+              iOS Settings → Accessibility → Spoken Content → Voices
+            </Text>
+          )}
+        </SafeAreaView>
+      </Modal>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
@@ -414,6 +499,13 @@ export default function SettingsScreen() {
                 thumbColor={Colors.textPrimary}
               />
             }
+          />
+          <SettingsRow
+            icon="person-circle" iconBg={`${Colors.accentLibrary}22`} iconColor={Colors.accentLibrary}
+            label="Voice"
+            sub={`${currentVoiceLabel} · tap to choose from installed voices`}
+            right={<Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />}
+            onPress={openVoicePicker}
           />
           <SettingsRow
             icon="play-circle" iconBg={`${Colors.gold}22`} iconColor={Colors.gold}
@@ -771,5 +863,48 @@ const srStyles = StyleSheet.create({
   stepVal: {
     fontSize: FontSize.body, fontWeight: FontWeight.semiBold,
     color: Colors.textPrimary, minWidth: 36, textAlign: 'center',
+  },
+});
+
+const vpStyles = StyleSheet.create({
+  container:  { flex: 1, backgroundColor: Colors.background },
+  header: {
+    flexDirection: 'row', alignItems: 'flex-start',
+    paddingHorizontal: Spacing.base, paddingVertical: Spacing.md,
+    borderBottomWidth: 1, borderBottomColor: Colors.border,
+  },
+  title:    { fontSize: FontSize.sectionHeader, fontWeight: FontWeight.bold, color: Colors.textPrimary },
+  subtitle: { fontSize: FontSize.caption, color: Colors.textMuted, marginTop: 2 },
+  list:     { flex: 1 },
+  voiceRow: {
+    flexDirection: 'row', alignItems: 'center',
+    paddingHorizontal: Spacing.base, paddingVertical: Spacing.md,
+    borderBottomWidth: 1, borderBottomColor: Colors.border,
+    gap: Spacing.sm,
+  },
+  voiceRowSelected: { backgroundColor: `${Colors.brand}0A` },
+  voiceName:        { fontSize: FontSize.body, color: Colors.textPrimary, fontWeight: FontWeight.medium },
+  voiceNameSelected:{ color: Colors.brand },
+  qualityPill: {
+    alignSelf: 'flex-start', marginTop: 3,
+    paddingHorizontal: 6, paddingVertical: 2,
+    borderRadius: BorderRadius.full, borderWidth: 1,
+  },
+  pillEnhanced: { backgroundColor: `${Colors.gold}1A`, borderColor: `${Colors.gold}55` },
+  pillCompact:  { backgroundColor: Colors.surfaceElevated, borderColor: Colors.border },
+  qualityText:  { fontSize: FontSize.micro, fontWeight: FontWeight.bold, letterSpacing: 0.4 },
+  textEnhanced: { color: Colors.gold },
+  textCompact:  { color: Colors.textMuted },
+  emptyCard: {
+    margin: Spacing.base, padding: Spacing.lg,
+    backgroundColor: Colors.surface, borderRadius: BorderRadius.xl,
+    borderWidth: 1, borderColor: Colors.border,
+    alignItems: 'center',
+  },
+  emptyTitle: { fontSize: FontSize.body, fontWeight: FontWeight.semiBold, color: Colors.textPrimary, marginBottom: 6 },
+  emptyNote:  { fontSize: FontSize.caption, color: Colors.textMuted, textAlign: 'center', lineHeight: 18 },
+  tip: {
+    fontSize: FontSize.caption, color: Colors.textMuted, textAlign: 'center',
+    paddingHorizontal: Spacing.base, paddingBottom: Spacing.md, lineHeight: 18,
   },
 });

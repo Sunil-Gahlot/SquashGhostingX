@@ -498,7 +498,7 @@ export default function HelpModal({ visible, onClose }: { visible: boolean; onCl
       onRequestClose={onClose}
     >
       <SafeAreaProvider>
-      <SafeAreaView style={s.safe} edges={['top']}>
+      <SafeAreaView style={s.safe} edges={['top', 'bottom']}>
         {/* Header */}
         <View style={s.header}>
           <View style={s.headerLeft}>
