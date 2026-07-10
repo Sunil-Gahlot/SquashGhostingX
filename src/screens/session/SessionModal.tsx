@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  Modal, View, Text, StyleSheet, TouchableOpacity,
+  View, Text, StyleSheet, TouchableOpacity,
   Animated, ScrollView, AppState, AppStateStatus,
   useWindowDimensions, Platform, Alert, InteractionManager,
 } from 'react-native';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { FullScreenModal } from '../../components/FullScreenModal';
 import { useSQLiteContext } from 'expo-sqlite';
 import * as Brightness from 'expo-brightness';
 import { Ionicons } from '@expo/vector-icons';
@@ -924,25 +925,32 @@ export default function SessionModal() {
 
   const visible = session !== null;
 
-  // Keep screen awake for entire session lifecycle (countdown → active → rest → summary).
-  // Deactivates when session modal closes so normal screen-timeout resumes.
-  // Respects the keepScreenAwake setting — if disabled, never activates.
+  // Keep screen on for all non-terminal session states (countdown → active → rest → paused).
+  // This is unconditional — a timed training session must not be interrupted by auto-lock
+  // regardless of the keepScreenAwake brightness-boost preference.
+  // On Android this also prevents Doze mode: Doze only activates when the screen is OFF,
+  // so keeping the screen on is the only reliable way to prevent JS-thread suspension
+  // without a Foreground Service. If the user manually locks with the power button,
+  // background audio keeps iOS alive; Android sessions may pause without expo-task-manager.
   useEffect(() => {
-    if (!settings.keepScreenAwake) return;
-    if (visible) {
+    const isTraining = session !== null &&
+      session.state !== 'complete' &&
+      session.state !== 'abandoned';
+
+    if (isTraining) {
       activateKeepAwakeAsync('squash-session').catch(() => {});
     } else {
       try { deactivateKeepAwake('squash-session'); } catch {}
     }
     return () => { try { deactivateKeepAwake('squash-session'); } catch {} };
-  }, [visible, settings.keepScreenAwake]);
+  }, [session?.state]);
 
   // Background behaviour: session continues running when screen is locked or app is backgrounded.
   // Player may use Bluetooth / speaker / headphones on court with phone in pocket.
   // Audio re-assertion is handled in useSessionEngine's AppState listener.
 
   return (
-    <Modal
+    <FullScreenModal
       visible={visible}
       animationType="slide"
       presentationStyle="fullScreen"
@@ -1013,7 +1021,7 @@ export default function SessionModal() {
           />
         )}
       </SafeAreaView>
-    </Modal>
+    </FullScreenModal>
   );
 }
 

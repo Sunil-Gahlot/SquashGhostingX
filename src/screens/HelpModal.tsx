@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal,
+  View, Text, StyleSheet, ScrollView, TouchableOpacity,
 } from 'react-native';
 import Svg, { Rect, Line, Circle, Text as SvgText, G, Defs, LinearGradient as SvgGradient, Stop } from 'react-native-svg';
-import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { FullScreenModal } from '../components/FullScreenModal';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Colors } from '../constants/colors';
@@ -491,13 +492,12 @@ export default function HelpModal({ visible, onClose }: { visible: boolean; onCl
   ];
 
   return (
-    <Modal
+    <FullScreenModal
       visible={visible}
       animationType="slide"
       presentationStyle="fullScreen"
       onRequestClose={onClose}
     >
-      <SafeAreaProvider>
       <SafeAreaView style={s.safe} edges={['top', 'bottom']}>
         {/* Header */}
         <View style={s.header}>
@@ -553,8 +553,7 @@ export default function HelpModal({ visible, onClose }: { visible: boolean; onCl
           </View>
         </ScrollView>
       </SafeAreaView>
-      </SafeAreaProvider>
-    </Modal>
+    </FullScreenModal>
   );
 }
 

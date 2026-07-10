@@ -5,6 +5,7 @@ import {
   KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+import { FullScreenModal } from '../components/FullScreenModal';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -141,13 +142,12 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
     <SafeAreaView style={styles.safe} edges={safeEdges}>
 
       {/* ── Language picker modal ───────────────────────────────────────── */}
-      <Modal
+      <FullScreenModal
         visible={langVisible}
         animationType="slide"
         presentationStyle="formSheet"
         onRequestClose={() => setLangVisible(false)}
       >
-        <SafeAreaProvider>
         <SafeAreaView style={langStyles.safe} edges={['top', 'bottom']}>
           <View style={langStyles.header}>
             <Text style={langStyles.title}>Language</Text>
@@ -183,8 +183,7 @@ export default function ProfileScreen({ onClose }: { onClose?: () => void } = {}
             )}
           />
         </SafeAreaView>
-        </SafeAreaProvider>
-      </Modal>
+      </FullScreenModal>
 
       {/* ── Modal header bar (only when opened as modal, not as tab screen) ─ */}
       {onClose && (

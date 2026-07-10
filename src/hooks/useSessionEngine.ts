@@ -1,5 +1,6 @@
 import { useRef, useCallback, useEffect } from 'react';
-import { AppState, Alert, Platform } from 'react-native';
+import { AppState, Alert, Linking, Platform } from 'react-native';
+import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { type SQLiteDatabase } from 'expo-sqlite';
 
 import { useSessionStore } from '../stores/sessionStore';
@@ -98,6 +99,10 @@ const INTENSITY_MAX =
 
 // Coaching cues fire every N seconds of active training
 const COACHING_INTERVAL_SECS = 90;
+
+// Shown once per launch (not once per session) so the developer sees it
+// the first time they start a session but it does not repeat for the entire run.
+let _shownExpoGoAlert = false;
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 
@@ -259,7 +264,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
       if (movements.length > 0) await saveMovements(db as any, movements);
       await deleteCheckpoint(db as any);
     } catch (e) {
-      console.warn('[Session] SQLite save failed:', e);
+      if (__DEV__) console.warn('[Session] SQLite save failed:', e);
       if (!abandoned) {
         Alert.alert(
           'Session not saved',
@@ -278,7 +283,7 @@ export function useSessionEngine(db: SQLiteDatabase) {
         await upsertPersonalBest(db as any, record.drillType, 'intensity',  record.intensityScore,  record.id, endAt);
         if (isMovementsPB) progressStore.setNewPBFlag(record.id);
       } catch (e) {
-        console.warn('[Session] PB upsert failed:', e);
+        if (__DEV__) console.warn('[Session] PB upsert failed:', e);
       }
     }
 
@@ -481,9 +486,10 @@ export function useSessionEngine(db: SQLiteDatabase) {
     loopTimer.current = setTimeout(() => {
       if (store.getState().session?.state !== 'active') return;
 
-      // Check total duration
-      const elapsed = store.getState().session?.elapsedSeconds ?? 0;
-      if (elapsed >= config.duration * 60) {
+      // Wall-clock duration check — more accurate than accumulated elapsedSeconds which
+      // can drift when the JS thread is suspended in background (missed setInterval ticks).
+      const actualElapsedMs = Date.now() - sessionStartRef.current;
+      if (actualElapsedMs >= config.duration * 60 * 1000) {
         completeSession(false);
         return;
       }
@@ -565,10 +571,19 @@ export function useSessionEngine(db: SQLiteDatabase) {
 
     // 1-second elapsed ticker + coaching cues
     secondTimer.current = setInterval(() => {
+      // Heartbeat: keep bgLoopPlayer playing every second so iOS sees a continuous audio
+      // stream between TTS position calls. Without this, iOS 17+ audio power management
+      // can suspend the audio subsystem during silent gaps and then suspend the JS thread.
+      // Called unconditionally — fires during both 'active' and 'rest' states.
+      Audio.assertBgLoop();
+
       store.getState().tickElapsed();
       const s = store.getState().session;
       if (!s || s.state !== 'active') return;
-      if (s.elapsedSeconds >= s.config.duration * 60) {
+      // Use wall clock for the secondTimer duration check as well — JS timer drift can
+      // cause elapsedSeconds to lag real time after background suspension on Android.
+      const actualElapsedMs = Date.now() - sessionStartRef.current;
+      if (actualElapsedMs >= s.config.duration * 60 * 1000) {
         completeSession(false);
         return;
       }
@@ -679,7 +694,21 @@ export function useSessionEngine(db: SQLiteDatabase) {
 
     await Audio.initAudioSession();
 
-    // One-time Android hint: TTS uses the media volume stream.
+    // Diagnostic: Expo Go ships with its own Info.plist that does NOT include
+    // UIBackgroundModes:audio. No JS-layer fix can overcome this — the entitlement
+    // must be baked into the native binary at build time. Show once per launch so
+    // the developer knows to switch to a native build for background-audio testing.
+    if (__DEV__ && !_shownExpoGoAlert &&
+        Constants.executionEnvironment === ExecutionEnvironment.StoreClient) {
+      _shownExpoGoAlert = true;
+      Alert.alert(
+        'Screen Lock Will Pause Session',
+        'You are running in Expo Go, which does not include UIBackgroundModes:audio. The session will pause the instant the screen locks.\n\nTo test background audio on a real device, create a development build:\n\n  eas build --profile development --platform ios\n\nOr run natively:\n\n  npx expo run:ios',
+        [{ text: 'Understood' }],
+      );
+    }
+
+    // One-time Android hints (volume + battery optimization).
     if (Platform.OS === 'android') {
       const profState = useProfileStore.getState();
       if (!profState.hasShownAndroidVolumeHint && getSettings().voiceEnabled) {
@@ -688,6 +717,21 @@ export function useSessionEngine(db: SQLiteDatabase) {
           'Volume tip',
           "Voice calls use your media volume. If calls are too quiet, press the volume-up button on your device while training.",
           [{ text: 'Got it' }],
+        );
+      }
+      // Battery optimization on many Android devices (Samsung, Xiaomi, OnePlus) kills
+      // background processes even when audio is playing. The only JS-layer remedy is to
+      // direct the user to the system settings to whitelist this app.
+      // This prompt fires once per device — it's skipped if the user has already seen it.
+      if (!profState.hasShownAndroidBatteryHint) {
+        profState.markAndroidBatteryHintShown();
+        Alert.alert(
+          'Keep training with screen locked',
+          'For uninterrupted training when your screen is locked, allow Squash GhostingX to run in the background:\n\nSettings → Apps → Squash GhostingX → Battery → Unrestricted',
+          [
+            { text: 'Not now', style: 'cancel' },
+            { text: 'Open Settings', onPress: () => Linking.openSettings() },
+          ],
         );
       }
     }
@@ -765,19 +809,26 @@ export function useSessionEngine(db: SQLiteDatabase) {
   }, []);
 
   // Audio session management across screen-lock and background transitions.
-  // bgLoopPlayer (silent loop) keeps the AVAudioSession continuously active so iOS never
-  // suspends the JS thread during silent gaps between cues (rest periods, movement phase).
+  // bgLoopPlayer (sub-sonic loop) keeps the AVAudioSession continuously active so iOS
+  // never suspends the JS thread during silent gaps between TTS cues.
   useEffect(() => {
     const sub = AppState.addEventListener('change', (nextState) => {
       if (nextState === 'active') {
-        // Returning to foreground: re-assert session in case a phone call or Siri interrupted it.
-        // resumeAudioSession() is lightweight — it does NOT recreate the loop player.
+        // Returning to foreground: run full audio session restore.
+        // restoreAudioSession() re-applies setAudioModeAsync first because phone calls
+        // and Siri interruptions reset the iOS audio session category, stripping our
+        // shouldPlayInBackground + playsInSilentMode settings. Without re-applying the
+        // mode, the next screen lock after a call would suspend the JS thread.
+        Audio.restoreAudioSession().catch(() => {});
+      } else {
+        // background / inactive: assert audio immediately — iOS has a narrow window between
+        // the AppState transition and its audio-activity check. resumeAudioSession() calls
+        // bgLoopPlayer.play() first (synchronous) so the audio stream is confirmed active
+        // at the exact instant iOS evaluates whether to keep the app alive.
+        // We do NOT call restoreAudioSession() here — setAudioModeAsync adds async latency
+        // that would push play() past that evaluation window.
         Audio.resumeAudioSession().catch(() => {});
       }
-      // background / inactive: do nothing.
-      // Calling initAudioSession() here destroys and recreates bgLoopPlayer, creating a gap
-      // at exactly the wrong moment (screen lock / home press) and can cut off a mid-cue utterance.
-      // The loop player keeps the session alive without any intervention needed.
     });
     return () => sub.remove();
   }, []);

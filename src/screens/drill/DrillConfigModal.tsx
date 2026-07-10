@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Modal, View, Text, StyleSheet, ScrollView, TouchableOpacity,
+  View, Text, StyleSheet, ScrollView, TouchableOpacity,
   Platform, KeyboardAvoidingView,
 } from 'react-native';
-import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { FullScreenModal } from '../../components/FullScreenModal';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Colors } from '../../constants/colors';
@@ -617,13 +618,12 @@ export default function DrillConfigModal() {
   })();
 
   return (
-    <Modal
+    <FullScreenModal
       visible={drillConfigVisible}
       animationType="slide"
       presentationStyle={Platform.OS === 'ios' ? 'formSheet' : 'fullScreen'}
       onRequestClose={closeDrillConfig}
     >
-      <SafeAreaProvider>
       {/* KeyboardAvoidingView protects the footer Next/Start button from being
           obscured by the soft keyboard on iOS and desktop web browsers. */}
       <KeyboardAvoidingView
@@ -870,8 +870,7 @@ export default function DrillConfigModal() {
 
       </SafeAreaView>
       </KeyboardAvoidingView>
-      </SafeAreaProvider>
-    </Modal>
+    </FullScreenModal>
   );
 }
 

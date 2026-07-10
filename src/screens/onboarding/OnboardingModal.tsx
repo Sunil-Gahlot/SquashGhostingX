@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import {
-  Modal, View, Text, StyleSheet, TouchableOpacity,
+  View, Text, StyleSheet, TouchableOpacity,
   TextInput, KeyboardAvoidingView, Platform, ScrollView, Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { FullScreenModal } from '../../components/FullScreenModal';
 
 import { Colors } from '../../constants/colors';
 import { FontSize, FontWeight, Spacing, BorderRadius, ButtonHeight } from '../../constants/layout';
@@ -332,13 +333,12 @@ export default function OnboardingModal() {
   }
 
   return (
-    <Modal
+    <FullScreenModal
       visible={hasCompletedAuth && !isOnboardingComplete}
       animationType="fade"
       presentationStyle="fullScreen"
       onRequestClose={() => {}}
     >
-      <SafeAreaProvider>
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -379,8 +379,7 @@ export default function OnboardingModal() {
           </View>
         </KeyboardAvoidingView>
       </SafeAreaView>
-      </SafeAreaProvider>
-    </Modal>
+    </FullScreenModal>
   );
 }
 

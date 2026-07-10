@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal,
+  View, Text, StyleSheet, ScrollView, TouchableOpacity,
 } from 'react-native';
+import { FullScreenModal } from '../components/FullScreenModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import Svg, { Rect, Defs, LinearGradient as SvgGradient, Stop } from 'react-native-svg';
@@ -566,7 +567,7 @@ export default function ProgressScreen() {
           ? (netActiveSecs / s.movementsTotal).toFixed(1)
           : '—';
         return (
-          <Modal visible transparent animationType="slide" onRequestClose={() => setSelectedSession(null)}>
+          <FullScreenModal visible transparent animationType="slide" onRequestClose={() => setSelectedSession(null)}>
             <View style={sdStyles.backdrop}>
               <SafeAreaView edges={['bottom']} style={sdStyles.safeSheet}>
               <View style={sdStyles.sheet}>
@@ -616,7 +617,7 @@ export default function ProgressScreen() {
               </View>
               </SafeAreaView>
             </View>
-          </Modal>
+          </FullScreenModal>
         );
       })()}
     </SafeAreaView>

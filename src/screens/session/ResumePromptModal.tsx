@@ -1,8 +1,9 @@
 import React from 'react';
 import {
-  Modal, View, Text, StyleSheet, TouchableOpacity, Alert,
+  View, Text, StyleSheet, TouchableOpacity, Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { FullScreenModal } from '../../components/FullScreenModal';
 import { useSQLiteContext } from 'expo-sqlite';
 
 import { Colors } from '../../constants/colors';
@@ -59,7 +60,7 @@ export default function ResumePromptModal() {
   }
 
   return (
-    <Modal visible transparent animationType="fade" onRequestClose={handleDiscard}>
+    <FullScreenModal visible transparent animationType="fade" onRequestClose={handleDiscard}>
       <View style={styles.backdrop}>
         <SafeAreaView edges={['bottom']}>
           <View style={styles.sheet}>
@@ -100,7 +101,7 @@ export default function ResumePromptModal() {
           </View>
         </SafeAreaView>
       </View>
-    </Modal>
+    </FullScreenModal>
   );
 }
 

@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Animated, Modal, PanResponder, Alert,
+  View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Animated, PanResponder, Alert,
 } from 'react-native';
+import { FullScreenModal } from '../components/FullScreenModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/colors';
@@ -279,9 +280,9 @@ export default function HomeScreen({ navigation }: any) {
 
   return (
     <>
-      <Modal visible={profileVisible} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => setProfileVisible(false)}>
+      <FullScreenModal visible={profileVisible} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => setProfileVisible(false)}>
         <ProfileScreen onClose={() => setProfileVisible(false)} />
-      </Modal>
+      </FullScreenModal>
       <HelpModal visible={helpVisible} onClose={() => setHelpVisible(false)} />
       <SafeAreaView style={styles.safe} edges={['top']}>
         <ScrollView

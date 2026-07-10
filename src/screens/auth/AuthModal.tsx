@@ -1,10 +1,11 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
-  Modal, View, Text, StyleSheet, TouchableOpacity, TextInput,
+  View, Text, StyleSheet, TouchableOpacity, TextInput,
   ScrollView, KeyboardAvoidingView, Platform, Animated, Alert,
   ActivityIndicator, Linking, FlatList, useWindowDimensions, Keyboard,
 } from 'react-native';
-import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { FullScreenModal } from '../../components/FullScreenModal';
 import * as SecureStore from 'expo-secure-store';
 import * as Crypto from 'expo-crypto';
 import { Ionicons } from '@expo/vector-icons';
@@ -1165,13 +1166,12 @@ export default function AuthModal() {
   }
 
   return (
-    <Modal
+    <FullScreenModal
       visible={!hasCompletedAuth}
       animationType="none"
       presentationStyle="fullScreen"
       onRequestClose={() => {}}
     >
-      <SafeAreaProvider>
       <SafeAreaView style={modalStyles.safe} edges={['top', 'bottom']}>
         {page === 'welcome' && (
           <WelcomePage
@@ -1200,8 +1200,7 @@ export default function AuthModal() {
           />
         )}
       </SafeAreaView>
-      </SafeAreaProvider>
-    </Modal>
+    </FullScreenModal>
   );
 }
 
@@ -1313,7 +1312,7 @@ function DobPickerCombined({
       </View>
 
       {/* Bottom sheet — shared for whichever chip was tapped */}
-      <Modal
+      <FullScreenModal
         visible={openField !== null}
         transparent
         animationType="slide"
@@ -1349,7 +1348,7 @@ function DobPickerCombined({
             />
           </View>
         </TouchableOpacity>
-      </Modal>
+      </FullScreenModal>
     </>
   );
 }

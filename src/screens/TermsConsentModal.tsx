@@ -1,9 +1,10 @@
 import React, { useRef, useState, useEffect } from 'react';
 import {
-  Modal, View, Text, ScrollView, TouchableOpacity,
+  View, Text, ScrollView, TouchableOpacity,
   StyleSheet, NativeScrollEvent, NativeSyntheticEvent,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { FullScreenModal } from '../components/FullScreenModal';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useProfileStore } from '../stores/profileStore';
@@ -119,7 +120,7 @@ export default function TermsConsentModal({
   // Privacy-only view: a standalone modal showing only the Privacy & Data section.
   if (privacyOnly) {
     return (
-      <Modal visible animationType="slide" presentationStyle="formSheet" onRequestClose={onClose}>
+      <FullScreenModal visible animationType="slide" presentationStyle="formSheet" onRequestClose={onClose}>
         <SafeAreaView style={s.safe}>
           <View style={s.header}>
             <View style={s.logoRow}>
@@ -149,7 +150,7 @@ export default function TermsConsentModal({
             </TouchableOpacity>
           </View>
         </SafeAreaView>
-      </Modal>
+      </FullScreenModal>
     );
   }
 
@@ -159,7 +160,7 @@ export default function TermsConsentModal({
   const isVisible = viewOnly ? true : !hasAcceptedTerms;
 
   return (
-    <Modal visible={isVisible} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => {}}>
+    <FullScreenModal visible={isVisible} animationType="slide" presentationStyle="fullScreen" onRequestClose={() => {}}>
       <SafeAreaView style={s.safe}>
 
         <View style={s.header}>
@@ -242,7 +243,7 @@ export default function TermsConsentModal({
         </View>
 
       </SafeAreaView>
-    </Modal>
+    </FullScreenModal>
   );
 }
 

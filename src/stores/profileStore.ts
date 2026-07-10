@@ -37,6 +37,7 @@ interface ProfileStore {
   hasStartedAnySession: boolean;
   hasAcceptedTerms: boolean;
   hasShownAndroidVolumeHint: boolean;
+  hasShownAndroidBatteryHint: boolean;
   /** True once hydratePii() has loaded PII from SecureStore. Guards UI from flash of empty name. */
   piiLoaded: boolean;
 
@@ -51,6 +52,7 @@ interface ProfileStore {
   markSessionStarted: () => void;
   acceptTerms: () => void;
   markAndroidVolumeHintShown: () => void;
+  markAndroidBatteryHintShown: () => void;
   hydratePii: () => Promise<void>;
 }
 
@@ -65,6 +67,7 @@ export const useProfileStore = create<ProfileStore>()(
       hasStartedAnySession: false,
       hasAcceptedTerms: false,
       hasShownAndroidVolumeHint: false,
+      hasShownAndroidBatteryHint: false,
       piiLoaded: false,
 
       setProfile: (updates) => {
@@ -115,12 +118,12 @@ export const useProfileStore = create<ProfileStore>()(
 
       resetProfile: () => {
         SecureStore.deleteItemAsync(SGX_PII_KEY).catch(() => {});
-        set({ profile: DEFAULT_PROFILE, isOnboardingComplete: false, hasCompletedAuth: false, hasSeenCourtTutorial: false, hasSeenPaceTutorial: false, hasStartedAnySession: false, hasAcceptedTerms: false, hasShownAndroidVolumeHint: false });
+        set({ profile: DEFAULT_PROFILE, isOnboardingComplete: false, hasCompletedAuth: false, hasSeenCourtTutorial: false, hasSeenPaceTutorial: false, hasStartedAnySession: false, hasAcceptedTerms: false, hasShownAndroidVolumeHint: false, hasShownAndroidBatteryHint: false });
       },
 
       deleteAccount: () => {
         SecureStore.deleteItemAsync(SGX_PII_KEY).catch(() => {});
-        set({ profile: DEFAULT_PROFILE, isOnboardingComplete: false, hasCompletedAuth: false, hasAcceptedTerms: false, hasSeenCourtTutorial: false, hasSeenPaceTutorial: false, hasStartedAnySession: false, hasShownAndroidVolumeHint: false });
+        set({ profile: DEFAULT_PROFILE, isOnboardingComplete: false, hasCompletedAuth: false, hasAcceptedTerms: false, hasSeenCourtTutorial: false, hasSeenPaceTutorial: false, hasStartedAnySession: false, hasShownAndroidVolumeHint: false, hasShownAndroidBatteryHint: false });
       },
 
       markCourtTutorialSeen: () => set({ hasSeenCourtTutorial: true }),
@@ -128,6 +131,7 @@ export const useProfileStore = create<ProfileStore>()(
       markSessionStarted: () => set({ hasStartedAnySession: true }),
       acceptTerms: () => set({ hasAcceptedTerms: true }),
       markAndroidVolumeHintShown: () => set({ hasShownAndroidVolumeHint: true }),
+      markAndroidBatteryHintShown: () => set({ hasShownAndroidBatteryHint: true }),
 
       hydratePii: async () => {
         try {
@@ -143,7 +147,7 @@ export const useProfileStore = create<ProfileStore>()(
     {
       name: 'profile-storage',
       storage: createJSONStorage(() => AsyncStorage),
-      version: 9,
+      version: 10,
 
       // Deep-merge persisted profile with initial state so DEFAULT_PROFILE fields
       // act as fallbacks for any fields absent from the stored JSON (e.g. PII fields
@@ -235,6 +239,11 @@ export const useProfileStore = create<ProfileStore>()(
         if (version < 9) {
           // PII (name, dob, gender) moved from AsyncStorage to SecureStore (SGX_PII_KEY).
           // One-time migration handled in onRehydrateStorage above — no sync work needed here.
+        }
+        if (version < 10) {
+          if (persisted?.state) {
+            if (persisted.state.hasShownAndroidBatteryHint === undefined) persisted.state.hasShownAndroidBatteryHint = false;
+          }
         }
         return persisted;
       },

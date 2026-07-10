@@ -242,7 +242,10 @@ export function getDynamicIntervalMs(
   const raw     = travel + dwell + tPause;
   const minMs   = Math.round(MIN_INTERVAL[difficulty] / tf);
   const floored = Math.max(minMs, Math.round(raw));
-  return Math.round(floored * paceMultiplier(adj));
+  const result  = Math.round(floored * paceMultiplier(adj));
+  // Safety net: NaN from a corrupted lookup table, or extreme pace adjustment reducing
+  // the interval below 500 ms, would cause setTimeout cascades. Clamp to a hard floor.
+  return Number.isFinite(result) ? Math.max(500, result) : minMs;
 }
 
 /**

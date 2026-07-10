@@ -1,8 +1,9 @@
 import React, { useRef, useState, useMemo } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity, Alert, Modal, Image, Linking,
-  InteractionManager, Platform,
+  View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity, Alert, Image, Linking,
+  InteractionManager, Platform, ActivityIndicator,
 } from 'react-native';
+import { FullScreenModal } from '../components/FullScreenModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSQLiteContext } from 'expo-sqlite';
 import * as SecureStore from 'expo-secure-store';
@@ -179,6 +180,8 @@ export default function SettingsScreen() {
   const [privacyVisible, setPrivacyVisible]   = useState(false);
   const [voicePickerVisible, setVoicePickerVisible] = useState(false);
   const [voiceOptions, setVoiceOptions] = useState<Audio.VoiceDisplayOption[]>([]);
+  const [previewingId, setPreviewingId] = useState<string | null>(null);
+  const [voicesLoading, setVoicesLoading] = useState(false);
 
   const currentVoiceLabel = useMemo(() => {
     if (!settings.preferredVoiceId) return 'Auto';
@@ -204,7 +207,18 @@ export default function SettingsScreen() {
   }
 
   async function openVoicePicker() {
-    await Audio.initAudioSession();
+    setVoicesLoading(true);
+    try {
+      await Audio.loadVoicesIfNeeded();
+    } finally {
+      setVoicesLoading(false);
+    }
+    // Clear stale preferredVoiceId if it no longer exists on this device
+    // (set on a different device, or deleted from iOS Settings → Spoken Content → Voices).
+    if (settings.preferredVoiceId && !Audio.isVoiceInstalled(settings.preferredVoiceId)) {
+      updateSettings({ preferredVoiceId: undefined });
+    }
+    // Pass no gender — picker shows both female and male voices so users can select any voice.
     const opts = Audio.getVoicesForDisplay(profile.language);
     setVoiceOptions(opts);
     setVoicePickerVisible(true);
@@ -221,7 +235,7 @@ export default function SettingsScreen() {
               'DELETE FROM movements; DELETE FROM personal_bests; DELETE FROM checkpoints; DELETE FROM sessions;'
             );
           } catch (e) {
-            console.warn('[Settings] SQLite reset failed:', e);
+            if (__DEV__) console.warn('[Settings] SQLite reset failed:', e);
           }
           clearCache();
           useBadgesStore.getState().resetBadges();
@@ -254,7 +268,7 @@ export default function SettingsScreen() {
               'DELETE FROM movements; DELETE FROM personal_bests; DELETE FROM checkpoints; DELETE FROM sessions;'
             );
           } catch (e) {
-            console.warn('[Settings] SQLite reset failed:', e);
+            if (__DEV__) console.warn('[Settings] SQLite reset failed:', e);
           }
           resetProfile();
           resetSettings();
@@ -302,21 +316,21 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
 
       {/* ── Profile modal ──────────────────────────────────── */}
-      <Modal
+      <FullScreenModal
         visible={profileVisible}
         animationType="slide"
         presentationStyle="fullScreen"
         onRequestClose={() => setProfileVisible(false)}
       >
         <ProfileScreen onClose={() => setProfileVisible(false)} />
-      </Modal>
+      </FullScreenModal>
 
       <HelpModal visible={helpVisible} onClose={() => setHelpVisible(false)} />
       {termsVisible  && <TermsConsentModal viewOnly onClose={() => setTermsVisible(false)} />}
       {privacyVisible && <TermsConsentModal privacyOnly onClose={() => setPrivacyVisible(false)} />}
 
       {/* ── Voice picker sheet ─────────────────────────────── */}
-      <Modal
+      <FullScreenModal
         visible={voicePickerVisible}
         animationType="slide"
         presentationStyle="pageSheet"
@@ -326,7 +340,7 @@ export default function SettingsScreen() {
           <View style={vpStyles.header}>
             <View style={{ flex: 1 }}>
               <Text style={vpStyles.title}>Voice Selection</Text>
-              <Text style={vpStyles.subtitle}>{langLabel} · {profile.voiceGender === 'female' ? 'Female' : 'Male'}</Text>
+              <Text style={vpStyles.subtitle}>{langLabel} · All Voices</Text>
             </View>
             <TouchableOpacity onPress={() => setVoicePickerVisible(false)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
               <Ionicons name="close-circle" size={28} color={Colors.textMuted} />
@@ -347,10 +361,13 @@ export default function SettingsScreen() {
 
           <ScrollView style={vpStyles.list} contentContainerStyle={{ paddingBottom: 24 }}>
             {voiceOptions.map((opt) => {
+              const rowKey     = opt.id ?? '__auto__';
               const isSelected = (settings.preferredVoiceId ?? undefined) === opt.id;
+              const isPreviewing = previewingId === rowKey;
+              const previewPhrase = TEST_PHRASES[profile.language] ?? 'Front left. Back right. Recover to T.';
               return (
                 <TouchableOpacity
-                  key={opt.id ?? '__auto__'}
+                  key={rowKey}
                   style={[vpStyles.voiceRow, isSelected && vpStyles.voiceRowSelected]}
                   onPress={() => {
                     updateSettings({ preferredVoiceId: opt.id });
@@ -363,14 +380,32 @@ export default function SettingsScreen() {
                       {opt.name}
                     </Text>
                     {opt.quality !== 'Auto' && (
-                      <View style={[vpStyles.qualityPill, opt.quality === 'Enhanced' ? vpStyles.pillEnhanced : vpStyles.pillCompact]}>
-                        <Text style={[vpStyles.qualityText, opt.quality === 'Enhanced' ? vpStyles.textEnhanced : vpStyles.textCompact]}>
+                      <View style={[vpStyles.qualityPill, opt.quality === 'Enhanced' ? vpStyles.pillEnhanced : vpStyles.pillStandard]}>
+                        <Text style={[vpStyles.qualityText, opt.quality === 'Enhanced' ? vpStyles.textEnhanced : vpStyles.textStandard]}>
                           {opt.quality}
                         </Text>
                       </View>
                     )}
                   </View>
-                  {isSelected && <Ionicons name="checkmark-circle" size={22} color={Colors.brand} />}
+                  <TouchableOpacity
+                    style={[vpStyles.previewBtn, isPreviewing && vpStyles.previewBtnActive]}
+                    onPress={() => {
+                      setPreviewingId(rowKey);
+                      Audio.previewVoice(previewPhrase, opt.id, profile.language, settings.speechRate, profile.voiceGender);
+                      setTimeout(() => setPreviewingId(null), 3500);
+                    }}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  >
+                    <Ionicons
+                      name={isPreviewing ? 'volume-high' : 'play-circle-outline'}
+                      size={22}
+                      color={isPreviewing ? Colors.brand : Colors.textMuted}
+                    />
+                  </TouchableOpacity>
+                  {isSelected
+                    ? <Ionicons name="checkmark-circle" size={22} color={Colors.brand} />
+                    : <View style={{ width: 22 }} />
+                  }
                 </TouchableOpacity>
               );
             })}
@@ -378,12 +413,12 @@ export default function SettingsScreen() {
 
           {Platform.OS === 'ios' && voiceOptions.length > 1 && (
             <Text style={vpStyles.tip}>
-              Enhanced voices are higher quality. Download more voices in{'\n'}
-              iOS Settings → Accessibility → Spoken Content → Voices
+              Recommended: Samantha (Female) · Tom (Male) — Enhanced quality.{'\n'}
+              Download via iOS Settings → Accessibility → Spoken Content → Voices
             </Text>
           )}
         </SafeAreaView>
-      </Modal>
+      </FullScreenModal>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
@@ -503,9 +538,12 @@ export default function SettingsScreen() {
           <SettingsRow
             icon="person-circle" iconBg={`${Colors.accentLibrary}22`} iconColor={Colors.accentLibrary}
             label="Voice"
-            sub={`${currentVoiceLabel} · tap to choose from installed voices`}
-            right={<Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />}
-            onPress={openVoicePicker}
+            sub={voicesLoading ? 'Loading voices…' : `${currentVoiceLabel} · tap to choose from installed voices`}
+            right={voicesLoading
+              ? <ActivityIndicator size="small" color={Colors.textMuted} />
+              : <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />
+            }
+            onPress={voicesLoading ? undefined : openVoicePicker}
           />
           <SettingsRow
             icon="play-circle" iconBg={`${Colors.gold}22`} iconColor={Colors.gold}
@@ -891,10 +929,10 @@ const vpStyles = StyleSheet.create({
     borderRadius: BorderRadius.full, borderWidth: 1,
   },
   pillEnhanced: { backgroundColor: `${Colors.gold}1A`, borderColor: `${Colors.gold}55` },
-  pillCompact:  { backgroundColor: Colors.surfaceElevated, borderColor: Colors.border },
+  pillStandard: { backgroundColor: Colors.surfaceElevated, borderColor: Colors.border },
   qualityText:  { fontSize: FontSize.micro, fontWeight: FontWeight.bold, letterSpacing: 0.4 },
   textEnhanced: { color: Colors.gold },
-  textCompact:  { color: Colors.textMuted },
+  textStandard: { color: Colors.textMuted },
   emptyCard: {
     margin: Spacing.base, padding: Spacing.lg,
     backgroundColor: Colors.surface, borderRadius: BorderRadius.xl,
@@ -903,6 +941,12 @@ const vpStyles = StyleSheet.create({
   },
   emptyTitle: { fontSize: FontSize.body, fontWeight: FontWeight.semiBold, color: Colors.textPrimary, marginBottom: 6 },
   emptyNote:  { fontSize: FontSize.caption, color: Colors.textMuted, textAlign: 'center', lineHeight: 18 },
+  previewBtn: {
+    width: 36, height: 36, borderRadius: 18,
+    alignItems: 'center', justifyContent: 'center',
+    marginRight: 4,
+  },
+  previewBtnActive: { backgroundColor: `${Colors.brand}18` },
   tip: {
     fontSize: FontSize.caption, color: Colors.textMuted, textAlign: 'center',
     paddingHorizontal: Spacing.base, paddingBottom: Spacing.md, lineHeight: 18,

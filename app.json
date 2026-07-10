@@ -3,6 +3,8 @@
     "name": "Squash GhostingX",
     "slug": "SquashGhostingX",
     "version": "1.0.1",
+    "privacy": "public",
+    "privacyPolicyUrl": "https://squashghostingx.com/privacy.html",
     "scheme": "squashghostingx",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

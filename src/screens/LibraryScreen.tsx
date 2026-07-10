@@ -2,10 +2,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import {
   View, Text, Image, StyleSheet, ScrollView, TouchableOpacity,
-  Modal, Platform, useWindowDimensions,
+  Platform, useWindowDimensions,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { FullScreenModal } from '../components/FullScreenModal';
 import { WebView } from 'react-native-webview';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/colors';
@@ -516,13 +517,12 @@ export default function LibraryScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
 
       {/* ── VIDEO PLAYER MODAL ──────────────────────────────────── */}
-      <Modal
+      <FullScreenModal
         visible={modalVideo !== null}
         animationType="slide"
         statusBarTranslucent
         onRequestClose={() => setModalVideo(null)}
       >
-        <SafeAreaProvider>
           <View style={styles.vmContainer}>
             <StatusBar style="light" backgroundColor="#000" />
             <SafeAreaView edges={['top']} style={{ backgroundColor: '#111' }}>
@@ -576,17 +576,15 @@ export default function LibraryScreen() {
               />
             )}
           </View>
-        </SafeAreaProvider>
-      </Modal>
+      </FullScreenModal>
 
       {/* ── ARTICLE READER MODAL ────────────────────────────────── */}
-      <Modal
+      <FullScreenModal
         visible={readingArticle !== null}
         animationType="slide"
         statusBarTranslucent
         onRequestClose={goBackArticle}
       >
-        <SafeAreaProvider>
           <View style={styles.amContainer}>
           <StatusBar style="light" backgroundColor="transparent" />
 
@@ -728,8 +726,7 @@ export default function LibraryScreen() {
             </TouchableOpacity>
           </SafeAreaView>
           </View>
-        </SafeAreaProvider>
-      </Modal>
+      </FullScreenModal>
 
       {/* ── MAIN SCROLL ─────────────────────────────────────────── */}
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
