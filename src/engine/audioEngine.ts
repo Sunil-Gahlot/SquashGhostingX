@@ -310,8 +310,16 @@ export async function initAudioSession(): Promise<void> {
     bgLoopPlayer = null;
   }
   try {
+    // keepAudioSessionActive: true — critical iOS option that prevents expo-audio from
+    // automatically deactivating the AVAudioSession at the end of each loop cycle.
+    // Without it, there is a brief dead window (a few ms) between each 181 ms WAV loop
+    // restart where iOS sees no active audio output and is eligible to suspend the app —
+    // even with UIBackgroundModes:audio present in the binary.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    bgLoopPlayer = createAudioPlayer(require('../../assets/silent-loop.wav'));
+    bgLoopPlayer = createAudioPlayer(
+      require('../../assets/silent-loop.wav'),
+      { keepAudioSessionActive: true },
+    );
     bgLoopPlayer.loop   = true;
     // Volume 1.0: the WAV is a 200 Hz sine at 0.61% amplitude — completely inaudible
     // through phone speakers (hardware HPF cutoff ~300 Hz). At full volume, iOS CoreAudio
@@ -410,7 +418,10 @@ export async function resumeAudioSession(): Promise<void> {
     // Player was released by the OS during a long interruption — recreate it.
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      bgLoopPlayer = createAudioPlayer(require('../../assets/silent-loop.wav'));
+      bgLoopPlayer = createAudioPlayer(
+        require('../../assets/silent-loop.wav'),
+        { keepAudioSessionActive: true },
+      );
       bgLoopPlayer.loop   = true;
       bgLoopPlayer.volume = 1.0;
       bgLoopPlayer.play();
@@ -442,7 +453,10 @@ export async function restoreAudioSession(): Promise<void> {
   } else {
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      bgLoopPlayer = createAudioPlayer(require('../../assets/silent-loop.wav'));
+      bgLoopPlayer = createAudioPlayer(
+        require('../../assets/silent-loop.wav'),
+        { keepAudioSessionActive: true },
+      );
       bgLoopPlayer.loop   = true;
       bgLoopPlayer.volume = 1.0;
       bgLoopPlayer.play();
