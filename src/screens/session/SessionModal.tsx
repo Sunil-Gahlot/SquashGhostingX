@@ -925,17 +925,19 @@ export default function SessionModal() {
 
   const visible = session !== null;
 
-  // Keep screen on for all non-terminal session states (countdown → active → rest → paused).
-  // This is unconditional — a timed training session must not be interrupted by auto-lock
-  // regardless of the keepScreenAwake brightness-boost preference.
-  // On Android this also prevents Doze mode: Doze only activates when the screen is OFF,
-  // so keeping the screen on is the only reliable way to prevent JS-thread suspension
-  // without a Foreground Service. If the user manually locks with the power button,
-  // background audio keeps iOS alive; Android sessions may pause without expo-task-manager.
+  // Keep screen on for active training states (countdown → active → rest).
+  // Deactivates on pause, complete, and abandoned per spec so the system auto-lock
+  // timer resumes to its user-configured value.
+  // On Android this also controls Doze mode: Doze only activates when the screen is OFF,
+  // so keeping the screen on during active training prevents JS-thread suspension.
+  // When the user manually locks (power button) during an active session, background
+  // audio (bgLoopPlayer + UIBackgroundModes:audio + MPNowPlayingInfoCenter) keeps the
+  // app alive on iOS; Android relies on the MediaSession foreground service.
   useEffect(() => {
     const isTraining = session !== null &&
       session.state !== 'complete' &&
-      session.state !== 'abandoned';
+      session.state !== 'abandoned' &&
+      session.state !== 'paused';
 
     if (isTraining) {
       activateKeepAwakeAsync('squash-session').catch(() => {});

@@ -310,23 +310,21 @@ export async function initAudioSession(): Promise<void> {
     bgLoopPlayer = null;
   }
   try {
-    // keepAudioSessionActive: true — critical iOS option that prevents expo-audio from
-    // automatically deactivating the AVAudioSession at the end of each loop cycle.
-    // Without it, there is a brief dead window (a few ms) between each 181 ms WAV loop
-    // restart where iOS sees no active audio output and is eligible to suspend the app —
-    // even with UIBackgroundModes:audio present in the binary.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     bgLoopPlayer = createAudioPlayer(
       require('../../assets/silent-loop.wav'),
       { keepAudioSessionActive: true },
     );
     bgLoopPlayer.loop   = true;
-    // Volume 1.0: the WAV is a 200 Hz sine at 0.61% amplitude — completely inaudible
-    // through phone speakers (hardware HPF cutoff ~300 Hz). At full volume, iOS CoreAudio
-    // sees clearly non-zero PCM samples and keeps the audio session — and with it the
-    // JS thread and all timers — alive in background.
     bgLoopPlayer.volume = 1.0;
     bgLoopPlayer.play();
+    // Register with MPNowPlayingInfoCenter so iOS recognises this as a legitimate
+    // Now Playing app and grants full background audio execution rights. Without this,
+    // iOS 17+ can deprioritise or suspend the JS thread even with UIBackgroundModes:audio
+    // present — the AVAudioSession being active is necessary but no longer sufficient alone.
+    if (Platform.OS === 'ios') {
+      bgLoopPlayer.setActiveForLockScreen(true, { title: 'Squash GhostingX', artist: 'Training in Progress' });
+    }
   } catch { /* non-critical — session still works, just may be suspended in background */ }
 
   // Load voices before returning so the correct voice is used from the very first TTS call.
@@ -425,6 +423,9 @@ export async function resumeAudioSession(): Promise<void> {
       bgLoopPlayer.loop   = true;
       bgLoopPlayer.volume = 1.0;
       bgLoopPlayer.play();
+      if (Platform.OS === 'ios') {
+        bgLoopPlayer.setActiveForLockScreen(true, { title: 'Squash GhostingX', artist: 'Training in Progress' });
+      }
     } catch {}
   }
   try { await setIsAudioActiveAsync(true); } catch {}
@@ -460,6 +461,9 @@ export async function restoreAudioSession(): Promise<void> {
       bgLoopPlayer.loop   = true;
       bgLoopPlayer.volume = 1.0;
       bgLoopPlayer.play();
+      if (Platform.OS === 'ios') {
+        bgLoopPlayer.setActiveForLockScreen(true, { title: 'Squash GhostingX', artist: 'Training in Progress' });
+      }
     } catch {}
   }
   try { await setIsAudioActiveAsync(true); } catch {}
