@@ -26,7 +26,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23FF6B35'/%3E%3Ctext x='16' y='23' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='900' font-size='14'%3ESX%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -35,8 +35,8 @@
   "url": "https://squashghostingx.com",
   "description": "Squash GhostingX is a free AI-powered squash ghosting training app built by players Varish and Darshika Gahlot.",
   "founders": [
-    { "@type": "Person", "name": "Varish Gahlot", "jobTitle": "Co-Founder & CEO" },
-    { "@type": "Person", "name": "Darshika Gahlot", "jobTitle": "Co-Founder & COO" }
+    { "@type": "Person", "name": "Varish Gahlot", "jobTitle": "Founder & Product Creator" },
+    { "@type": "Person", "name": "Darshika Gahlot", "jobTitle": "Co-Founder & Community Lead" }
   ],
   "applicationCategory": "Sports",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
@@ -52,7 +52,7 @@
   --white:#FFFFFF;--text:#E8D5C4;
   --r8:8px;--r12:12px;--r16:16px;--r24:24px;
   --fh:'Barlow Condensed',sans-serif;--font-display:'Barlow Condensed',sans-serif;
-  --font-body:'DM Sans',sans-serif;
+  --font-body:'Plus Jakarta Sans',sans-serif;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:16px;overflow-x:hidden;scroll-behavior:smooth;-webkit-text-size-adjust:100%}
@@ -62,13 +62,14 @@ a:hover{text-decoration:underline}
 
 /* NAV */
 nav{position:sticky;top:0;z-index:100;padding:0 1.5rem;height:60px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,4,1,.94);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-.nav-logo{display:flex;align-items:center;gap:.6rem;font-family:var(--fh);font-size:1.45rem;font-weight:900;color:var(--white);text-decoration:none;letter-spacing:.05em}
-.nav-logo-icon{width:34px;height:34px;background:linear-gradient(135deg,#FF6B35 0%,#c0392b 100%);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:900;color:#fff;box-shadow:0 0 14px rgba(255,107,53,.4);flex-shrink:0}
-.nav-logo-g{background:linear-gradient(135deg,#FF6B35 0%,#ff9f6b 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-logo{display:flex;align-items:center;gap:.6rem;font-family:'Barlow Condensed',sans-serif;font-size:1.45rem;font-weight:900;color:var(--white);text-decoration:none;letter-spacing:.05em}
+.logo-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(140deg,#FF6B35 0%,#AA2F0E 100%);display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:900;color:#fff;box-shadow:0 0 18px rgba(255,107,53,.5),inset 0 1px 0 rgba(255,255,255,.18);flex-shrink:0}
+.logo-g{background:linear-gradient(135deg,#FF6B35,#FF9268);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .nav-links{display:flex;align-items:center;gap:1.5rem}
 .nav-links a{font-size:.84rem;font-weight:500;color:var(--gray1);transition:color .2s;text-decoration:none;white-space:nowrap}
 .nav-links a:hover{color:var(--white);text-decoration:none}
-.nav-links a[aria-current="page"]{color:var(--accent)}
+.nav-links a[aria-current="page"]{color:var(--accent);font-weight:700;text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:2px;text-decoration-color:rgba(255,107,53,.5)}
+#mob-nav a[aria-current="page"]{color:var(--accent) !important;font-weight:700}
 [data-theme="light"]{--bg:#FAF6F0;--bg2:#F0E8DC;--bg3:#E6D8C4;--bg4:#D8C5AA;--gray1:#5C3A20;--gray2:#9A7A60;--gray3:#E8D5C4;--white:#0C0402;--text:#2A1408;--border:rgba(0,0,0,.09);--borderacc:rgba(200,65,10,.28);--glow:rgba(200,65,10,.05);--glow2:rgba(200,65,10,.12);--glow3:rgba(200,65,10,.22);}
 [data-theme="ocean"]{--bg:#010914;--bg2:#041220;--bg3:#07192C;--bg4:#0C2240;--gray1:#A8CCE8;--gray2:#6A9CC8;--gray3:#1A3A60;--white:#FFFFFF;--text:#C8E4F4;--border:rgba(60,100,180,.12);--borderacc:rgba(255,107,53,.32);--glow:rgba(255,107,53,.06);--glow2:rgba(255,107,53,.14);--glow3:rgba(255,107,53,.28);}
 [data-theme="light"] nav,[data-theme="light"] #mob-nav{background:rgba(250,246,240,.97) !important}
@@ -105,7 +106,7 @@ nav{position:sticky;top:0;z-index:100;padding:0 1.5rem;height:60px;display:flex;
 
 /* HERO */
 .eyebrow{display:inline-flex;align-items:center;gap:.4rem;background:var(--glow2);border:1px solid var(--borderacc);border-radius:100px;padding:.3rem .85rem;font-size:.72rem;font-weight:700;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:1.1rem}
-h1{font-family:var(--font-display);font-size:clamp(2.8rem,8vw,4.2rem);font-weight:900;color:var(--white);line-height:1.04;letter-spacing:.05em;margin-bottom:1rem}
+h1{font-family:var(--font-body);font-size:clamp(2.8rem,8vw,4.2rem);font-weight:800;color:var(--white);line-height:1.07;letter-spacing:-.025em;margin-bottom:1rem}
 h1 em{font-style:normal;background:linear-gradient(135deg,#FF6B35 0%,#ff9f6b 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .lead{font-size:1.1rem;color:var(--gray1);line-height:1.75;margin-bottom:3.5rem;max-width:620px}
 
@@ -114,7 +115,7 @@ h1 em{font-style:normal;background:linear-gradient(135deg,#FF6B35 0%,#ff9f6b 100
 
 /* SECTION HEADING */
 .sec-label{font-size:.68rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:.7rem}
-h2{font-family:var(--font-display);font-size:clamp(1.9rem,5vw,2.8rem);font-weight:900;color:var(--white);line-height:1.08;letter-spacing:.06em;margin-bottom:1.1rem}
+h2{font-family:var(--font-body);font-size:clamp(1.9rem,5vw,2.8rem);font-weight:800;color:var(--white);line-height:1.12;letter-spacing:-.015em;margin-bottom:1.1rem}
 .body-text{font-size:1.03rem;color:var(--gray1);line-height:1.85;margin-bottom:1.15rem}
 .body-text:last-child{margin-bottom:0}
 
@@ -128,7 +129,7 @@ h2{font-family:var(--font-display);font-size:clamp(1.9rem,5vw,2.8rem);font-weigh
 .value-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:1.4rem}
 .value-card:hover{border-color:rgba(255,255,255,.13)}
 .value-icon{font-size:1.6rem;margin-bottom:.75rem}
-.value-title{font-family:var(--font-display);font-size:1.05rem;font-weight:800;color:var(--white);letter-spacing:.02em;margin-bottom:.4rem}
+.value-title{font-family:var(--font-body);font-size:1rem;font-weight:700;color:var(--white);letter-spacing:-.005em;margin-bottom:.4rem}
 .value-desc{font-size:.9rem;color:var(--gray1);line-height:1.7}
 @media(max-width:520px){.values-grid{grid-template-columns:1fr}}
 
@@ -140,13 +141,13 @@ h2{font-family:var(--font-display);font-size:clamp(1.9rem,5vw,2.8rem);font-weigh
 .founder-photo{width:100%;height:280px;object-fit:cover;object-position:center top;display:block}
 @supports (aspect-ratio:1){.founder-photo{height:auto;aspect-ratio:1/1}}
 .founder-body{padding:1.25rem}
-.founder-name{font-family:var(--font-display);font-size:1.3rem;font-weight:900;color:var(--white);letter-spacing:.06em}
+.founder-name{font-family:var(--font-body);font-size:1.2rem;font-weight:700;color:var(--white);letter-spacing:-.01em}
 .founder-role{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:.25rem 0 .75rem}
 .founder-bio{font-size:.9rem;color:var(--gray1);line-height:1.72}
 
 /* MISSION BAND */
 .mission-band{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r24);padding:2.5rem 2rem;text-align:center;margin-top:2rem}
-.mission-band p{font-family:var(--font-display);font-size:clamp(1.4rem,4vw,2rem);font-weight:800;color:var(--white);line-height:1.3;letter-spacing:.06em}
+.mission-band p{font-family:var(--font-body);font-size:clamp(1.4rem,4vw,2rem);font-weight:800;color:var(--white);line-height:1.3;letter-spacing:-.015em}
 .mission-band p em{font-style:normal;color:var(--accent)}
 .mission-sub{font-size:.95rem;color:var(--gray1);margin-top:.85rem;line-height:1.7}
 
@@ -173,8 +174,8 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 1.5
 
 <nav>
   <a href="index.html" class="nav-logo" aria-label="Squash GhostingX home">
-    <div class="nav-logo-icon">SX</div>
-    <span>Squash </span><span class="nav-logo-g">GhostingX</span>
+    <div class="logo-mark" aria-hidden="true">SX</div>
+    <span>Squash <span class="logo-g">GhostingX</span></span>
   </a>
   <div class="nav-links">
     <a href="index.html#feats">Features</a>
@@ -188,7 +189,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 1.5
       <button class="theme-btn"        data-t="light" onclick="setTheme('light')" aria-label="Light theme" title="Light"></button>
       <button class="theme-btn"        data-t="ocean" onclick="setTheme('ocean')" aria-label="Ocean theme" title="Ocean"></button>
     </div>
-    <a href="https://apps.apple.com/app/squashghostingx/id6744036820" class="nav-cta" target="_blank" rel="noopener noreferrer">Download Free</a>
+    <a href="index.html#download-cta" class="nav-cta">Download Free</a>
   </div>
   <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><b></b><b></b><b></b></button>
 </nav>
@@ -207,73 +208,75 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 1.5
       <button class="theme-btn"        data-t="ocean" onclick="setTheme('ocean')" aria-label="Ocean theme" title="Ocean"></button>
     </div>
   </div>
-    <a href="https://apps.apple.com/app/squashghostingx/id6744036820" target="_blank" rel="noopener noreferrer">Download Free</a>
+    <a href="index.html#download-cta" class="mob-dl">Download Free</a>
 </div>
 
 <main class="page">
 
   <!-- HERO -->
-  <div class="eyebrow">The reason it exists.</div>
-  <h1>Forty minutes. Every corner covered.<br>One question walking off <em>court.</em></h1>
-  <p class="lead">Every serious player knows the feeling. You finish forty minutes of solo ghosting &mdash; lungs burning, every position covered, the work genuinely done. And walking off court, a quiet question follows you: <em>was any of that actually making me better?</em> Varish and Darshika Gahlot spent years asking that question on courts they had entirely to themselves, before dawn. Squash GhostingX is the answer they built &mdash; and decided to give away for free.</p>
+  <div class="eyebrow">Why I built GhostingX</div>
+  <h1>I trained alone most of the time<br>and had no real way<br>to know if it was <em>working.</em></h1>
+  <p class="lead">So I built something to find out.</p>
 
   <div class="divider"></div>
 
   <!-- ORIGIN -->
-  <div class="sec-label">The Beginning</div>
-  <h2>Was any of that actually<br>making me <em>better?</em></h2>
+  <div class="sec-label">The Reason It Exists</div>
+  <h2>Every session ended the same:<br>a drive home and <em>no real answer.</em></h2>
 
-  <p class="body-text">Solo squash training has a problem nobody talks about: you can be disciplined, consistent, and genuinely hard-working &mdash; and still have no honest picture of whether any of it is moving your game forward. Ghosting drills get done. Positions get covered. Sweat gets produced. But without feedback, without data, there is no way to separate effort from progress. The drill that felt sharp on Tuesday might be reinforcing the same weak pattern it always has. You simply have no way to know.</p>
+  <p class="body-text">I started playing squash in middle school. My school didn&rsquo;t have a team, so I trained on my own &mdash; at local clubs, mostly before school. I competed in a lot of tournaments over the years. I worked hard at it. But I never really knew what was improving and what wasn&rsquo;t.</p>
 
-  <p class="body-text">That was Varish&rsquo;s world for years. On court at 6am, before the club opened, running ghost patterns with the kind of focus most players never find. The commitment was never in question. What was missing was any way to know whether it was working &mdash; which zones were weak, where pace was fading, whether this session&rsquo;s movement quality was actually sharper than last month&rsquo;s. At the professional level, coaches, video analysts, and movement data answer exactly these questions. For the rest of the squash world, you train on instinct and hope.</p>
+  <p class="body-text">The main drill I kept doing was ghosting. Sprint to a position, mimic a shot, back to the T, repeat. Every coach I&rsquo;d talked to said it was the most important solo movement drill in squash. I believed them. I did it a lot.</p>
 
   <div class="pull-quote">
-    <p>"I wanted the data that professional coaches have — position coverage, pace consistency, zone balance — in a format I could use alone, at 6am, on any court in the world. That tool didn't exist. So we built it."</p>
-    <cite>— Varish Gahlot, Co-Founder &amp; CEO</cite>
+    <p>&ldquo;I could feel the work. I just couldn&rsquo;t measure it. After a session I&rsquo;d go home not knowing which corners I was slow to, or whether any of it was actually helping.&rdquo;</p>
+    <cite>&mdash; Varish Gahlot, Founder</cite>
   </div>
 
-  <p class="body-text">Together with Darshika, Varish designed Squash GhostingX from the court up &mdash; not as a fitness timer with a squash label, but as a genuine training intelligence system built around how ghosting actually works: structured position sequencing, progressive pace overload, zone-weighted sessions, and session-over-session analytics that show the truth about your own movement over time.</p>
+  <p class="body-text">I asked a few other players about it. Same problem, different words. Some kept notes. Most just trained and hoped it would show up in their matches. Nobody had a real answer.</p>
 
-  <p class="body-text">When the app launched in 2025, the decision to make it completely free was never a marketing strategy. It was the whole point. Elite training tools have always been gated by money, access, and geography. Squash GhostingX removes all three barriers &mdash; for every player, at every level, on every court in the world.</p>
+  <p class="body-text">That gap bothered me. I couldn&rsquo;t find anything built to solve it. So I started figuring out how to build something myself.</p>
 
   <div class="divider"></div>
 
-  <!-- VISION / MISSION -->
-  <div class="sec-label">Vision &amp; Mission</div>
-  <h2>Elite training data for every player.<br>Not just <em>the few.</em></h2>
+  <!-- THE IDEA -->
+  <div class="sec-label">The Idea Behind GhostingX</div>
+  <h2>A voice to call positions.<br>A record of where<br>I was <em>slowest.</em></h2>
 
-  <p class="body-text">Ghosting is the foundation of squash fitness. Every elite player does it. Most club players know they should do more of it. The gap between knowing and actually doing &mdash; structured, measurable, progressive ghosting &mdash; is exactly where Squash GhostingX lives.</p>
+  <p class="body-text">I wanted something that called positions out loud while I ghosted, so I&rsquo;d be reacting instead of deciding where to go next. I wanted to know which corners I was consistently slow to. And I wanted to see that across multiple sessions &mdash; not just feel it once and forget it.</p>
 
-  <p class="body-text">Our goal is straightforward: every squash player, regardless of budget or access to a coach, should have the tools to train intelligently. An AI voice that calls positions. Analytics that surface weak zones over time. Programs built on movement science. A session history that gives honest data about your own development &mdash; not vague impressions.</p>
+  <p class="body-text">I didn&rsquo;t know how to code when I started. I learned as I went, fixed things when they broke, and showed early versions to other players to see what made sense to them and what didn&rsquo;t.</p>
+
+  <p class="body-text">The app runs without Wi-Fi because most courts don&rsquo;t have it. It&rsquo;s free because I built it for a problem I had, and charging for it didn&rsquo;t feel right.</p>
 
   <div class="mission-band">
-    <p>The best training tools shouldn't come with a price tag.<br><em>Squash GhostingX is free forever.</em></p>
-    <p class="mission-sub">Every court system. Every programme. AI voice in every language. Unlimited history. Full analytics. No trial, no subscription, no ads — for every player, at every level, forever. That's the founding commitment and it isn't changing.</p>
+    <p>GhostingX is free.<br><em>It always will be.</em></p>
+    <p class="mission-sub">Every court system, every programme, full session history, all analytics. No subscription, no trial. If it helps you train better, that&rsquo;s the point.</p>
   </div>
 
   <div class="divider"></div>
 
   <!-- FOUNDERS -->
-  <div class="sec-label">The Founders</div>
-  <h2>Two players who still<br>train with their own <em>app.</em></h2>
+  <div class="sec-label">Who Built This</div>
+  <h2>A player who needed it<br>and a co-founder<br>who made it <em>better.</em></h2>
 
-  <p class="body-text">Squash GhostingX wasn't designed in a boardroom or an accelerator. It was designed on court, by two players who still train with the app and who built each feature because they personally felt the gap it fills.</p>
+  <p class="body-text">GhostingX was built by a squash player who had the problem himself and a co-founder who kept asking whether it was actually useful. No outside investment, no accelerator. Just a training problem that needed a real answer.</p>
 
   <div class="founders-grid">
     <div class="founder-card">
-      <img src="Co-Founder%20%26%20CEO-Varish.jpg" alt="Varish Gahlot, Co-Founder and CEO of Squash GhostingX" class="founder-photo" loading="lazy">
+      <img src="Co-Founder%20%26%20CEO-Varish.jpg" alt="Varish Gahlot, Founder and Product Creator of Squash GhostingX" class="founder-photo" loading="lazy">
       <div class="founder-body">
         <div class="founder-name">Varish Gahlot</div>
-        <div class="founder-role">Co-Founder &amp; CEO</div>
-        <p class="founder-bio">Varish leads product vision and technology. His obsession with movement efficiency and data-driven training shaped every feature — from the AI voice engine and pace system to the analytics architecture that tracks your improvement session by session.</p>
+        <div class="founder-role">Founder &amp; Product Creator</div>
+        <p class="founder-bio">Varish has been playing squash competitively since middle school, mostly through local clubs without a school team. He built GhostingX because he needed it &mdash; and figured out how to build it because he couldn&rsquo;t find it anywhere else.</p>
       </div>
     </div>
     <div class="founder-card">
-      <img src="Co-Founder%20%26%20President-Darshika.JPG" alt="Darshika Gahlot, Co-Founder and COO of Squash GhostingX" class="founder-photo" loading="lazy">
+      <img src="Co-Founder%20%26%20President-Darshika.JPG" alt="Darshika Gahlot, Co-Founder and Community Lead of Squash GhostingX" class="founder-photo" loading="lazy">
       <div class="founder-body">
         <div class="founder-name">Darshika Gahlot</div>
-        <div class="founder-role">Co-Founder &amp; COO</div>
-        <p class="founder-bio">Darshika drives growth and community strategy. Her commitment to making elite-level training accessible to all players is the reason the app is free — and why it always will be. She ensures the product remains focused on real players with real court time, not just data enthusiasts.</p>
+        <div class="founder-role">Co-Founder &amp; Community Lead</div>
+        <p class="founder-bio">Darshika is Varish&rsquo;s co-founder. She pushed for the app to stay free from the beginning and kept the focus on whether it was genuinely helping players. A lot of what GhostingX became came from those conversations.</p>
       </div>
     </div>
   </div>
@@ -282,7 +285,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 1.5
 
   <!-- VALUES -->
   <div class="sec-label">What We Stand For</div>
-  <h2>The four principles we<br>won't compromise <em>on.</em></h2>
+  <h2>Four things<br>we won&rsquo;t <em>compromise on.</em></h2>
 
   <div class="values-grid">
     <div class="value-card">
@@ -313,20 +316,20 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 1.5
   <div class="cta-wrap">
     <div class="cta-label">Your first coached session starts here.</div>
     <div class="store-btns">
-      <a href="https://apps.apple.com/app/squashghostingx/id6744036820" class="store-btn" target="_blank" rel="noopener noreferrer" aria-label="Download Squash GhostingX on the App Store">
+      <a href="https://apps.apple.com/us/app/squash-ghostingx/id6749510678" class="store-btn" target="_blank" rel="noopener noreferrer" aria-label="Download Squash GhostingX on the App Store">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
         <span class="store-btn-label">
           <span class="store-btn-sub">Download on the</span>
           <span class="store-btn-name">App Store</span>
         </span>
       </a>
-      <a href="https://play.google.com/store/apps/details?id=com.squashghostingx.app" class="store-btn" target="_blank" rel="noopener noreferrer" aria-label="Get Squash GhostingX on Google Play">
+      <span class="store-btn" style="opacity:.42;cursor:not-allowed;" aria-label="Android – Coming Soon">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.18 23.76c.35.2.75.24 1.15.09l12.53-7.03-2.56-2.56-11.12 9.5zm-1.05-20.3C2.06 3.73 2 4.03 2 4.38v15.23c0 .35.06.65.13.92l.08.07 8.53-8.52v-.2l-8.53-8.52-.08.1zM20.49 10.7L17.9 9.23l-2.87 2.87 2.87 2.87 2.6-1.49c.74-.43.74-1.35-.01-1.78zm-17.31 11.5l11.12-9.5-2.56-2.55L2.13 17.7l1.05 4.5z"/></svg>
         <span class="store-btn-label">
-          <span class="store-btn-sub">Get it on</span>
-          <span class="store-btn-name">Google Play</span>
+          <span class="store-btn-sub">Android</span>
+          <span class="store-btn-name">Coming Soon</span>
         </span>
-      </a>
+      </span>
     </div>
   </div>
 

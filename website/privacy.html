@@ -31,7 +31,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23FF6B35'/%3E%3Ctext x='16' y='23' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='900' font-size='14'%3ESX%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#080401;--bg2:#0F0700;--bg3:#170C02;--bg4:#1E1104;
@@ -42,7 +42,7 @@
   --white:#FFFFFF;--text:#E8D5C4;
   --r8:8px;--r12:12px;--r16:16px;
   --font-display:'Barlow Condensed',sans-serif;
-  --font-body:'DM Sans',sans-serif;
+  --font-body:'Plus Jakarta Sans',sans-serif;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:16px;overflow-x:hidden;scroll-behavior:smooth;-webkit-text-size-adjust:100%}
@@ -54,12 +54,14 @@ img{max-width:100%;display:block}
 
 /* NAV */
 nav{position:sticky;top:0;z-index:100;padding:0 1.5rem;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,4,1,.94);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-.nav-logo{display:flex;align-items:center;gap:.7rem;font-family:var(--font-display);font-size:1.5rem;font-weight:900;color:var(--white);text-decoration:none;letter-spacing:.05em}
-.nav-logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#FF6B35 0%,#c0392b 100%);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:900;color:#fff;box-shadow:0 0 14px rgba(255,107,53,.4);flex-shrink:0}
-.nav-logo-g{background:linear-gradient(135deg,#FF6B35 0%,#ff9f6b 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-logo{display:flex;align-items:center;gap:.6rem;font-family:'Barlow Condensed',sans-serif;font-size:1.45rem;font-weight:900;color:var(--white);text-decoration:none;letter-spacing:.05em}
+.logo-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(140deg,#FF6B35 0%,#AA2F0E 100%);display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:900;color:#fff;box-shadow:0 0 18px rgba(255,107,53,.5),inset 0 1px 0 rgba(255,255,255,.18);flex-shrink:0}
+.logo-g{background:linear-gradient(135deg,#FF6B35,#FF9268);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .nav-links{display:flex;align-items:center;gap:1.5rem}
 .nav-links a{font-size:.84rem;font-weight:500;color:var(--gray1);transition:color .2s;text-decoration:none;white-space:nowrap}
 .nav-links a:hover{color:var(--white);text-decoration:none}
+.nav-links a[aria-current="page"]{color:var(--accent);font-weight:700;text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:2px;text-decoration-color:rgba(255,107,53,.5)}
+#mob-nav a[aria-current="page"]{color:var(--accent) !important;font-weight:700}
 .nav-cta{background:var(--accent);color:#fff !important;padding:.42rem 1rem;border-radius:8px;font-weight:700 !important;transition:background .2s !important}
 .nav-cta:hover{background:var(--accent-b) !important;color:#fff !important}
 .burger{display:none;flex-direction:column;justify-content:center;align-items:center;gap:5px;min-width:44px;min-height:44px;padding:0;cursor:pointer;background:none;border:none}
@@ -80,8 +82,8 @@ nav{position:sticky;top:0;z-index:100;padding:0 1.5rem;height:64px;display:flex;
 
 /* HEADER */
 .pp-header{margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--border)}
-.pp-label{font-family:var(--font-display);font-size:.8rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem}
-.pp-title{font-family:var(--font-display);font-size:clamp(2.4rem,7vw,3.5rem);font-weight:900;color:var(--white);line-height:1.05;letter-spacing:.05em;margin-bottom:1rem}
+.pp-label{font-family:var(--font-body);font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem}
+.pp-title{font-family:var(--font-body);font-size:clamp(2.4rem,7vw,3.5rem);font-weight:800;color:var(--white);line-height:1.08;letter-spacing:-.02em;margin-bottom:1rem}
 .pp-meta{font-size:.85rem;color:var(--gray2);display:flex;flex-wrap:wrap;gap:1.5rem}
 .pp-meta span{display:flex;align-items:center;gap:.35rem}
 
@@ -93,7 +95,7 @@ nav{position:sticky;top:0;z-index:100;padding:0 1.5rem;height:64px;display:flex;
 
 /* SECTIONS */
 .pp-section{margin-bottom:2.5rem}
-.pp-section h2{font-family:var(--font-display);font-size:1.45rem;font-weight:800;color:var(--white);letter-spacing:.01em;margin-bottom:.9rem;display:flex;align-items:center;gap:.5rem}
+.pp-section h2{font-family:var(--font-body);font-size:1.3rem;font-weight:700;color:var(--white);letter-spacing:-.01em;margin-bottom:.9rem;display:flex;align-items:center;gap:.5rem}
 .pp-section h2::before{content:'';display:inline-block;width:4px;height:1.2em;background:var(--accent);border-radius:2px;flex-shrink:0}
 .pp-section h3{font-size:1rem;font-weight:600;color:var(--white);margin:1.25rem 0 .5rem}
 .pp-section p{font-size:.95rem;color:var(--text);margin-bottom:.75rem}
@@ -105,7 +107,7 @@ nav{position:sticky;top:0;z-index:100;padding:0 1.5rem;height:64px;display:flex;
 
 /* CONTACT CARD */
 .pp-contact{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r16);padding:1.5rem;margin-top:1rem}
-.pp-contact-name{font-family:var(--font-display);font-size:1.2rem;font-weight:800;color:var(--white);margin-bottom:.75rem}
+.pp-contact-name{font-family:var(--font-body);font-size:1.1rem;font-weight:700;color:var(--white);margin-bottom:.75rem}
 .pp-contact-row{display:flex;align-items:center;gap:.6rem;font-size:.9rem;color:var(--gray1);margin-bottom:.4rem}
 .pp-contact-row a{color:var(--accent)}
 
@@ -127,8 +129,8 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 1.5
 
 <nav>
   <a href="index.html" class="nav-logo" aria-label="Squash GhostingX home">
-    <div class="nav-logo-icon">SX</div>
-    <span>Squash </span><span class="nav-logo-g">GhostingX</span>
+    <div class="logo-mark" aria-hidden="true">SX</div>
+    <span>Squash <span class="logo-g">GhostingX</span></span>
   </a>
   <div class="nav-links">
     <a href="index.html#feats">Features</a>
@@ -137,7 +139,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 1.5
     <a href="guide.html">Guide</a>
     <a href="support.html">Support</a>
     <a href="about.html">About</a>
-    <a href="https://apps.apple.com/app/squashghostingx/id6744036820" class="nav-cta" target="_blank" rel="noopener noreferrer">Download Free</a>
+    <a href="index.html#download-cta" class="nav-cta">Download Free</a>
   </div>
   <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><b></b><b></b><b></b></button>
 </nav>
@@ -148,7 +150,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem 1.5
   <a href="guide.html">Guide</a>
   <a href="support.html">Support</a>
   <a href="about.html">About</a>
-  <a href="https://apps.apple.com/app/squashghostingx/id6744036820" target="_blank" rel="noopener noreferrer">Download Free</a>
+  <a href="index.html#download-cta" class="mob-dl">Download Free</a>
 </div>
 
 <div class="page-wrap">

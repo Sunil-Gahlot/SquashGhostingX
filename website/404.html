@@ -18,7 +18,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23FF6B35'/%3E%3Ctext x='16' y='23' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='900' font-size='14'%3ESX%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#080401;--bg2:#0F0700;--bg3:#170C02;--bg4:#1E1104;
@@ -29,7 +29,7 @@
   --white:#FFFFFF;--text:#E8D5C4;
   --r8:8px;--r12:12px;--r16:16px;
   --font-display:'Barlow Condensed',sans-serif;
-  --font-body:'DM Sans',sans-serif;
+  --font-body:'Plus Jakarta Sans',sans-serif;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:16px;overflow-x:hidden}
@@ -38,21 +38,20 @@ a{color:var(--accent);text-decoration:none}
 a:hover{text-decoration:underline}
 
 nav{position:sticky;top:0;z-index:100;padding:0 1.5rem;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(8,4,1,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-.nav-logo{display:flex;align-items:center;gap:.75rem;font-family:var(--font-display);font-size:1.55rem;font-weight:900;letter-spacing:.05em;text-decoration:none}
-.nav-logo-icon{width:38px;height:38px;background:linear-gradient(135deg,#FF6B35 0%,#c0392b 100%);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:900;color:#fff;font-family:var(--font-display);box-shadow:0 0 18px rgba(255,107,53,.5),0 2px 8px rgba(0,0,0,.4);flex-shrink:0}
-.nav-logo-squash{color:#fff}
-.nav-logo-ghosting{background:linear-gradient(135deg,#FF6B35 0%,#ff9f6b 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-logo{display:flex;align-items:center;gap:.6rem;font-family:'Barlow Condensed',sans-serif;font-size:1.45rem;font-weight:900;letter-spacing:.05em;text-decoration:none}
+.logo-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(140deg,#FF6B35 0%,#AA2F0E 100%);display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:900;color:#fff;box-shadow:0 0 18px rgba(255,107,53,.5),inset 0 1px 0 rgba(255,255,255,.18);flex-shrink:0}
+.logo-g{background:linear-gradient(135deg,#FF6B35,#FF9268);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 
 .main{flex:1;display:flex;align-items:center;justify-content:center;padding:4rem 1.5rem}
 .wrap{max-width:520px;text-align:center}
 .err-code{font-family:var(--font-display);font-size:clamp(5rem,20vw,9rem);font-weight:900;line-height:1;background:linear-gradient(135deg,#FF6B35 0%,#cc4a18 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.25rem}
-.err-title{font-family:var(--font-display);font-size:clamp(1.6rem,5vw,2.4rem);font-weight:900;color:var(--white);margin-bottom:.75rem}
+.err-title{font-family:var(--font-body);font-size:clamp(1.6rem,5vw,2.4rem);font-weight:800;color:var(--white);margin-bottom:.75rem;letter-spacing:-.015em}
 .err-sub{font-size:.95rem;color:var(--gray1);margin-bottom:2rem;line-height:1.7}
 
 .nav-links-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:2rem}
 .nav-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:1rem 1.25rem;text-align:left;transition:border-color .2s;text-decoration:none;display:block}
 .nav-card:hover{border-color:var(--borderacc);text-decoration:none}
-.nav-card-title{font-family:var(--font-display);font-size:1.05rem;font-weight:800;color:var(--white);margin-bottom:.2rem}
+.nav-card-title{font-family:var(--font-body);font-size:1rem;font-weight:700;color:var(--white);margin-bottom:.2rem}
 .nav-card-desc{font-size:.8rem;color:var(--gray2);line-height:1.4}
 
 .home-btn{display:inline-flex;align-items:center;gap:.5rem;background:var(--accent);color:#fff;padding:.75rem 1.75rem;border-radius:var(--r8);font-size:1rem;font-weight:700;font-family:var(--font-body);transition:background .2s;text-decoration:none}
@@ -73,8 +72,8 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:1.5rem 1
 
 <nav>
   <a href="index.html" class="nav-logo" aria-label="Squash GhostingX Home">
-    <div class="nav-logo-icon">SX</div>
-    <span class="nav-logo-squash">Squash</span><span class="nav-logo-ghosting">GhostingX</span>
+    <div class="logo-mark" aria-hidden="true">SX</div>
+    <span>Squash <span class="logo-g">GhostingX</span></span>
   </a>
 </nav>
 
